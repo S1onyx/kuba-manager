@@ -1,5 +1,5 @@
 # ./caddy/Caddyfile
-kuba.yourdomain.de {
+:80 {
   encode gzip
 
   reverse_proxy /api/* backend:3000
