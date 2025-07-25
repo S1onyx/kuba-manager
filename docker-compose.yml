@@ -1,0 +1,85 @@
+# ./docker-compose.yml
+version: "3.8"
+
+services:
+  backend:
+    build: ./backend
+    container_name: kuba-backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - BASE_URL=${BASE_URL}
+    depends_on:
+      - postgres
+      - redis
+
+  admin-frontend:
+    build: ./frontend/admin
+    container_name: kuba-admin
+    environment:
+      - VITE_BACKEND_URL=${BASE_URL}/api
+    ports:
+      - "3001:80"
+
+  public-frontend:
+    build: ./frontend/public
+    container_name: kuba-public
+    environment:
+      - VITE_BACKEND_URL=${BASE_URL}/api
+    ports:
+      - "3002:80"
+
+  display-frontend:
+    build: ./frontend/display
+    container_name: kuba-display
+    environment:
+      - VITE_BACKEND_URL=${BASE_URL}/api
+    ports:
+      - "3003:80"
+
+  postgres:
+    image: postgres:16
+    container_name: kuba-postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=kuba
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: kuba-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+
+  caddy:
+    image: caddy:2
+    container_name: kuba-caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - backend
+      - admin-frontend
+      - public-frontend
+      - display-frontend
+
+volumes:
+  pg_data:
+  redis_data:
+  caddy_data:
+  caddy_config:

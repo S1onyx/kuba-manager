@@ -1,0 +1,23 @@
+# ./caddy/Caddyfile
+kuba.yourdomain.de {
+  encode gzip
+
+  reverse_proxy /api/* backend:3000
+  reverse_proxy /socket.io/* backend:3000
+
+  handle_path /admin/* {
+    reverse_proxy admin-frontend:80
+  }
+
+  handle_path /public/* {
+    reverse_proxy public-frontend:80
+  }
+
+  handle_path /display/* {
+    reverse_proxy display-frontend:80
+  }
+
+  handle {
+    respond "Not Found" 404
+  }
+}
