@@ -1,4 +1,3 @@
-# ./docker-compose.yml
 version: "3.8"
 
 services:
@@ -48,12 +47,16 @@ services:
     image: postgres:16
     container_name: kuba-postgres
     restart: always
+    ports: 
+      - "5432:5432"
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
       - POSTGRES_DB=kuba
+    # volumes verhindern, dass die DB neu erstellt wird
     volumes:
       - pg_data:/var/lib/postgresql/data
+      - ./postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
 
   redis:
     image: redis:7-alpine
