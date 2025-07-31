@@ -1,15 +1,9 @@
-import { Sequelize } from 'sequelize';
+import { Sequelize, DataTypes } from 'sequelize';
 import dotenv from 'dotenv';
 dotenv.config();
 
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
-  dialect: 'postgres',
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false // Nur für Entwicklungsumgebungen!
-    }
-  }
+  dialect: 'postgres'
 });
 
 // Definition der Modelle
@@ -59,6 +53,19 @@ const TournamentType = sequelize.define('TournamentType', {
   has_knockout_stage: Sequelize.BOOLEAN
 });
 
+const MatchStatus = sequelize.define('MatchStatus', {
+  id: {
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  name: {
+    type: DataTypes.ENUM('Scheduled', 'In Progress', 'Completed', 'Postponed'),
+    allowNull: false
+  },
+  description: Sequelize.STRING
+});
+
 const Match = sequelize.define('Match', {
   id: {
     type: Sequelize.INTEGER,
@@ -85,6 +92,19 @@ const MatchType = sequelize.define('MatchType', {
   name: Sequelize.STRING
 });
 
+const EventType = sequelize.define('EventType', {
+  id: {
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  name: {
+    type: DataTypes.ENUM('korb', 'Freiwurf', 'timeout', 'foul', 'strafe', 'pause', 'start', 'stop', 'extra_time'),
+    allowNull: false
+  },
+  description: Sequelize.STRING
+});
+
 const MatchEvent = sequelize.define('MatchEvent', {
   id: {
     type: Sequelize.INTEGER,
@@ -99,15 +119,6 @@ const MatchEvent = sequelize.define('MatchEvent', {
   player_id: Sequelize.INTEGER,
   points: Sequelize.INTEGER,
   time: Sequelize.INTEGER // Dauer bei Strafen
-});
-
-const EventType = sequelize.define('EventType', {
-  id: {
-    type: Sequelize.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  name: Sequelize.STRING
 });
 
 const TournamentTeam = sequelize.define('TournamentTeam', {
@@ -145,6 +156,12 @@ Tournament.hasMany(Match, { foreignKey: 'tournament_id' });
 MatchEvent.belongsTo(Match, { foreignKey: 'match_id' });
 Match.hasMany(MatchEvent, { foreignKey: 'match_id' });
 
+Match.belongsTo(MatchStatus, { foreignKey: 'status_id' });
+MatchStatus.hasMany(Match, { foreignKey: 'status_id' });
+
+MatchEvent.belongsTo(EventType, { foreignKey: 'event_type_id' });
+EventType.hasMany(MatchEvent, { foreignKey: 'event_type_id' });
+
 // Funktion zur Initialisierung der Datenbank und Erstellung der Tabellen
 export const initDatabase = async () => {
   try {
@@ -163,6 +180,7 @@ export {
   Team,
   Tournament,
   TournamentType,
+  MatchStatus,
   Match,
   MatchType,
   MatchEvent,

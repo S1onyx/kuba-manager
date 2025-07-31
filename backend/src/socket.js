@@ -1,55 +1,12 @@
-import { Match, MatchEvent } from './db.js';
+import { Match, MatchEvent, EventType } from './db.js';
+import { get } from './redis.js';
 
-export default function setupSocket(io) {
+function setupSocket(io) {
   io.on('connection', (socket) => {
     console.log('Socket connected:', socket.id);
 
-    socket.on('match:start', async (data) => {
-      console.log('Match Start:', data);
-      const { matchId, startTime, durationSeconds } = data;
-
-      // Match starten (Status ändern)
-      try {
-        const match = await Match.findByPk(matchId);
-        if (!match) {
-          console.log('Match not found');
-          return;
-        }
-
-        match.status_id = 1; // Angenommen 1 bedeutet "running"
-        await match.save();
-
-        io.emit('match:start', { matchId, startTime, durationSeconds });
-
-        // Timer starten (vereinfacht)
-        startTimer(io, matchId, durationSeconds);
-      } catch (error) {
-        console.error('Fehler beim Starten des Matches:', error);
-      }
-    });
-
-    socket.on('match:pause', (data) => {
-      console.log('Match Pause:', data);
-      io.emit('match:pause', data);
-      // Hier sollte die Logik zum Pausieren des Timers implementiert werden
-    });
-
-    socket.on('match:resume', (data) => {
-      console.log('Match Resume:', data);
-      io.emit('match:resume', data);
-      // Hier sollte die Logik zum Fortsetzen des Timers implementiert werden
-    });
-
-    socket.on('match:stop', (data) => {
-      console.log('Match Stop:', data);
-      io.emit('match:stop', data);
-      // Hier sollte die Logik zum Stoppen des Timers implementiert werden
-    });
-
-    socket.on('score:update', (data) => {
-      console.log('Score Update:', data);
-      io.emit('score:update', data);
-    });
+    // Starte den Timer für alle laufenden Matches
+    startTimers(io);
 
     socket.on('disconnect', () => {
       console.log('Socket disconnected:', socket.id);
@@ -57,17 +14,52 @@ export default function setupSocket(io) {
   });
 }
 
-function startTimer(io, matchId, durationSeconds) {
-  let remainingTime = durationSeconds;
+export async function publishMatchUpdate(io, matchId, match) {
+  // Lade alle Match Events
+  const matchEvents = await MatchEvent.findAll({ where: { match_id: matchId } });
 
-  const timer = setInterval(() => {
+  io.emit(`match:${matchId}:update`, {
+    match: match,
+    events: matchEvents
+  });
+}
+
+async function startTimers(io) {
+  const matches = await Match.findAll();
+
+  matches.forEach(async (match) => {
+    if (match.status_id === 2) { // Angenommen 2 bedeutet "läuft"
+      startTimer(io, match.id, match.duration_seconds);
+    }
+  });
+}
+
+async function startTimer(io, matchId, durationSeconds) {
+  let remainingTime = await get(`match:${matchId}:timer`);
+  if (!remainingTime) {
+    remainingTime = durationSeconds || 300;
+  } else {
+    remainingTime = parseInt(remainingTime);
+  }
+
+  const timer = setInterval(async () => {
     remainingTime--;
-    io.emit('timer:update', { matchId: matchId, remainingTime: remainingTime });
+
+    await get(`match:${matchId}:timer`, remainingTime);
+    io.emit(`match:${matchId}:timer:update`, { remainingTime });
 
     if (remainingTime <= 0) {
       clearInterval(timer);
       console.log('Timer abgelaufen für Match:', matchId);
+
       // Hier kann die Logik für das automatische Stoppen des Matches eingefügt werden
+      const match = await Match.findByPk(matchId);
+      match.status_id = 4; // Angenommen 4 bedeutet "abgebrochen"
+      await match.save();
+
+      publishMatchUpdate(io, matchId, match);
     }
   }, 1000);
 }
+
+export default setupSocket;

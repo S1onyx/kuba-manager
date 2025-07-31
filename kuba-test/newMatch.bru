@@ -1,0 +1,28 @@
+meta {
+  name: newMatch
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3000/api/matches
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "tournament_id": 1,
+    "type_id": 1,
+    "team_a": 1,
+    "team_b": 2,
+    "schedule_at": "2024-07-31T14:00:00.000Z",
+    "duration_seconds": 600,
+    "score_a": 0,
+    "score_b": 0
+  }
+}
+
+settings {
+  encodeUrl: true
+}
