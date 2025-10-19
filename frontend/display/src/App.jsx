@@ -1,128 +1,210 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom'; // Import useParams
-import socket from './socket';
-import Scoreboard from './components/Scoreboard';
-import Timer from './components/Timer';
+import { useEffect, useMemo, useState } from 'react';
+import Scoreboard from './components/Scoreboard.jsx';
+import Timer from './components/Timer.jsx';
+import socket from './socket.js';
+
+const BASE = import.meta.env.VITE_BACKEND_URL;
+const API_BASE = `${BASE}/api`;
+
+function formatTime(seconds = 0) {
+  const total = Math.max(0, Math.trunc(seconds));
+  const minutes = Math.floor(total / 60);
+  const secs = total % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
 
 export default function App() {
-  const [score, setScore] = useState({ teamA: 0, teamB: 0 });
-  const [teamNames, setTeamNames] = useState({ teamA: 'Team Rot', teamB: 'Team Blau' });
-  const [time, setTime] = useState(0); // Geändert zu number
-  const [isRunning, setIsRunning] = useState(false);
-  const { matchId } = useParams(); // Get matchId from URL
-  const [adjustment, setAdjustment] = useState(0);
+  const [scoreboard, setScoreboard] = useState(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    if (matchId) {
-      // Join the room for the specific match
-      socket.emit('joinMatch', matchId);
-    }
+    let active = true;
 
-    socket.on(`match:${matchId}:update`, (data) => {
-      console.log('Match Update:', data);
-      setScore({ teamA: data.match.score_a, teamB: data.match.score_b });
-    });
-
-    socket.on(`match:${matchId}:timer:update`, (data) => {
-      setTime(data.remainingTime); // Speichert die verbleibende Zeit
-    });
-
-    socket.on('match:start', (data) => {
-      setIsRunning(true);
-    });
-
-    socket.on('match:pause', (data) => {
-      setIsRunning(false);
-    });
-
-    socket.on('match:resume', (data) => {
-      setIsRunning(true);
-    });
-
-    socket.on('match:stop', (data) => {
-      setIsRunning(false);
-      setTime(0); // Setze die Zeit zurück
-    });
-
-    socket.on('teams:update', setTeamNames);
+    fetch(`${API_BASE}/scoreboard`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Scoreboard Anfrage fehlgeschlagen');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (active) {
+          setScoreboard(data);
+          setError('');
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        if (active) {
+          setError('Scoreboard konnte nicht geladen werden.');
+        }
+      });
 
     return () => {
-      socket.off(`match:${matchId}:update`);
-      socket.off(`match:${matchId}:timer:update`);
-      socket.off('match:start');
-      socket.off('match:pause');
-      socket.off('match:resume');
-      socket.off('match:stop');
-      socket.off('teams:update');
+      active = false;
     };
-  }, [matchId, socket]);
+  }, []);
 
-  // Funktion zur Formatierung der Zeit in MM:SS
-  const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    const formattedMinutes = String(minutes).padStart(2, '0');
-    const formattedSeconds = String(remainingSeconds).padStart(2, '0');
-    return `${formattedMinutes}:${formattedSeconds}`;
+  useEffect(() => {
+    const handleUpdate = (payload) => {
+      setScoreboard(payload);
+      setError('');
+    };
+
+    socket.on('scoreboard:update', handleUpdate);
+    return () => {
+      socket.off('scoreboard:update', handleUpdate);
+    };
+  }, []);
+
+  const formattedRemaining = useMemo(() => {
+    return formatTime(scoreboard?.remainingSeconds ?? 0);
+  }, [scoreboard?.remainingSeconds]);
+
+  const score = useMemo(() => ({
+    teamA: scoreboard?.scoreA ?? 0,
+    teamB: scoreboard?.scoreB ?? 0
+  }), [scoreboard?.scoreA, scoreboard?.scoreB]);
+
+  const teamNames = useMemo(() => ({
+    teamA: scoreboard?.teamAName ?? 'Team A',
+    teamB: scoreboard?.teamBName ?? 'Team B'
+  }), [scoreboard?.teamAName, scoreboard?.teamBName]);
+
+  const extraExpected = useMemo(() => {
+    if (!scoreboard || (scoreboard.extraSeconds ?? 0) === 0) {
+      return null;
+    }
+    return formatTime(scoreboard.extraSeconds ?? 0);
+  }, [scoreboard?.extraSeconds]);
+
+  const extraElapsed = useMemo(() => {
+    if (!scoreboard || (scoreboard.extraElapsedSeconds ?? 0) === 0) {
+      return null;
+    }
+    return formatTime(scoreboard.extraElapsedSeconds ?? 0);
+  }, [scoreboard?.extraElapsedSeconds]);
+
+  const halftimeFormatted = useMemo(() => {
+    if (!scoreboard || !scoreboard.halftimeSeconds) {
+      return null;
+    }
+    return formatTime(scoreboard.halftimeSeconds);
+  }, [scoreboard?.halftimeSeconds]);
+
+  const penalties = scoreboard?.penalties ?? { a: [], b: [] };
+  const currentHalf = scoreboard?.currentHalf ?? 1;
+  const isHalftimeBreak = Boolean(scoreboard?.isHalftimeBreak);
+  const halftimeBreakRemaining = isHalftimeBreak ? formatTime(scoreboard?.halftimePauseRemaining ?? 0) : null;
+  const isExtraTime = Boolean(scoreboard?.isExtraTime);
+
+  const pageStyle = {
+    minHeight: '100vh',
+    background: 'radial-gradient(circle at top, #1f3b73 0%, #0b1a2b 55%, #050d1a 100%)',
+    color: '#ffffff',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '3rem 3vw',
+    gap: '3rem'
   };
 
-  const handleStartMatch = () => {
-    socket.emit('match:start', { matchId: matchId });
+  const penaltiesWrapperStyle = {
+    width: '100%',
+    maxWidth: '1200px',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+    gap: '1.75rem'
   };
 
-  const handlePauseMatch = () => {
-    socket.emit('match:pause', { matchId: matchId });
+  const penaltyCardStyle = {
+    padding: '1.5rem',
+    background: 'rgba(0,0,0,0.35)',
+    borderRadius: '18px',
+    boxShadow: '0 15px 35px rgba(0,0,0,0.3)',
+    backdropFilter: 'blur(4px)',
+    textAlign: 'left'
   };
 
-  const handleResumeMatch = () => {
-    socket.emit('match:resume', { matchId: matchId });
+  const penaltyListStyle = {
+    listStyle: 'none',
+    padding: 0,
+    margin: 0,
+    display: 'grid',
+    gap: '0.65rem'
   };
 
-  const handleStopMatch = () => {
-    socket.emit('match:stop', { matchId: matchId });
-  };
-
-  const handleAdjustTimer = () => {
-    socket.emit('timer:adjust', { matchId: matchId, adjustment: adjustment });
+  const penaltyItemStyle = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    background: 'rgba(255,255,255,0.12)',
+    padding: '0.6rem 0.9rem',
+    borderRadius: '10px',
+    fontSize: '1.2rem'
   };
 
   return (
-    <div style={{ textAlign: 'center', padding: '2rem' }}>
-      <h1 style={{ fontSize: '4rem' }}>Kunstrad Basketball</h1>
+    <div style={pageStyle}>
+      <header style={{ textAlign: 'center' }}>
+        <h1 style={{ fontSize: '4.5rem', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '1rem' }}>
+          Kunstrad Basketball
+        </h1>
+        {error && <p style={{ color: '#ff8a80', fontSize: '1.2rem' }}>{error}</p>}
+      </header>
+
       <Scoreboard score={score} teamNames={teamNames} />
-      <Timer time={formatTime(time)} isRunning={isRunning} /> {/* Übergabe von isRunning */}
 
-      {/* Testfunktionen */}
-      {/* Testfunktionen sind nur sichtbar, wenn eine Match-ID vorhanden ist */}
-      {matchId && (
-        <div style={{ marginTop: '2rem', border: '1px solid white', padding: '1rem' }}>
-          <h2>Testfunktionen</h2>
-          <div>
-            <label htmlFor="matchId">Match ID:</label>
-            <input
-              type="text"
-              id="matchId"
-              value={matchId}
-              disabled // Match ID ist jetzt aus der URL
-            />
-          </div>
-          <button onClick={handleStartMatch}>Start Match</button>
-          <button onClick={handlePauseMatch}>Pause Match</button>
-          <button onClick={handleResumeMatch}>Resume Match</button>
-          <button onClick={handleStopMatch}>Stop Match</button>
+      <Timer
+        time={formattedRemaining}
+        isRunning={Boolean(scoreboard?.isRunning)}
+        extraTime={extraExpected}
+        extraElapsed={extraElapsed}
+        halftimeAt={halftimeFormatted}
+        half={currentHalf}
+        isHalftimeBreak={isHalftimeBreak}
+        halftimeBreakRemaining={halftimeBreakRemaining}
+        isExtraTime={isExtraTime}
+      />
 
-          <div>
-            <label htmlFor="adjustment">Timer Adjustment (seconds):</label>
-            <input
-              type="number"
-              id="adjustment"
-              value={adjustment}
-              onChange={(e) => setAdjustment(parseInt(e.target.value))}
-            />
-            <button onClick={handleAdjustTimer}>Adjust Timer</button>
-          </div>
-        </div>
-      )}
+      <section style={penaltiesWrapperStyle}>
+        {['a', 'b'].map((teamKey) => {
+          const list = penalties[teamKey] ?? [];
+          const name = teamKey === 'a' ? teamNames.teamA : teamNames.teamB;
+
+          return (
+            <article key={teamKey} style={penaltyCardStyle}>
+              <h3 style={{
+                margin: 0,
+                marginBottom: '1rem',
+                textTransform: 'uppercase',
+                fontSize: '1.5rem',
+                letterSpacing: '0.08em'
+              }}>
+                Zeitstrafen {name}
+              </h3>
+              {list.length === 0 ? (
+                <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '1.1rem' }}>Keine laufenden Strafen</p>
+              ) : (
+                <ul style={penaltyListStyle}>
+                  {list.map((penalty) => (
+                    <li
+                      key={penalty.id}
+                      style={{
+                        ...penaltyItemStyle,
+                        opacity: penalty.isExpired ? 0.6 : 1
+                      }}
+                    >
+                      <span>{penalty.name}</span>
+                      <span>{penalty.isExpired ? 'abgelaufen' : formatTime(penalty.remainingSeconds)}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </article>
+          );
+        })}
+      </section>
     </div>
   );
 }

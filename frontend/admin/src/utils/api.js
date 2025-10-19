@@ -1,21 +1,136 @@
 const BASE = import.meta.env.VITE_BACKEND_URL;
+const API_BASE = `${BASE}/api`;
 
-export async function login(username, password) {
-  const res = await fetch(`${BASE}/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password })
+async function request(path, options = {}) {
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    }
   });
-  if (!res.ok) throw new Error('Login failed');
-  const data = await res.json();
-  return data.token;
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || 'Request failed');
+  }
+
+  if (response.status === 204) {
+    return null;
+  }
+
+  return response.json();
 }
 
-export async function getMatches() {
-  const token = localStorage.getItem('token');
-  const res = await fetch(`${BASE}/matches`, {
-    headers: { Authorization: `Bearer ${token}` }
+export function fetchScoreboard() {
+  return request('/scoreboard');
+}
+
+export function updateTeams(payload) {
+  return request('/scoreboard/teams', {
+    method: 'POST',
+    body: JSON.stringify(payload)
   });
-  if (!res.ok) throw new Error('Unauthorized');
-  return await res.json();
+}
+
+export function mutateScore(team, points) {
+  return request('/scoreboard/score', {
+    method: 'POST',
+    body: JSON.stringify({ team, points })
+  });
+}
+
+export function setScoreAbsolute(team, score) {
+  return request('/scoreboard/score/set', {
+    method: 'POST',
+    body: JSON.stringify({ team, score })
+  });
+}
+
+export function resetScoreboard() {
+  return request('/scoreboard/score/reset', {
+    method: 'POST'
+  });
+}
+
+export function startScoreboardTimer() {
+  return request('/scoreboard/start', {
+    method: 'POST'
+  });
+}
+
+export function pauseScoreboardTimer() {
+  return request('/scoreboard/pause', {
+    method: 'POST'
+  });
+}
+
+export function setScoreboardTimer(seconds) {
+  return request('/scoreboard/timer', {
+    method: 'POST',
+    body: JSON.stringify({ seconds })
+  });
+}
+
+export function addPenalty(team, name, seconds) {
+  return request('/scoreboard/penalties', {
+    method: 'POST',
+    body: JSON.stringify({ team, name, seconds })
+  });
+}
+
+export function removePenalty(id) {
+  return request(`/scoreboard/penalties/${id}`, {
+    method: 'DELETE'
+  });
+}
+
+export function setHalftime(seconds) {
+  return request('/scoreboard/halftime', {
+    method: 'POST',
+    body: JSON.stringify({ seconds })
+  });
+}
+
+export function setExtraTime(seconds) {
+  return request('/scoreboard/extra-time', {
+    method: 'POST',
+    body: JSON.stringify({ seconds })
+  });
+}
+
+export function setHalftimePause(seconds) {
+  return request('/scoreboard/halftime/pause', {
+    method: 'POST',
+    body: JSON.stringify({ seconds })
+  });
+}
+
+export function finishGame() {
+  return request('/scoreboard/finish', {
+    method: 'POST'
+  });
+}
+
+export function startNewGame() {
+  return request('/scoreboard/game/new', {
+    method: 'POST'
+  });
+}
+
+export function fetchHistory() {
+  return request('/scoreboard/history');
+}
+
+export function updateHistoryGame(id, payload) {
+  return request(`/scoreboard/history/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload)
+  });
+}
+
+export function deleteHistoryGame(id) {
+  return request(`/scoreboard/history/${id}`, {
+    method: 'DELETE'
+  });
 }
