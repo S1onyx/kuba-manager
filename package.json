@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "mysql2": "^3.15.2",
+    "pg": "^8.16.3",
+    "pg-hstore": "^2.3.4",
+    "react-router-dom": "^7.7.1",
+    "sequelize": "^6.37.7"
+  }
+}
