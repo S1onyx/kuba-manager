@@ -21,7 +21,8 @@ export function resetGame() {
     teamBName: state.teamBName,
     teamAId: state.teamAId,
     teamBId: state.teamBId,
-    scheduleCode: state.scheduleCode
+    scheduleCode: state.scheduleCode,
+    displayView: state.displayView
   };
 
   Object.assign(state, createDefaultState(context));

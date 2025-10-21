@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Scoreboard from './components/Scoreboard.jsx';
 import Timer from './components/Timer.jsx';
 import GroupStandings from './components/GroupStandings.jsx';
+import BracketView from './components/bracket/BracketView.jsx';
+import FullscreenToggle from './components/FullscreenToggle.jsx';
 import socket from './socket.js';
 
 const BASE = import.meta.env.VITE_BACKEND_URL;
@@ -35,6 +37,25 @@ export default function App() {
   const [standingsLoading, setStandingsLoading] = useState(false);
   const [recordedGamesCount, setRecordedGamesCount] = useState(0);
   const standingsContextRef = useRef(null);
+  const displayView = scoreboard?.displayView ?? 'scoreboard';
+  const [structure, setStructure] = useState(null);
+  const [structureError, setStructureError] = useState('');
+  const [structureLoading, setStructureLoading] = useState(false);
+  const structureContextRef = useRef({ tournamentId: null });
+  const rootRef = useRef(null);
+  const contentRef = useRef(null);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    const previousMargin = document.body.style.margin;
+    document.body.style.overflow = 'hidden';
+    document.body.style.margin = '0';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.body.style.margin = previousMargin;
+    };
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -131,6 +152,104 @@ export default function App() {
     };
   }, [scoreboard?.tournamentId, scoreboard?.stageType, scoreboard?.stageLabel, scoreboard?.scoreA, scoreboard?.scoreB, scoreboard?.lastUpdated]);
 
+  useEffect(() => {
+    if (displayView !== 'bracket' || !scoreboard?.tournamentId) {
+      structureContextRef.current = { tournamentId: null };
+      setStructure(null);
+      setStructureError('');
+      setStructureLoading(false);
+      return;
+    }
+
+    const activeTournamentId = scoreboard.tournamentId;
+    if (structureContextRef.current.tournamentId === activeTournamentId && structure) {
+      return;
+    }
+
+    let cancelled = false;
+    setStructureLoading(true);
+
+    fetch(`${API_BASE}/scoreboard/structure`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('failed');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (cancelled) return;
+        setStructure(data?.structure ?? null);
+        setStructureError('');
+        structureContextRef.current = { tournamentId: activeTournamentId };
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.error(err);
+        setStructure(null);
+        setStructureError('Turnierstruktur konnte nicht geladen werden.');
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setStructureLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [displayView, scoreboard?.tournamentId, structure]);
+
+  useEffect(() => {
+    const updateScale = () => {
+      if (!rootRef.current || !contentRef.current) {
+        return;
+      }
+      const container = rootRef.current;
+      const content = contentRef.current;
+      const contentWidth = content.offsetWidth;
+      const contentHeight = content.offsetHeight;
+      if (!contentWidth || !contentHeight) {
+        return;
+      }
+      const computed = window.getComputedStyle(container);
+      const paddingX =
+        parseFloat(computed.paddingLeft || '0') + parseFloat(computed.paddingRight || '0');
+      const paddingY =
+        parseFloat(computed.paddingTop || '0') + parseFloat(computed.paddingBottom || '0');
+      const availableWidth = Math.max(container.clientWidth - paddingX, 50);
+      const availableHeight = Math.max(container.clientHeight - paddingY, 50);
+      const nextScale = Math.min(availableWidth / contentWidth, availableHeight / contentHeight);
+      const clamped = Math.max(Math.min(nextScale, 1.6), 0.45);
+      setScale(clamped);
+    };
+
+    updateScale();
+
+    const resizeObserver = typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(updateScale)
+      : null;
+
+    if (resizeObserver && contentRef.current) {
+      resizeObserver.observe(contentRef.current);
+    }
+
+    window.addEventListener('resize', updateScale);
+    return () => {
+      window.removeEventListener('resize', updateScale);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+    };
+  }, [
+    displayView,
+    scoreboard?.lastUpdated,
+    structure?.tournament?.id,
+    structure?.groups?.length,
+    structure?.schedule?.knockout?.length,
+    structure?.schedule?.placement?.length,
+    recordedGamesCount
+  ]);
+
   const formattedRemaining = useMemo(() => {
     return formatTime(scoreboard?.remainingSeconds ?? 0);
   }, [scoreboard?.remainingSeconds]);
@@ -173,15 +292,44 @@ export default function App() {
   const isExtraTime = Boolean(scoreboard?.isExtraTime);
   const showStandingsSection = scoreboard?.stageType === 'group' && Array.isArray(standings) && standings.length > 0;
 
-  const pageStyle = {
-    minHeight: '100vh',
+  const rootWrapperStyle = {
+    width: '100vw',
+    height: '100vh',
     background: 'radial-gradient(circle at top, #1f3b73 0%, #0b1a2b 55%, #050d1a 100%)',
     color: '#ffffff',
+    overflow: 'hidden',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    position: 'relative'
+  };
+
+  const scaledLayoutStyle = {
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    overflow: 'hidden',
+    boxSizing: 'border-box'
+  };
+
+  const scaledContentStyle = {
+    transform: `scale(${scale})`,
+    transformOrigin: 'top center',
+    width: '1600px',
+    margin: '0 auto'
+  };
+
+  const basePageStyle = {
+    width: '1600px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    padding: '3rem 3vw',
-    gap: '3rem'
+    padding: '2.5rem 3rem',
+    gap: '2.2rem',
+    boxSizing: 'border-box',
+    color: '#ffffff'
   };
 
   const penaltiesWrapperStyle = {
@@ -219,8 +367,47 @@ export default function App() {
     fontSize: '1.2rem'
   };
 
-  return (
-    <div style={pageStyle}>
+  const scoreboardPageStyle = basePageStyle;
+  const bracketPageStyle = { ...basePageStyle, gap: '2.5rem' };
+  const tournamentName = scoreboard?.tournamentName || standingsMeta?.tournamentName || structure?.tournament?.name || '';
+  const bracketTournamentName = scoreboard?.tournamentName || structure?.tournament?.name || '';
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const autoFullscreen = searchParams?.has('fullscreen');
+
+  const bracketContent = (
+    <div style={bracketPageStyle}>
+      <header style={{ textAlign: 'center' }}>
+        <h1 style={{ fontSize: '4.2rem', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '1rem' }}>
+          Kunstrad Basketball
+        </h1>
+        <p style={{ fontSize: '1.4rem', opacity: 0.8, letterSpacing: '0.05em' }}>
+          Turnierbaum & Gruppenübersicht
+        </p>
+        {error && <p style={{ color: '#ff8a80', fontSize: '1.2rem', marginTop: '0.75rem' }}>{error}</p>}
+      </header>
+
+      {!scoreboard?.tournamentId ? (
+        <p style={{ fontSize: '1.4rem', opacity: 0.8, textAlign: 'center' }}>
+          Kein Turnier ausgewählt. Bitte im Admin-Panel ein Turnier für das Scoreboard setzen.
+        </p>
+      ) : structureLoading ? (
+        <p style={{ fontSize: '1.4rem', textAlign: 'center' }}>Lade Turnierstruktur…</p>
+      ) : structureError ? (
+        <p style={{ fontSize: '1.4rem', textAlign: 'center', color: '#ff8a80' }}>{structureError}</p>
+      ) : !structure ? (
+        <p style={{ fontSize: '1.4rem', textAlign: 'center', opacity: 0.8 }}>
+          Noch keine Turnierstruktur verfügbar. Bitte im Admin-Panel Spielplan und Gruppen pflegen.
+        </p>
+      ) : (
+        <div style={{ width: '100%' }}>
+          <BracketView tournamentName={bracketTournamentName} structure={structure} />
+        </div>
+      )}
+    </div>
+  );
+
+  const scoreboardContent = (
+    <div style={scoreboardPageStyle}>
       <header style={{ textAlign: 'center' }}>
         <h1 style={{ fontSize: '4.5rem', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '1rem' }}>
           Kunstrad Basketball
@@ -228,14 +415,14 @@ export default function App() {
         {error && <p style={{ color: '#ff8a80', fontSize: '1.2rem' }}>{error}</p>}
       </header>
 
-      {(scoreboard?.tournamentName || standingsMeta?.tournamentName || scoreboard?.stageLabel) && (
+      {tournamentName || scoreboard?.stageLabel ? (
         <div style={{ textAlign: 'center' }}>
-          {scoreboard?.tournamentName && (
+          {tournamentName ? (
             <h2 style={{ fontSize: '2.4rem', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-              {scoreboard.tournamentName}
+              {tournamentName}
             </h2>
-          )}
-          {scoreboard?.stageLabel && (
+          ) : null}
+          {scoreboard?.stageLabel ? (
             <p style={{ fontSize: '1.6rem', opacity: 0.85, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
               <span>
                 {scoreboard.stageType === 'group'
@@ -252,9 +439,9 @@ export default function App() {
                 </span>
               ) : null}
             </p>
-          )}
+          ) : null}
         </div>
-      )}
+      ) : null}
 
       <Scoreboard score={score} teamNames={teamNames} />
 
@@ -324,6 +511,19 @@ export default function App() {
           )}
         </section>
       )}
+    </div>
+  );
+
+  const activeContent = displayView === 'bracket' ? bracketContent : scoreboardContent;
+
+  return (
+    <div ref={rootRef} style={rootWrapperStyle}>
+      <div style={scaledLayoutStyle}>
+        <div ref={contentRef} style={scaledContentStyle}>
+          {activeContent}
+        </div>
+      </div>
+      <FullscreenToggle auto={autoFullscreen} />
     </div>
   );
 }

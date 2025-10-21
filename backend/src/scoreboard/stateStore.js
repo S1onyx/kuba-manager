@@ -1,4 +1,6 @@
 const DEFAULT_DURATION_SECONDS = 10 * 60;
+const DISPLAY_VIEWS = ['scoreboard', 'bracket'];
+const DEFAULT_DISPLAY_VIEW = DISPLAY_VIEWS[0];
 
 function normalizeGroupStageLabel(input) {
   const raw = String(input ?? '').trim();
@@ -44,6 +46,7 @@ function createDefaultState(overrides = {}) {
     stageType: null,
     stageLabel: '',
     scheduleCode: null,
+    displayView: DEFAULT_DISPLAY_VIEW,
     lastUpdated: new Date().toISOString(),
     ...overrides
   };
@@ -51,6 +54,13 @@ function createDefaultState(overrides = {}) {
   if (base.stageType === 'group') {
     base.stageLabel = normalizeGroupStageLabel(base.stageLabel);
   }
+
+  const normalizedDisplayView = typeof base.displayView === 'string'
+    ? base.displayView.toLowerCase().trim()
+    : DEFAULT_DISPLAY_VIEW;
+  base.displayView = DISPLAY_VIEWS.includes(normalizedDisplayView)
+    ? normalizedDisplayView
+    : DEFAULT_DISPLAY_VIEW;
 
   return base;
 }
@@ -116,4 +126,10 @@ export function resetState(overrides = {}) {
   notifySubscribers();
 }
 
-export { DEFAULT_DURATION_SECONDS, normalizeGroupStageLabel, createDefaultState };
+export {
+  DEFAULT_DURATION_SECONDS,
+  normalizeGroupStageLabel,
+  createDefaultState,
+  DISPLAY_VIEWS,
+  DEFAULT_DISPLAY_VIEW
+};

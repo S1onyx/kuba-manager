@@ -7,18 +7,31 @@ export function usePublicTournaments() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const intervalRef = useRef(null);
+  const initializedRef = useRef(false);
+  const fetchingRef = useRef(false);
 
   const refresh = useCallback(async () => {
-    try {
+    if (fetchingRef.current) {
+      return;
+    }
+    fetchingRef.current = true;
+
+    if (!initializedRef.current) {
       setLoading(true);
+    }
+
+    try {
       const data = await fetchPublicTournaments();
       setPublicTournaments(Array.isArray(data) ? data : []);
       setError('');
+      initializedRef.current = true;
     } catch (err) {
       console.error(err);
       setError('Öffentliche Turniere konnten nicht geladen werden.');
     } finally {
+      initializedRef.current = true;
       setLoading(false);
+      fetchingRef.current = false;
     }
   }, []);
 

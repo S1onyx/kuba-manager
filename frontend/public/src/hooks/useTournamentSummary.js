@@ -8,6 +8,8 @@ export function useTournamentSummary(selectedTournamentId) {
   const [loading, setLoading] = useState(false);
   const intervalRef = useRef(null);
   const targetIdRef = useRef(null);
+  const initializedRef = useRef(false);
+  const fetchingRef = useRef(false);
 
   const refresh = useCallback(
     async (explicitId) => {
@@ -20,17 +22,27 @@ export function useTournamentSummary(selectedTournamentId) {
 
       targetIdRef.current = targetId;
 
-      try {
+      if (fetchingRef.current) {
+        return;
+      }
+      fetchingRef.current = true;
+
+      if (!initializedRef.current) {
         setLoading(true);
+      }
+
+      try {
         const data = await fetchTournamentSummary(targetId);
         setSummary(data);
         setError('');
+        initializedRef.current = true;
       } catch (err) {
         console.error(err);
         setError('Turnierübersicht konnte nicht geladen werden.');
         setSummary(null);
       } finally {
         setLoading(false);
+        fetchingRef.current = false;
       }
     },
     []
@@ -45,6 +57,7 @@ export function useTournamentSummary(selectedTournamentId) {
 
     if (!selectedTournamentId) {
       setSummary(null);
+      initializedRef.current = false;
       return undefined;
     }
 

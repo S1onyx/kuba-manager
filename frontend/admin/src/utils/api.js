@@ -142,6 +142,13 @@ export function updateMatchContext(payload) {
   });
 }
 
+export function setDisplayView(view) {
+  return request('/scoreboard/display', {
+    method: 'POST',
+    body: JSON.stringify({ view })
+  });
+}
+
 export function selectScheduleMatch(tournamentId, scheduleCode) {
   return request('/scoreboard/schedule/select', {
     method: 'POST',

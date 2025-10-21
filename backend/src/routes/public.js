@@ -41,6 +41,7 @@ function sanitizeScoreboardState(state) {
     stageType: state.stageType,
     stageLabel: state.stageLabel,
     penalties: state.penalties,
+    displayView: state.displayView,
     lastUpdated: state.lastUpdated,
     scheduleCode: state.scheduleCode
   };

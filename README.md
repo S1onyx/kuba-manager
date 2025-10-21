@@ -43,13 +43,15 @@ entsprechend an.
 
 ## Geplante Features
 
-- Die Beameranzeige soll später im vollbildmodus startbar sein, es ist wichtig das immer alles auf einem bildschirm zu sehen ist!!!
 - In der Beameranzeige soll man über das admin panel auch andere dinge anzeigen lassen können. 1. Der Live stand (so wie jetzt), 2. Der Tunierbaum also bitte wenn vorhanden am anfang die tabellen der Gruppenphasen und dannd die ko Runden spiele, wenn vorhandn schon mit ergebnis und den partnern...
+- Die Beameranzeige soll später im vollbildmodus startbar sein, es ist wichtig das immer alles auf einem bildschirm zu sehen ist!!!
 - Im public interface soll das aktuelle Spiel in einem extra "Live" Tab angezeigt werden.
 - Es wird ein impressum benötigt, da die applikation gehostet werden soll.
-- Hosting: Alles soll in docker lauffähig sein. Dann über github workflow push auf dockerhub und dann update auf server. Mittels github workflows soll man die applikation auf dem server starten, stoppen und updaten können.
+- Hosting: Alles soll in docker lauffähig sein. Dann über github workflow push auf dockerhub und dann update auf server. Mittels github workflows soll man die applikation auf dem server starten, stoppen und updaten können. Auf dem server soll dann einfach ein dockercompose file liegen. Denke am beten wäre caddy, aber keine Ahnung. Stell mir gerne Fragen, wenn irgendwas unklar ist. Ich habe einen vServer mit folgender ip: 46.224.14.124 Hierauf sollen später auch die verschiedenen interfaces über die ports erreichbar sein. Folgender Github Secrets stehen zu verfügung: DEPLOY_KEY, SSH_USER, SERVER_IP, DEPLOY_PATH
 - Jedes Team besteht aus 4-5 Playern, genaues Tracking wer wann und wie lange eine Strafe hat. Wer Wann einen Korb geworfen hat. Extra Tab im Public interface mit Player Statistiken
 - User Management mit Admin, User und Beamer Accounts. Bestätigung der Accounts durch den Admin. Login ins Admin Panel und Beamer Anzeige. Optionaler Login in Public Interface. Speicherung der Sessions in Cookies (24h)
 - Wettsystem: Eingeloggte User können virtuelle Coins auf den Sieger der geplanten matches setzen. Beim richtigen Tipp gewinn von Betrag X (guter Algorithums nötig). Eigener Tab mit Tippspieltabelle! Hier sollen user gerankt werden, wer am ende am besten getippt hat. (Gewinner tipp, unentschieden und genauer Endstand) Coins kann man nur durch Admins über das admin panel zugeschrieben bkeommen. Im admin panel soll das usermanagement sein.
 
+## Impressum hinterlegen
 
+Im öffentlichen Dashboard gibt es jetzt einen „Impressum“-Button im Footer. Damit die Anwendung konform gehostet werden kann, ersetze die Platzhalter in `frontend/public/src/components/Impressum.jsx` durch deine tatsächlichen Betreiberangaben (Firma/Verein, Kontakt, Registerdaten etc.). Die Inhalte werden im Overlay angezeigt, sobald der Button geklickt wird.

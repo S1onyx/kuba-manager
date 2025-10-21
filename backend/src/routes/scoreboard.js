@@ -17,7 +17,8 @@ import {
   setMatchContext,
   applyScheduleMatchSelection,
   startTimer,
-  normalizeGroupStageLabel
+  normalizeGroupStageLabel,
+  setDisplayView
 } from '../scoreboard/index.js';
 import {
   computeGroupStandings,
@@ -26,6 +27,7 @@ import {
   getTeam,
   getTournament,
   getTournamentSchedule,
+  getTournamentStructureDetails,
   listGames,
   saveGame,
   updateGame
@@ -217,6 +219,20 @@ router.post('/context', async (req, res) => {
   }
 });
 
+router.post('/display', (req, res) => {
+  const { view } = req.body ?? {};
+  try {
+    const nextState = setDisplayView(view);
+    res.json(nextState);
+  } catch (error) {
+    if (error?.code === 'INVALID_DISPLAY_VIEW') {
+      return res.status(400).json({ message: error.message });
+    }
+    console.error('Anzeige-Modus konnte nicht gesetzt werden:', error);
+    res.status(500).json({ message: 'Anzeige-Modus konnte nicht gesetzt werden.' });
+  }
+});
+
 router.post('/schedule/select', async (req, res) => {
   const { tournamentId, scheduleCode } = req.body ?? {};
 
@@ -295,6 +311,33 @@ router.get('/standings', async (_req, res) => {
   } catch (error) {
     console.error('Tabelle konnte nicht berechnet werden:', error);
     res.status(500).json({ message: 'Tabelle konnte nicht berechnet werden.' });
+  }
+});
+
+router.get('/structure', async (_req, res) => {
+  try {
+    const snapshot = getScoreboardState();
+    if (!snapshot.tournamentId) {
+      return res.json({
+        tournamentId: null,
+        tournamentName: snapshot.tournamentName ?? '',
+        structure: null
+      });
+    }
+
+    const structure = await getTournamentStructureDetails(snapshot.tournamentId);
+    if (!structure) {
+      return res.status(404).json({ message: 'Turnierstruktur nicht gefunden.' });
+    }
+
+    res.json({
+      tournamentId: snapshot.tournamentId,
+      tournamentName: snapshot.tournamentName || structure.tournament?.name || '',
+      structure
+    });
+  } catch (error) {
+    console.error('Turnierstruktur konnte nicht geladen werden:', error);
+    res.status(500).json({ message: 'Turnierstruktur konnte nicht geladen werden.' });
   }
 });
 

@@ -1,51 +1,57 @@
 export default function Scoreboard({ score, teamNames }) {
   const wrapperStyle = {
     display: 'grid',
-    gridTemplateColumns: '1fr auto 1fr',
+    gridTemplateColumns: 'minmax(0, 1.2fr) auto auto auto minmax(0, 1.2fr)',
     alignItems: 'center',
-    gap: '3rem',
+    columnGap: '1.2rem',
     width: '100%',
-    maxWidth: '1200px',
+    maxWidth: '1300px',
     margin: '0 auto',
-    padding: '2rem 3rem',
+    padding: '2.1rem 2.8rem',
     background: 'rgba(0, 0, 0, 0.25)',
     borderRadius: '24px',
     boxShadow: '0 20px 45px rgba(0,0,0,0.35)',
     backdropFilter: 'blur(6px)'
   };
 
-  const teamStyle = {
-    display: 'grid',
-    gap: '1rem',
-    textTransform: 'uppercase'
+  const nameStyleLeft = {
+    fontSize: '2.6rem',
+    fontWeight: 600,
+    letterSpacing: '0.08em',
+    opacity: 0.92,
+    wordBreak: 'break-word',
+    lineHeight: 1.15,
+    textAlign: 'right',
+    display: 'block'
   };
 
-  const nameStyle = {
-    fontSize: '2.5rem',
-    fontWeight: '600',
-    letterSpacing: '0.08em',
-    opacity: 0.9
+  const nameStyleRight = {
+    ...nameStyleLeft,
+    textAlign: 'left'
   };
 
   const scoreStyle = {
-    fontSize: '6rem',
-    fontWeight: '700',
-    textShadow: '0 0 25px rgba(0,0,0,0.6)'
+    fontSize: '5.8rem',
+    fontWeight: 700,
+    textShadow: '0 0 25px rgba(0,0,0,0.6)',
+    minWidth: '3.6rem',
+    textAlign: 'center'
+  };
+
+  const separatorStyle = {
+    fontSize: '4.4rem',
+    fontWeight: 700,
+    opacity: 0.75,
+    padding: '0 0.75rem'
   };
 
   return (
     <div style={wrapperStyle}>
-      <div style={{ ...teamStyle, textAlign: 'right' }}>
-        <span style={nameStyle}>{teamNames.teamA}</span>
-        <span style={scoreStyle}>{score.teamA}</span>
-      </div>
-
-      <div style={{ fontSize: '5rem', fontWeight: '700', opacity: 0.8 }}>:</div>
-
-      <div style={{ ...teamStyle, textAlign: 'left' }}>
-        <span style={nameStyle}>{teamNames.teamB}</span>
-        <span style={scoreStyle}>{score.teamB}</span>
-      </div>
+      <span style={nameStyleLeft}>{teamNames.teamA}</span>
+      <span style={scoreStyle}>{score.teamA}</span>
+      <span style={separatorStyle}>:</span>
+      <span style={scoreStyle}>{score.teamB}</span>
+      <span style={nameStyleRight}>{teamNames.teamB}</span>
     </div>
   );
 }

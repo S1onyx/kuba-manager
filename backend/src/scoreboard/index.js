@@ -1,4 +1,5 @@
 import { snapshotState, normalizeGroupStageLabel } from './stateStore.js';
+import { setDisplayView } from './display.js';
 import { registerScoreboardSocket } from './socket.js';
 import { setTeams, setMatchContext, applyScheduleMatchSelection } from './teams.js';
 import { addPoints, setScoreAbsolute, resetScores } from './scoring.js';
@@ -36,5 +37,6 @@ export {
   addPenalty,
   removePenalty,
   resetGame,
-  normalizeGroupStageLabel
+  normalizeGroupStageLabel,
+  setDisplayView
 };

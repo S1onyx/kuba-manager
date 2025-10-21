@@ -24,10 +24,10 @@ const roundHeaderStyle = {
 };
 
 const matchRowStyle = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  gap: '0.5rem',
+  display: 'grid',
+  gridTemplateColumns: '1fr auto 1fr',
   alignItems: 'center',
+  columnGap: '0.7rem',
   fontSize: '0.95rem'
 };
 
@@ -40,15 +40,15 @@ const responsiveStyles = `
       padding: 1rem 1.05rem;
     }
     .schedule-preview__match {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.35rem;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      column-gap: 0.45rem;
     }
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: 520px) {
     .schedule-preview__match {
-      align-items: center;
+      grid-template-columns: 1fr;
+      row-gap: 0.35rem;
       text-align: center;
     }
   }
@@ -82,19 +82,25 @@ function renderGroupSchedule(groupStages) {
                         className="schedule-preview__match"
                         style={matchRowStyle}
                       >
-                        <span style={{ fontWeight: 600 }}>{match.home_label}</span>
+                        <span style={{ fontWeight: 600, textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {match.home_label}
+                        </span>
                         <span
                           style={{
                             opacity: match.result?.hasResult ? 1 : 0.7,
                             fontWeight: match.result?.hasResult ? 700 : 400,
-                            letterSpacing: '0.02em'
+                            letterSpacing: '0.02em',
+                            minWidth: '4.5rem',
+                            textAlign: 'center'
                           }}
                         >
                           {match.result?.hasResult
                             ? `${match.result.scoreA ?? 0} : ${match.result.scoreB ?? 0}`
                             : 'vs'}
                         </span>
-                        <span style={{ fontWeight: 600 }}>{match.away_label}</span>
+                        <span style={{ fontWeight: 600, textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {match.away_label}
+                        </span>
                       </div>
                     ))}
                   </div>

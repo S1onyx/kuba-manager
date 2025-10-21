@@ -15,6 +15,7 @@ import {
   setHalftimePause,
   setScoreAbsolute,
   setScoreboardTimer,
+  setDisplayView,
   startNewGame,
   startScoreboardTimer,
   updateHistoryGame,
@@ -40,6 +41,10 @@ const createPenaltyForms = () => ({
   a: { name: '', preset: '60', custom: '' },
   b: { name: '', preset: '60', custom: '' }
 });
+const DISPLAY_VIEW_OPTIONS = [
+  { id: 'scoreboard', label: 'Live-Spielstand' },
+  { id: 'bracket', label: 'Turnierbaum' }
+];
 
 function formatTime(seconds = 0) {
   const total = Math.max(0, Math.trunc(seconds));
@@ -126,6 +131,7 @@ export default function Dashboard() {
   const [editForm, setEditForm] = useState(null);
   const [contextForm, setContextForm] = useState({ tournamentId: '', stageType: '', stageLabel: '' });
   const [contextFormDirty, setContextFormDirty] = useState(false);
+  const [displayViewPending, setDisplayViewPending] = useState(false);
   const [tournaments, setTournaments] = useState([]);
   const [tournamentsLoading, setTournamentsLoading] = useState(true);
   const [tournamentsError, setTournamentsError] = useState('');
@@ -625,6 +631,7 @@ export default function Dashboard() {
           ? 'z.B. Spiel um Platz 3 / 4'
           : 'z.B. Viertelfinale oder Spiel um Platz 3 / 4';
 
+  const displayView = scoreboard?.displayView ?? 'scoreboard';
   const formattedRemaining = useMemo(() => formatTime(scoreboard?.remainingSeconds ?? 0), [scoreboard?.remainingSeconds]);
   const statusLabel = useMemo(() => {
     if (scoreboard?.isHalftimeBreak) return 'Halbzeitpause';
@@ -657,6 +664,28 @@ export default function Dashboard() {
     } else {
       setInfo(message);
       setError('');
+    }
+  }
+
+  async function handleDisplayViewChange(targetView) {
+    const normalized = typeof targetView === 'string' ? targetView : '';
+    if (!normalized || scoreboard?.displayView === normalized) {
+      return;
+    }
+
+    setDisplayViewPending(true);
+    try {
+      await setDisplayView(normalized);
+      const successMessage =
+        normalized === 'scoreboard'
+          ? 'Beamer zeigt jetzt den Live-Spielstand.'
+          : 'Beamer zeigt jetzt den Turnierbaum.';
+      updateMessage('info', successMessage);
+    } catch (err) {
+      console.error(err);
+      updateMessage('error', 'Anzeige-Modus konnte nicht aktualisiert werden.');
+    } finally {
+      setDisplayViewPending(false);
     }
   }
 
@@ -1565,6 +1594,46 @@ export default function Dashboard() {
 
   const controlContent = (
     <>
+      <section style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
+        <h3>Beameranzeige</h3>
+        <p style={{ marginTop: 0, marginBottom: '0.75rem', color: '#555' }}>
+          Wähle, was auf der Beameranzeige gezeigt wird.
+        </p>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          {DISPLAY_VIEW_OPTIONS.map((option) => {
+            const isActive = displayView === option.id;
+            return (
+              <button
+                key={option.id}
+                type="button"
+                onClick={() => handleDisplayViewChange(option.id)}
+                disabled={isActive || displayViewPending}
+                style={{
+                  padding: '0.5rem 1rem',
+                  borderRadius: '999px',
+                  border: '1px solid #0b1a2b',
+                  background: isActive ? '#0b1a2b' : 'transparent',
+                  color: isActive ? '#fff' : '#0b1a2b',
+                  fontWeight: 600,
+                  cursor: isActive ? 'default' : 'pointer',
+                  opacity: displayViewPending && !isActive ? 0.7 : 1
+                }}
+              >
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+        {displayView === 'bracket' && !scoreboard?.tournamentId ? (
+          <p style={{ marginTop: '0.75rem', color: '#b26a00' }}>
+            Hinweis: Für den Turnierbaum muss ein Turnier im Match-Kontext gesetzt werden.
+          </p>
+        ) : null}
+        {displayViewPending ? (
+          <p style={{ marginTop: '0.75rem', color: '#555' }}>Aktualisiere Anzeige...</p>
+        ) : null}
+      </section>
+
       <section style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
         <h3>Match-Kontext</h3>
         <form onSubmit={handleContextSubmit} style={{ display: 'grid', gap: '0.75rem' }}>

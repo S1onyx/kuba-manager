@@ -5,6 +5,7 @@ import StatHighlights from './components/StatHighlights.jsx';
 import TeamStatsGrid from './components/TeamStatsGrid.jsx';
 import SchedulePreview from './components/SchedulePreview.jsx';
 import RecentResults from './components/RecentResults.jsx';
+import Impressum from './components/Impressum.jsx';
 import { useScoreboardFeed } from './hooks/useScoreboardFeed.js';
 import { usePublicTournaments } from './hooks/usePublicTournaments.js';
 import { useTournamentSummary } from './hooks/useTournamentSummary.js';
@@ -12,9 +13,11 @@ import { useTournamentSummary } from './hooks/useTournamentSummary.js';
 export default function App() {
   const [selectedTournamentId, setSelectedTournamentId] = useState(null);
   const [activeSummaryTab, setActiveSummaryTab] = useState('overview');
+  const [showImpressum, setShowImpressum] = useState(false);
 
   const selectedTournamentRef = useRef(null);
   const lastScoreboardTournamentIdRef = useRef(null);
+  const liveTabAutoRef = useRef({ lastApplied: null, suppressed: null });
 
   const {
     publicTournaments,
@@ -102,7 +105,63 @@ export default function App() {
 
   useEffect(() => {
     setActiveSummaryTab('overview');
+    liveTabAutoRef.current = { lastApplied: null, suppressed: null };
   }, [selectedTournamentId]);
+
+  useEffect(() => {
+    if (!scoreboardPublic) {
+      liveTabAutoRef.current = { lastApplied: null, suppressed: null };
+      return;
+    }
+    const activeTournamentId = scoreboard?.tournamentId ?? null;
+    if (!activeTournamentId) {
+      return;
+    }
+    if (activeTournamentId !== selectedTournamentId) {
+      return;
+    }
+    if (activeSummaryTab === 'live') {
+      liveTabAutoRef.current.lastApplied = activeTournamentId;
+      return;
+    }
+    if (liveTabAutoRef.current.suppressed === activeTournamentId) {
+      return;
+    }
+    if (liveTabAutoRef.current.lastApplied === activeTournamentId) {
+      return;
+    }
+    liveTabAutoRef.current.lastApplied = activeTournamentId;
+    setActiveSummaryTab('live');
+  }, [scoreboardPublic, scoreboard?.tournamentId, selectedTournamentId, activeSummaryTab]);
+
+  const handleSummaryTabSelect = useCallback(
+    (tabId) => {
+      if (tabId === 'live') {
+        liveTabAutoRef.current = {
+          lastApplied: scoreboard?.tournamentId ?? selectedTournamentId ?? null,
+          suppressed: null
+        };
+      } else {
+        liveTabAutoRef.current = {
+          lastApplied: liveTabAutoRef.current.lastApplied,
+          suppressed: selectedTournamentId ?? null
+        };
+      }
+      setActiveSummaryTab(tabId);
+    },
+    [scoreboard?.tournamentId, selectedTournamentId]
+  );
+
+  useEffect(() => {
+    if (!showImpressum) {
+      return;
+    }
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [showImpressum]);
 
   const currentCardData = scoreboardPublic ? scoreboard : null;
   const showPrivateNotice = Boolean(scoreboard?.tournamentId ?? currentTournamentMeta?.id) && !scoreboardPublic;
@@ -116,6 +175,7 @@ export default function App() {
     [scoreboard, recordedGamesCount, currentGroupStandings, scoreboardPublic]
   );
   const summaryTabs = [
+    { id: 'live', label: 'Live' },
     { id: 'overview', label: 'Übersicht' },
     { id: 'schedule', label: 'Spielplan' }
   ];
@@ -131,16 +191,17 @@ export default function App() {
   });
 
   return (
-    <div
-      className="public-app"
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '2rem',
-        padding: '2.5rem clamp(1.5rem, 4vw, 4rem)'
-      }}
-    >
+    <>
+      <div
+        className="public-app"
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '2rem',
+          padding: '2.5rem clamp(1.5rem, 4vw, 4rem)'
+        }}
+      >
       <header style={{ display: 'grid', gap: '0.75rem', textAlign: 'center' }}>
         <h1 style={{ fontSize: '2.8rem', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
           Kunstrad Basketball – Public
@@ -170,21 +231,6 @@ export default function App() {
           Dashboard.
         </div>
       ) : null}
-
-      <CurrentMatchCard scoreboard={currentCardData} />
-
-      {showCurrentGroup ? (
-      <section style={{ display: 'grid', gap: '1.5rem' }}>
-        <h2 style={{ fontSize: '1.4rem', letterSpacing: '0.05em' }}>Aktuelle Gruppentabelle</h2>
-        <GroupStandingsCard
-          group={{
-            label: formatGroupLabel(scoreboard.stageLabel),
-            standings: currentGroupStandings,
-            recordedGamesCount
-          }}
-        />
-      </section>
-    ) : null}
 
       <section style={{ display: 'grid', gap: '1rem' }}>
         <h2 style={{ fontSize: '1.3rem', letterSpacing: '0.05em' }}>Öffentliche Turniere</h2>
@@ -251,7 +297,7 @@ export default function App() {
                 <button
                   key={tab.id}
                   type="button"
-                  onClick={() => setActiveSummaryTab(tab.id)}
+                  onClick={() => handleSummaryTabSelect(tab.id)}
                   style={summaryTabButtonStyle(activeSummaryTab === tab.id)}
                 >
                   {tab.label}
@@ -259,7 +305,23 @@ export default function App() {
               ))}
             </div>
 
-            {activeSummaryTab === 'overview' ? (
+            {activeSummaryTab === 'live' ? (
+              <section style={{ display: 'grid', gap: '1.5rem' }}>
+                <CurrentMatchCard scoreboard={currentCardData} />
+                {showCurrentGroup ? (
+                  <section style={{ display: 'grid', gap: '1.5rem' }}>
+                    <h3 style={{ fontSize: '1.2rem', letterSpacing: '0.05em' }}>Aktuelle Gruppentabelle</h3>
+                    <GroupStandingsCard
+                      group={{
+                        label: formatGroupLabel(scoreboard?.stageLabel),
+                        standings: currentGroupStandings,
+                        recordedGamesCount
+                      }}
+                    />
+                  </section>
+                ) : null}
+              </section>
+            ) : activeSummaryTab === 'overview' ? (
               <>
                 <StatHighlights totals={tournamentSummary.totals} />
                 {Array.isArray(tournamentSummary.groupStandings) && tournamentSummary.groupStandings.length > 0 ? (
@@ -292,7 +354,37 @@ export default function App() {
           </p>
         ) : null}
       </section>
+
+      <footer
+        style={{
+          marginTop: 'auto',
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '0.75rem',
+          flexWrap: 'wrap',
+          padding: '1rem 0 0'
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => setShowImpressum(true)}
+          style={{
+            padding: '0.4rem 1rem',
+            borderRadius: '999px',
+            border: '1px solid rgba(255,255,255,0.35)',
+            background: 'transparent',
+            color: '#f0f4ff',
+            letterSpacing: '0.06em',
+            cursor: 'pointer',
+            fontSize: '0.9rem'
+          }}
+        >
+          Impressum
+        </button>
+      </footer>
     </div>
+    {showImpressum ? <Impressum onClose={() => setShowImpressum(false)} /> : null}
+    </>
   );
 }
 
