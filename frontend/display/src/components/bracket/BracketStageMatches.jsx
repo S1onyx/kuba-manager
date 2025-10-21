@@ -1,0 +1,142 @@
+function resolveParticipantName(entry, fallback) {
+  if (!entry) {
+    return fallback || '—';
+  }
+  if (entry.teamName) return entry.teamName;
+  if (entry.placeholder) return entry.placeholder;
+  if (entry.label) return entry.label;
+  if (entry.name) return entry.name;
+  return fallback || '—';
+}
+
+const sectionStyle = {
+  width: '100%',
+  display: 'grid',
+  gap: '1.5rem'
+};
+
+const stagesGridStyle = {
+  display: 'grid',
+  gap: '1.25rem',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))'
+};
+
+const stageCardStyle = {
+  padding: '1.2rem',
+  borderRadius: '18px',
+  background: 'rgba(0,0,0,0.28)',
+  boxShadow: '0 12px 30px rgba(0,0,0,0.25)',
+  backdropFilter: 'blur(6px)',
+  display: 'grid',
+  gap: '0.9rem'
+};
+
+const stageHeaderStyle = {
+  margin: 0,
+  fontSize: '1.35rem',
+  textTransform: 'uppercase',
+  letterSpacing: '0.07em'
+};
+
+const matchListStyle = {
+  display: 'grid',
+  gap: '0.75rem'
+};
+
+const matchRowStyle = {
+  display: 'grid',
+  gap: '0.65rem',
+  gridTemplateColumns: '1fr auto 1fr',
+  alignItems: 'center',
+  background: 'rgba(255,255,255,0.08)',
+  padding: '0.85rem 1rem',
+  borderRadius: '12px'
+};
+
+const teamStyle = {
+  fontSize: '1.05rem',
+  fontWeight: 600,
+  textAlign: 'left'
+};
+
+const scoreStyle = {
+  fontSize: '1.15rem',
+  fontWeight: 700,
+  letterSpacing: '0.08em',
+  textAlign: 'center'
+};
+
+const codeStyle = {
+  marginTop: '0.3rem',
+  fontSize: '0.85rem',
+  opacity: 0.7,
+  letterSpacing: '0.08em'
+};
+
+export default function BracketStageMatches({ title, stages }) {
+  const validStages = Array.isArray(stages)
+    ? stages.filter((stage) => Array.isArray(stage.matches) && stage.matches.length > 0)
+    : [];
+
+  if (validStages.length === 0) {
+    return null;
+  }
+
+  return (
+    <section style={sectionStyle}>
+      <h2 style={{ margin: 0, fontSize: '1.8rem', letterSpacing: '0.06em' }}>{title}</h2>
+      <div style={stagesGridStyle}>
+        {validStages.map((stage) => (
+          <article key={stage.stage_label || stage.label} style={stageCardStyle}>
+            {(() => {
+              const firstMatch = stage.matches?.[0];
+              const roundNumber = firstMatch?.round_number ?? firstMatch?.round ?? null;
+              return (
+                <div>
+                  <h3 style={stageHeaderStyle}>{stage.stage_label || stage.label || 'Phase'}</h3>
+                  {roundNumber ? (
+                    <p style={{ margin: 0, opacity: 0.7, fontSize: '0.9rem' }}>Runde {roundNumber}</p>
+                  ) : null}
+                </div>
+              );
+            })()}
+            <div style={matchListStyle}>
+              {stage.matches.map((match) => {
+                const homeName = resolveParticipantName(match.home, match.home_label);
+                const awayName = resolveParticipantName(match.away, match.away_label);
+                const hasResult = match.result?.hasResult;
+                const scoreDisplay = hasResult
+                  ? `${match.result.scoreA ?? 0}:${match.result.scoreB ?? 0}`
+                  : 'vs';
+
+                const metaLine = match.code
+                  ? `Matchcode ${match.code}`
+                  : hasResult && match.result?.finishedAt
+                    ? new Date(match.result.finishedAt).toLocaleString('de-DE', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })
+                    : '';
+
+                return (
+                  <div key={match.id ?? match.code ?? `${homeName}-${awayName}`} style={matchRowStyle}>
+                    <div style={teamStyle}>{homeName}</div>
+                    <div style={scoreStyle}>{scoreDisplay}</div>
+                    <div style={{ ...teamStyle, textAlign: 'right' }}>{awayName}</div>
+                    {metaLine ? (
+                      <div style={{ gridColumn: '1 / -1', ...codeStyle }}>
+                        {metaLine}
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}

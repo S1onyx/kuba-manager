@@ -1,0 +1,29 @@
+{
+  "name": "kuba-manager-backend",
+  "version": "1.0.0",
+  "description": "Backend für ein Kunstrad-Basketball Turniersystem",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js"
+  },
+  "keywords": [
+    "kunstrad",
+    "basketball",
+    "turnier",
+    "backend"
+  ],
+  "author": "RIEDISI",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "sql.js": "^1.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}
