@@ -5,6 +5,9 @@ import { Server as SocketIO } from 'socket.io';
 import dotenv from 'dotenv';
 import scoreboardRoutes from './routes/scoreboard.js';
 import setupSocket from './socket.js';
+import tournamentRoutes from './routes/tournaments.js';
+import publicRoutes from './routes/public.js';
+import teamRoutes from './routes/teams.js';
 
 dotenv.config();
 
@@ -20,6 +23,9 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/scoreboard', scoreboardRoutes);
+app.use('/api/tournaments', tournamentRoutes);
+app.use('/api/public', publicRoutes);
+app.use('/api/teams', teamRoutes);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

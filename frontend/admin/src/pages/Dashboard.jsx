@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import socket from '../socket.js';
 import {
   addPenalty,
@@ -18,7 +18,21 @@ import {
   startNewGame,
   startScoreboardTimer,
   updateHistoryGame,
-  updateTeams
+  updateMatchContext,
+  updateTeams,
+  fetchTournaments,
+  createTournament,
+  updateTournament,
+  deleteTournament,
+  fetchTeams,
+  createTeam,
+  updateTeam,
+  deleteTeam,
+  fetchTournamentStages,
+  fetchTournamentSchedule,
+  fetchTournamentStructure,
+  selectScheduleMatch,
+  updateTournamentTeams
 } from '../utils/api.js';
 
 const POINT_OPTIONS = [1, 2, 3];
@@ -71,12 +85,27 @@ function parseTimerInput(value) {
   return Math.max(0, Math.trunc(numeric));
 }
 
+function canonicalizeGroupLabel(label) {
+  const raw = (label ?? '').toString().trim();
+  if (!raw) {
+    return '';
+  }
+
+  const upper = raw.toUpperCase();
+  const match = upper.match(/^(GRUPPE|GROUP)\s+/);
+  if (match) {
+    return upper.slice(match[0].length).trim();
+  }
+
+  return upper.trim();
+}
+
 export default function Dashboard() {
   const [scoreboard, setScoreboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
-  const [teamForm, setTeamForm] = useState({ teamAName: '', teamBName: '' });
+  const [teamForm, setTeamForm] = useState({ teamAName: '', teamBName: '', teamAId: '', teamBId: '' });
   const [teamDirty, setTeamDirty] = useState(false);
   const [manualScores, setManualScores] = useState({ a: '', b: '' });
   const [manualDirty, setManualDirty] = useState({ a: false, b: false });
@@ -95,6 +124,238 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('control');
   const [editingGameId, setEditingGameId] = useState(null);
   const [editForm, setEditForm] = useState(null);
+  const [contextForm, setContextForm] = useState({ tournamentId: '', stageType: '', stageLabel: '' });
+  const [contextFormDirty, setContextFormDirty] = useState(false);
+  const [tournaments, setTournaments] = useState([]);
+  const [tournamentsLoading, setTournamentsLoading] = useState(true);
+  const [tournamentsError, setTournamentsError] = useState('');
+  const [tournamentForm, setTournamentForm] = useState({
+    name: '',
+    group_count: '',
+    knockout_rounds: '',
+    team_count: '',
+    classification_mode: 'top4',
+    is_public: false
+  });
+  const [tournamentEdits, setTournamentEdits] = useState({});
+  const [stageOptions, setStageOptions] = useState({ group: [], knockout: [], placement: [] });
+  const [stageOptionsLoading, setStageOptionsLoading] = useState(false);
+  const [scheduleData, setScheduleData] = useState(null);
+  const [scheduleLoading, setScheduleLoading] = useState(false);
+  const [scheduleError, setScheduleError] = useState('');
+  const [schedulePickerCode, setSchedulePickerCode] = useState('');
+  const [scheduleSelection, setScheduleSelection] = useState('');
+  const resolvedTournamentId = useMemo(() => {
+    const scoreboardId = scoreboard?.tournamentId ? Number(scoreboard.tournamentId) : null;
+    if (scoreboardId && Number.isInteger(scoreboardId) && scoreboardId > 0) {
+      return scoreboardId;
+    }
+    const contextId = contextForm.tournamentId ? Number(contextForm.tournamentId) : null;
+    if (contextId && Number.isInteger(contextId) && contextId > 0) {
+      return contextId;
+    }
+    return null;
+  }, [scoreboard?.tournamentId, contextForm.tournamentId]);
+  const [teams, setTeams] = useState([]);
+  const [teamsLoading, setTeamsLoading] = useState(true);
+  const [teamsError, setTeamsError] = useState('');
+  const [teamCreateName, setTeamCreateName] = useState('');
+  const [teamEdits, setTeamEdits] = useState({});
+  const [expandedTournamentId, setExpandedTournamentId] = useState(null);
+  const [tournamentStructure, setTournamentStructure] = useState(null);
+  const [structureTournamentId, setStructureTournamentId] = useState(null);
+  const [structureLoading, setStructureLoading] = useState(false);
+  const [structureError, setStructureError] = useState('');
+  const [slotAssignments, setSlotAssignments] = useState({});
+  const [slotInitialAssignments, setSlotInitialAssignments] = useState({});
+  const [structureSaving, setStructureSaving] = useState(false);
+  const teamNameById = useMemo(() => {
+    const map = new Map();
+    teams.forEach((team) => {
+      map.set(String(team.id), team.name);
+    });
+    return map;
+  }, [teams]);
+
+  const initializeSlotAssignments = useCallback((structureData) => {
+    if (!structureData?.groups) {
+      setSlotAssignments({});
+      setSlotInitialAssignments({});
+      return;
+    }
+
+    const current = {};
+    const initial = {};
+
+    structureData.groups.forEach((group) => {
+      group.slots.forEach((slot) => {
+        const key = String(slot.slotNumber);
+        const name = slot.displayName || `Team ${slot.slotNumber}`;
+        const placeholder = slot.placeholder || name;
+        const teamId = slot.teamId ? String(slot.teamId) : '';
+
+        current[key] = {
+          name,
+          placeholder,
+          teamId
+        };
+
+        initial[key] = {
+          name,
+          placeholder,
+          teamId
+        };
+      });
+    });
+
+    setSlotAssignments(current);
+    setSlotInitialAssignments(initial);
+  }, []);
+
+  const loadTournamentStructure = useCallback(
+    async (id) => {
+      if (!id) {
+        return;
+      }
+
+      setStructureLoading(true);
+      setStructureError('');
+      setTournamentStructure(null);
+      setStructureTournamentId(null);
+      setSlotAssignments({});
+      setSlotInitialAssignments({});
+
+      try {
+        const data = await fetchTournamentStructure(id);
+        setTournamentStructure(data);
+        setStructureTournamentId(id);
+        initializeSlotAssignments(data);
+      } catch (error) {
+        console.error(error);
+        setStructureError('Turnierstruktur konnte nicht geladen werden.');
+        setTournamentStructure(null);
+        setStructureTournamentId(null);
+        setSlotAssignments({});
+        setSlotInitialAssignments({});
+      } finally {
+        setStructureLoading(false);
+      }
+    },
+    [initializeSlotAssignments]
+  );
+
+  const stageLabelMapRef = useRef(new Map());
+  const stageLabelData = useMemo(() => {
+    const labelMap = new Map();
+    const hintsByPhase = {
+      group: [],
+      knockout: [],
+      placement: []
+    };
+
+    Object.entries(stageOptions).forEach(([phase, labels = []]) => {
+      labels.forEach((label) => {
+        const trimmed = (label ?? '').toString().trim();
+        if (!trimmed) {
+          return;
+        }
+
+        if (Array.isArray(hintsByPhase[phase]) && !hintsByPhase[phase].includes(trimmed)) {
+          hintsByPhase[phase].push(trimmed);
+        }
+
+        const normalized = trimmed.toLowerCase();
+        const existing = labelMap.get(normalized);
+        if (existing) {
+          if (!existing.phases.includes(phase)) {
+            existing.phases.push(phase);
+          }
+        } else {
+          labelMap.set(normalized, {
+            label: trimmed,
+            phases: [phase]
+          });
+        }
+      });
+    });
+
+    Object.keys(hintsByPhase).forEach((phase) => {
+      hintsByPhase[phase].sort((a, b) => a.localeCompare(b, 'de', { sensitivity: 'base' }));
+    });
+
+    const suggestions = Array.from(labelMap.values()).sort((a, b) =>
+      a.label.localeCompare(b.label, 'de', { sensitivity: 'base' })
+    );
+
+    return {
+      labelMap,
+      hintsByPhase,
+      suggestions
+    };
+  }, [stageOptions]);
+
+  stageLabelMapRef.current = stageLabelData.labelMap;
+  const stageHintsByPhase = stageLabelData.hintsByPhase;
+  const stageSuggestionEntries = stageLabelData.suggestions;
+  const scheduleOptionData = useMemo(() => {
+    const options = [];
+    const matchMap = new Map();
+    if (!scheduleData?.raw || !Array.isArray(scheduleData.raw)) {
+      return { options, matchMap };
+    }
+
+    const phaseRank = {
+      group: 1,
+      knockout: 2,
+      placement: 3
+    };
+
+    scheduleData.raw.forEach((entry) => {
+      if (!entry || !entry.code) {
+        return;
+      }
+      matchMap.set(entry.code, entry);
+      const phase = entry.phase ?? 'group';
+      const roundNumber = entry.round_number ?? entry.metadata?.round ?? null;
+      const hasResult = Boolean(entry.result?.hasResult);
+      const scoreText = hasResult ? `${entry.result.scoreA ?? 0}:${entry.result.scoreB ?? 0}` : null;
+      const stageLabel = entry.stage_label || (phase === 'group' ? 'Gruppe' : 'Phase');
+      const descriptor =
+        phase === 'group'
+          ? `${stageLabel}${roundNumber ? ` · Runde ${roundNumber}` : ''}`
+          : stageLabel;
+
+      const label = `${descriptor} – ${entry.home_label} vs ${entry.away_label}${
+        scoreText ? ` · Ergebnis ${scoreText}` : ''
+      }`;
+
+      options.push({
+        code: entry.code,
+        label,
+        phase,
+        stageOrder: entry.stage_order ?? 0,
+        matchOrder: entry.match_order ?? 0,
+        round: roundNumber ?? null,
+        hasResult
+      });
+    });
+
+    options.sort((a, b) => {
+      const rankDiff = (phaseRank[a.phase] ?? 99) - (phaseRank[b.phase] ?? 99);
+      if (rankDiff !== 0) {
+        return rankDiff;
+      }
+      if ((a.stageOrder ?? 0) !== (b.stageOrder ?? 0)) {
+        return (a.stageOrder ?? 0) - (b.stageOrder ?? 0);
+      }
+      if ((a.round ?? 0) !== (b.round ?? 0)) {
+        return (a.round ?? 0) - (b.round ?? 0);
+      }
+      return (a.matchOrder ?? 0) - (b.matchOrder ?? 0);
+    });
+
+    return { options, matchMap };
+  }, [scheduleData]);
 
   const loadHistory = useCallback(() => {
     setHistoryLoading(true);
@@ -111,6 +372,36 @@ export default function Dashboard() {
       });
   }, []);
 
+  const loadTournaments = useCallback(() => {
+    setTournamentsLoading(true);
+    fetchTournaments()
+      .then((data) => {
+        setTournaments(data);
+        setTournamentsError('');
+      })
+      .catch(() => {
+        setTournamentsError('Turniere konnten nicht geladen werden.');
+      })
+      .finally(() => {
+        setTournamentsLoading(false);
+      });
+  }, []);
+
+  const loadTeams = useCallback(() => {
+    setTeamsLoading(true);
+    fetchTeams()
+      .then((data) => {
+        setTeams(data);
+        setTeamsError('');
+      })
+      .catch(() => {
+        setTeamsError('Teams konnten nicht geladen werden.');
+      })
+      .finally(() => {
+        setTeamsLoading(false);
+      });
+  }, []);
+
   useEffect(() => {
     let active = true;
 
@@ -118,7 +409,12 @@ export default function Dashboard() {
       .then((data) => {
         if (!active) return;
         setScoreboard(data);
-        setTeamForm({ teamAName: data.teamAName ?? '', teamBName: data.teamBName ?? '' });
+        setTeamForm({
+          teamAName: data.teamAName ?? '',
+          teamBName: data.teamBName ?? '',
+          teamAId: data.teamAId ? String(data.teamAId) : '',
+          teamBId: data.teamBId ? String(data.teamBId) : ''
+        });
         setManualScores({
           a: String(data.scoreA ?? 0),
           b: String(data.scoreB ?? 0)
@@ -147,12 +443,105 @@ export default function Dashboard() {
   }, [loadHistory]);
 
   useEffect(() => {
+    loadTournaments();
+  }, [loadTournaments]);
+
+  useEffect(() => {
+    loadTeams();
+  }, [loadTeams]);
+
+  useEffect(() => {
+    if (!expandedTournamentId) {
+      setTournamentStructure(null);
+      setStructureTournamentId(null);
+      setStructureError('');
+      setSlotAssignments({});
+      setSlotInitialAssignments({});
+      return;
+    }
+    loadTournamentStructure(expandedTournamentId);
+  }, [expandedTournamentId, loadTournamentStructure]);
+
+  useEffect(() => {
+    if (!resolvedTournamentId) {
+      setStageOptions({ group: [], knockout: [], placement: [] });
+      setStageOptionsLoading(false);
+      return;
+    }
+
+    let active = true;
+    setStageOptionsLoading(true);
+
+    fetchTournamentStages(resolvedTournamentId)
+      .then((data) => {
+        if (!active) return;
+        setStageOptions({
+          group: Array.isArray(data?.group) ? data.group : [],
+          knockout: Array.isArray(data?.knockout) ? data.knockout : [],
+          placement: Array.isArray(data?.placement) ? data.placement : []
+        });
+      })
+      .catch(() => {
+        if (!active) return;
+        setStageOptions({ group: [], knockout: [], placement: [] });
+      })
+      .finally(() => {
+        if (!active) return;
+        setStageOptionsLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [resolvedTournamentId]);
+
+  useEffect(() => {
+    if (scoreboard?.scheduleCode) {
+      setSchedulePickerCode(scoreboard.scheduleCode);
+    }
+  }, [scoreboard?.scheduleCode]);
+
+  useEffect(() => {
+    if (!resolvedTournamentId) {
+      setScheduleData(null);
+      setScheduleError('');
+      setScheduleLoading(false);
+      return;
+    }
+
+    let active = true;
+    setScheduleLoading(true);
+
+    fetchTournamentSchedule(resolvedTournamentId)
+      .then((data) => {
+        if (!active) return;
+        setScheduleData(data ?? null);
+        setScheduleError('');
+      })
+      .catch(() => {
+        if (!active) return;
+        setScheduleData(null);
+        setScheduleError('Spielplan konnte nicht geladen werden.');
+      })
+      .finally(() => {
+        if (!active) return;
+        setScheduleLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [resolvedTournamentId]);
+
+  useEffect(() => {
     const handleUpdate = (payload) => {
       setScoreboard(payload);
       if (!teamDirty) {
         setTeamForm({
           teamAName: payload.teamAName ?? '',
-          teamBName: payload.teamBName ?? ''
+          teamBName: payload.teamBName ?? '',
+          teamAId: payload.teamAId ? String(payload.teamAId) : '',
+          teamBId: payload.teamBId ? String(payload.teamBId) : ''
         });
       }
       if (!halftimeDirty) {
@@ -191,12 +580,75 @@ export default function Dashboard() {
     };
   }, [teamDirty, halftimeDirty, halftimePauseDirty, extraDirty, manualDirty]);
 
+  useEffect(() => {
+    if (!scoreboard) return;
+    if (contextFormDirty) return;
+    setContextForm({
+      tournamentId: scoreboard.tournamentId ? String(scoreboard.tournamentId) : '',
+      stageType: scoreboard.stageType ?? '',
+      stageLabel: scoreboard.stageLabel ?? ''
+    });
+  }, [contextFormDirty, scoreboard?.tournamentId, scoreboard?.stageType, scoreboard?.stageLabel]);
+
+  useEffect(() => {
+    if (!contextForm.stageType || contextForm.stageLabel) {
+      return;
+    }
+    const options = stageOptions[contextForm.stageType] ?? [];
+    if (options.length > 0 && !contextFormDirty) {
+      setContextForm((prev) => {
+        if (prev.stageType !== contextForm.stageType || prev.stageLabel) {
+          return prev;
+        }
+        return { ...prev, stageLabel: options[0] };
+      });
+    }
+  }, [stageOptions, contextForm.stageType, contextForm.stageLabel, contextFormDirty]);
+
+  const stageListId = stageSuggestionEntries.length > 0 ? 'stage-options-all' : undefined;
+  const stageHintLines = useMemo(() => {
+    const labels = {
+      group: 'Gruppen',
+      knockout: 'KO',
+      placement: 'Platzierung'
+    };
+    return Object.entries(stageHintsByPhase)
+      .filter(([, entries]) => Array.isArray(entries) && entries.length > 0)
+      .map(([phase, entries]) => `${labels[phase] ?? phase}: ${entries.join(', ')}`);
+  }, [stageHintsByPhase]);
+  const stageLabelPlaceholder =
+    contextForm.stageType === 'group'
+      ? 'z.B. Gruppe A'
+      : contextForm.stageType === 'knockout'
+        ? 'z.B. Viertelfinale'
+        : contextForm.stageType === 'placement'
+          ? 'z.B. Spiel um Platz 3 / 4'
+          : 'z.B. Viertelfinale oder Spiel um Platz 3 / 4';
+
   const formattedRemaining = useMemo(() => formatTime(scoreboard?.remainingSeconds ?? 0), [scoreboard?.remainingSeconds]);
   const statusLabel = useMemo(() => {
     if (scoreboard?.isHalftimeBreak) return 'Halbzeitpause';
     if (scoreboard?.isExtraTime) return scoreboard?.isRunning ? 'Nachspielzeit' : 'Nachspielzeit (Pause)';
     return scoreboard?.isRunning ? 'läuft' : 'pausiert';
   }, [scoreboard?.isHalftimeBreak, scoreboard?.isExtraTime, scoreboard?.isRunning]);
+  const activeStructure = useMemo(
+    () => (expandedTournamentId && structureTournamentId === expandedTournamentId ? tournamentStructure : null),
+    [expandedTournamentId, structureTournamentId, tournamentStructure]
+  );
+  const hasTournamentChanges = useMemo(() => {
+    if (!expandedTournamentId) {
+      return false;
+    }
+
+    return Object.entries(slotAssignments).some(([slotKey, entry]) => {
+      const initial = slotInitialAssignments[slotKey] ?? { name: '', teamId: '' };
+      const currentTeamId = entry?.teamId ?? '';
+      const initialTeamId = initial.teamId ?? '';
+      const currentName = (entry?.name ?? '').trim();
+      const initialName = (initial.name ?? '').trim();
+      return currentTeamId !== initialTeamId || currentName !== initialName;
+    });
+  }, [expandedTournamentId, slotAssignments, slotInitialAssignments]);
 
   function updateMessage(type, message) {
     if (type === 'error') {
@@ -210,22 +662,63 @@ export default function Dashboard() {
 
   function handleTeamInputChange(field, value) {
     setTeamDirty(true);
-    setTeamForm((prev) => ({ ...prev, [field]: value }));
+    setTeamForm((prev) => {
+      const next = { ...prev, [field]: value };
+      if (field === 'teamAName') {
+        next.teamAId = '';
+      } else if (field === 'teamBName') {
+        next.teamBId = '';
+      }
+      return next;
+    });
+  }
+
+  function handleTeamSelectChange(field, value) {
+    setTeamDirty(true);
+    setTeamForm((prev) => {
+      const next = { ...prev, [field]: value };
+      if (value) {
+        const match = teams.find((team) => String(team.id) === value);
+        if (field === 'teamAId' && match) {
+          next.teamAName = match.name;
+        }
+        if (field === 'teamBId' && match) {
+          next.teamBName = match.name;
+        }
+      }
+      return next;
+    });
   }
 
   async function handleTeamSubmit(event) {
     event.preventDefault();
 
     const payload = {};
-    if (teamForm.teamAName.trim()) {
+
+    if (teamForm.teamAId) {
+      const numeric = Number(teamForm.teamAId);
+      if (!Number.isInteger(numeric) || numeric <= 0) {
+        updateMessage('error', 'Ungültige Auswahl für Team A.');
+        return;
+      }
+      payload.teamAId = numeric;
+    } else if (teamForm.teamAName.trim()) {
       payload.teamAName = teamForm.teamAName;
     }
-    if (teamForm.teamBName.trim()) {
+
+    if (teamForm.teamBId) {
+      const numeric = Number(teamForm.teamBId);
+      if (!Number.isInteger(numeric) || numeric <= 0) {
+        updateMessage('error', 'Ungültige Auswahl für Team B.');
+        return;
+      }
+      payload.teamBId = numeric;
+    } else if (teamForm.teamBName.trim()) {
       payload.teamBName = teamForm.teamBName;
     }
 
     if (Object.keys(payload).length === 0) {
-      updateMessage('error', 'Bitte mindestens einen Teamnamen ausfüllen.');
+      updateMessage('error', 'Bitte mindestens ein Team setzen oder benennen.');
       return;
     }
 
@@ -447,7 +940,8 @@ export default function Dashboard() {
 
   async function handleNewGame() {
     try {
-      await startNewGame();
+      const newState = await startNewGame();
+      setScoreboard(newState);
       setTeamDirty(false);
       setManualDirty({ a: false, b: false });
       setPenaltyForms(createPenaltyForms());
@@ -461,6 +955,450 @@ export default function Dashboard() {
     } catch (err) {
       console.error(err);
       updateMessage('error', 'Neues Spiel konnte nicht gestartet werden.');
+    }
+  }
+
+  function handleContextFormChange(field, value) {
+    setContextFormDirty(true);
+    setContextForm((prev) => {
+      if (field === 'stageType') {
+        return {
+          ...prev,
+          stageType: value,
+          stageLabel: ''
+        };
+      }
+
+      if (field === 'stageLabel') {
+        const raw = typeof value === 'string' ? value : String(value ?? '');
+        const trimmed = raw.trim();
+        const normalized = trimmed.toLowerCase();
+        const match = stageLabelMapRef.current.get(normalized);
+
+        let nextStageType = prev.stageType || '';
+        if (match) {
+          if (!nextStageType || !match.phases.includes(nextStageType)) {
+            [nextStageType] = match.phases;
+          }
+        }
+
+        const canonical = nextStageType === 'group' ? canonicalizeGroupLabel(raw) : trimmed;
+
+        return {
+          ...prev,
+          stageType: nextStageType,
+          stageLabel: nextStageType ? canonical : trimmed
+        };
+      }
+
+      return { ...prev, [field]: value };
+    });
+  }
+
+  async function handleContextSubmit(event) {
+    event.preventDefault();
+    const trimmedLabel = (contextForm.stageLabel ?? '').trim();
+    const payload = {
+      tournamentId: contextForm.tournamentId ? Number(contextForm.tournamentId) : null,
+      stageType: contextForm.stageType || null,
+      stageLabel: contextForm.stageType ? trimmedLabel : ''
+    };
+
+    if (payload.stageType && !payload.stageLabel) {
+      updateMessage('error', 'Bitte eine Phasenbezeichnung angeben.');
+      return;
+    }
+
+    try {
+      const updated = await updateMatchContext(payload);
+      setScoreboard(updated);
+      updateMessage('info', 'Match-Kontext aktualisiert.');
+      setContextFormDirty(false);
+    } catch (err) {
+      console.error(err);
+      updateMessage('error', 'Match-Kontext konnte nicht gesetzt werden.');
+    }
+  }
+
+  async function handleScheduleMatchApply(code) {
+    const selectedCode = String(code ?? '').trim();
+    if (!selectedCode) {
+      updateMessage('error', 'Bitte ein Match aus dem Spielplan auswählen.');
+      return;
+    }
+    if (!resolvedTournamentId) {
+      updateMessage('error', 'Bitte zuerst ein Turnier im Match-Kontext auswählen.');
+      return;
+    }
+
+    const match = scheduleOptionData.matchMap.get(selectedCode);
+    if (!match) {
+      updateMessage('error', 'Das ausgewählte Match konnte im Spielplan nicht gefunden werden.');
+      return;
+    }
+
+    if (match.result?.hasResult) {
+      const confirmReuse = window.confirm(
+        'Für dieses Match wurde bereits ein Ergebnis gespeichert. Soll es trotzdem übernommen werden?'
+      );
+      if (!confirmReuse) {
+        return;
+      }
+    }
+
+    setScheduleSelection(selectedCode);
+
+    try {
+      const response = await selectScheduleMatch(resolvedTournamentId, selectedCode);
+      const nextState = response?.scoreboard ?? null;
+      if (!nextState) {
+        updateMessage('error', 'Aktualisierter Scoreboard-Status nicht verfügbar.');
+        return;
+      }
+
+      setScoreboard(nextState);
+      setTeamDirty(false);
+      setTeamForm({
+        teamAName: nextState.teamAName ?? '',
+        teamBName: nextState.teamBName ?? '',
+        teamAId: nextState.teamAId ? String(nextState.teamAId) : '',
+        teamBId: nextState.teamBId ? String(nextState.teamBId) : ''
+      });
+      setManualScores({
+        a: String(nextState.scoreA ?? 0),
+        b: String(nextState.scoreB ?? 0)
+      });
+      setManualDirty({ a: false, b: false });
+      setContextForm({
+        tournamentId: nextState.tournamentId ? String(nextState.tournamentId) : '',
+        stageType: nextState.stageType ?? '',
+        stageLabel: nextState.stageType === 'group' ? nextState.stageLabel : nextState.stageLabel ?? ''
+      });
+      setContextFormDirty(false);
+      setPenaltyForms(createPenaltyForms());
+      setHalftimeInput(formatTime(nextState.halftimeSeconds ?? 0));
+      setHalftimePauseInput(formatTime(nextState.halftimePauseSeconds ?? 0));
+      setExtraTimeInput(formatTime(nextState.extraSeconds ?? 0));
+      setHalftimeDirty(false);
+      setHalftimePauseDirty(false);
+      setExtraDirty(false);
+      setSchedulePickerCode(nextState.scheduleCode ?? selectedCode);
+      updateMessage('info', 'Match aus Spielplan übernommen.');
+    } catch (error) {
+      console.error(error);
+      updateMessage('error', 'Spielplan-Match konnte nicht übernommen werden.');
+    } finally {
+      setScheduleSelection('');
+    }
+  }
+
+  function handleTournamentDetailsToggle(id) {
+    setExpandedTournamentId((prev) => (prev === id ? null : id));
+  }
+
+  function handleSlotNameChange(slotNumber, value) {
+    const key = String(slotNumber);
+    setSlotAssignments((prev) => {
+      const next = { ...prev };
+      const previous = prev[key] ?? { name: '', placeholder: '', teamId: '' };
+      const nameValue = value;
+      let teamId = previous.teamId ?? '';
+      if (teamId) {
+        const linkedName = teamNameById.get(teamId);
+        if (linkedName && linkedName !== nameValue) {
+          teamId = '';
+        }
+      }
+      const trimmed = nameValue.trim();
+      next[key] = {
+        ...previous,
+        name: nameValue,
+        placeholder: trimmed || previous.placeholder || `Team ${slotNumber}`,
+        teamId
+      };
+      return next;
+    });
+  }
+
+  function handleSlotTeamSelect(slotNumber, value) {
+    const key = String(slotNumber);
+    const normalized = value || '';
+    setSlotAssignments((prev) => {
+      const next = { ...prev };
+      const previous = prev[key] ?? { name: '', placeholder: '', teamId: '' };
+      if (normalized) {
+        const selectedName = teamNameById.get(normalized) ?? '';
+        next[key] = {
+          ...previous,
+          teamId: normalized,
+          name: selectedName,
+          placeholder: selectedName || `Team ${slotNumber}`
+        };
+      } else {
+        next[key] = {
+          ...previous,
+          teamId: '',
+          name: previous.name,
+          placeholder: (previous.name ?? '').trim() || `Team ${slotNumber}`
+        };
+      }
+      return next;
+    });
+  }
+
+  function handleSlotReset(slotNumber) {
+    const key = String(slotNumber);
+    setSlotAssignments((prev) => {
+      const next = { ...prev };
+      if (slotInitialAssignments[key]) {
+        next[key] = { ...slotInitialAssignments[key] };
+      } else {
+        next[key] = {
+          name: `Team ${slotNumber}`,
+          placeholder: `Team ${slotNumber}`,
+          teamId: ''
+        };
+      }
+      return next;
+    });
+  }
+
+  function handleResetAllSlots() {
+    setSlotAssignments(() => {
+      const next = {};
+      Object.entries(slotInitialAssignments).forEach(([key, value]) => {
+        next[key] = { ...value };
+      });
+      return next;
+    });
+  }
+
+  function handleTournamentStructureRefresh() {
+    if (expandedTournamentId) {
+      loadTournamentStructure(expandedTournamentId);
+    }
+  }
+
+  async function handleTournamentAssignmentsSave() {
+    if (!expandedTournamentId) {
+      return;
+    }
+
+    const assignments = Object.entries(slotAssignments).map(([slotKey, entry]) => {
+      const slotNumber = Number(slotKey);
+      const trimmedName = (entry?.name ?? '').trim();
+      const teamIdValue = entry?.teamId ? Number(entry.teamId) : null;
+      const fallback =
+        (entry?.teamId ? teamNameById.get(entry.teamId) : null) ||
+        slotInitialAssignments[slotKey]?.name ||
+        `Team ${slotNumber}`;
+      return {
+        slot_number: slotNumber,
+        team_id: teamIdValue,
+        placeholder: trimmedName || fallback
+      };
+    });
+
+    setStructureSaving(true);
+    setStructureError('');
+
+    try {
+      const data = await updateTournamentTeams(expandedTournamentId, assignments);
+      setTournamentStructure(data);
+      setStructureTournamentId(expandedTournamentId);
+      initializeSlotAssignments(data);
+      updateMessage('info', 'Teamzuweisungen gespeichert.');
+    } catch (error) {
+      console.error(error);
+      setStructureError('Teamzuweisungen konnten nicht gespeichert werden.');
+      updateMessage('error', 'Teamzuweisungen konnten nicht gespeichert werden.');
+    } finally {
+      setStructureSaving(false);
+    }
+  }
+
+  function handleTournamentFormChange(field, value) {
+    setTournamentForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  async function handleTournamentFormSubmit(event) {
+    event.preventDefault();
+    if (!tournamentForm.name.trim()) {
+      updateMessage('error', 'Turniername darf nicht leer sein.');
+      return;
+    }
+
+    try {
+      await createTournament({
+        name: tournamentForm.name,
+        group_count: Number(tournamentForm.group_count || 0),
+        knockout_rounds: Number(tournamentForm.knockout_rounds || 0),
+        team_count: Number(tournamentForm.team_count || 0),
+        classification_mode: tournamentForm.classification_mode,
+        is_public: Boolean(tournamentForm.is_public)
+      });
+      setTournamentForm({
+        name: '',
+        group_count: '',
+        knockout_rounds: '',
+        team_count: '',
+        classification_mode: 'top4',
+        is_public: false
+      });
+      loadTournaments();
+      updateMessage('info', 'Turnier erstellt.');
+    } catch (err) {
+      console.error(err);
+      updateMessage('error', 'Turnier konnte nicht erstellt werden.');
+    }
+  }
+
+  function startTournamentEdit(tournament) {
+    setTournamentEdits((prev) => ({
+      ...prev,
+      [tournament.id]: {
+        name: tournament.name,
+        group_count: String(tournament.group_count ?? 0),
+        knockout_rounds: String(tournament.knockout_rounds ?? 0),
+        team_count: String(tournament.team_count ?? 0),
+        classification_mode: tournament.classification_mode ?? 'top4',
+        is_public: Boolean(tournament.is_public)
+      }
+    }));
+  }
+
+  function handleTournamentEditChange(id, field, value) {
+    setTournamentEdits((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], [field]: value }
+    }));
+  }
+
+  function cancelTournamentEdit(id) {
+    setTournamentEdits((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+  }
+
+  async function handleTournamentSave(id) {
+    const draft = tournamentEdits[id];
+    if (!draft || !draft.name.trim()) {
+      updateMessage('error', 'Turniername darf nicht leer sein.');
+      return;
+    }
+
+    try {
+      await updateTournament(id, {
+        name: draft.name,
+        group_count: Number(draft.group_count || 0),
+        knockout_rounds: Number(draft.knockout_rounds || 0),
+        team_count: Number(draft.team_count || 0),
+        classification_mode: draft.classification_mode,
+        is_public: Boolean(draft.is_public)
+      });
+      cancelTournamentEdit(id);
+      loadTournaments();
+      updateMessage('info', 'Turnier aktualisiert.');
+    } catch (err) {
+      console.error(err);
+      updateMessage('error', 'Turnier konnte nicht aktualisiert werden.');
+    }
+  }
+
+  async function handleTournamentDelete(id) {
+    if (!window.confirm('Turnier wirklich löschen?')) {
+      return;
+    }
+
+    try {
+      await deleteTournament(id);
+      cancelTournamentEdit(id);
+      if (scoreboard?.tournamentId === id) {
+        const updated = await updateMatchContext({ tournamentId: null, stageType: null, stageLabel: '' });
+        setScoreboard(updated);
+      }
+      loadTournaments();
+      updateMessage('info', 'Turnier gelöscht.');
+    } catch (err) {
+      console.error(err);
+      updateMessage('error', 'Turnier konnte nicht gelöscht werden.');
+    }
+  }
+
+  async function handleTeamCreateSubmit(event) {
+    event.preventDefault();
+    const trimmed = teamCreateName.trim();
+    if (!trimmed) {
+      updateMessage('error', 'Teamname darf nicht leer sein.');
+      return;
+    }
+
+    try {
+      await createTeam({ name: trimmed });
+      setTeamCreateName('');
+      loadTeams();
+      updateMessage('info', 'Team angelegt.');
+    } catch (err) {
+      console.error(err);
+      updateMessage('error', 'Team konnte nicht angelegt werden.');
+    }
+  }
+
+  function startTeamEdit(team) {
+    setTeamEdits((prev) => ({
+      ...prev,
+      [team.id]: { name: team.name }
+    }));
+  }
+
+  function handleTeamEditChange(id, value) {
+    setTeamEdits((prev) => ({
+      ...prev,
+      [id]: { name: value }
+    }));
+  }
+
+  function cancelTeamEdit(id) {
+    setTeamEdits((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+  }
+
+  async function handleTeamSave(id) {
+    const draft = teamEdits[id];
+    if (!draft || !draft.name.trim()) {
+      updateMessage('error', 'Teamname darf nicht leer sein.');
+      return;
+    }
+
+    try {
+      await updateTeam(id, { name: draft.name });
+      cancelTeamEdit(id);
+      loadTeams();
+      updateMessage('info', 'Team aktualisiert.');
+    } catch (err) {
+      console.error(err);
+      updateMessage('error', 'Team konnte nicht aktualisiert werden.');
+    }
+  }
+
+  async function handleTeamDelete(id) {
+    if (!window.confirm('Team wirklich löschen?')) {
+      return;
+    }
+
+    try {
+      await deleteTeam(id);
+      cancelTeamEdit(id);
+      loadTeams();
+      updateMessage('info', 'Team gelöscht.');
+    } catch (err) {
+      console.error(err);
+      updateMessage('error', 'Team konnte nicht gelöscht werden.');
     }
   }
 
@@ -553,8 +1491,22 @@ export default function Dashboard() {
     }
 
     payload.penalties = {
-      a: Array.from({ length: Math.trunc(penaltyCountA) }, (_, idx) => ({ id: `a-${idx}`, isExpired: true })),
-      b: Array.from({ length: Math.trunc(penaltyCountB) }, (_, idx) => ({ id: `b-${idx}`, isExpired: true }))
+      a: Array.from({ length: Math.trunc(penaltyCountA) }, (_, idx) => ({
+        id: `a-${editingGameId}-${idx}`,
+        team: 'a',
+        name: `Strafe ${idx + 1}`,
+        remainingSeconds: 0,
+        totalSeconds: 0,
+        isExpired: true
+      })),
+      b: Array.from({ length: Math.trunc(penaltyCountB) }, (_, idx) => ({
+        id: `b-${editingGameId}-${idx}`,
+        team: 'b',
+        name: `Strafe ${idx + 1}`,
+        remainingSeconds: 0,
+        totalSeconds: 0,
+        isExpired: true
+      }))
     };
 
     try {
@@ -594,29 +1546,236 @@ export default function Dashboard() {
     return <p>Scoreboard-Daten nicht verfügbar.</p>;
   }
 
+  const describeScheduleMatch = (entry) => {
+    if (!entry) {
+      return '';
+    }
+
+    const roundPart = entry.phase === 'group' && entry.round_number
+      ? ` · Runde ${entry.round_number}`
+      : '';
+
+    return `${entry.stage_label || 'Phase'}${roundPart} – ${entry.home_label} vs ${entry.away_label}`;
+  };
+
+  const selectedScheduleMatch = scheduleOptionData.matchMap.get(schedulePickerCode ?? '');
+  const activeScheduleMatch = scoreboard?.scheduleCode
+    ? scheduleOptionData.matchMap.get(scoreboard.scheduleCode)
+    : null;
+
   const controlContent = (
     <>
       <section style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
-        <h3>Teamnamen</h3>
-        <form onSubmit={handleTeamSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <label>
-            Team A
-            <input
-              value={teamForm.teamAName}
-              onChange={(event) => handleTeamInputChange('teamAName', event.target.value)}
-              placeholder="Team A Name"
-            />
+        <h3>Match-Kontext</h3>
+        <form onSubmit={handleContextSubmit} style={{ display: 'grid', gap: '0.75rem' }}>
+          <label style={{ display: 'grid', gap: '0.35rem' }}>
+            Turnier
+            <select
+              value={contextForm.tournamentId}
+              onChange={(event) => handleContextFormChange('tournamentId', event.target.value)}
+              disabled={tournamentsLoading}
+            >
+              <option value="">Kein Turnier</option>
+              {tournaments.map((tournament) => (
+                <option key={tournament.id} value={tournament.id}>
+                  {tournament.name}
+                </option>
+              ))}
+            </select>
           </label>
-          <label>
-            Team B
-            <input
-              value={teamForm.teamBName}
-              onChange={(event) => handleTeamInputChange('teamBName', event.target.value)}
-              placeholder="Team B Name"
-            />
+
+          <label style={{ display: 'grid', gap: '0.35rem' }}>
+            Phase
+            <select
+              value={contextForm.stageType}
+              onChange={(event) => handleContextFormChange('stageType', event.target.value)}
+            >
+              <option value="">Keine Phase</option>
+              <option value="group">Gruppenphase</option>
+              <option value="knockout">KO-Runde</option>
+              <option value="placement">Platzierung</option>
+            </select>
           </label>
-          <button type="submit">Speichern</button>
+
+          {contextForm.stageType && (
+            <label style={{ display: 'grid', gap: '0.35rem' }}>
+              {contextForm.stageType === 'group'
+                ? 'Gruppenbezeichnung'
+                : contextForm.stageType === 'knockout'
+                  ? 'Rundenbezeichnung'
+                  : 'Platzierungsbezeichnung'}
+              <input
+                value={contextForm.stageLabel}
+                onChange={(event) => handleContextFormChange('stageLabel', event.target.value)}
+                placeholder={stageLabelPlaceholder}
+                list={stageListId}
+              />
+              {stageListId ? (
+                <datalist id={stageListId}>
+                  {stageSuggestionEntries.map((entry) => (
+                    <option key={`${stageListId}-${entry.label}`} value={entry.label} />
+                  ))}
+                </datalist>
+              ) : null}
+              {stageOptionsLoading ? (
+                <span style={{ fontSize: '0.8rem', opacity: 0.65 }}>Lade verfügbare Phasen ...</span>
+              ) : stageHintLines.length > 0 ? (
+                <>
+                  <span style={{ fontSize: '0.8rem', opacity: 0.65 }}>
+                    Vorschläge: {stageHintLines.join(' · ')}
+                  </span>
+                  <span style={{ fontSize: '0.8rem', opacity: 0.65 }}>
+                    Tipp: Auswahl eines bekannten Labels setzt die passende Phase automatisch.
+                  </span>
+                </>
+              ) : (
+                <span style={{ fontSize: '0.8rem', opacity: 0.65 }}>
+                  Noch keine Vorschläge verfügbar.
+                </span>
+              )}
+            </label>
+          )}
+
+          <button type="submit">Match-Kontext aktualisieren</button>
         </form>
+        {tournamentsError && <p style={{ marginTop: '0.75rem', color: 'crimson' }}>{tournamentsError}</p>}
+        {scoreboard?.tournamentName && (
+          <p style={{ marginTop: '0.75rem' }}>
+            Aktuelles Turnier: <strong>{scoreboard.tournamentName}</strong>
+            {scoreboard.stageType && scoreboard.stageLabel ? (
+              <>
+                {' · '}
+                {scoreboard.stageType === 'group' ? `Gruppe ${scoreboard.stageLabel}` : scoreboard.stageLabel}
+              </>
+            ) : null}
+            {scoreboard.scheduleCode ? (
+              <>
+                {' · '}Matchcode {scoreboard.scheduleCode}
+              </>
+            ) : null}
+          </p>
+        )}
+      </section>
+
+      <section style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
+        <h3>Spielplan-Matches</h3>
+        <p style={{ marginTop: 0, marginBottom: '0.75rem', color: '#555' }}>
+          Übernehme geplante Paarungen direkt aus dem Spielplan, damit Teams, Phase und Spielcode automatisch gesetzt werden.
+        </p>
+        {!resolvedTournamentId ? (
+          <p>Bitte zuerst ein Turnier im Match-Kontext auswählen.</p>
+        ) : scheduleLoading ? (
+          <p>Lade Spielplan...</p>
+        ) : scheduleError ? (
+          <p style={{ color: 'crimson' }}>{scheduleError}</p>
+        ) : scheduleOptionData.options.length === 0 ? (
+          <p>Noch keine Partien im Spielplan vorhanden.</p>
+        ) : (
+          <div style={{ display: 'grid', gap: '0.75rem' }}>
+            <label style={{ display: 'grid', gap: '0.35rem' }}>
+              Match auswählen
+              <select
+                value={schedulePickerCode}
+                onChange={(event) => setSchedulePickerCode(event.target.value)}
+              >
+                <option value="">Bitte wählen</option>
+                {scheduleOptionData.options.map((option) => (
+                  <option key={option.code} value={option.code}>
+                    {option.label}
+                    {option.hasResult ? ' (bereits gespielt)' : ''}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+              <button
+                type="button"
+                onClick={() => handleScheduleMatchApply(schedulePickerCode)}
+                disabled={!schedulePickerCode || Boolean(scheduleSelection)}
+              >
+                Match übernehmen
+              </button>
+              {scheduleSelection ? (
+                <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>Übernehme Match...</span>
+              ) : null}
+              {activeScheduleMatch ? (
+                <span style={{ fontSize: '0.85rem', opacity: 0.75 }}>
+                  Aktuelles Scoreboard-Match: {describeScheduleMatch(activeScheduleMatch)}
+                </span>
+              ) : null}
+            </div>
+
+            {selectedScheduleMatch ? (
+              <p style={{ fontSize: '0.85rem', opacity: 0.75, margin: 0 }}>
+                Auswahl: {describeScheduleMatch(selectedScheduleMatch)}
+              </p>
+            ) : null}
+
+            {selectedScheduleMatch?.result?.hasResult ? (
+              <p style={{ fontSize: '0.85rem', color: '#b26a00', margin: 0 }}>
+                Hinweis: Für dieses Match existiert bereits ein Ergebnis ({selectedScheduleMatch.result.scoreA ?? 0}
+                :
+                {selectedScheduleMatch.result.scoreB ?? 0}).
+              </p>
+            ) : null}
+          </div>
+        )}
+      </section>
+
+      <section style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
+        <h3>Teams</h3>
+        <p style={{ marginTop: 0, marginBottom: '0.75rem', color: '#555' }}>
+          Wähle Teams aus der Liste oder trage freie Namen ein. Verwaltung der Teams im Tab &quot;Teams&quot;.
+        </p>
+        <form onSubmit={handleTeamSubmit} style={{ display: 'grid', gap: '0.75rem' }}>
+          <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
+            {[
+              { idField: 'teamAId', nameField: 'teamAName', label: 'Team A' },
+              { idField: 'teamBId', nameField: 'teamBName', label: 'Team B' }
+            ].map(({ idField, nameField, label }) => {
+              const currentId = teamForm[idField];
+              const hasCurrentSelection = Boolean(currentId) && teams.some((team) => String(team.id) === currentId);
+              return (
+                <div key={idField} style={{ display: 'grid', gap: '0.5rem' }}>
+                <label style={{ display: 'grid', gap: '0.35rem' }}>
+                  {label} auswählen
+                  <select
+                    value={teamForm[idField]}
+                    onChange={(event) => handleTeamSelectChange(idField, event.target.value)}
+                    disabled={teamsLoading}
+                  >
+                    <option value="">Freier Name</option>
+                    {teams.map((team) => (
+                      <option key={team.id} value={team.id}>
+                        {team.name}
+                      </option>
+                    ))}
+                    {!hasCurrentSelection && currentId && (
+                      <option value={currentId}>
+                        {teamForm[nameField] ? `${teamForm[nameField]} (nicht mehr verfügbar)` : 'Ehemaliges Team'}
+                      </option>
+                    )}
+                  </select>
+                </label>
+                <label style={{ display: 'grid', gap: '0.35rem' }}>
+                  {label} Name
+                  <input
+                    value={teamForm[nameField]}
+                    onChange={(event) => handleTeamInputChange(nameField, event.target.value)}
+                    placeholder={`${label} Name`}
+                  />
+                </label>
+              </div>
+              );
+            })}
+          </div>
+          <div>
+            <button type="submit">Teams übernehmen</button>
+          </div>
+        </form>
+        {teamsLoading && <p style={{ marginTop: '0.75rem' }}>Teams werden geladen...</p>}
+        {teamsError && <p style={{ marginTop: '0.75rem', color: 'crimson' }}>{teamsError}</p>}
       </section>
 
       <section style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
@@ -912,6 +2071,10 @@ export default function Dashboard() {
                         onChange={(event) => handleHistoryEditChange('penalty_count_b', event.target.value)}
                       />
                     </div>
+                    <div style={{ marginTop: '0.25rem', fontStyle: 'italic' }}>
+                      Turnier: {game.tournament_name ?? '—'}
+                      {game.stage_type === 'group' && game.stage_label ? ` · Gruppe ${game.stage_label}` : game.stage_type === 'knockout' && game.stage_label ? ` · ${game.stage_label}` : ''}
+                    </div>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                       <button type="submit">Speichern</button>
                       <button type="button" onClick={cancelHistoryEdit}>Abbrechen</button>
@@ -921,6 +2084,10 @@ export default function Dashboard() {
                   <div style={{ display: 'grid', gap: '0.35rem' }}>
                     <p style={{ margin: 0, fontWeight: 600 }}>
                       {game.team_a} {game.score_a} : {game.score_b} {game.team_b}
+                    </p>
+                    <p style={{ margin: 0, fontStyle: 'italic' }}>
+                      Turnier: {game.tournament_name ?? '—'}
+                      {game.stage_type === 'group' && game.stage_label ? ` · Gruppe ${game.stage_label}` : game.stage_type === 'knockout' && game.stage_label ? ` · ${game.stage_label}` : ''}
                     </p>
                     <p style={{ margin: 0 }}>
                       Spielzeit: {formatTime(game.duration_seconds)} · Halbzeit bei {formatTime(game.halftime_seconds)} · Pause {formatTime(game.halftime_pause_seconds)}
@@ -947,10 +2114,297 @@ export default function Dashboard() {
     </section>
   );
 
+  const teamsContent = (
+    <section style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
+      <h3>Teams verwalten</h3>
+      <form onSubmit={handleTeamCreateSubmit} style={{ display: 'grid', gap: '0.75rem', marginBottom: '1.5rem' }}>
+        <label style={{ display: 'grid', gap: '0.35rem' }}>
+          Neues Team
+          <input
+            value={teamCreateName}
+            onChange={(event) => setTeamCreateName(event.target.value)}
+            placeholder="Teamname"
+            required
+          />
+        </label>
+        <div>
+          <button type="submit" disabled={teamsLoading}>Team anlegen</button>
+        </div>
+      </form>
+
+      {teamsLoading ? (
+        <p>Lade Teams...</p>
+      ) : teamsError ? (
+        <p style={{ color: 'crimson' }}>{teamsError}</p>
+      ) : teams.length === 0 ? (
+        <p>Noch keine Teams vorhanden.</p>
+      ) : (
+        <div style={{ display: 'grid', gap: '1rem' }}>
+          {teams.map((team) => {
+            const edit = teamEdits[team.id];
+            const formValue = edit ? edit.name : team.name;
+            const isEditing = Boolean(edit);
+            return (
+              <article
+                key={team.id}
+                style={{
+                  border: '1px solid rgba(0,0,0,0.15)',
+                  borderRadius: '8px',
+                  padding: '0.75rem 1rem',
+                  background: 'rgba(0,0,0,0.02)'
+                }}
+              >
+                {isEditing ? (
+                  <div style={{ display: 'grid', gap: '0.5rem' }}>
+                    <label style={{ display: 'grid', gap: '0.35rem' }}>
+                      Name
+                      <input value={formValue} onChange={(event) => handleTeamEditChange(team.id, event.target.value)} />
+                    </label>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button type="button" onClick={() => handleTeamSave(team.id)}>Speichern</button>
+                      <button type="button" onClick={() => cancelTeamEdit(team.id)}>Abbrechen</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gap: '0.35rem' }}>
+                    <strong>{team.name}</strong>
+                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                      <button type="button" onClick={() => startTeamEdit(team)}>Bearbeiten</button>
+                      <button type="button" onClick={() => handleTeamDelete(team.id)} style={{ background: '#d32f2f', color: '#fff' }}>
+                        Löschen
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </article>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+
   const tabs = [
     { id: 'control', label: 'Steuerung' },
-    { id: 'history', label: 'Historie' }
+    { id: 'history', label: 'Historie' },
+    { id: 'teams', label: 'Teams' },
+    { id: 'tournaments', label: 'Turniere' }
   ];
+
+  const tournamentContent = (
+    <section style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
+      <h3>Turniere verwalten</h3>
+      <form onSubmit={handleTournamentFormSubmit} style={{ display: 'grid', gap: '0.75rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'grid', gap: '0.35rem' }}>
+          <label>Neues Turnier</label>
+          <input
+            value={tournamentForm.name}
+            onChange={(event) => handleTournamentFormChange('name', event.target.value)}
+            placeholder="Turniername"
+            required
+          />
+        </div>
+        <div style={{ display: 'grid', gap: '0.35rem', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
+          <label>
+            Gruppen
+            <input
+              type="number"
+              min="0"
+              value={tournamentForm.group_count}
+              onChange={(event) => handleTournamentFormChange('group_count', event.target.value)}
+              placeholder="z.B. 4"
+            />
+          </label>
+          <label>
+            KO-Runden
+            <input
+              type="number"
+              min="0"
+              value={tournamentForm.knockout_rounds}
+              onChange={(event) => handleTournamentFormChange('knockout_rounds', event.target.value)}
+              placeholder="z.B. 2"
+            />
+          </label>
+        </div>
+        <div style={{ display: 'grid', gap: '0.35rem', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
+          <label>
+            Mannschaften
+            <input
+              type="number"
+              min="0"
+              value={tournamentForm.team_count}
+              onChange={(event) => handleTournamentFormChange('team_count', event.target.value)}
+              placeholder="z.B. 16"
+              required
+            />
+          </label>
+          <label>
+            Platzierungsmodus
+            <select
+              value={tournamentForm.classification_mode}
+              onChange={(event) => handleTournamentFormChange('classification_mode', event.target.value)}
+            >
+              <option value="top4">nur Plätze 1–4</option>
+              <option value="all">alle Plätze (vollständiger Spielplan)</option>
+            </select>
+          </label>
+        </div>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <input
+            type="checkbox"
+            checked={Boolean(tournamentForm.is_public)}
+            onChange={(event) => handleTournamentFormChange('is_public', event.target.checked)}
+          />
+          Öffentlich im Public-Dashboard anzeigen
+        </label>
+        <div>
+          <button type="submit" disabled={tournamentsLoading}>Turnier anlegen</button>
+        </div>
+      </form>
+
+      {tournamentsLoading ? (
+        <p>Lade Turniere...</p>
+      ) : tournamentsError ? (
+        <p style={{ color: 'crimson' }}>{tournamentsError}</p>
+      ) : tournaments.length === 0 ? (
+        <p>Noch keine Turniere vorhanden.</p>
+      ) : (
+        <div style={{ display: 'grid', gap: '1rem' }}>
+          {tournaments.map((tournament) => {
+            const edit = tournamentEdits[tournament.id];
+            const formValues = edit || {
+              name: tournament.name,
+              group_count: String(tournament.group_count ?? 0),
+              knockout_rounds: String(tournament.knockout_rounds ?? 0),
+              team_count: String(tournament.team_count ?? 0),
+              classification_mode: tournament.classification_mode ?? 'top4',
+              is_public: Boolean(tournament.is_public)
+            };
+            const isEditing = Boolean(edit);
+            return (
+              <Fragment key={tournament.id}>
+                <article
+                  style={{
+                    border: '1px solid rgba(0,0,0,0.15)',
+                    borderRadius: '8px',
+                    padding: '0.75rem 1rem',
+                    background: 'rgba(0,0,0,0.02)'
+                  }}
+                >
+                {isEditing ? (
+                  <div style={{ display: 'grid', gap: '0.5rem' }}>
+                    <div style={{ display: 'grid', gap: '0.35rem' }}>
+                      <label>Name</label>
+                      <input value={formValues.name} onChange={(event) => handleTournamentEditChange(tournament.id, 'name', event.target.value)} />
+                    </div>
+                    <div style={{ display: 'grid', gap: '0.35rem', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
+                      <label>
+                        Gruppen
+                        <input
+                          type="number"
+                          min="0"
+                          value={formValues.group_count}
+                          onChange={(event) => handleTournamentEditChange(tournament.id, 'group_count', event.target.value)}
+                        />
+                      </label>
+                      <label>
+                        KO-Runden
+                        <input
+                          type="number"
+                          min="0"
+                          value={formValues.knockout_rounds}
+                          onChange={(event) => handleTournamentEditChange(tournament.id, 'knockout_rounds', event.target.value)}
+                        />
+                      </label>
+                    </div>
+                    <div style={{ display: 'grid', gap: '0.35rem', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
+                      <label>
+                        Mannschaften
+                        <input
+                          type="number"
+                          min="0"
+                          value={formValues.team_count}
+                          onChange={(event) => handleTournamentEditChange(tournament.id, 'team_count', event.target.value)}
+                        />
+                      </label>
+                      <label>
+                        Platzierungsmodus
+                        <select
+                          value={formValues.classification_mode}
+                          onChange={(event) => handleTournamentEditChange(tournament.id, 'classification_mode', event.target.value)}
+                        >
+                          <option value="top4">nur Plätze 1–4</option>
+                          <option value="all">alle Plätze (vollständig)</option>
+                        </select>
+                      </label>
+                    </div>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(formValues.is_public)}
+                        onChange={(event) => handleTournamentEditChange(tournament.id, 'is_public', event.target.checked)}
+                      />
+                      Öffentlich im Public-Dashboard anzeigen
+                    </label>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gap: '0.35rem' }}>
+                    <strong>{tournament.name}</strong>
+                    <span>Gruppen: {tournament.group_count ?? 0} · KO-Runden: {tournament.knockout_rounds ?? 0}</span>
+                    <span>Teams: {tournament.team_count ?? 0} · Platzierungen: {tournament.classification_mode === 'all' ? 'alle Plätze' : 'nur 1–4'}</span>
+                    <span style={{ fontSize: '0.9rem', opacity: 0.75 }}>
+                      Status: {tournament.is_public ? 'öffentlich' : 'privat'}
+                    </span>
+                  </div>
+                )}
+                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
+                  <button type="button" onClick={() => handleTournamentDetailsToggle(tournament.id)}>
+                    {expandedTournamentId === tournament.id ? 'Details verbergen' : 'Details anzeigen'}
+                  </button>
+                  {isEditing ? (
+                    <>
+                      <button type="button" onClick={() => handleTournamentSave(tournament.id)}>Speichern</button>
+                      <button type="button" onClick={() => cancelTournamentEdit(tournament.id)}>Abbrechen</button>
+                    </>
+                  ) : (
+                    <>
+                      <button type="button" onClick={() => startTournamentEdit(tournament)}>Bearbeiten</button>
+                      <button
+                        type="button"
+                        onClick={() => handleTournamentDelete(tournament.id)}
+                        style={{ background: '#d32f2f', color: '#fff' }}
+                      >
+                        Löschen
+                      </button>
+                    </>
+                  )}
+                </div>
+                </article>
+                {expandedTournamentId === tournament.id ? (
+                  <TournamentDetailsPanel
+                    tournament={tournament}
+                    structure={expandedTournamentId === tournament.id ? activeStructure : null}
+                    teams={teams}
+                    assignments={slotAssignments}
+                    loading={structureLoading}
+                    error={structureError}
+                    hasChanges={hasTournamentChanges}
+                    saving={structureSaving}
+                    onNameChange={handleSlotNameChange}
+                    onTeamSelect={handleSlotTeamSelect}
+                    onResetSlot={handleSlotReset}
+                    onResetAll={handleResetAllSlots}
+                    onSave={handleTournamentAssignmentsSave}
+                    onRefresh={handleTournamentStructureRefresh}
+                  />
+                ) : null}
+              </Fragment>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
 
   const tabButtonStyle = (active) => ({
     padding: '0.6rem 1.2rem',
@@ -984,8 +2438,260 @@ export default function Dashboard() {
       </nav>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        {activeTab === 'control' ? controlContent : historyContent}
+        {activeTab === 'control'
+          ? controlContent
+          : activeTab === 'history'
+            ? historyContent
+            : activeTab === 'teams'
+              ? teamsContent
+              : tournamentContent}
       </div>
+    </div>
+  );
+}
+
+function TournamentDetailsPanel({
+  tournament,
+  structure,
+  teams,
+  assignments,
+  loading,
+  error,
+  hasChanges,
+  saving,
+  onNameChange,
+  onTeamSelect,
+  onResetSlot,
+  onResetAll,
+  onSave,
+  onRefresh
+}) {
+  const containerStyle = {
+    marginTop: '0.75rem',
+    border: '1px solid rgba(0,0,0,0.1)',
+    borderRadius: '8px',
+    padding: '0.85rem 1rem',
+    background: 'rgba(0,0,0,0.015)',
+    display: 'grid',
+    gap: '0.9rem'
+  };
+
+  if (loading) {
+    return (
+      <div style={containerStyle}>
+        <p style={{ margin: 0 }}>Lade Turnierstruktur…</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={containerStyle}>
+        <p style={{ margin: 0, color: 'crimson' }}>{error}</p>
+        <div>
+          <button type="button" onClick={onRefresh}>Erneut versuchen</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!structure) {
+    return (
+      <div style={containerStyle}>
+        <p style={{ margin: 0 }}>Noch keine Turnierstruktur verfügbar. Bitte neu laden.</p>
+        <div>
+          <button type="button" onClick={onRefresh}>Aktualisieren</button>
+        </div>
+      </div>
+    );
+  }
+
+  const groups = Array.isArray(structure.groups) ? structure.groups : [];
+  const qualifierSummary = structure.knockout?.entrants
+    ? `${structure.knockout.entrants} mögliche KO-Teilnehmer`
+    : 'Keine KO-Runde konfiguriert';
+
+  const statusLabel = (status) => {
+    if (status === 'qualified') return 'qualifiziert';
+    if (status === 'in_position') return 'auf Kurs';
+    if (status === 'contender') return 'verfolgt';
+    return '—';
+  };
+
+  const statusColor = (status) => {
+    if (status === 'qualified') return '#1b5e20';
+    if (status === 'in_position') return '#1565c0';
+    if (status === 'contender') return '#6d4c41';
+    return '#546e7a';
+  };
+
+  return (
+    <div style={containerStyle}>
+      <header style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'grid', gap: '0.25rem' }}>
+          <strong style={{ fontSize: '1.05rem' }}>Turnierdetails – {tournament.name}</strong>
+          <span style={{ fontSize: '0.85rem', opacity: 0.8 }}>{qualifierSummary}</span>
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <button type="button" onClick={onSave} disabled={!hasChanges || saving}>
+            {saving ? 'Speichern…' : 'Änderungen speichern'}
+          </button>
+          <button type="button" onClick={onResetAll} disabled={!hasChanges || saving}>
+            Änderungen verwerfen
+          </button>
+          <button type="button" onClick={onRefresh} disabled={saving}>
+            Neu laden
+          </button>
+        </div>
+      </header>
+
+      {groups.length === 0 ? (
+        <p style={{ margin: 0 }}>Keine Gruppen vorhanden.</p>
+      ) : (
+        <div style={{ display: 'grid', gap: '1.25rem' }}>
+          {groups.map((group) => {
+            const qualifiesCount = group.qualifiers?.count ?? 0;
+            const recorded = group.standings?.recordedGamesCount ?? 0;
+            const totalMatches = group.standings?.totalMatches ?? 0;
+            const qualifierLabel =
+              qualifiesCount > 0
+                ? `${qualifiesCount} ${qualifiesCount === 1 ? 'Platz' : 'Plätze'} für KO`
+                : 'Keine direkte Qualifikation';
+            const progressLabel =
+              totalMatches > 0 ? `${recorded}/${totalMatches} Spiele erfasst` : 'Noch keine Spiele angesetzt';
+            return (
+              <section
+                key={`group-${group.label}`}
+                style={{
+                  border: '1px solid rgba(0,0,0,0.08)',
+                  borderRadius: '8px',
+                  padding: '0.75rem 0.9rem',
+                  display: 'grid',
+                  gap: '0.75rem',
+                  background: 'rgba(255,255,255,0.6)'
+                }}
+              >
+                <header style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <div style={{ display: 'grid', gap: '0.2rem' }}>
+                    <strong>Gruppe {group.label}</strong>
+                    <span style={{ fontSize: '0.85rem', opacity: 0.75 }}>{qualifierLabel}</span>
+                  </div>
+                  <span style={{ fontSize: '0.85rem', opacity: 0.75 }}>{progressLabel}</span>
+                </header>
+
+                <div
+                  style={{
+                    display: 'grid',
+                    gap: '0.75rem',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))'
+                  }}
+                >
+                  {group.slots.map((slot) => {
+                    const key = String(slot.slotNumber);
+                    const assignment = assignments[key] ?? { name: '', teamId: '' };
+                    return (
+                      <div
+                        key={`slot-${group.label}-${slot.slotNumber}`}
+                        style={{
+                          border: '1px solid rgba(0,0,0,0.08)',
+                          borderRadius: '6px',
+                          padding: '0.6rem 0.65rem',
+                          display: 'grid',
+                          gap: '0.5rem',
+                          background: 'rgba(0,0,0,0.02)'
+                        }}
+                      >
+                        <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>Slot {slot.slotNumber}</div>
+                        <label style={{ display: 'grid', gap: '0.25rem', fontSize: '0.85rem' }}>
+                          Teamname
+                          <input
+                            value={assignment.name ?? ''}
+                            onChange={(event) => onNameChange(slot.slotNumber, event.target.value)}
+                            placeholder={`Team ${slot.slotNumber}`}
+                          />
+                        </label>
+                        <label style={{ display: 'grid', gap: '0.25rem', fontSize: '0.85rem' }}>
+                          Verknüpftes Team
+                          <select
+                            value={assignment.teamId ?? ''}
+                            onChange={(event) => onTeamSelect(slot.slotNumber, event.target.value)}
+                          >
+                            <option value="">Eigenen Namen verwenden</option>
+                            {teams.map((team) => (
+                              <option key={`slot-team-${team.id}`} value={team.id}>
+                                {team.name}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <button type="button" onClick={() => onResetSlot(slot.slotNumber)}>
+                          Slot zurücksetzen
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div style={{ display: 'grid', gap: '0.5rem' }}>
+                  <strong style={{ fontSize: '0.95rem' }}>Aktuelle Tabelle</strong>
+                  {Array.isArray(group.standings?.entries) && group.standings.entries.length > 0 ? (
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                      <thead>
+                        <tr>
+                          {['Platz', 'Team', 'Sp', 'Tore', 'Diff', 'Pkt', 'Status'].map((label) => (
+                            <th
+                              key={`${group.label}-${label}`}
+                              style={{
+                                textAlign: label === 'Team' ? 'left' : 'center',
+                                padding: '0.4rem',
+                                borderBottom: '1px solid rgba(0,0,0,0.1)'
+                              }}
+                            >
+                              {label}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {group.standings.entries.map((entry) => (
+                          <tr key={`${group.label}-pos-${entry.position}`}>
+                            <td style={{ padding: '0.35rem', textAlign: 'center' }}>{entry.position}</td>
+                            <td style={{ padding: '0.35rem' }}>{entry.team}</td>
+                            <td style={{ padding: '0.35rem', textAlign: 'center' }}>{entry.played}</td>
+                            <td style={{ padding: '0.35rem', textAlign: 'center' }}>
+                              {entry.goalsFor}:{entry.goalsAgainst}
+                            </td>
+                            <td style={{ padding: '0.35rem', textAlign: 'center' }}>{entry.goalDiff}</td>
+                            <td style={{ padding: '0.35rem', textAlign: 'center' }}>{entry.points}</td>
+                            <td style={{ padding: '0.35rem', textAlign: 'center', color: statusColor(entry.status) }}>
+                              {statusLabel(entry.status)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.7 }}>Noch keine Ergebnisse gespeichert.</p>
+                  )}
+                  {group.qualifiers?.qualifiedTeams?.length > 0 ? (
+                    <span style={{ fontSize: '0.8rem', color: '#1b5e20' }}>
+                      Qualifiziert: {group.qualifiers.qualifiedTeams.join(', ')}
+                    </span>
+                  ) : group.qualifiers?.provisionalTeams?.length > 0 ? (
+                    <span style={{ fontSize: '0.8rem', color: '#1565c0' }}>
+                      Aktuell auf den Qualifikationsplätzen: {group.qualifiers.provisionalTeams.join(', ')}
+                    </span>
+                  ) : null}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      )}
+      <p style={{ margin: 0, fontSize: '0.75rem', opacity: 0.65 }}>
+        Hinweis: Wird ein Team aus der Liste gewählt, nutzt der Spielplan automatisch dessen offiziellen Namen. Freitext
+        ohne Auswahl gilt als individueller Name für diesen Slot.
+      </p>
     </div>
   );
 }

@@ -14,9 +14,22 @@ import {
   setScoreAbsolute,
   setRemainingSeconds,
   setTeams,
-  startTimer
-} from '../scoreboardState.js';
-import { deleteGame, getGame, listGames, saveGame, updateGame } from '../storage.js';
+  setMatchContext,
+  applyScheduleMatchSelection,
+  startTimer,
+  normalizeGroupStageLabel
+} from '../scoreboard/index.js';
+import {
+  computeGroupStandings,
+  deleteGame,
+  getGame,
+  getTeam,
+  getTournament,
+  getTournamentSchedule,
+  listGames,
+  saveGame,
+  updateGame
+} from '../services/index.js';
 
 const router = express.Router();
 
@@ -24,18 +37,64 @@ router.get('/', (_req, res) => {
   res.json(getScoreboardState());
 });
 
-router.post('/teams', (req, res) => {
-  const { teamAName, teamBName } = req.body ?? {};
+router.post('/teams', async (req, res) => {
+  try {
+    const {
+      teamAName,
+      teamBName,
+      teamAId,
+      teamBId
+    } = req.body ?? {};
 
-  if (
-    (teamAName === undefined || String(teamAName).trim().length === 0) &&
-    (teamBName === undefined || String(teamBName).trim().length === 0)
-  ) {
-    return res.status(400).json({ message: 'teamAName oder teamBName muss angegeben werden.' });
+    const payload = {};
+    let provided = false;
+
+    if (teamAId !== undefined && teamAId !== null && teamAId !== '') {
+      const numeric = Number(teamAId);
+      if (!Number.isInteger(numeric) || numeric <= 0) {
+        return res.status(400).json({ message: 'Ungültige Team-ID für Team A.' });
+      }
+      const team = await getTeam(numeric);
+      if (!team) {
+        return res.status(404).json({ message: 'Team A wurde nicht gefunden.' });
+      }
+      payload.teamAId = team.id;
+      payload.teamAName = team.name;
+      provided = true;
+    } else if (typeof teamAName === 'string' && teamAName.trim().length > 0) {
+      payload.teamAName = teamAName;
+      payload.teamAId = null;
+      provided = true;
+    }
+
+    if (teamBId !== undefined && teamBId !== null && teamBId !== '') {
+      const numeric = Number(teamBId);
+      if (!Number.isInteger(numeric) || numeric <= 0) {
+        return res.status(400).json({ message: 'Ungültige Team-ID für Team B.' });
+      }
+      const team = await getTeam(numeric);
+      if (!team) {
+        return res.status(404).json({ message: 'Team B wurde nicht gefunden.' });
+      }
+      payload.teamBId = team.id;
+      payload.teamBName = team.name;
+      provided = true;
+    } else if (typeof teamBName === 'string' && teamBName.trim().length > 0) {
+      payload.teamBName = teamBName;
+      payload.teamBId = null;
+      provided = true;
+    }
+
+    if (!provided) {
+      return res.status(400).json({ message: 'Bitte mindestens ein Team setzen.' });
+    }
+
+    const nextState = setTeams(payload);
+    res.json(nextState);
+  } catch (error) {
+    console.error('Teamnamen konnten nicht gesetzt werden:', error);
+    res.status(500).json({ message: 'Teamnamen konnten nicht gesetzt werden.' });
   }
-
-  const nextState = setTeams({ teamAName, teamBName });
-  res.json(nextState);
 });
 
 router.post('/score', (req, res) => {
@@ -94,6 +153,149 @@ router.post('/timer', (req, res) => {
 
   const nextState = setRemainingSeconds(Number(seconds));
   res.json(nextState);
+});
+
+router.post('/context', async (req, res) => {
+  try {
+    const { tournamentId, stageType, stageLabel } = req.body ?? {};
+    let resolvedTournamentId = null;
+    let resolvedTournamentName = '';
+
+    if (tournamentId !== null && tournamentId !== undefined && tournamentId !== '') {
+      const parsedId = Number(tournamentId);
+      if (!Number.isInteger(parsedId) || parsedId <= 0) {
+        return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+      }
+
+      const tournament = await getTournament(parsedId);
+      if (!tournament) {
+        return res.status(404).json({ message: 'Turnier nicht gefunden.' });
+      }
+
+      resolvedTournamentId = tournament.id;
+      resolvedTournamentName = tournament.name;
+    }
+
+    if (stageType) {
+      const normalizedStageType = String(stageType);
+      if (!['group', 'knockout', 'placement'].includes(normalizedStageType)) {
+        return res.status(400).json({ message: 'Ungültiger Phasentyp.' });
+      }
+
+      const label = String(stageLabel ?? '').trim();
+      if (!label) {
+        return res.status(400).json({ message: 'Phasenbezeichnung darf nicht leer sein.' });
+      }
+
+      const normalizedLabel = normalizedStageType === 'group'
+        ? normalizeGroupStageLabel(label)
+        : label;
+
+      if (normalizedStageType === 'group' && !normalizedLabel) {
+        return res.status(400).json({ message: 'Ungültige Gruppenbezeichnung.' });
+      }
+
+      setMatchContext({
+        tournamentId: resolvedTournamentId,
+        tournamentName: resolvedTournamentName,
+        stageType: normalizedStageType,
+        stageLabel: normalizedLabel
+      });
+    } else {
+      setMatchContext({
+        tournamentId: resolvedTournamentId,
+        tournamentName: resolvedTournamentName,
+        stageType: null,
+        stageLabel: ''
+      });
+    }
+
+    res.json(getScoreboardState());
+  } catch (error) {
+    console.error('Match-Kontext konnte nicht gesetzt werden:', error);
+    res.status(500).json({ message: 'Match-Kontext konnte nicht gesetzt werden.' });
+  }
+});
+
+router.post('/schedule/select', async (req, res) => {
+  const { tournamentId, scheduleCode } = req.body ?? {};
+
+  const numericId = Number(tournamentId);
+  if (!Number.isInteger(numericId) || numericId <= 0) {
+    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+  }
+
+  const code = String(scheduleCode ?? '').trim();
+  if (!code) {
+    return res.status(400).json({ message: 'Ungültiger Spielcode.' });
+  }
+
+  try {
+    const tournament = await getTournament(numericId);
+    if (!tournament) {
+      return res.status(404).json({ message: 'Turnier nicht gefunden.' });
+    }
+
+    const scheduleEntries = await getTournamentSchedule(tournament.id);
+    const match = scheduleEntries.find((entry) => entry.code === code);
+
+    if (!match) {
+      return res.status(404).json({ message: 'Spiel konnte im Spielplan nicht gefunden werden.' });
+    }
+
+    clearScoreboardTicker();
+    const nextState = applyScheduleMatchSelection({
+      tournamentId: tournament.id,
+      tournamentName: tournament.name,
+      phase: match.phase,
+      stageLabel: match.stage_label,
+      scheduleCode: match.code,
+      home: match.home,
+      away: match.away
+    });
+
+    res.json({
+      scoreboard: nextState,
+      match: {
+        code: match.code,
+        phase: match.phase,
+        stage_label: match.stage_label,
+        result: match.result,
+        home: match.home,
+        away: match.away
+      }
+    });
+  } catch (error) {
+    console.error('Spielplan-Match konnte nicht ausgewählt werden:', error);
+    res.status(500).json({ message: 'Spielplan-Match konnte nicht ausgewählt werden.' });
+  }
+});
+
+router.get('/standings', async (_req, res) => {
+  try {
+    const snapshot = getScoreboardState();
+    if (!snapshot.tournamentId || snapshot.stageType !== 'group' || !snapshot.stageLabel) {
+      return res.json({
+        standings: [],
+        tournamentId: snapshot.tournamentId,
+        tournamentName: snapshot.tournamentName,
+        stageLabel: snapshot.stageLabel,
+        recordedGamesCount: 0
+      });
+    }
+
+    const { standings, recordedGamesCount } = await computeGroupStandings(snapshot.tournamentId, snapshot.stageLabel, { currentSnapshot: snapshot });
+    res.json({
+      standings,
+      tournamentId: snapshot.tournamentId,
+      tournamentName: snapshot.tournamentName,
+      stageLabel: snapshot.stageLabel,
+      recordedGamesCount
+    });
+  } catch (error) {
+    console.error('Tabelle konnte nicht berechnet werden:', error);
+    res.status(500).json({ message: 'Tabelle konnte nicht berechnet werden.' });
+  }
 });
 
 router.post('/finish', async (_req, res) => {

@@ -1,4 +1,4 @@
-import { registerScoreboardSocket } from './scoreboardState.js';
+import { registerScoreboardSocket } from './scoreboard/index.js';
 
 export default function setupSocket(io) {
   io.on('connection', (socket) => {

@@ -134,3 +134,84 @@ export function deleteHistoryGame(id) {
     method: 'DELETE'
   });
 }
+
+export function updateMatchContext(payload) {
+  return request('/scoreboard/context', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+}
+
+export function selectScheduleMatch(tournamentId, scheduleCode) {
+  return request('/scoreboard/schedule/select', {
+    method: 'POST',
+    body: JSON.stringify({ tournamentId, scheduleCode })
+  });
+}
+
+export function fetchTournaments() {
+  return request('/tournaments');
+}
+
+export function createTournament(payload) {
+  return request('/tournaments', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+}
+
+export function updateTournament(id, payload) {
+  return request(`/tournaments/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload)
+  });
+}
+
+export function deleteTournament(id) {
+  return request(`/tournaments/${id}`, {
+    method: 'DELETE'
+  });
+}
+
+export function fetchTeams() {
+  return request('/teams');
+}
+
+export function createTeam(payload) {
+  return request('/teams', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+}
+
+export function updateTeam(id, payload) {
+  return request(`/teams/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload)
+  });
+}
+
+export function deleteTeam(id) {
+  return request(`/teams/${id}`, {
+    method: 'DELETE'
+  });
+}
+
+export function fetchTournamentStages(id) {
+  return request(`/tournaments/${id}/stages`);
+}
+
+export function fetchTournamentSchedule(id) {
+  return request(`/tournaments/${id}/schedule`);
+}
+
+export function fetchTournamentStructure(id) {
+  return request(`/tournaments/${id}/structure`);
+}
+
+export function updateTournamentTeams(id, assignments) {
+  return request(`/tournaments/${id}/teams`, {
+    method: 'PUT',
+    body: JSON.stringify({ assignments })
+  });
+}

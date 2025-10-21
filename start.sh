@@ -19,19 +19,25 @@ echo "Installiere Abhängigkeiten und starte Entwicklungsserver..."
 
 (
   cd "$ROOT_DIR/backend"
-  npm install
+  npm install --no-audit
   npm run dev
 ) &
 
 (
   cd "$ROOT_DIR/frontend/admin"
-  npm install
+  npm install --no-audit
   npm run dev
 ) &
 
 (
   cd "$ROOT_DIR/frontend/display"
-  npm install
+  npm install --no-audit
+  npm run dev
+) &
+
+(
+  cd "$ROOT_DIR/frontend/public"
+  npm install --no-audit
   npm run dev
 ) &
 

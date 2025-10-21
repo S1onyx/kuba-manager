@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Scoreboard from './components/Scoreboard.jsx';
 import Timer from './components/Timer.jsx';
+import GroupStandings from './components/GroupStandings.jsx';
 import socket from './socket.js';
 
 const BASE = import.meta.env.VITE_BACKEND_URL;
@@ -13,9 +14,27 @@ function formatTime(seconds = 0) {
   return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
 
+function formatGroupLabel(label) {
+  if (!label) {
+    return '';
+  }
+
+  const upper = label.toUpperCase();
+  if (upper.startsWith('GRUPPE')) {
+    return label;
+  }
+  return `Gruppe ${label}`;
+}
+
 export default function App() {
   const [scoreboard, setScoreboard] = useState(null);
   const [error, setError] = useState('');
+  const [standings, setStandings] = useState(null);
+  const [standingsMeta, setStandingsMeta] = useState(null);
+  const [standingsError, setStandingsError] = useState('');
+  const [standingsLoading, setStandingsLoading] = useState(false);
+  const [recordedGamesCount, setRecordedGamesCount] = useState(0);
+  const standingsContextRef = useRef(null);
 
   useEffect(() => {
     let active = true;
@@ -57,6 +76,61 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    const contextKey = scoreboard?.tournamentId && scoreboard.stageType === 'group' && scoreboard.stageLabel
+      ? `${scoreboard.tournamentId}::${scoreboard.stageLabel}`
+      : null;
+
+    if (!contextKey) {
+      standingsContextRef.current = null;
+      setStandings(null);
+      setStandingsMeta(null);
+      setStandingsError('');
+      setStandingsLoading(false);
+      setRecordedGamesCount(0);
+      return;
+    }
+
+    const shouldShowLoading = standingsContextRef.current !== contextKey || standings === null;
+    if (shouldShowLoading) {
+      setStandingsLoading(true);
+    }
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const response = await fetch(`${API_BASE}/scoreboard/standings`);
+        if (!response.ok) throw new Error('failed');
+        const data = await response.json();
+        if (cancelled) return;
+        standingsContextRef.current = contextKey;
+        setStandings(data.standings ?? []);
+        setStandingsMeta({
+          tournamentName: data.tournamentName ?? scoreboard.tournamentName ?? '',
+          stageLabel: data.stageLabel ?? scoreboard.stageLabel
+        });
+        setRecordedGamesCount(Number.isFinite(data.recordedGamesCount) ? Number(data.recordedGamesCount) : 0);
+        setStandingsError('');
+      } catch (err) {
+        if (cancelled) return;
+        console.error(err);
+        setStandingsError('Tabelle konnte nicht geladen werden.');
+        setStandings(null);
+        setStandingsMeta(null);
+        setRecordedGamesCount(0);
+      } finally {
+        if (!cancelled) {
+          setStandingsLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [scoreboard?.tournamentId, scoreboard?.stageType, scoreboard?.stageLabel, scoreboard?.scoreA, scoreboard?.scoreB, scoreboard?.lastUpdated]);
+
   const formattedRemaining = useMemo(() => {
     return formatTime(scoreboard?.remainingSeconds ?? 0);
   }, [scoreboard?.remainingSeconds]);
@@ -97,6 +171,7 @@ export default function App() {
   const isHalftimeBreak = Boolean(scoreboard?.isHalftimeBreak);
   const halftimeBreakRemaining = isHalftimeBreak ? formatTime(scoreboard?.halftimePauseRemaining ?? 0) : null;
   const isExtraTime = Boolean(scoreboard?.isExtraTime);
+  const showStandingsSection = scoreboard?.stageType === 'group' && Array.isArray(standings) && standings.length > 0;
 
   const pageStyle = {
     minHeight: '100vh',
@@ -153,6 +228,34 @@ export default function App() {
         {error && <p style={{ color: '#ff8a80', fontSize: '1.2rem' }}>{error}</p>}
       </header>
 
+      {(scoreboard?.tournamentName || standingsMeta?.tournamentName || scoreboard?.stageLabel) && (
+        <div style={{ textAlign: 'center' }}>
+          {scoreboard?.tournamentName && (
+            <h2 style={{ fontSize: '2.4rem', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+              {scoreboard.tournamentName}
+            </h2>
+          )}
+          {scoreboard?.stageLabel && (
+            <p style={{ fontSize: '1.6rem', opacity: 0.85, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <span>
+                {scoreboard.stageType === 'group'
+                  ? `Gruppenphase · ${formatGroupLabel(scoreboard.stageLabel)}`
+                  : scoreboard.stageType === 'knockout'
+                    ? `KO-Runde · ${scoreboard.stageLabel}`
+                    : scoreboard.stageType === 'placement'
+                      ? `Platzierung · ${scoreboard.stageLabel}`
+                      : scoreboard.stageLabel}
+              </span>
+              {scoreboard.scheduleCode ? (
+                <span style={{ fontSize: '1.1rem', opacity: 0.7, letterSpacing: '0.12em' }}>
+                  Matchcode {scoreboard.scheduleCode}
+                </span>
+              ) : null}
+            </p>
+          )}
+        </div>
+      )}
+
       <Scoreboard score={score} teamNames={teamNames} />
 
       <Timer
@@ -205,6 +308,22 @@ export default function App() {
           );
         })}
       </section>
+
+      {showStandingsSection && (
+        <section style={{ width: '100%', maxWidth: '1200px' }}>
+          <h3 style={{ textAlign: 'left', marginBottom: '1rem', fontSize: '2rem' }}>
+            Aktuelle Gruppentabelle
+            {standingsMeta?.stageLabel ? ` – ${formatGroupLabel(standingsMeta.stageLabel)}` : ''}
+          </h3>
+          {standingsLoading ? (
+            <p style={{ textAlign: 'left' }}>Lade Tabelle...</p>
+          ) : standingsError ? (
+            <p style={{ textAlign: 'left', color: '#ff8a80' }}>{standingsError}</p>
+          ) : (
+            <GroupStandings standings={standings ?? []} />
+          )}
+        </section>
+      )}
     </div>
   );
 }

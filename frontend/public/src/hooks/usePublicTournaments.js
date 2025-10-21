@@ -1,0 +1,42 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { fetchPublicTournaments } from '../api.js';
+import { REFRESH_INTERVAL_MS } from '../constants.js';
+
+export function usePublicTournaments() {
+  const [publicTournaments, setPublicTournaments] = useState([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+  const intervalRef = useRef(null);
+
+  const refresh = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await fetchPublicTournaments();
+      setPublicTournaments(Array.isArray(data) ? data : []);
+      setError('');
+    } catch (err) {
+      console.error(err);
+      setError('Öffentliche Turniere konnten nicht geladen werden.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    refresh();
+    intervalRef.current = window.setInterval(refresh, REFRESH_INTERVAL_MS * 2);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [refresh]);
+
+  return {
+    publicTournaments,
+    error,
+    loading,
+    refresh
+  };
+}
