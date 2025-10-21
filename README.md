@@ -47,11 +47,74 @@ entsprechend an.
 - Die Beameranzeige soll später im vollbildmodus startbar sein, es ist wichtig das immer alles auf einem bildschirm zu sehen ist!!!
 - Im public interface soll das aktuelle Spiel in einem extra "Live" Tab angezeigt werden.
 - Es wird ein impressum benötigt, da die applikation gehostet werden soll.
-- Hosting: Alles soll in docker lauffähig sein. Dann über github workflow push auf dockerhub und dann update auf server. Mittels github workflows soll man die applikation auf dem server starten, stoppen und updaten können. Auf dem server soll dann einfach ein dockercompose file liegen. Denke am beten wäre caddy, aber keine Ahnung. Stell mir gerne Fragen, wenn irgendwas unklar ist. Ich habe einen vServer mit folgender ip: 46.224.14.124 Hierauf sollen später auch die verschiedenen interfaces über die ports erreichbar sein. Folgender Github Secrets stehen zu verfügung: DEPLOY_KEY, SSH_USER, SERVER_IP, DEPLOY_PATH
+- Hosting: Alles soll in docker lauffähig sein. Dann über github workflow push auf dockerhub und dann update auf server. Mittels github workflows soll man die applikation auf dem server starten, stoppen und updaten können. Auf dem server soll dann einfach ein dockercompose file liegen. Denke am beten wäre caddy, aber keine Ahnung. Stell mir gerne Fragen, wenn irgendwas unklar ist. Ich habe einen vServer mit folgender ip: 46.224.14.124 Hierauf sollen später auch die verschiedenen interfaces über die ports erreichbar sein. Folgender Github Secrets stehen zu verfügung: DEPLOY_KEY, SSH_USER, SERVER_IP, DEPLOY_PATH. Auserdem habe ich einen deployment key auf github angelegt und diesen auch unter .ssh/kuba-deploy auf dem server gespeichert. So kann man also vom server aus das github repo pullen.
 - Jedes Team besteht aus 4-5 Playern, genaues Tracking wer wann und wie lange eine Strafe hat. Wer Wann einen Korb geworfen hat. Extra Tab im Public interface mit Player Statistiken
 - User Management mit Admin, User und Beamer Accounts. Bestätigung der Accounts durch den Admin. Login ins Admin Panel und Beamer Anzeige. Optionaler Login in Public Interface. Speicherung der Sessions in Cookies (24h)
 - Wettsystem: Eingeloggte User können virtuelle Coins auf den Sieger der geplanten matches setzen. Beim richtigen Tipp gewinn von Betrag X (guter Algorithums nötig). Eigener Tab mit Tippspieltabelle! Hier sollen user gerankt werden, wer am ende am besten getippt hat. (Gewinner tipp, unentschieden und genauer Endstand) Coins kann man nur durch Admins über das admin panel zugeschrieben bkeommen. Im admin panel soll das usermanagement sein.
 
+## Deployment (Docker & Caddy)
+
+Das Repository enthält eine komplette Container-Orchestrierung mit Caddy als Reverse Proxy. Alle Services laufen in eigenen Images, die per GitHub Actions nach Docker Hub gepusht und anschließend automatisch auf dem Server aktualisiert werden können.
+
+### Container-Layout & Ports
+
+- `backend` (Node.js API & WebSocket, Port 3000 über Caddy erreichbar)
+- `public-frontend` (öffentliche Turnierübersicht, ausgeliefert über Port 80)
+- `display-frontend` (Beameransicht, Port 8081)
+- `admin-frontend` (Scoreboard-Steuerung, Port 8082)
+- `caddy` (Reverse Proxy, mapped Ports `80:80`, `8081:8081`, `8082:8082`, `3000:3000`)
+
+Caddy leitet `/api/*` auf das Backend durch und stellt die drei Oberflächen unter den genannten Ports bereit. HTTPS ist deaktiviert, damit die Dienste sofort per IP erreichbar sind; Zertifikate lassen sich jederzeit nachrüsten.
+
+### Vorbereitung auf dem Server
+
+1. Voraussetzungen installieren: `docker`, `docker compose`, `git`.
+2. Repository einmalig klonen (Deployment-Key liegt bereits unter `/var/www/kuba/.ssh/kuba-deploy`):  
+   ```bash
+   git clone git@github.com:<repo-owner>/kuba-manager.git /var/www/kuba
+   ```
+3. Konfiguration setzen:
+   ```bash
+   cd /var/www/kuba
+   cp .env.example .env
+   # .env bearbeiten und IMAGE_REGISTRY (z. B. docker.io/<dein-user>) sowie optional IMAGE_TAG setzen
+   ```
+4. Stack starten oder aktualisieren:
+   ```bash
+   docker compose pull
+   docker compose up -d --remove-orphans
+   ```
+
+Die SQLite-Datenbank des Backends wird im Named Volume `backend-data` persistent gespeichert.
+
+### GitHub Secrets (Repository > Settings > Secrets and variables > Actions)
+
+- `DOCKERHUB_USERNAME`: Docker-Hub-Nutzername (für `docker login`)
+- `DOCKERHUB_TOKEN`: PAT mit Push-Rechten auf die gewünschten Repositories
+- `DEPLOY_KEY`: privater SSH-Key, der Zugriff auf den Server erlaubt (Gegenstück liegt unter `/home/<user>/.ssh/kuba-deploy`)
+- `SSH_USER`: Benutzername für den SSH-Login (z. B. `root` oder `deploy`)
+- `SERVER_IP`: `46.224.14.124`
+- `DEPLOY_PATH`: `/var/www/kuba`
+
+### GitHub Workflows
+
+- **Build and Deploy Containers** (`.github/workflows/build-and-deploy.yml`)  
+  Läuft automatisch auf `main`-Pushes oder manuell. Baut alle Images (`backend`, `public`, `display`, `admin`), pusht sie nach Docker Hub (`latest` + Commit-SHA) und führt danach das Deployment-Skript auf dem Server aus.
+- **Manage Remote Stack** (`.github/workflows/manage-stack.yml`)  
+  Manueller Workflow mit Aktionen `start`, `stop`, `restart`, `update`, `status`. Ideal, um den Stack remote zu steuern, ohne sich per SSH einzuloggen.
+
+### Lokaler Test mit Docker
+
+Für lokale Builds wird eine Override-Datei mit `build`-Kontexten bereitgestellt:
+
+```bash
+cp .env.example .env
+IMAGE_REGISTRY=local-test IMAGE_TAG=dev # optional anpassen
+docker compose -f docker-compose.yml -f docker-compose.override.local.yml up --build
+```
+
+Damit entstehen dieselben Container wie in Produktion, ohne dass Images nach außen gepusht werden.
+
 ## Impressum hinterlegen
 
-Im öffentlichen Dashboard gibt es jetzt einen „Impressum“-Button im Footer. Damit die Anwendung konform gehostet werden kann, ersetze die Platzhalter in `frontend/public/src/components/Impressum.jsx` durch deine tatsächlichen Betreiberangaben (Firma/Verein, Kontakt, Registerdaten etc.). Die Inhalte werden im Overlay angezeigt, sobald der Button geklickt wird.
+Im öffentlichen Dashboard gibt es jetzt einen „Impressum“-Button im Footer.

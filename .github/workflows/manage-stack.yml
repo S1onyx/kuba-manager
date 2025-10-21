@@ -1,0 +1,57 @@
+name: Manage Remote Stack
+
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: Aktion für den Remote-Stack
+        required: true
+        default: update
+        type: choice
+        options:
+          - start
+          - stop
+          - restart
+          - update
+          - status
+
+jobs:
+  manage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute ${{ inputs.command }} on server
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            set -eo pipefail
+            cd ${{ secrets.DEPLOY_PATH }}
+            git fetch origin main
+            git checkout main
+            git pull origin main
+
+            case "${{ inputs.command }}" in
+              start)
+                docker compose up -d
+                ;;
+              stop)
+                docker compose down
+                ;;
+              restart)
+                docker compose down
+                docker compose up -d
+                ;;
+              update)
+                docker compose pull
+                docker compose up -d --remove-orphans
+                ;;
+              status)
+                docker compose ps
+                ;;
+              *)
+                echo "Unsupported command: ${{ inputs.command }}"
+                exit 1
+                ;;
+            esac

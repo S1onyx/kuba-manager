@@ -1,10 +1,13 @@
-# 1. Build-Phase
 FROM node:20 AS builder
 WORKDIR /app
-COPY . .
-RUN npm ci && npm run build
 
-# 2. Static-Serve
+# Install dependencies and build with cached layers
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+RUN npm run build
+
 FROM nginx:stable-alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 80

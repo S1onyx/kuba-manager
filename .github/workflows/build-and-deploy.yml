@@ -1,0 +1,88 @@
+name: Build and Deploy Containers
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      skip_deploy:
+        description: Skip remote deployment (only build & push images)
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+
+env:
+  REGISTRY: docker.io/${{ secrets.DOCKERHUB_USERNAME }}
+
+jobs:
+  build-and-push:
+    name: Build ${{ matrix.component }} image
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - component: backend
+            context: backend
+            dockerfile: backend/Dockerfile
+            image: kuba-backend
+          - component: public
+            context: frontend/public
+            dockerfile: frontend/public/Dockerfile
+            image: kuba-public
+          - component: display
+            context: frontend/display
+            dockerfile: frontend/display/Dockerfile
+            image: kuba-display
+          - component: admin
+            context: frontend/admin
+            dockerfile: frontend/admin/Dockerfile
+            image: kuba-admin
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push ${{ matrix.component }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ matrix.image }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ matrix.image }}:latest
+
+  deploy:
+    name: Update remote stack
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.event_name != 'workflow_dispatch' || inputs.skip_deploy != 'true'
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            set -eo pipefail
+            cd ${{ secrets.DEPLOY_PATH }}
+            git fetch origin main
+            git checkout main
+            git pull origin main
+            docker compose pull
+            docker compose up -d --remove-orphans

@@ -1,0 +1,58 @@
+services:
+  backend:
+    image: ${IMAGE_REGISTRY:-your-dockerhub-username}/kuba-backend:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    volumes:
+      - backend-data:/app/data
+    networks:
+      - app
+
+  public-frontend:
+    image: ${IMAGE_REGISTRY:-your-dockerhub-username}/kuba-public:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    networks:
+      - app
+
+  display-frontend:
+    image: ${IMAGE_REGISTRY:-your-dockerhub-username}/kuba-display:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    networks:
+      - app
+
+  admin-frontend:
+    image: ${IMAGE_REGISTRY:-your-dockerhub-username}/kuba-admin:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    networks:
+      - app
+
+  caddy:
+    image: caddy:2.8-alpine
+    restart: unless-stopped
+    depends_on:
+      - backend
+      - public-frontend
+      - display-frontend
+      - admin-frontend
+    ports:
+      - "80:80"
+      - "8081:8081"
+      - "8082:8082"
+      - "3000:3000"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+    networks:
+      - app
+
+networks:
+  app:
+    driver: bridge
+
+volumes:
+  backend-data:
+  caddy_data:
+  caddy_config:

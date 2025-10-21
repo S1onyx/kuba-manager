@@ -5,8 +5,9 @@ import GroupStandings from './components/GroupStandings.jsx';
 import BracketView from './components/bracket/BracketView.jsx';
 import FullscreenToggle from './components/FullscreenToggle.jsx';
 import socket from './socket.js';
+import { BACKEND_URL } from './config.js';
 
-const BASE = import.meta.env.VITE_BACKEND_URL;
+const BASE = BACKEND_URL;
 const API_BASE = `${BASE}/api`;
 
 function formatTime(seconds = 0) {
