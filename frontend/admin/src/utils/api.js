@@ -1,4 +1,6 @@
-const BASE = import.meta.env.VITE_BACKEND_URL;
+import { BACKEND_URL } from '../config.js';
+
+const BASE = BACKEND_URL;
 const API_BASE = `${BASE}/api`;
 
 async function request(path, options = {}) {

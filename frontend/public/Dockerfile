@@ -1,7 +1,7 @@
 FROM node:20 AS builder
 WORKDIR /app
 
-# Install dependencies first to cache layer if sources change
+# Install dependencies first to leverage Docker cache
 COPY package*.json ./
 RUN npm ci
 
