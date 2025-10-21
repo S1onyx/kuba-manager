@@ -1,9 +1,8 @@
 {
-  auto_https off
   admin off
 }
 
-:80 {
+kunstradbasketball.de, www.kunstradbasketball.de {
   encode gzip zstd
 
   handle /api/* {
@@ -12,6 +11,30 @@
 
   handle {
     reverse_proxy public-frontend:80
+  }
+}
+
+display.kunstradbasketball.de {
+  encode gzip zstd
+
+  handle /api/* {
+    reverse_proxy backend:3000
+  }
+
+  handle {
+    reverse_proxy display-frontend:80
+  }
+}
+
+admin.kunstradbasketball.de {
+  encode gzip zstd
+
+  handle /api/* {
+    reverse_proxy backend:3000
+  }
+
+  handle {
+    reverse_proxy admin-frontend:80
   }
 }
 

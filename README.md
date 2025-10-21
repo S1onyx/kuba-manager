@@ -48,7 +48,7 @@ entsprechend an.
 - Im public interface soll das aktuelle Spiel in einem extra "Live" Tab angezeigt werden.
 - Es wird ein impressum benötigt, da die applikation gehostet werden soll.
 - Hosting: Alles soll in docker lauffähig sein. Dann über github workflow push auf dockerhub und dann update auf server. Mittels github workflows soll man die applikation auf dem server starten, stoppen und updaten können. Auf dem server soll dann einfach ein dockercompose file liegen. Denke am beten wäre caddy, aber keine Ahnung. Stell mir gerne Fragen, wenn irgendwas unklar ist. Ich habe einen vServer mit folgender ip: 46.224.14.124 Hierauf sollen später auch die verschiedenen interfaces über die ports erreichbar sein. Folgender Github Secrets stehen zu verfügung: DEPLOY_KEY, SSH_USER, SERVER_IP, DEPLOY_PATH. Auserdem habe ich einen deployment key auf github angelegt und diesen auch unter .ssh/kuba-deploy auf dem server gespeichert. So kann man also vom server aus das github repo pullen.
-- Jedes Team besteht aus 4-5 Playern, genaues Tracking wer wann und wie lange eine Strafe hat. Wer Wann einen Korb geworfen hat. Extra Tab im Public interface mit Player Statistiken
+- Jedes Team besteht aus 4-5 Playern, genaues Tracking implementieren wer wann und wie lange eine Strafe hat. Wer Wann einen Korb geworfen hat. Extra Tab im Public interface mit Player Statistiken. Erweiterte statistiken wären cool. Bitte public interface besser gliedern in mehr tabs, einmal live, dann letzte ergebnisse, dann spielplan, dann gruppenübersicht, dann tunierstatistik, dann team stats und player stats. oder so ähnlich, denke dir hier was cooles aus das alles übersichltich ist und für den user nicht zu viel auf einmal. Denke daran das das public interface meist auf handys angeschaut wird
 - User Management mit Admin, User und Beamer Accounts. Bestätigung der Accounts durch den Admin. Login ins Admin Panel und Beamer Anzeige. Optionaler Login in Public Interface. Speicherung der Sessions in Cookies (24h)
 - Wettsystem: Eingeloggte User können virtuelle Coins auf den Sieger der geplanten matches setzen. Beim richtigen Tipp gewinn von Betrag X (guter Algorithums nötig). Eigener Tab mit Tippspieltabelle! Hier sollen user gerankt werden, wer am ende am besten getippt hat. (Gewinner tipp, unentschieden und genauer Endstand) Coins kann man nur durch Admins über das admin panel zugeschrieben bkeommen. Im admin panel soll das usermanagement sein.
 
@@ -114,6 +114,15 @@ docker compose -f docker-compose.yml -f docker-compose.override.local.yml up --b
 ```
 
 Damit entstehen dieselben Container wie in Produktion, ohne dass Images nach außen gepusht werden.
+
+### Domain & HTTPS (Caddy)
+
+1. Lege drei `A`-Records auf die Server-IP `46.224.14.124` an: `@` (Root-Domain), `admin`, `display` (optional auch `www`). 
+2. Öffne Ports `80` und `443` in der Firewall, damit Caddy die ACME-Challenges für HTTPS lösen kann.
+3. Passe bei Bedarf `caddy/Caddyfile` an, wenn weitere Subdomains benötigt werden – jede Domain hat dort einen `handle`-Block, der `/api/*` an das Backend und den Rest an das jeweilige Frontend weiterleitet.
+4. Ziehe die Änderungen auf dem Server (`git pull`), setze neue Images (`docker compose pull`) und starte den Proxy neu (`docker compose up -d`).
+
+Die Frontends verwenden künftig automatisch die aktuelle Ursprung-Domain für API-Aufrufe, solange sie unter Standardports (80/443) laufen; für lokale Entwicklung bleiben die bisherigen Ports unverändert.
 
 ## Impressum hinterlegen
 
