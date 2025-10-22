@@ -603,11 +603,25 @@ export async function getTournamentSchedule(tournamentId) {
 
   const groupStandingsMap = new Map();
   const groupLabelsToResolve = new Set();
+  const groupMatchStatus = new Map();
   rawRows.forEach((row) => {
     if (row.phase === 'group') {
-      const canonical = canonicalGroupLabel(row.stage_label);
+      const metadata = safeParse(row.metadata_json, null);
+      const rawGroupLabel = metadata?.group ?? row.stage_label;
+      const canonical = canonicalGroupLabel(rawGroupLabel);
       if (canonical) {
         groupLabelsToResolve.add(canonical);
+        if (!groupMatchStatus.has(canonical)) {
+          groupMatchStatus.set(canonical, { total: 0, completed: 0 });
+        }
+        const status = groupMatchStatus.get(canonical);
+        status.total += 1;
+        if (row.code) {
+          const resultRecord = resultLookup.get(row.code);
+          if (resultRecord && resultRecord.id) {
+            status.completed += 1;
+          }
+        }
       }
     }
     const homeSource = safeParse(row.home_source, null);
@@ -617,6 +631,9 @@ export async function getTournamentSchedule(tournamentId) {
         const canonical = canonicalGroupLabel(source.group);
         if (canonical) {
           groupLabelsToResolve.add(canonical);
+          if (!groupMatchStatus.has(canonical)) {
+            groupMatchStatus.set(canonical, { total: 0, completed: 0 });
+          }
         }
       }
     });
@@ -625,10 +642,21 @@ export async function getTournamentSchedule(tournamentId) {
   if (groupLabelsToResolve.size > 0) {
     const tasks = Array.from(groupLabelsToResolve).map(async (label) => {
       try {
-        const { standings } = await computeGroupStandings(tournamentId, label, {});
-        if (Array.isArray(standings) && standings.length > 0) {
-          groupStandingsMap.set(label, standings);
-        }
+        const standingsResult = await computeGroupStandings(tournamentId, label, {});
+        const totals = groupMatchStatus.get(label) ?? { total: 0, completed: 0 };
+        const standings = Array.isArray(standingsResult?.standings) ? standingsResult.standings : [];
+        const recordedGamesCount = standingsResult?.recordedGamesCount ?? 0;
+        const totalMatches = totals.total ?? 0;
+        const completedMatches = totals.completed ?? 0;
+        const isComplete = totalMatches > 0 && completedMatches >= totalMatches;
+
+        groupStandingsMap.set(label, {
+          standings,
+          recordedGamesCount,
+          totalMatches,
+          completedMatches,
+          isComplete
+        });
       } catch (error) {
         console.error('Gruppenstand konnte für KO-Belegung nicht ermittelt werden:', error);
       }
@@ -725,17 +753,66 @@ export function groupScheduleByPhase(schedule = []) {
     }
   });
 
-  grouped.group = Array.from(groupStageMap.values())
-    .map((stage) => ({
+  const groupStagesWithMeta = Array.from(groupStageMap.values()).map((stage) => {
+    const roundsWithMeta = Array.from(stage.rounds.entries()).map(([round, matches]) => {
+      const sortedMatches = sortMatches(matches);
+      const firstTimestamp =
+        sortedMatches.length > 0 ? toScheduledTimestamp(sortedMatches[0]?.scheduled_at) : null;
+      return {
+        round,
+        matches: sortedMatches,
+        firstTimestamp
+      };
+    });
+
+    roundsWithMeta.sort((a, b) => {
+      if (a.firstTimestamp !== null && b.firstTimestamp !== null && a.firstTimestamp !== b.firstTimestamp) {
+        return a.firstTimestamp - b.firstTimestamp;
+      }
+      if (a.firstTimestamp !== null && b.firstTimestamp === null) {
+        return -1;
+      }
+      if (a.firstTimestamp === null && b.firstTimestamp !== null) {
+        return 1;
+      }
+      return a.round - b.round;
+    });
+
+    const stageFirstTimestamp = roundsWithMeta.reduce((acc, round) => {
+      const candidate = round.firstTimestamp;
+      if (candidate === null) {
+        return acc;
+      }
+      if (acc === null || candidate < acc) {
+        return candidate;
+      }
+      return acc;
+    }, null);
+
+    return {
       stage_label: stage.stage_label,
-      rounds: Array.from(stage.rounds.entries())
-        .sort(([a], [b]) => a - b)
-        .map(([round, matches]) => ({
-          round,
-          matches: sortMatches(matches)
-        }))
-    }))
-    .sort((a, b) => a.stage_label.localeCompare(b.stage_label, 'de', { sensitivity: 'base' }));
+      rounds: roundsWithMeta.map(({ round, matches }) => ({
+        round,
+        matches
+      })),
+      firstTimestamp: stageFirstTimestamp
+    };
+  });
+
+  grouped.group = groupStagesWithMeta
+    .sort((a, b) => {
+      if (a.firstTimestamp !== null && b.firstTimestamp !== null && a.firstTimestamp !== b.firstTimestamp) {
+        return a.firstTimestamp - b.firstTimestamp;
+      }
+      if (a.firstTimestamp !== null && b.firstTimestamp === null) {
+        return -1;
+      }
+      if (a.firstTimestamp === null && b.firstTimestamp !== null) {
+        return 1;
+      }
+      return a.stage_label.localeCompare(b.stage_label, 'de', { sensitivity: 'base' });
+    })
+    .map(({ firstTimestamp: _ignore, ...rest }) => rest);
 
   ['knockout', 'placement'].forEach((phase) => {
     grouped[phase] = Array.from(otherStageMaps[phase].entries())

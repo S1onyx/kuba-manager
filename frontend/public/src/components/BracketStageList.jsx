@@ -58,10 +58,17 @@ const teamNameStyle = {
   fontWeight: 600
 };
 
-function renderMatch(match, index) {
+const matchTimeStyle = {
+  fontSize: '0.8rem',
+  letterSpacing: '0.06em',
+  opacity: 0.7
+};
+
+function renderMatch(match, index, formatDateTime) {
   const labelKey = match.id || `${match.stage_label}-${index}`;
   const hasResult = Boolean(match.result?.hasResult);
   const scoreText = hasResult ? `${match.result.scoreA ?? 0} : ${match.result.scoreB ?? 0}` : 'vs';
+  const scheduledLabel = formatDateTime ? formatDateTime(match.scheduled_at) : null;
   return (
     <article key={labelKey} className="bracket-stage__match" style={matchStyle}>
       <div className="bracket-stage__row" style={matchRowStyle}>
@@ -82,6 +89,7 @@ function renderMatch(match, index) {
           {match.away_label}
         </span>
       </div>
+      {scheduledLabel ? <span style={matchTimeStyle}>{scheduledLabel}</span> : null}
       {match.metadata?.description ? (
         <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>{match.metadata.description}</span>
       ) : null}
@@ -89,7 +97,7 @@ function renderMatch(match, index) {
   );
 }
 
-export default function BracketStageList({ stages = [], title, description }) {
+export default function BracketStageList({ stages = [], title, description, formatDateTime }) {
   if (!stages || stages.length === 0) {
     return null;
   }
@@ -107,7 +115,7 @@ export default function BracketStageList({ stages = [], title, description }) {
         {stages.map((stage) => (
           <div key={stage.stage_label} style={stageWrapperStyle}>
             <strong style={stageLabelStyle}>{stage.stage_label}</strong>
-            {stage.matches.map((match, index) => renderMatch(match, index))}
+            {stage.matches.map((match, index) => renderMatch(match, index, formatDateTime))}
           </div>
         ))}
       </div>

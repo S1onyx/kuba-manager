@@ -73,6 +73,27 @@ const codeStyle = {
   letterSpacing: '0.08em'
 };
 
+const scheduleFormatter = new Intl.DateTimeFormat('de-DE', {
+  weekday: 'short',
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+});
+
+function formatMatchDateTime(value) {
+  if (!value) {
+    return null;
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+  const formatted = scheduleFormatter.format(date).split(', ').join(' · ');
+  return `${formatted} Uhr`;
+}
+
 export default function BracketStageMatches({ title, stages }) {
   const validStages = Array.isArray(stages)
     ? stages.filter((stage) => Array.isArray(stage.matches) && stage.matches.length > 0)
@@ -109,16 +130,25 @@ export default function BracketStageMatches({ title, stages }) {
                   ? `${match.result.scoreA ?? 0}:${match.result.scoreB ?? 0}`
                   : 'vs';
 
-                const metaLine = match.code
-                  ? `Matchcode ${match.code}`
-                  : hasResult && match.result?.finishedAt
-                    ? new Date(match.result.finishedAt).toLocaleString('de-DE', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })
-                    : '';
+                const scheduledLabel = formatMatchDateTime(match.scheduled_at);
+                const metaSegments = [];
+                if (scheduledLabel) {
+                  metaSegments.push(scheduledLabel);
+                }
+                if (match.code) {
+                  metaSegments.push(`Matchcode ${match.code}`);
+                } else if (hasResult && match.result?.finishedAt) {
+                  const finishedAtLabel = new Date(match.result.finishedAt).toLocaleString('de-DE', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })
+                    .split(', ')
+                    .join(' · ');
+                  metaSegments.push(`${finishedAtLabel} Uhr`);
+                }
+                const metaLine = metaSegments.join(' · ');
 
                 return (
                   <div key={match.id ?? match.code ?? `${homeName}-${awayName}`} style={matchRowStyle}>

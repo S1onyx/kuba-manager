@@ -400,11 +400,22 @@ export function resolveParticipantLabel({
 
     if (source.type === 'groupPosition' && groupStandingsMap) {
       const canonical = canonicalGroupLabel(source.group);
-      const standings = groupStandingsMap.get(canonical);
-      if (standings && standings.length >= source.position) {
-        const entry = standings[source.position - 1];
-        if (entry?.team) {
-          return entry.team;
+      if (canonical) {
+        const entry = groupStandingsMap.get(canonical);
+        const wrapper =
+          entry && !Array.isArray(entry)
+            ? entry
+            : {
+                standings: Array.isArray(entry) ? entry : [],
+                isComplete: false
+              };
+        const standings = Array.isArray(wrapper.standings) ? wrapper.standings : [];
+        const isComplete = Boolean(wrapper.isComplete);
+        if (isComplete && standings.length >= source.position) {
+          const standingEntry = standings[source.position - 1];
+          if (standingEntry?.team) {
+            return standingEntry.team;
+          }
         }
       }
     }

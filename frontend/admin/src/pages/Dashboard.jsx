@@ -372,9 +372,16 @@ export default function Dashboard() {
           ? `${stageLabel}${roundNumber ? ` · Runde ${roundNumber}` : ''}`
           : stageLabel;
 
-      const label = `${descriptor} – ${entry.home_label} vs ${entry.away_label}${
-        scoreText ? ` · Ergebnis ${scoreText}` : ''
-      }`;
+      const scheduledLabel = entry.scheduled_at ? formatDateTime(entry.scheduled_at) : null;
+      const detailParts = [];
+      if (scheduledLabel) {
+        detailParts.push(`Start ${scheduledLabel}`);
+      }
+      if (scoreText) {
+        detailParts.push(`Ergebnis ${scoreText}`);
+      }
+      const detailSuffix = detailParts.length > 0 ? ` · ${detailParts.join(' · ')}` : '';
+      const label = `${descriptor} – ${entry.home_label} vs ${entry.away_label}${detailSuffix}`;
 
       options.push({
         code: entry.code,

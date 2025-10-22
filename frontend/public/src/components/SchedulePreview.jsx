@@ -31,6 +31,14 @@ const matchRowStyle = {
   fontSize: '0.95rem'
 };
 
+const matchTimeLabelStyle = {
+  gridColumn: '1 / -1',
+  fontSize: '0.8rem',
+  letterSpacing: '0.06em',
+  opacity: 0.7,
+  textAlign: 'center'
+};
+
 const responsiveStyles = `
   @media (max-width: 768px) {
     .schedule-preview {
@@ -54,7 +62,28 @@ const responsiveStyles = `
   }
 `;
 
-function renderGroupSchedule(groupStages) {
+const dateTimeFormatter = new Intl.DateTimeFormat('de-DE', {
+  weekday: 'short',
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+});
+
+function formatMatchDateTime(value) {
+  if (!value) {
+    return null;
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+  const formatted = dateTimeFormatter.format(date).split(', ').join(' · ');
+  return `${formatted} Uhr`;
+}
+
+function renderGroupSchedule(groupStages, formatDateTime) {
   if (!groupStages || groupStages.length === 0) {
     return null;
   }
@@ -76,33 +105,37 @@ function renderGroupSchedule(groupStages) {
                 <div key={`${group.stage_label}-round-${round.round}`} style={{ display: 'grid', gap: '0.55rem' }}>
                   <span style={roundHeaderStyle}>Runde {round.round}</span>
                   <div style={{ display: 'grid', gap: '0.35rem' }}>
-                    {round.matches.map((match) => (
-                      <div
-                        key={match.id || `${group.stage_label}-${round.round}-${match.match_order}`}
-                        className="schedule-preview__match"
-                        style={matchRowStyle}
-                      >
-                        <span style={{ fontWeight: 600, textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {match.home_label}
-                        </span>
-                        <span
-                          style={{
-                            opacity: match.result?.hasResult ? 1 : 0.7,
-                            fontWeight: match.result?.hasResult ? 700 : 400,
-                            letterSpacing: '0.02em',
-                            minWidth: '4.5rem',
-                            textAlign: 'center'
-                          }}
+                    {round.matches.map((match) => {
+                      const scheduledLabel = formatDateTime ? formatDateTime(match.scheduled_at) : null;
+                      return (
+                        <div
+                          key={match.id || `${group.stage_label}-${round.round}-${match.match_order}`}
+                          className="schedule-preview__match"
+                          style={matchRowStyle}
                         >
-                          {match.result?.hasResult
-                            ? `${match.result.scoreA ?? 0} : ${match.result.scoreB ?? 0}`
-                            : 'vs'}
-                        </span>
-                        <span style={{ fontWeight: 600, textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {match.away_label}
-                        </span>
-                      </div>
-                    ))}
+                          <span style={{ fontWeight: 600, textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {match.home_label}
+                          </span>
+                          <span
+                            style={{
+                              opacity: match.result?.hasResult ? 1 : 0.7,
+                              fontWeight: match.result?.hasResult ? 700 : 400,
+                              letterSpacing: '0.02em',
+                              minWidth: '4.5rem',
+                              textAlign: 'center'
+                            }}
+                          >
+                            {match.result?.hasResult
+                              ? `${match.result.scoreA ?? 0} : ${match.result.scoreB ?? 0}`
+                              : 'vs'}
+                          </span>
+                          <span style={{ fontWeight: 600, textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {match.away_label}
+                          </span>
+                          {scheduledLabel ? <span style={matchTimeLabelStyle}>{scheduledLabel}</span> : null}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               ))}
@@ -140,13 +173,14 @@ export default function SchedulePreview({ schedule }) {
         </p>
       ) : (
         <>
-          {renderGroupSchedule(schedule.group)}
+          {renderGroupSchedule(schedule.group, formatMatchDateTime)}
 
           {hasKnockout ? (
             <BracketStageList
               stages={schedule.knockout}
               title="KO-Phase"
               description="Duell-Baum der Finalrunden – Sieger steigen jeweils eine Ebene auf."
+              formatDateTime={formatMatchDateTime}
             />
           ) : null}
 
@@ -155,6 +189,7 @@ export default function SchedulePreview({ schedule }) {
               stages={schedule.placement}
               title="Platzierungsspiele"
               description="Spiele um die weiteren Platzierungen – alle Teams absolvieren gleich viele Partien."
+              formatDateTime={formatMatchDateTime}
             />
           ) : null}
         </>
