@@ -42,6 +42,10 @@ jobs:
             context: frontend/admin
             dockerfile: frontend/admin/Dockerfile
             image: kuba-admin
+          - component: audio
+            context: frontend/audio
+            dockerfile: frontend/audio/Dockerfile
+            image: kuba-audio
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

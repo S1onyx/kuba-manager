@@ -38,7 +38,16 @@ import {
   fetchTournamentStructure,
   selectScheduleMatch,
   updateTournamentTeams,
-  updateTournamentScheduleEntry
+  updateTournamentScheduleEntry,
+  fetchAudioTriggers,
+  updateAudioTrigger,
+  uploadAudioTriggerFile,
+  playAudioTriggerPreview,
+  assignAudioTriggerFile,
+  fetchAudioLibrary,
+  uploadAudioLibraryFile,
+  deleteAudioLibraryFile,
+  playAudioLibraryFile
 } from '../utils/api.js';
 
 const POINT_OPTIONS = [1, 2, 3];
@@ -187,6 +196,15 @@ export default function Dashboard() {
   const [scheduleSelection, setScheduleSelection] = useState('');
   const [scheduleDrafts, setScheduleDrafts] = useState({});
   const [scheduleSaving, setScheduleSaving] = useState({});
+  const [audioTriggers, setAudioTriggers] = useState([]);
+  const [audioLibrary, setAudioLibrary] = useState([]);
+  const [audioLoading, setAudioLoading] = useState(false);
+  const [audioError, setAudioError] = useState('');
+  const [audioTriggerBusy, setAudioTriggerBusy] = useState({});
+  const [audioUploadBusy, setAudioUploadBusy] = useState({});
+  const [audioManualBusy, setAudioManualBusy] = useState({});
+  const [audioTriggerLabels, setAudioTriggerLabels] = useState({});
+  const [audioLibraryUploadLabel, setAudioLibraryUploadLabel] = useState('');
   const resolvedTournamentId = useMemo(() => {
     const scoreboardId = scoreboard?.tournamentId ? Number(scoreboard.tournamentId) : null;
     if (scoreboardId && Number.isInteger(scoreboardId) && scoreboardId > 0) {
@@ -567,6 +585,24 @@ export default function Dashboard() {
     }
   }, [resolvedTournamentId]);
 
+  const loadAudioData = useCallback(async () => {
+    setAudioLoading(true);
+    setAudioError('');
+    try {
+      const [triggersResponse, libraryResponse] = await Promise.all([
+        fetchAudioTriggers(),
+        fetchAudioLibrary()
+      ]);
+      setAudioTriggers(triggersResponse?.triggers ?? []);
+      setAudioLibrary(libraryResponse?.files ?? []);
+    } catch (err) {
+      console.error('Audiodaten konnten nicht geladen werden.', err);
+      setAudioError('Audiodaten konnten nicht geladen werden.');
+    } finally {
+      setAudioLoading(false);
+    }
+  }, []);
+
   const refreshActiveTeams = useCallback(async () => {
     if (!scoreboard) {
       return;
@@ -639,6 +675,10 @@ export default function Dashboard() {
   useEffect(() => {
     loadTournaments();
   }, [loadTournaments]);
+
+  useEffect(() => {
+    loadAudioData();
+  }, [loadAudioData]);
 
   useEffect(() => {
     loadTeams();
@@ -927,6 +967,183 @@ export default function Dashboard() {
       setError('');
     }
   }
+
+  const handleAudioTriggerLabelChange = useCallback((key, value) => {
+    setAudioTriggerLabels((prev) => ({
+      ...prev,
+      [key]: value
+    }));
+  }, []);
+
+  const handleAudioTriggerToggle = useCallback(
+    async (key, nextState) => {
+      setAudioTriggerBusy((prev) => ({ ...prev, [key]: true }));
+      try {
+        await updateAudioTrigger(key, { isActive: nextState });
+        await loadAudioData();
+        updateMessage('info', nextState ? 'Sound aktiviert.' : 'Sound deaktiviert.');
+      } catch (err) {
+        console.error('Audio-Trigger konnte nicht aktualisiert werden.', err);
+        updateMessage('error', 'Audio-Trigger konnte nicht aktualisiert werden.');
+      } finally {
+        setAudioTriggerBusy((prev) => {
+          const next = { ...prev };
+          delete next[key];
+          return next;
+        });
+      }
+    },
+    [loadAudioData]
+  );
+
+  const handleAudioTriggerUpload = useCallback(
+    async (key, file) => {
+      if (!file) {
+        return;
+      }
+      setAudioUploadBusy((prev) => ({ ...prev, [key]: true }));
+      try {
+        const label = (audioTriggerLabels[key] ?? '').trim();
+        await uploadAudioTriggerFile(key, file, label || undefined);
+        setAudioTriggerLabels((prev) => ({ ...prev, [key]: '' }));
+        await loadAudioData();
+        updateMessage('info', 'Audiodatei gespeichert.');
+      } catch (err) {
+        console.error('Audiodatei konnte nicht gespeichert werden.', err);
+        updateMessage('error', 'Audiodatei konnte nicht gespeichert werden.');
+      } finally {
+        setAudioUploadBusy((prev) => {
+          const next = { ...prev };
+          delete next[key];
+          return next;
+        });
+      }
+    },
+    [audioTriggerLabels, loadAudioData]
+  );
+
+  const handleAudioTriggerAssign = useCallback(
+    async (key, fileId) => {
+      if (!fileId) {
+        return;
+      }
+      setAudioTriggerBusy((prev) => ({ ...prev, [key]: true }));
+      const numeric = Number(fileId);
+      try {
+        await assignAudioTriggerFile(key, Number.isFinite(numeric) ? numeric : null);
+        await loadAudioData();
+        updateMessage('info', 'Audiodatei verknüpft.');
+      } catch (err) {
+        console.error('Audiodatei konnte nicht verknüpft werden.', err);
+        updateMessage('error', 'Audiodatei konnte nicht verknüpft werden.');
+      } finally {
+        setAudioTriggerBusy((prev) => {
+          const next = { ...prev };
+          delete next[key];
+          return next;
+        });
+      }
+    },
+    [loadAudioData]
+  );
+
+  const handleAudioTriggerClear = useCallback(
+    async (key) => {
+      setAudioTriggerBusy((prev) => ({ ...prev, [key]: true }));
+      try {
+        await assignAudioTriggerFile(key, null);
+        await loadAudioData();
+        updateMessage('info', 'Soundzuordnung entfernt.');
+      } catch (err) {
+        console.error('Soundzuordnung konnte nicht entfernt werden.', err);
+        updateMessage('error', 'Soundzuordnung konnte nicht entfernt werden.');
+      } finally {
+        setAudioTriggerBusy((prev) => {
+          const next = { ...prev };
+          delete next[key];
+          return next;
+        });
+      }
+    },
+    [loadAudioData]
+  );
+
+  const handleAudioTriggerPreview = useCallback(async (key) => {
+    setAudioTriggerBusy((prev) => ({ ...prev, [key]: true }));
+    try {
+      await playAudioTriggerPreview(key);
+      updateMessage('info', 'Sound ausgelöst.');
+    } catch (err) {
+      console.error('Sound konnte nicht abgespielt werden.', err);
+      updateMessage('error', 'Sound konnte nicht abgespielt werden.');
+    } finally {
+      setAudioTriggerBusy((prev) => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+    }
+  }, []);
+
+  const handleAudioLibraryUpload = useCallback(
+    async (file) => {
+      if (!file) {
+        return;
+      }
+      setAudioLoading(true);
+      try {
+        const label = audioLibraryUploadLabel.trim();
+        await uploadAudioLibraryFile(file, label || undefined);
+        setAudioLibraryUploadLabel('');
+        await loadAudioData();
+        updateMessage('info', 'Audiodatei hinzugefügt.');
+      } catch (err) {
+        console.error('Audiodatei konnte nicht hochgeladen werden.', err);
+        updateMessage('error', 'Audiodatei konnte nicht hochgeladen werden.');
+      } finally {
+        setAudioLoading(false);
+      }
+    },
+    [audioLibraryUploadLabel, loadAudioData]
+  );
+
+  const handleAudioLibraryDelete = useCallback(
+    async (fileId) => {
+      setAudioManualBusy((prev) => ({ ...prev, [fileId]: true }));
+      try {
+        await deleteAudioLibraryFile(fileId);
+        await loadAudioData();
+        updateMessage('info', 'Audiodatei gelöscht.');
+      } catch (err) {
+        console.error('Audiodatei konnte nicht gelöscht werden.', err);
+        updateMessage('error', 'Audiodatei konnte nicht gelöscht werden.');
+      } finally {
+        setAudioManualBusy((prev) => {
+          const next = { ...prev };
+          delete next[fileId];
+          return next;
+        });
+      }
+    },
+    [loadAudioData]
+  );
+
+  const handleAudioLibraryPlay = useCallback(async (fileId) => {
+    setAudioManualBusy((prev) => ({ ...prev, [fileId]: true }));
+    try {
+      await playAudioLibraryFile(fileId);
+      updateMessage('info', 'Sound ausgelöst.');
+    } catch (err) {
+      console.error('Sound konnte nicht ausgelöst werden.', err);
+      updateMessage('error', 'Sound konnte nicht ausgelöst werden.');
+    } finally {
+      setAudioManualBusy((prev) => {
+        const next = { ...prev };
+        delete next[fileId];
+        return next;
+      });
+    }
+  }, []);
 
   async function handleDisplayViewChange(targetView) {
     const normalized = typeof targetView === 'string' ? targetView : '';
@@ -2085,6 +2302,19 @@ export default function Dashboard() {
     return <p>Scoreboard-Daten nicht verfügbar.</p>;
   }
 
+  const describeAudioFile = (file) => {
+    if (!file) {
+      return '';
+    }
+    if (file.label && file.label.trim()) {
+      return file.label.trim();
+    }
+    if (file.original_name) {
+      return file.original_name;
+    }
+    return `Sound #${file.id}`;
+  };
+
   const describeScheduleMatch = (entry) => {
     if (!entry) {
       return '';
@@ -3001,7 +3231,242 @@ export default function Dashboard() {
     </section>
   );
 
-  const teamsContent = (
+const audioContent = (
+  <section style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px', display: 'grid', gap: '1rem' }}>
+    <div style={{ display: 'grid', gap: '0.35rem' }}>
+      <h3>Audio-Steuerung</h3>
+      <p style={{ margin: 0, color: '#555' }}>
+        Verwalte automatische Spielereignis-Sounds und löse hochgeladene Clips manuell für die Audio-Ausgabe aus.
+      </p>
+    </div>
+    {audioError ? <p style={{ color: 'crimson', margin: 0 }}>{audioError}</p> : null}
+    {audioLoading ? (
+      <p style={{ margin: 0 }}>Lade Audiodaten...</p>
+    ) : (
+      <div style={{ display: 'grid', gap: '1.15rem' }}>
+        <article style={{ border: '1px solid rgba(0,0,0,0.1)', borderRadius: '8px', padding: '1rem', display: 'grid', gap: '0.9rem' }}>
+          <div>
+            <strong>Spielereignisse</strong>
+            <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: '#555' }}>
+              Weise jedem Ereignis einen Sound zu, schalte ihn bei Bedarf stumm oder teste ihn direkt hier.
+            </p>
+          </div>
+          {audioTriggers.length === 0 ? (
+            <p style={{ margin: 0, opacity: 0.7 }}>Noch keine Audio-Trigger konfiguriert.</p>
+          ) : (
+            <div style={{ display: 'grid', gap: '0.85rem' }}>
+              {audioTriggers.map((trigger) => {
+                const busy = Boolean(audioTriggerBusy[trigger.key] || audioUploadBusy[trigger.key]);
+                const currentFile = trigger.file;
+                return (
+                  <div
+                    key={trigger.key}
+                    style={{
+                      border: '1px solid rgba(0,0,0,0.08)',
+                      borderRadius: '8px',
+                      padding: '0.9rem',
+                      display: 'grid',
+                      gap: '0.65rem',
+                      background: 'rgba(0,0,0,0.02)'
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                      <div style={{ display: 'grid', gap: '0.25rem' }}>
+                        <strong>{trigger.label}</strong>
+                        {trigger.description ? (
+                          <span style={{ fontSize: '0.85rem', color: '#555' }}>{trigger.description}</span>
+                        ) : null}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleAudioTriggerToggle(trigger.key, !trigger.is_active)}
+                        disabled={busy}
+                        style={{
+                          padding: '0.35rem 0.85rem',
+                          borderRadius: '999px',
+                          border: '1px solid #0b1a2b',
+                          background: trigger.is_active ? '#0b1a2b' : 'transparent',
+                          color: trigger.is_active ? '#fff' : '#0b1a2b',
+                          fontWeight: 600,
+                          cursor: busy ? 'default' : 'pointer',
+                          opacity: busy ? 0.6 : 1
+                        }}
+                      >
+                        {trigger.is_active ? 'Aktiv' : 'Inaktiv'}
+                      </button>
+                    </div>
+
+                    {currentFile ? (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.9rem' }}>
+                          Aktueller Sound:{' '}
+                          <strong>{describeAudioFile(currentFile)}</strong>
+                        </span>
+                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                          <button
+                            type="button"
+                            onClick={() => handleAudioTriggerPreview(trigger.key)}
+                            disabled={busy}
+                          >
+                            Abspielen
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleAudioTriggerClear(trigger.key)}
+                            disabled={busy}
+                          >
+                            Zuordnung entfernen
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.7 }}>Keine Audiodatei zugewiesen.</p>
+                    )}
+
+                    <div style={{ display: 'grid', gap: '0.65rem', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
+                      <div style={{ display: 'grid', gap: '0.35rem' }}>
+                        <label style={{ display: 'grid', gap: '0.25rem' }}>
+                          Label (optional)
+                          <input
+                            value={audioTriggerLabels[trigger.key] ?? ''}
+                            onChange={(event) => handleAudioTriggerLabelChange(trigger.key, event.target.value)}
+                            placeholder="z. B. Fanfare"
+                            disabled={audioUploadBusy[trigger.key]}
+                          />
+                        </label>
+                        <label style={{ display: 'grid', gap: '0.25rem' }}>
+                          MP3 hochladen
+                          <input
+                            type="file"
+                            accept="audio/mpeg"
+                            onChange={(event) => {
+                              const nextFile = event.target.files?.[0];
+                              handleAudioTriggerUpload(trigger.key, nextFile);
+                              event.target.value = '';
+                            }}
+                            disabled={audioUploadBusy[trigger.key]}
+                          />
+                        </label>
+                      </div>
+                      <div style={{ display: 'grid', gap: '0.25rem' }}>
+                        <label style={{ display: 'grid', gap: '0.25rem' }}>
+                          Aus Bibliothek verwenden
+                          <select
+                            defaultValue=""
+                            onChange={(event) => {
+                              const nextValue = event.target.value;
+                              if (nextValue) {
+                                handleAudioTriggerAssign(trigger.key, nextValue);
+                                event.target.value = '';
+                              }
+                            }}
+                            disabled={audioLibrary.length === 0 || busy}
+                          >
+                            <option value="">Auswählen...</option>
+                            {audioLibrary.map((file) => (
+                              <option key={file.id} value={file.id}>
+                                {describeAudioFile(file)}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <span style={{ fontSize: '0.75rem', opacity: 0.65 }}>Unterstützt werden MP3-Dateien bis 25&nbsp;MB.</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </article>
+
+        <article style={{ border: '1px solid rgba(0,0,0,0.1)', borderRadius: '8px', padding: '1rem', display: 'grid', gap: '0.85rem' }}>
+          <div>
+            <strong>Sound-Bibliothek &amp; manuelle Auslösung</strong>
+            <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: '#555' }}>
+              Lade zusätzliche Sounds hoch und löse sie bei Bedarf manuell aus – die Audio-Ausgabe erfolgt auf der Audio-Subdomain.
+            </p>
+          </div>
+          <div style={{ display: 'grid', gap: '0.6rem', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
+            <label style={{ display: 'grid', gap: '0.25rem' }}>
+              Label (optional)
+              <input
+                value={audioLibraryUploadLabel}
+                onChange={(event) => setAudioLibraryUploadLabel(event.target.value)}
+                placeholder="z. B. Sirene"
+              />
+            </label>
+            <label style={{ display: 'grid', gap: '0.25rem' }}>
+              MP3 hochladen
+              <input
+                type="file"
+                accept="audio/mpeg"
+                onChange={(event) => {
+                  const nextFile = event.target.files?.[0];
+                  handleAudioLibraryUpload(nextFile);
+                  event.target.value = '';
+                }}
+              />
+            </label>
+          </div>
+          {audioLibrary.length === 0 ? (
+            <p style={{ margin: 0, opacity: 0.7 }}>Noch keine Sounds in der Bibliothek.</p>
+          ) : (
+            <div style={{ display: 'grid', gap: '0.75rem' }}>
+              {audioLibrary.map((file) => {
+                const busy = Boolean(audioManualBusy[file.id]);
+                const sizeBytes = Number(file.size_bytes ?? 0);
+                const sizeLabel = sizeBytes >= 1024
+                  ? `${Math.round(sizeBytes / 1024)} KB`
+                  : `${sizeBytes} B`;
+                return (
+                  <div
+                    key={file.id}
+                    style={{
+                      border: '1px solid rgba(0,0,0,0.08)',
+                      borderRadius: '8px',
+                      padding: '0.75rem',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      gap: '0.75rem',
+                      alignItems: 'center',
+                      flexWrap: 'wrap'
+                    }}
+                  >
+                    <div style={{ display: 'grid', gap: '0.25rem' }}>
+                      <strong>{describeAudioFile(file)}</strong>
+                      <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>
+                        Hochgeladen am {formatDateTime(file.created_at)} · {sizeLabel}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleAudioLibraryPlay(file.id)}
+                        disabled={busy}
+                      >
+                        Abspielen
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleAudioLibraryDelete(file.id)}
+                        disabled={busy}
+                      >
+                        Löschen
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </article>
+      </div>
+    )}
+  </section>
+);
+
+const teamsContent = (
     <section style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
       <h3>Teams verwalten</h3>
       <form onSubmit={handleTeamCreateSubmit} style={{ display: 'grid', gap: '0.75rem', marginBottom: '1.5rem' }}>
@@ -3073,6 +3538,7 @@ export default function Dashboard() {
 
   const tabs = [
     { id: 'control', label: 'Live-Steuerung' },
+    { id: 'audio', label: 'Audio' },
     { id: 'history', label: 'Historie' },
     { id: 'players', label: 'Spieler' },
     { id: 'teams', label: 'Teams' },
@@ -3330,13 +3796,15 @@ export default function Dashboard() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         {activeTab === 'control'
           ? controlContent
-          : activeTab === 'history'
-            ? historyContent
-            : activeTab === 'players'
-              ? playersContent
-              : activeTab === 'teams'
-                ? teamsContent
-                : tournamentContent}
+          : activeTab === 'audio'
+            ? audioContent
+            : activeTab === 'history'
+              ? historyContent
+              : activeTab === 'players'
+                ? playersContent
+                : activeTab === 'teams'
+                  ? teamsContent
+                  : tournamentContent}
       </div>
     </div>
   );

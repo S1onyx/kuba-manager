@@ -9,6 +9,8 @@ import tournamentRoutes from './routes/tournaments.js';
 import publicRoutes from './routes/public.js';
 import teamRoutes from './routes/teams.js';
 import playerRoutes from './routes/players.js';
+import audioRoutes from './routes/audio.js';
+import { getAudioStorageDirectory } from './services/index.js';
 
 dotenv.config();
 
@@ -23,11 +25,21 @@ setupSocket(io);
 app.use(cors());
 app.use(express.json());
 
+app.use(
+  '/media/audio',
+  express.static(getAudioStorageDirectory(), {
+    setHeaders: (res) => {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+  })
+);
+
 app.use('/api/scoreboard', scoreboardRoutes);
 app.use('/api/tournaments', tournamentRoutes);
 app.use('/api/public', publicRoutes);
 app.use('/api/teams', teamRoutes);
 app.use('/api/players', playerRoutes);
+app.use('/api/audio', audioRoutes);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

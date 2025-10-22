@@ -4,6 +4,7 @@ import {
   snapshotState,
   markPenaltyExpiration
 } from './stateStore.js';
+import { triggerAudioEvent } from '../audio/dispatcher.js';
 
 let ticker = null;
 
@@ -205,6 +206,13 @@ export function startTimer() {
   state.isRunning = true;
   ensureTicker();
   notifySubscribers();
+  triggerAudioEvent('game_start', {
+    teamA: state.teamAName,
+    teamB: state.teamBName,
+    remainingSeconds: state.remainingSeconds
+  }).catch((error) => {
+    console.error('Audio-Trigger (game_start) fehlgeschlagen:', error);
+  });
   return snapshotState();
 }
 
@@ -219,6 +227,13 @@ export function pauseTimer() {
     stopTicker();
   }
   notifySubscribers();
+  triggerAudioEvent('game_pause', {
+    teamA: state.teamAName,
+    teamB: state.teamBName,
+    remainingSeconds: state.remainingSeconds
+  }).catch((error) => {
+    console.error('Audio-Trigger (game_pause) fehlgeschlagen:', error);
+  });
   return snapshotState();
 }
 

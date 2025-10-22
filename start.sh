@@ -41,4 +41,10 @@ echo "Installiere Abhängigkeiten und starte Entwicklungsserver..."
   npm run dev
 ) &
 
+(
+  cd "$ROOT_DIR/frontend/audio"
+  npm install --no-audit
+  npm run dev
+) &
+
 wait

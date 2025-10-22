@@ -14,3 +14,7 @@ services:
   admin-frontend:
     build:
       context: ./frontend/admin
+
+  audio-frontend:
+    build:
+      context: ./frontend/audio

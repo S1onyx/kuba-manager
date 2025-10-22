@@ -28,6 +28,12 @@ services:
     networks:
       - app
 
+  audio-frontend:
+    image: ${IMAGE_REGISTRY:-your-dockerhub-username}/kuba-audio:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    networks:
+      - app
+
   caddy:
     image: caddy:2.8-alpine
     restart: unless-stopped
@@ -36,11 +42,13 @@ services:
       - public-frontend
       - display-frontend
       - admin-frontend
+      - audio-frontend
     ports:
       - "80:80"
       - "443:443"
       - "8081:8081"
       - "8082:8082"
+      - "8083:8083"
       - "3000:3000"
     volumes:
       - caddy_data:/data

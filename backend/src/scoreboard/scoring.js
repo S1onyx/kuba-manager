@@ -6,6 +6,8 @@ import {
   resetScoreEventIds,
   resetTeamStats
 } from './stateStore.js';
+import { triggerAudioEvent } from '../audio/dispatcher.js';
+import { ensureScoreTriggerForTeam } from '../services/audio/index.js';
 
 export function addPoints(team, points, metadata = {}) {
   const state = getState();
@@ -26,6 +28,35 @@ export function addPoints(team, points, metadata = {}) {
         ...metadata,
         type: appliedDelta >= 0 ? metadata.type ?? 'score' : 'adjustment'
       });
+      if (appliedDelta > 0) {
+        const numericTeamIdRaw = Number(state.teamBId);
+        const validTeamId = Number.isInteger(numericTeamIdRaw) && numericTeamIdRaw > 0 ? numericTeamIdRaw : null;
+        const context = {
+          points: appliedDelta,
+          score: state.scoreB,
+          team: state.teamBName,
+          teamKey: 'b'
+        };
+        if (validTeamId !== null) {
+          ensureScoreTriggerForTeam(validTeamId, state.teamBName).catch((error) => {
+            console.error('Team-Trigger (B) konnte nicht vorbereitet werden:', error);
+          });
+          triggerAudioEvent(`score_team_${validTeamId}`, {
+            ...context,
+            teamId: validTeamId,
+            teamName: state.teamBName
+          }).catch((error) => {
+            console.error('Audio-Trigger (score_team_ID_B) fehlgeschlagen:', error);
+          });
+        }
+        triggerAudioEvent('score_team_b', {
+          ...context,
+          teamId: validTeamId,
+          teamName: state.teamBName
+        }).catch((error) => {
+          console.error('Audio-Trigger (score_team_b) fehlgeschlagen:', error);
+        });
+      }
     }
   } else {
     const current = state.scoreA || 0;
@@ -37,6 +68,35 @@ export function addPoints(team, points, metadata = {}) {
         ...metadata,
         type: appliedDelta >= 0 ? metadata.type ?? 'score' : 'adjustment'
       });
+      if (appliedDelta > 0) {
+        const numericTeamIdRaw = Number(state.teamAId);
+        const validTeamId = Number.isInteger(numericTeamIdRaw) && numericTeamIdRaw > 0 ? numericTeamIdRaw : null;
+        const context = {
+          points: appliedDelta,
+          score: state.scoreA,
+          team: state.teamAName,
+          teamKey: 'a'
+        };
+        if (validTeamId !== null) {
+          ensureScoreTriggerForTeam(validTeamId, state.teamAName).catch((error) => {
+            console.error('Team-Trigger (A) konnte nicht vorbereitet werden:', error);
+          });
+          triggerAudioEvent(`score_team_${validTeamId}`, {
+            ...context,
+            teamId: validTeamId,
+            teamName: state.teamAName
+          }).catch((error) => {
+            console.error('Audio-Trigger (score_team_ID_A) fehlgeschlagen:', error);
+          });
+        }
+        triggerAudioEvent('score_team_a', {
+          ...context,
+          teamId: validTeamId,
+          teamName: state.teamAName
+        }).catch((error) => {
+          console.error('Audio-Trigger (score_team_a) fehlgeschlagen:', error);
+        });
+      }
     }
   }
 

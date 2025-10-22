@@ -50,6 +50,22 @@ admin.kunstradbasketball.de {
   }
 }
 
+audio.kunstradbasketball.de {
+  encode gzip zstd
+
+  handle /api/* {
+    reverse_proxy backend:3000
+  }
+
+  handle /socket.io/* {
+    reverse_proxy backend:3000
+  }
+
+  handle {
+    reverse_proxy audio-frontend:80
+  }
+}
+
 :8081 {
   encode gzip zstd
   handle /socket.io/* {
@@ -69,6 +85,17 @@ admin.kunstradbasketball.de {
 
   handle {
     reverse_proxy admin-frontend:80
+  }
+}
+
+:8083 {
+  encode gzip zstd
+  handle /socket.io/* {
+    reverse_proxy backend:3000
+  }
+
+  handle {
+    reverse_proxy audio-frontend:80
   }
 }
 

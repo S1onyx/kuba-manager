@@ -4,12 +4,19 @@ const BASE = BACKEND_URL;
 const API_BASE = `${BASE}/api`;
 
 async function request(path, options = {}) {
+  const isFormData = options?.body instanceof FormData;
+  const headers = { ...(options.headers || {}) };
+
+  if (isFormData) {
+    // Browser setzt Boundary automatisch
+    delete headers['Content-Type'];
+  } else if (!headers['Content-Type']) {
+    headers['Content-Type'] = 'application/json';
+  }
+
   const response = await fetch(`${API_BASE}${path}`, {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options.headers || {})
-    }
+    headers
   });
 
   if (!response.ok) {
@@ -155,6 +162,71 @@ export function updateHistoryGame(id, payload) {
 export function deleteHistoryGame(id) {
   return request(`/scoreboard/history/${id}`, {
     method: 'DELETE'
+  });
+}
+
+export function fetchAudioTriggers() {
+  return request('/audio/triggers');
+}
+
+export function updateAudioTrigger(key, payload) {
+  return request(`/audio/triggers/${encodeURIComponent(key)}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload)
+  });
+}
+
+export function uploadAudioTriggerFile(key, file, label) {
+  const formData = new FormData();
+  formData.append('file', file);
+  if (label) {
+    formData.append('label', label);
+  }
+  return request(`/audio/triggers/${encodeURIComponent(key)}/upload`, {
+    method: 'POST',
+    body: formData
+  });
+}
+
+export function playAudioTriggerPreview(key) {
+  return request(`/audio/triggers/${encodeURIComponent(key)}/play`, {
+    method: 'POST'
+  });
+}
+
+export function assignAudioTriggerFile(key, fileId) {
+  return request(`/audio/triggers/${encodeURIComponent(key)}/assign`, {
+    method: 'POST',
+    body: JSON.stringify({ fileId })
+  });
+}
+
+export function fetchAudioLibrary() {
+  return request('/audio/library');
+}
+
+export function uploadAudioLibraryFile(file, label) {
+  const formData = new FormData();
+  formData.append('file', file);
+  if (label) {
+    formData.append('label', label);
+  }
+  return request('/audio/library/upload', {
+    method: 'POST',
+    body: formData
+  });
+}
+
+export function deleteAudioLibraryFile(id) {
+  return request(`/audio/library/${id}`, {
+    method: 'DELETE'
+  });
+}
+
+export function playAudioLibraryFile(id) {
+  return request('/audio/manual/play', {
+    method: 'POST',
+    body: JSON.stringify({ fileId: id })
   });
 }
 

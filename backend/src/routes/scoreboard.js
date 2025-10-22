@@ -33,6 +33,7 @@ import {
   saveGame,
   updateGame
 } from '../services/index.js';
+import { triggerAudioEvent } from '../audio/dispatcher.js';
 
 const router = express.Router();
 
@@ -398,6 +399,14 @@ router.post('/finish', async (_req, res) => {
     clearScoreboardTicker();
     const snapshot = getScoreboardState();
     const savedGame = await saveGame(snapshot);
+    triggerAudioEvent('game_end', {
+      teamA: snapshot.teamAName,
+      teamB: snapshot.teamBName,
+      scoreA: snapshot.scoreA,
+      scoreB: snapshot.scoreB
+    }).catch((error) => {
+      console.error('Audio-Trigger (game_end) fehlgeschlagen:', error);
+    });
     res.json(savedGame);
   } catch (error) {
     console.error('Spiel konnte nicht gespeichert werden:', error);

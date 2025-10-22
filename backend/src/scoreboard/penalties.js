@@ -6,6 +6,7 @@ import {
   registerPenaltyEvent,
   markPenaltyRemoval
 } from './stateStore.js';
+import { triggerAudioEvent } from '../audio/dispatcher.js';
 
 export function addPenalty(team, label, durationSeconds, options = {}) {
   const state = getState();
@@ -43,6 +44,12 @@ export function addPenalty(team, label, durationSeconds, options = {}) {
     description: penalty.description
   });
   notifySubscribers();
+  triggerAudioEvent('foul', {
+    team: normalizedTeam === 'a' ? state.teamAName : state.teamBName,
+    label: penalty.name
+  }).catch((error) => {
+    console.error('Audio-Trigger (foul) fehlgeschlagen:', error);
+  });
   return snapshotState();
 }
 

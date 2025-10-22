@@ -1,11 +1,12 @@
 # Kunstrad Scoreboard
 
 Ein schlankes Setup für die Spielstandsanzeige im Kunstrad-Basketball.
-Das Projekt besteht aus drei Oberflächen sowie einem kleinen Node.js-Backend:
+Das Projekt besteht aus vier Oberflächen sowie einem kleinen Node.js-Backend:
 
 - `frontend/admin`: Steuerpanel für Teamnamen, Punkte (+1/+2/+3) und Spieluhr (Start, Pause, Zeit setzen).
 - `frontend/display`: Public Display für die Halle mit Teamnamen, Spielstand und Restzeit.
 - `frontend/public`: Öffentliche Turnierübersicht mit Live-Spiel, Gruppen- und KO-Tabellen sowie Team-Statistiken (mobilfreundlich).
+- `frontend/audio`: Audio-Frontend auf einer eigenen Subdomain, das automatisch eingehende Spiel- und manuell ausgelöste Sounds abspielt.
 - `backend`: REST- und WebSocket-Server, der den Scoreboard-Zustand verwaltet.
 
 ## Entwicklung starten
@@ -21,6 +22,7 @@ Entwicklungsserver parallel:
 - Admin-Panel: http://localhost:5173
 - Display: http://localhost:5174
 - Public Interface: http://localhost:5175
+- Audio Interface: http://localhost:5176
 
 Die Frontends sprechen das Backend standardmäßig über `http://localhost:3000`
 (die REST-Routen liegen dort unter `/api/...`). Falls ein anderer Host oder
@@ -40,11 +42,10 @@ entsprechend an.
 - Sofortige Synchronisation zwischen Steuerpanel und Hallenanzeige via WebSocket
 - Öffentliche Turnierseite mit Live-Spielstand, automatischen Gruppentabellen, KO-Übersicht sowie separaten Tabs für Ergebnisse, Spielplan, Team- und Spielerstatistiken; aktualisiert sich automatisch bei neuen Ereignissen
 - Pro Team 4–5 Spieler verwalten, Scoring- und Straf-Aktionen mit Spielern verknüpfen und aggregierte Statistiken im Dashboard auswerten
+- Audioverwaltung im Admin-Panel: Für Spielstart, Pause, Ende, Körbe der Teams sowie Fouls lassen sich individuelle MP3-Sounds hochladen, aktivieren/deaktivieren und testen; zusätzlich können beliebige Sounds in einer Bibliothek gespeichert und manuell ausgelöst werden. Die Wiedergabe erfolgt über die eigenständige Audio-Domain.
 
 
 ## Geplante Features
-
-- Reglement im public dashboard
 - User Management mit Admin, User und Beamer Accounts. Bestätigung der Accounts durch den Admin. Login ins Admin Panel und Beamer Anzeige. Optionaler Login in Public Interface. Speicherung der Sessions in Cookies (24h)
 - Wettsystem: Eingeloggte User können virtuelle Coins auf den Sieger der geplanten matches setzen. Beim richtigen Tipp gewinn von Betrag X (guter Algorithums nötig). Eigener Tab mit Tippspieltabelle! Hier sollen user gerankt werden, wer am ende am besten getippt hat. (Gewinner tipp, unentschieden und genauer Endstand) Coins kann man nur durch Admins über das admin panel zugeschrieben bkeommen. Im admin panel soll das usermanagement sein.
 
@@ -65,7 +66,8 @@ Das Repository enthält eine komplette Container-Orchestrierung mit Caddy als Re
 - `public-frontend` (öffentliche Turnierübersicht, ausgeliefert über Port 80)
 - `display-frontend` (Beameransicht, Port 8081)
 - `admin-frontend` (Scoreboard-Steuerung, Port 8082)
-- `caddy` (Reverse Proxy, mapped Ports `80:80`, `8081:8081`, `8082:8082`, `3000:3000`)
+- `audio-frontend` (Audio-Ausgabe, Port 8083)
+- `caddy` (Reverse Proxy, mapped Ports `80:80`, `8081:8081`, `8082:8082`, `8083:8083`, `3000:3000`)
 
 Caddy leitet `/api/*` auf das Backend durch und stellt die drei Oberflächen unter den genannten Ports bereit. HTTPS ist deaktiviert, damit die Dienste sofort per IP erreichbar sind; Zertifikate lassen sich jederzeit nachrüsten.
 

@@ -132,4 +132,47 @@ export default function initializeSchema(db) {
   `);
 
   db.exec('CREATE INDEX IF NOT EXISTS idx_team_players_team ON team_players (team_id, name)');
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS audio_files (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      label TEXT,
+      original_name TEXT NOT NULL,
+      file_name TEXT NOT NULL UNIQUE,
+      mime_type TEXT NOT NULL,
+      size_bytes INTEGER NOT NULL DEFAULT 0,
+      usage TEXT DEFAULT 'library',
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
+  `);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS audio_triggers (
+      key TEXT PRIMARY KEY,
+      label TEXT NOT NULL,
+      description TEXT,
+      is_active INTEGER DEFAULT 1,
+      audio_file_id INTEGER,
+      updated_at TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY(audio_file_id) REFERENCES audio_files(id) ON DELETE SET NULL
+    );
+  `);
+
+  const defaultTriggers = [
+    ['game_start', 'Spielstart', 'Wird beim Starten des Spiels abgespielt.'],
+    ['game_pause', 'Spielpause', 'Wird beim Pausieren des Spiels abgespielt.'],
+    ['game_end', 'Spielende', 'Wird beim Beenden/Speichern des Spiels abgespielt.'],
+    ['score_team_a', 'Korb Team A', 'Wird bei einem Korb für Team A abgespielt.'],
+    ['score_team_b', 'Korb Team B', 'Wird bei einem Korb für Team B abgespielt.'],
+    ['foul', 'Foul', 'Wird bei einem Foul abgespielt.']
+  ];
+
+  defaultTriggers.forEach(([key, label, description]) => {
+    db.exec(`
+      INSERT INTO audio_triggers (key, label, description, is_active)
+      SELECT '${key}', '${label}', '${description.replace(/'/g, "''")}', 1
+      WHERE NOT EXISTS (SELECT 1 FROM audio_triggers WHERE key = '${key}');
+    `);
+  });
 }

@@ -43,3 +43,19 @@ export {
   getTournamentSummary,
   updateTournamentScheduleEntry
 } from './tournaments/index.js';
+
+export {
+  listAudioTriggers,
+  getAudioTrigger,
+  updateTriggerSettings,
+  assignFileToTrigger,
+  setTriggerActivation,
+  listAudioFiles,
+  getAudioFileById,
+  deleteAudioFile,
+  upsertTriggerFileFromUpload,
+  storeLibraryUpload,
+  getAudioStorageDirectory,
+  getActiveTriggerWithFile,
+  ensureScoreTriggerForTeam
+} from './audio/index.js';
