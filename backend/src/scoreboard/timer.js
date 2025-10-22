@@ -1,7 +1,8 @@
 import {
   getState,
   notifySubscribers,
-  snapshotState
+  snapshotState,
+  markPenaltyExpiration
 } from './stateStore.js';
 
 let ticker = null;
@@ -33,6 +34,7 @@ function tickPenalties(state) {
         if (penalty.remainingSeconds === 0 && !penalty.isExpired) {
           penalty.isExpired = true;
           penalty.expiredAt = new Date().toISOString();
+          markPenaltyExpiration(penalty, penalty.expiredAt);
           changed = true;
         }
       }

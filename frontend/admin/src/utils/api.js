@@ -35,10 +35,24 @@ export function updateTeams(payload) {
   });
 }
 
-export function mutateScore(team, points) {
+export function mutateScore(team, points, options = {}) {
+  const payload = { team, points };
+  if (options.playerId !== undefined && options.playerId !== null && options.playerId !== '') {
+    payload.playerId = options.playerId;
+  }
+  if (options.shotType) {
+    payload.shotType = options.shotType;
+  }
+  if (options.description) {
+    payload.description = options.description;
+  }
+  if (options.affectStats !== undefined) {
+    payload.affectStats = options.affectStats;
+  }
+
   return request('/scoreboard/score', {
     method: 'POST',
-    body: JSON.stringify({ team, points })
+    body: JSON.stringify(payload)
   });
 }
 
@@ -74,10 +88,17 @@ export function setScoreboardTimer(seconds) {
   });
 }
 
-export function addPenalty(team, name, seconds) {
+export function addPenalty(team, name, seconds, options = {}) {
+  const payload = { team, name, seconds };
+  if (options.playerId !== undefined && options.playerId !== null && options.playerId !== '') {
+    payload.playerId = options.playerId;
+  }
+  if (options.description) {
+    payload.description = options.description;
+  }
   return request('/scoreboard/penalties', {
     method: 'POST',
-    body: JSON.stringify({ team, name, seconds })
+    body: JSON.stringify(payload)
   });
 }
 
@@ -206,12 +227,44 @@ export function deleteTeam(id) {
   });
 }
 
+export function fetchPlayers(teamId) {
+  const query = teamId ? `?teamId=${teamId}` : '';
+  return request(`/players${query}`);
+}
+
+export function createPlayer(payload) {
+  return request('/players', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+}
+
+export function updatePlayer(id, payload) {
+  return request(`/players/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload)
+  });
+}
+
+export function deletePlayer(id) {
+  return request(`/players/${id}`, {
+    method: 'DELETE'
+  });
+}
+
 export function fetchTournamentStages(id) {
   return request(`/tournaments/${id}/stages`);
 }
 
 export function fetchTournamentSchedule(id) {
   return request(`/tournaments/${id}/schedule`);
+}
+
+export function updateTournamentScheduleEntry(tournamentId, scheduleId, payload) {
+  return request(`/tournaments/${tournamentId}/schedule/${scheduleId}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload)
+  });
 }
 
 export function fetchTournamentStructure(id) {

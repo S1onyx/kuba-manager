@@ -43,7 +43,11 @@ function sanitizeScoreboardState(state) {
     penalties: state.penalties,
     displayView: state.displayView,
     lastUpdated: state.lastUpdated,
-    scheduleCode: state.scheduleCode
+    scheduleCode: state.scheduleCode,
+    players: state.players,
+    playerStats: state.playerStats,
+    scoringLog: state.scoringLog,
+    penaltyLog: state.penaltyLog
   };
 }
 

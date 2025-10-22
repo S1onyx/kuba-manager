@@ -3,12 +3,30 @@ import {
   notifySubscribers,
   snapshotState,
   normalizeGroupStageLabel,
-  resetPenaltyIds
+  resetPenaltyIds,
+  resetScoreEventIds,
+  setTeamPlayers,
+  refreshTeamTotals
 } from './stateStore.js';
 
-export function setTeams({ teamAName, teamBName, teamAId, teamBId }) {
+export function setTeams({
+  teamAName,
+  teamBName,
+  teamAId,
+  teamBId,
+  teamAPlayers,
+  teamBPlayers
+}) {
   const state = getState();
+  const previousTeamAId = state.teamAId;
+  const previousTeamBId = state.teamBId;
+  const previousTeamAName = state.teamAName;
+  const previousTeamBName = state.teamBName;
   let changed = false;
+  let teamAIdChanged = false;
+  let teamBIdChanged = false;
+  let teamANameChanged = false;
+  let teamBNameChanged = false;
 
   if (teamAId !== undefined) {
     const normalized = teamAId === null || teamAId === '' ? null : Number(teamAId);
@@ -16,6 +34,7 @@ export function setTeams({ teamAName, teamBName, teamAId, teamBId }) {
     if (state.teamAId !== sanitized) {
       state.teamAId = sanitized;
       changed = true;
+      teamAIdChanged = true;
     }
   }
 
@@ -24,6 +43,7 @@ export function setTeams({ teamAName, teamBName, teamAId, teamBId }) {
     if (trimmed.length > 0 && trimmed !== state.teamAName) {
       state.teamAName = trimmed;
       changed = true;
+      teamANameChanged = true;
     }
   }
 
@@ -33,6 +53,7 @@ export function setTeams({ teamAName, teamBName, teamAId, teamBId }) {
     if (state.teamBId !== sanitized) {
       state.teamBId = sanitized;
       changed = true;
+      teamBIdChanged = true;
     }
   }
 
@@ -41,7 +62,48 @@ export function setTeams({ teamAName, teamBName, teamAId, teamBId }) {
     if (trimmed.length > 0 && trimmed !== state.teamBName) {
       state.teamBName = trimmed;
       changed = true;
+      teamBNameChanged = true;
     }
+  }
+
+  const hasTeamAPlayers = teamAPlayers !== undefined;
+  const hasTeamBPlayers = teamBPlayers !== undefined;
+
+  if (hasTeamAPlayers) {
+    const rosterArray = Array.isArray(teamAPlayers) ? teamAPlayers : [];
+    const shouldReset = teamAIdChanged || rosterArray.length === 0;
+    setTeamPlayers('a', rosterArray, { teamName: state.teamAName, resetStats: shouldReset });
+    changed = true;
+  } else if (teamAIdChanged) {
+    setTeamPlayers('a', [], { teamName: state.teamAName, resetStats: true });
+    changed = true;
+  } else if (teamANameChanged && previousTeamAName !== state.teamAName) {
+    refreshTeamTotals('a');
+    changed = true;
+  }
+
+  if (hasTeamBPlayers) {
+    const rosterArray = Array.isArray(teamBPlayers) ? teamBPlayers : [];
+    const shouldReset = teamBIdChanged || rosterArray.length === 0;
+    setTeamPlayers('b', rosterArray, { teamName: state.teamBName, resetStats: shouldReset });
+    changed = true;
+  } else if (teamBIdChanged) {
+    setTeamPlayers('b', [], { teamName: state.teamBName, resetStats: true });
+    changed = true;
+  } else if (teamBNameChanged && previousTeamBName !== state.teamBName) {
+    refreshTeamTotals('b');
+    changed = true;
+  }
+
+  if (teamAIdChanged || teamBIdChanged) {
+    state.penalties = {
+      a: [],
+      b: []
+    };
+    resetPenaltyIds();
+    resetScoreEventIds();
+    state.scoringLog = [];
+    state.penaltyLog = [];
   }
 
   if (changed) {
@@ -124,7 +186,9 @@ export function applyScheduleMatchSelection({
   stageLabel,
   scheduleCode,
   home,
-  away
+  away,
+  homePlayers = [],
+  awayPlayers = []
 }) {
   const state = getState();
   const normalizedTournamentId =
@@ -154,6 +218,9 @@ export function applyScheduleMatchSelection({
   state.teamBId = away?.teamId ?? null;
   state.teamBName = resolveDisplayName(away, away?.label, 'Team B');
 
+  setTeamPlayers('a', homePlayers, { teamName: state.teamAName });
+  setTeamPlayers('b', awayPlayers, { teamName: state.teamBName });
+
   state.scheduleCode = scheduleCode ?? null;
 
   state.scoreA = 0;
@@ -171,6 +238,9 @@ export function applyScheduleMatchSelection({
     b: []
   };
   resetPenaltyIds();
+  resetScoreEventIds();
+  state.scoringLog = [];
+  state.penaltyLog = [];
 
   notifySubscribers();
   return snapshotState();

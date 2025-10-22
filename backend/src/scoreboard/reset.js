@@ -3,7 +3,8 @@ import {
   notifySubscribers,
   snapshotState,
   createDefaultState,
-  resetPenaltyIds
+  resetPenaltyIds,
+  resetScoreEventIds
 } from './stateStore.js';
 import { stopTicker } from './timer.js';
 
@@ -11,6 +12,7 @@ export function resetGame() {
   const state = getState();
   stopTicker();
   resetPenaltyIds();
+  resetScoreEventIds();
 
   const context = {
     tournamentId: state.tournamentId,
@@ -22,7 +24,11 @@ export function resetGame() {
     teamAId: state.teamAId,
     teamBId: state.teamBId,
     scheduleCode: state.scheduleCode,
-    displayView: state.displayView
+    displayView: state.displayView,
+    players: {
+      a: state.players?.a ?? [],
+      b: state.players?.b ?? []
+    }
   };
 
   Object.assign(state, createDefaultState(context));

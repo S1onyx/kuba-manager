@@ -2,6 +2,7 @@ import { getConnection, persistDatabase } from '../db/connection.js';
 import { safeParse } from './shared/json.js';
 
 function mapGameRow(row) {
+  const snapshot = safeParse(row.snapshot_json, null);
   return {
     id: row.id,
     created_at: row.created_at,
@@ -23,7 +24,10 @@ function mapGameRow(row) {
     stage_label: row.stage_label,
     schedule_code: row.schedule_code,
     penalties: safeParse(row.penalties_json, { a: [], b: [] }),
-    snapshot: safeParse(row.snapshot_json, null)
+    snapshot,
+    player_stats: snapshot?.playerStats ?? { a: [], b: [] },
+    scoring_log: snapshot?.scoringLog ?? [],
+    penalty_log: snapshot?.penaltyLog ?? []
   };
 }
 

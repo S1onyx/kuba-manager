@@ -29,17 +29,22 @@ import {
   createTeam,
   updateTeam,
   deleteTeam,
+  fetchPlayers,
+  createPlayer,
+  updatePlayer,
+  deletePlayer,
   fetchTournamentStages,
   fetchTournamentSchedule,
   fetchTournamentStructure,
   selectScheduleMatch,
-  updateTournamentTeams
+  updateTournamentTeams,
+  updateTournamentScheduleEntry
 } from '../utils/api.js';
 
 const POINT_OPTIONS = [1, 2, 3];
 const createPenaltyForms = () => ({
-  a: { name: '', preset: '60', custom: '' },
-  b: { name: '', preset: '60', custom: '' }
+  a: { name: '', preset: '60', custom: '', playerId: '' },
+  b: { name: '', preset: '60', custom: '', playerId: '' }
 });
 const DISPLAY_VIEW_OPTIONS = [
   { id: 'scoreboard', label: 'Live-Spielstand' },
@@ -67,6 +72,34 @@ function formatDateTime(isoString) {
   } catch {
     return isoString;
   }
+}
+
+function formatDateTimeLocalInput(isoString) {
+  if (!isoString) {
+    return '';
+  }
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) {
+    return '';
+  }
+  const pad = (value) => String(value).padStart(2, '0');
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+function normalizeLocalDateTimeToISO(value) {
+  if (!value) {
+    return null;
+  }
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+  return parsed.toISOString();
 }
 
 function parseTimerInput(value) {
@@ -117,6 +150,7 @@ export default function Dashboard() {
   const [timerInput, setTimerInput] = useState('');
   const [submittingTimer, setSubmittingTimer] = useState(false);
   const [penaltyForms, setPenaltyForms] = useState(() => createPenaltyForms());
+  const [selectedScorer, setSelectedScorer] = useState({ a: '', b: '' });
   const [halftimeInput, setHalftimeInput] = useState('');
   const [extraTimeInput, setExtraTimeInput] = useState('');
   const [halftimeDirty, setHalftimeDirty] = useState(false);
@@ -151,6 +185,8 @@ export default function Dashboard() {
   const [scheduleError, setScheduleError] = useState('');
   const [schedulePickerCode, setSchedulePickerCode] = useState('');
   const [scheduleSelection, setScheduleSelection] = useState('');
+  const [scheduleDrafts, setScheduleDrafts] = useState({});
+  const [scheduleSaving, setScheduleSaving] = useState({});
   const resolvedTournamentId = useMemo(() => {
     const scoreboardId = scoreboard?.tournamentId ? Number(scoreboard.tournamentId) : null;
     if (scoreboardId && Number.isInteger(scoreboardId) && scoreboardId > 0) {
@@ -167,6 +203,11 @@ export default function Dashboard() {
   const [teamsError, setTeamsError] = useState('');
   const [teamCreateName, setTeamCreateName] = useState('');
   const [teamEdits, setTeamEdits] = useState({});
+  const [players, setPlayers] = useState([]);
+  const [playersLoading, setPlayersLoading] = useState(true);
+  const [playersError, setPlayersError] = useState('');
+  const [playerCreate, setPlayerCreate] = useState({ teamId: '', name: '', jerseyNumber: '', position: '' });
+  const [playerEdits, setPlayerEdits] = useState({});
   const [expandedTournamentId, setExpandedTournamentId] = useState(null);
   const [tournamentStructure, setTournamentStructure] = useState(null);
   const [structureTournamentId, setStructureTournamentId] = useState(null);
@@ -363,6 +404,64 @@ export default function Dashboard() {
     return { options, matchMap };
   }, [scheduleData]);
 
+  const scheduleChronological = useMemo(() => {
+    if (!scheduleData?.raw || !Array.isArray(scheduleData.raw)) {
+      return [];
+    }
+
+    return scheduleData.raw.slice().sort((a, b) => {
+      const timeA = a?.scheduled_at ? Date.parse(a.scheduled_at) : null;
+      const timeB = b?.scheduled_at ? Date.parse(b.scheduled_at) : null;
+      const validA = Number.isFinite(timeA);
+      const validB = Number.isFinite(timeB);
+      if (validA && validB && timeA !== timeB) {
+        return timeA - timeB;
+      }
+      if (validA && !validB) {
+        return -1;
+      }
+      if (!validA && validB) {
+        return 1;
+      }
+      if ((a.stage_order ?? 0) !== (b.stage_order ?? 0)) {
+        return (a.stage_order ?? 0) - (b.stage_order ?? 0);
+      }
+      if ((a.round_number ?? 0) !== (b.round_number ?? 0)) {
+        return (a.round_number ?? 0) - (b.round_number ?? 0);
+      }
+      if ((a.match_order ?? 0) !== (b.match_order ?? 0)) {
+        return (a.match_order ?? 0) - (b.match_order ?? 0);
+      }
+      return (a.id ?? 0) - (b.id ?? 0);
+    });
+  }, [scheduleData?.raw]);
+
+  const playersByTeam = useMemo(() => {
+    const map = new Map();
+    players.forEach((player) => {
+      const key = player.team_id != null ? String(player.team_id) : 'unassigned';
+      if (!map.has(key)) {
+        map.set(key, []);
+      }
+      map.get(key).push(player);
+    });
+
+    map.forEach((list) => {
+      list.sort((a, b) => {
+        const aNum = a.jersey_number ?? Number.MAX_SAFE_INTEGER;
+        const bNum = b.jersey_number ?? Number.MAX_SAFE_INTEGER;
+        if (aNum !== bNum) {
+          return aNum - bNum;
+        }
+        return (a.name ?? '').localeCompare(b.name ?? '', 'de', { sensitivity: 'base' });
+      });
+    });
+
+    return map;
+  }, [players]);
+
+  const unassignedPlayers = playersByTeam.get('unassigned') ?? [];
+
   const loadHistory = useCallback(() => {
     setHistoryLoading(true);
     fetchHistory()
@@ -407,6 +506,74 @@ export default function Dashboard() {
         setTeamsLoading(false);
       });
   }, []);
+
+  const loadPlayers = useCallback(() => {
+    setPlayersLoading(true);
+    fetchPlayers()
+      .then((data) => {
+        setPlayers(data);
+        setPlayersError('');
+      })
+      .catch(() => {
+        setPlayersError('Spieler konnten nicht geladen werden.');
+      })
+      .finally(() => {
+        setPlayersLoading(false);
+      });
+  }, []);
+
+  const refreshSchedule = useCallback(async () => {
+    if (!resolvedTournamentId) {
+      setScheduleData(null);
+      setScheduleError('');
+      setScheduleLoading(false);
+      return true;
+    }
+
+    setScheduleLoading(true);
+    try {
+      const data = await fetchTournamentSchedule(resolvedTournamentId);
+      setScheduleData(data ?? null);
+      setScheduleError('');
+      return true;
+    } catch (err) {
+      console.error(err);
+      setScheduleData(null);
+      setScheduleError('Spielplan konnte nicht geladen werden.');
+      return false;
+    } finally {
+      setScheduleLoading(false);
+    }
+  }, [resolvedTournamentId]);
+
+  const refreshActiveTeams = useCallback(async () => {
+    if (!scoreboard) {
+      return;
+    }
+
+    const payload = {};
+    if (scoreboard.teamAId) {
+      payload.teamAId = scoreboard.teamAId;
+    } else if (scoreboard.teamAName) {
+      payload.teamAName = scoreboard.teamAName;
+    }
+
+    if (scoreboard.teamBId) {
+      payload.teamBId = scoreboard.teamBId;
+    } else if (scoreboard.teamBName) {
+      payload.teamBName = scoreboard.teamBName;
+    }
+
+    if (Object.keys(payload).length === 0) {
+      return;
+    }
+
+    try {
+      await updateTeams(payload);
+    } catch (err) {
+      console.error('Aktive Teams konnten nicht aktualisiert werden.', err);
+    }
+  }, [scoreboard?.teamAId, scoreboard?.teamAName, scoreboard?.teamBId, scoreboard?.teamBName]);
 
   useEffect(() => {
     let active = true;
@@ -455,6 +622,10 @@ export default function Dashboard() {
   useEffect(() => {
     loadTeams();
   }, [loadTeams]);
+
+  useEffect(() => {
+    loadPlayers();
+  }, [loadPlayers]);
 
   useEffect(() => {
     if (!expandedTournamentId) {
@@ -508,36 +679,22 @@ export default function Dashboard() {
   }, [scoreboard?.scheduleCode]);
 
   useEffect(() => {
-    if (!resolvedTournamentId) {
-      setScheduleData(null);
-      setScheduleError('');
-      setScheduleLoading(false);
+    refreshSchedule();
+  }, [refreshSchedule]);
+
+  useEffect(() => {
+    if (!scheduleData?.raw || !Array.isArray(scheduleData.raw)) {
+      setScheduleDrafts({});
       return;
     }
 
-    let active = true;
-    setScheduleLoading(true);
-
-    fetchTournamentSchedule(resolvedTournamentId)
-      .then((data) => {
-        if (!active) return;
-        setScheduleData(data ?? null);
-        setScheduleError('');
-      })
-      .catch(() => {
-        if (!active) return;
-        setScheduleData(null);
-        setScheduleError('Spielplan konnte nicht geladen werden.');
-      })
-      .finally(() => {
-        if (!active) return;
-        setScheduleLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [resolvedTournamentId]);
+    const nextDrafts = {};
+    scheduleData.raw.forEach((entry) => {
+      const key = String(entry.id);
+      nextDrafts[key] = entry.scheduled_at ? formatDateTimeLocalInput(entry.scheduled_at) : '';
+    });
+    setScheduleDrafts(nextDrafts);
+  }, [scheduleData?.raw]);
 
   useEffect(() => {
     const handleUpdate = (payload) => {
@@ -577,6 +734,36 @@ export default function Dashboard() {
         }
         return next;
       });
+
+      setSelectedScorer((prev) => {
+        const next = { ...prev };
+        ['a', 'b'].forEach((teamKey) => {
+          const roster = payload.players?.[teamKey] ?? [];
+          if (!roster.some((player) => String(player.playerId) === String(prev[teamKey]))) {
+            next[teamKey] = '';
+          }
+        });
+        return next;
+      });
+
+      setPenaltyForms((prev) => ({
+        a: {
+          ...prev.a,
+          playerId:
+            prev.a.playerId &&
+            (payload.players?.a ?? []).some((player) => String(player.playerId) === String(prev.a.playerId))
+              ? prev.a.playerId
+              : ''
+        },
+        b: {
+          ...prev.b,
+          playerId:
+            prev.b.playerId &&
+            (payload.players?.b ?? []).some((player) => String(player.playerId) === String(prev.b.playerId))
+              ? prev.b.playerId
+              : ''
+        }
+      }));
     };
 
     socket.on('scoreboard:update', handleUpdate);
@@ -638,6 +825,11 @@ export default function Dashboard() {
     if (scoreboard?.isExtraTime) return scoreboard?.isRunning ? 'Nachspielzeit' : 'Nachspielzeit (Pause)';
     return scoreboard?.isRunning ? 'läuft' : 'pausiert';
   }, [scoreboard?.isHalftimeBreak, scoreboard?.isExtraTime, scoreboard?.isRunning]);
+  const liveStateLabel = scoreboard?.isHalftimeBreak
+    ? 'Halbzeitpause'
+    : scoreboard?.isRunning
+      ? 'läuft'
+      : 'pausiert';
   const activeStructure = useMemo(
     () => (expandedTournamentId && structureTournamentId === expandedTournamentId ? tournamentStructure : null),
     [expandedTournamentId, structureTournamentId, tournamentStructure]
@@ -656,6 +848,54 @@ export default function Dashboard() {
       return currentTeamId !== initialTeamId || currentName !== initialName;
     });
   }, [expandedTournamentId, slotAssignments, slotInitialAssignments]);
+
+  const scoreboardSummaryCard = scoreboard ? (
+    <section
+      style={{
+        border: '1px solid #0b1a2b',
+        borderRadius: '16px',
+        padding: '1.25rem',
+        background: 'linear-gradient(135deg, rgba(11,26,43,0.9), rgba(7,54,94,0.9))',
+        color: '#f3f7ff',
+        display: 'grid',
+        gap: '0.9rem'
+      }}
+    >
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+        <div style={{ display: 'grid', gap: '0.25rem' }}>
+          <span style={{ fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.78 }}>
+            Spielübersicht
+          </span>
+          <strong style={{ fontSize: '1.4rem' }}>
+            {scoreboard.teamAName} {scoreboard.scoreA ?? 0} : {scoreboard.scoreB ?? 0} {scoreboard.teamBName}
+          </strong>
+        </div>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <span style={{ padding: '0.35rem 0.75rem', borderRadius: '999px', background: 'rgba(255,255,255,0.18)', fontSize: '0.85rem' }}>
+            {formattedRemaining} · {liveStateLabel}
+          </span>
+          {scoreboard.stageType && scoreboard.stageLabel ? (
+            <span style={{ padding: '0.35rem 0.75rem', borderRadius: '999px', background: 'rgba(255,255,255,0.12)', fontSize: '0.85rem' }}>
+              {scoreboard.stageType === 'group' ? `Gruppe ${scoreboard.stageLabel}` : scoreboard.stageLabel}
+            </span>
+          ) : null}
+        </div>
+      </header>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', fontSize: '0.9rem', opacity: 0.9 }}>
+        {scoreboard.tournamentName ? (
+          <span>
+            Turnier: <strong>{scoreboard.tournamentName}</strong>
+          </span>
+        ) : (
+          <span>Kein Turnier hinterlegt</span>
+        )}
+        {scoreboard.scheduleCode ? (
+          <span>Matchcode: <strong>{scoreboard.scheduleCode}</strong></span>
+        ) : null}
+        <span>Anzeige: {displayView === 'bracket' ? 'Turnierbaum' : 'Live-Spielstand'}</span>
+      </div>
+    </section>
+  ) : null;
 
   function updateMessage(type, message) {
     if (type === 'error') {
@@ -719,6 +959,154 @@ export default function Dashboard() {
     });
   }
 
+  function handlePlayerCreateChange(field, value) {
+    setPlayerCreate((prev) => ({ ...prev, [field]: value }));
+  }
+
+  async function handlePlayerCreateSubmit(event) {
+    event.preventDefault();
+
+    if (!playerCreate.teamId) {
+      updateMessage('error', 'Bitte ein Team auswählen.');
+      return;
+    }
+    if (!playerCreate.name.trim()) {
+      updateMessage('error', 'Bitte einen Spielernamen eingeben.');
+      return;
+    }
+
+    let jerseyNumber;
+    const jerseyValue = (playerCreate.jerseyNumber ?? '').toString().trim();
+    if (jerseyValue) {
+      const parsed = Number(jerseyValue);
+      if (!Number.isFinite(parsed) || parsed < 0) {
+        updateMessage('error', 'Bitte eine gültige Rückennummer angeben.');
+        return;
+      }
+      jerseyNumber = parsed;
+    }
+
+    const payload = {
+      teamId: Number(playerCreate.teamId),
+      name: playerCreate.name.trim(),
+      jerseyNumber,
+      position: playerCreate.position.trim()
+    };
+
+    try {
+      await createPlayer(payload);
+      setPlayerCreate((prev) => ({ teamId: prev.teamId, name: '', jerseyNumber: '', position: '' }));
+      updateMessage('info', 'Spieler angelegt.');
+      loadPlayers();
+      refreshActiveTeams();
+    } catch (err) {
+      console.error(err);
+      updateMessage('error', 'Spieler konnte nicht angelegt werden.');
+    }
+  }
+
+  function startPlayerEdit(player) {
+    setPlayerEdits((prev) => ({
+      ...prev,
+      [player.id]: {
+        name: player.name ?? '',
+        jerseyNumber: player.jersey_number ?? '',
+        position: player.position ?? '',
+        teamId: player.team_id ? String(player.team_id) : '',
+        editing: true
+      }
+    }));
+  }
+
+  function cancelPlayerEdit(id) {
+    setPlayerEdits((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+  }
+
+  function handlePlayerEditChange(id, field, value) {
+    setPlayerEdits((prev) => {
+      const current = prev[id];
+      if (!current) {
+        return prev;
+      }
+      return {
+        ...prev,
+        [id]: { ...current, [field]: value }
+      };
+    });
+  }
+
+  async function handlePlayerUpdateSubmit(id) {
+    const edit = playerEdits[id];
+    if (!edit) {
+      return;
+    }
+
+    if (!edit.name.trim()) {
+      updateMessage('error', 'Bitte einen Spielernamen eingeben.');
+      return;
+    }
+
+    let jerseyNumber;
+    const jerseyValue = (edit.jerseyNumber ?? '').toString().trim();
+    if (jerseyValue) {
+      const parsed = Number(jerseyValue);
+      if (!Number.isFinite(parsed) || parsed < 0) {
+        updateMessage('error', 'Bitte eine gültige Rückennummer angeben.');
+        return;
+      }
+      jerseyNumber = parsed;
+    }
+
+    const original = players.find((player) => player.id === id);
+    const payload = {
+      name: edit.name.trim(),
+      jerseyNumber,
+      position: edit.position.trim(),
+      teamId: edit.teamId ? Number(edit.teamId) : original?.team_id
+    };
+
+    if (payload.teamId == null) {
+      updateMessage('error', 'Bitte ein Team auswählen.');
+      return;
+    }
+
+    try {
+      await updatePlayer(id, payload);
+      updateMessage('info', 'Spieler aktualisiert.');
+      cancelPlayerEdit(id);
+      loadPlayers();
+      refreshActiveTeams();
+    } catch (err) {
+      console.error(err);
+      updateMessage('error', 'Spieler konnte nicht aktualisiert werden.');
+    }
+  }
+
+  async function handlePlayerDelete(id) {
+    if (!window.confirm('Spieler wirklich löschen?')) {
+      return;
+    }
+
+    try {
+      await deletePlayer(id);
+      updateMessage('info', 'Spieler gelöscht.');
+      setPlayerEdits((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+      loadPlayers();
+      refreshActiveTeams();
+    } catch (err) {
+      console.error(err);
+      updateMessage('error', 'Spieler konnte nicht gelöscht werden.');
+    }
+  }
+
   async function handleTeamSubmit(event) {
     event.preventDefault();
 
@@ -762,9 +1150,28 @@ export default function Dashboard() {
   }
 
   async function handleScore(team, points) {
+    const teamKey = team === 'b' ? 'b' : 'a';
+    const selected = selectedScorer[teamKey];
+    const payload = {};
+
+    if (selected) {
+      payload.playerId = Number(selected);
+    }
+
+    if (points > 0) {
+      payload.shotType = points === 3 ? 'three' : points === 2 ? 'field' : 'free';
+    } else {
+      payload.affectStats = false;
+    }
+
     try {
-      await mutateScore(team, points);
-      updateMessage('info', `${points > 0 ? '+' : ''}${points} Punkte für Team ${team.toUpperCase()}.`);
+      await mutateScore(team, points, payload);
+      const roster = scoreboard?.players?.[teamKey] ?? [];
+      const playerName = selected
+        ? roster.find((player) => String(player.playerId) === String(selected))?.name ?? null
+        : null;
+      const baseMessage = `${points > 0 ? '+' : ''}${points} Punkte für Team ${team.toUpperCase()}`;
+      updateMessage('info', playerName ? `${baseMessage} (${playerName}).` : `${baseMessage}.`);
     } catch (err) {
       console.error(err);
       updateMessage('error', 'Punkte konnten nicht aktualisiert werden.');
@@ -837,8 +1244,13 @@ export default function Dashboard() {
     }
 
     try {
-      await addPenalty(teamKey, form.name, seconds);
-      setPenaltyForms((prev) => ({ ...prev, [teamKey]: { name: '', preset: '60', custom: '' } }));
+      await addPenalty(teamKey, form.name, seconds, {
+        playerId: form.playerId ? Number(form.playerId) : undefined
+      });
+      setPenaltyForms((prev) => ({
+        ...prev,
+        [teamKey]: { name: '', preset: '60', custom: '', playerId: '' }
+      }));
       updateMessage('info', `Zeitstrafe für Team ${teamKey.toUpperCase()} hinzugefügt.`);
     } catch (err) {
       console.error(err);
@@ -1047,6 +1459,83 @@ export default function Dashboard() {
       console.error(err);
       updateMessage('error', 'Match-Kontext konnte nicht gesetzt werden.');
     }
+  }
+
+  function handleScheduleDraftChange(entryId, value) {
+    const key = String(entryId);
+    setScheduleDrafts((prev) => ({
+      ...prev,
+      [key]: value
+    }));
+  }
+
+  async function handleScheduleDraftSubmit(entryId, overrideValue = undefined) {
+    if (!resolvedTournamentId) {
+      updateMessage('error', 'Bitte zuerst ein Turnier im Match-Kontext auswählen.');
+      return;
+    }
+
+    const key = String(entryId);
+    const rawValue =
+      overrideValue !== undefined ? overrideValue : scheduleDrafts[key] ?? '';
+    const trimmed = typeof rawValue === 'string' ? rawValue.trim() : '';
+
+    let normalized = null;
+    if (trimmed) {
+      normalized = normalizeLocalDateTimeToISO(trimmed);
+      if (!normalized) {
+        updateMessage('error', 'Bitte ein gültiges Datum/Uhrzeit auswählen.');
+        return;
+      }
+    }
+
+    setScheduleSaving((prev) => ({
+      ...prev,
+      [key]: true
+    }));
+
+    try {
+      await updateTournamentScheduleEntry(resolvedTournamentId, entryId, {
+        scheduledAt: normalized
+      });
+      setScheduleDrafts((prev) => ({
+        ...prev,
+        [key]: trimmed
+      }));
+      updateMessage('info', normalized ? 'Spieltermin gespeichert.' : 'Spieltermin entfernt.');
+      await refreshSchedule();
+    } catch (err) {
+      console.error(err);
+      let detail = '';
+      if (typeof err?.message === 'string') {
+        try {
+          const parsed = JSON.parse(err.message);
+          detail = parsed?.detail ?? parsed?.message ?? '';
+        } catch {
+          detail = err.message;
+        }
+      }
+      if (detail.includes('Ungültiger Zeitpunkt')) {
+        updateMessage('error', 'Bitte ein gültiges Datum/Uhrzeit auswählen.');
+      } else {
+        updateMessage('error', 'Spieltermin konnte nicht gespeichert werden.');
+      }
+    } finally {
+      setScheduleSaving((prev) => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+    }
+  }
+
+  async function handleScheduleDraftClear(entryId) {
+    const key = String(entryId);
+    setScheduleDrafts((prev) => ({
+      ...prev,
+      [key]: ''
+    }));
+    await handleScheduleDraftSubmit(entryId, '');
   }
 
   async function handleScheduleMatchApply(code) {
@@ -1793,6 +2282,84 @@ export default function Dashboard() {
       </section>
 
       <section style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
+        <h3>Spieltermine planen</h3>
+        <p style={{ marginTop: 0, marginBottom: '0.75rem', color: '#555' }}>
+          Lege Datum und Uhrzeit für jede Partie fest, um den Ablauf des Spieltages zeitlich zu strukturieren.
+        </p>
+        {!resolvedTournamentId ? (
+          <p>Bitte zuerst ein Turnier im Match-Kontext auswählen.</p>
+        ) : scheduleLoading ? (
+          <p>Lade Spielplan...</p>
+        ) : scheduleError ? (
+          <p style={{ color: 'crimson' }}>{scheduleError}</p>
+        ) : scheduleChronological.length === 0 ? (
+          <p>Noch keine Partien im Spielplan vorhanden.</p>
+        ) : (
+          <div style={{ display: 'grid', gap: '0.9rem' }}>
+            {scheduleChronological.map((entry) => {
+              const key = String(entry.id);
+              const baseValue = entry.scheduled_at ? formatDateTimeLocalInput(entry.scheduled_at) : '';
+              const currentValue = Object.prototype.hasOwnProperty.call(scheduleDrafts, key)
+                ? scheduleDrafts[key]
+                : baseValue;
+              const saving = Boolean(scheduleSaving[key]);
+              const isDirty = (currentValue ?? '') !== baseValue;
+              const hasScheduled = Boolean(entry.scheduled_at);
+              const summary = `${entry.home_label} vs ${entry.away_label}`;
+              const stageInfo = entry.phase === 'group' && entry.round_number
+                ? `${entry.stage_label} · Runde ${entry.round_number}`
+                : entry.stage_label || 'Phase';
+              const statusLabel = hasScheduled
+                ? `Geplant: ${formatDateTime(entry.scheduled_at)}`
+                : 'Noch kein Zeitpunkt gesetzt';
+
+              return (
+                <article
+                  key={entry.id}
+                  style={{
+                    border: '1px solid rgba(0,0,0,0.12)',
+                    borderRadius: '8px',
+                    padding: '0.75rem',
+                    display: 'grid',
+                    gap: '0.6rem',
+                    background: 'rgba(0,0,0,0.02)'
+                  }}
+                >
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
+                    <strong style={{ fontSize: '0.95rem' }}>{stageInfo}</strong>
+                    <span style={{ opacity: 0.75 }}>{summary}</span>
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
+                    <input
+                      type="datetime-local"
+                      value={currentValue}
+                      onChange={(event) => handleScheduleDraftChange(entry.id, event.target.value)}
+                      disabled={saving}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleScheduleDraftSubmit(entry.id)}
+                      disabled={saving || !isDirty}
+                    >
+                      {saving ? 'Speichere...' : 'Speichern'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleScheduleDraftClear(entry.id)}
+                      disabled={saving || (!hasScheduled && (currentValue ?? '') === '')}
+                    >
+                      Löschen
+                    </button>
+                    <span style={{ fontSize: '0.85rem', opacity: 0.75 }}>{statusLabel}</span>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      <section style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
         <h3>Teams</h3>
         <p style={{ marginTop: 0, marginBottom: '0.75rem', color: '#555' }}>
           Wähle Teams aus der Liste oder trage freie Namen ein. Verwaltung der Teams im Tab &quot;Teams&quot;.
@@ -1857,6 +2424,25 @@ export default function Dashboard() {
             return (
               <div key={teamKey}>
                 <p style={{ marginBottom: '0.5rem' }}>{teamName}: {score}</p>
+                <label style={{ display: 'grid', gap: '0.35rem', marginBottom: '0.5rem' }}>
+                  Wer hat getroffen?
+                  <select
+                    value={selectedScorer[teamKey]}
+                    onChange={(event) =>
+                      setSelectedScorer((prev) => ({ ...prev, [teamKey]: event.target.value }))
+                    }
+                  >
+                    <option value="">Team gesamt</option>
+                    {(scoreboard.players?.[teamKey] ?? []).map((player) => (
+                      <option
+                        key={player.id ?? player.playerId ?? player.name}
+                        value={player.playerId ?? ''}
+                      >
+                        {player.displayName ?? player.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
                 {POINT_OPTIONS.map((value) => (
                   <button key={`${teamKey}-${value}`} onClick={() => handleScore(teamKey, value)} style={{ marginRight: '0.5rem' }}>
                     +{value}
@@ -1984,6 +2570,20 @@ export default function Dashboard() {
               <div key={teamKey} style={{ minWidth: '260px', flex: '1 1 260px' }}>
                 <h4>{teamName}</h4>
                 <form onSubmit={(event) => handlePenaltySubmit(event, teamKey)} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <label style={{ display: 'grid', gap: '0.35rem' }}>
+                    Spieler
+                    <select
+                      value={form.playerId}
+                      onChange={(event) => handlePenaltyFormChange(teamKey, 'playerId', event.target.value)}
+                    >
+                      <option value="">Team gesamt</option>
+                      {(scoreboard.players?.[teamKey] ?? []).map((player) => (
+                        <option key={player.id ?? player.playerId ?? player.name} value={player.playerId ?? ''}>
+                          {player.displayName ?? player.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                   <input
                     value={form.name}
                     onChange={(event) => handlePenaltyFormChange(teamKey, 'name', event.target.value)}
@@ -2028,6 +2628,7 @@ export default function Dashboard() {
                       }}
                     >
                       <span>
+                        {penalty.playerName ? `${penalty.playerName} · ` : ''}
                         {penalty.name} – {penalty.isExpired ? 'abgelaufen' : formatTime(penalty.remainingSeconds)}
                       </span>
                       <button type="button" onClick={() => handlePenaltyRemove(penalty.id)}>
@@ -2183,6 +2784,202 @@ export default function Dashboard() {
     </section>
   );
 
+  const playersContent = (
+    <section style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
+      <h3>Spieler verwalten</h3>
+      <p style={{ marginTop: 0, marginBottom: '0.75rem', color: '#555' }}>
+        Lege für jedes Team 4–5 Spieler an und verknüpfe sie mit dem Scoreboard. Punkte- und Straf-Aktionen können
+        anschließend einem Spieler zugeordnet werden.
+      </p>
+      <form onSubmit={handlePlayerCreateSubmit} style={{ display: 'grid', gap: '0.75rem', marginBottom: '1.25rem' }}>
+        <div style={{ display: 'grid', gap: '0.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
+          <label style={{ display: 'grid', gap: '0.35rem' }}>
+            Team
+            <select
+              value={playerCreate.teamId}
+              onChange={(event) => handlePlayerCreateChange('teamId', event.target.value)}
+              required
+            >
+              <option value="">Team wählen</option>
+              {teams.map((team) => (
+                <option key={team.id} value={team.id}>
+                  {team.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label style={{ display: 'grid', gap: '0.35rem' }}>
+            Spielername
+            <input
+              value={playerCreate.name}
+              onChange={(event) => handlePlayerCreateChange('name', event.target.value)}
+              placeholder="Name"
+              required
+            />
+          </label>
+          <label style={{ display: 'grid', gap: '0.35rem' }}>
+            Rückennummer
+            <input
+              value={playerCreate.jerseyNumber}
+              onChange={(event) => handlePlayerCreateChange('jerseyNumber', event.target.value)}
+              placeholder="z.B. 12"
+            />
+          </label>
+          <label style={{ display: 'grid', gap: '0.35rem' }}>
+            Position (optional)
+            <input
+              value={playerCreate.position}
+              onChange={(event) => handlePlayerCreateChange('position', event.target.value)}
+              placeholder="z.B. Center"
+            />
+          </label>
+        </div>
+        <div>
+          <button type="submit">Spieler anlegen</button>
+        </div>
+      </form>
+
+      {playersLoading ? (
+        <p>Spieler werden geladen...</p>
+      ) : playersError ? (
+        <p style={{ color: 'crimson' }}>{playersError}</p>
+      ) : (
+        <div style={{ display: 'grid', gap: '1rem' }}>
+          {teams.map((team) => {
+            const teamPlayers = playersByTeam.get(String(team.id)) ?? [];
+            return (
+              <article
+                key={team.id}
+                style={{
+                  border: '1px solid rgba(0,0,0,0.1)',
+                  borderRadius: '8px',
+                  padding: '0.75rem 1rem',
+                  background: 'rgba(0,0,0,0.02)',
+                  display: 'grid',
+                  gap: '0.5rem'
+                }}
+              >
+                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <strong>{team.name}</strong>
+                  <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>
+                    {teamPlayers.length} Spieler
+                  </span>
+                </header>
+                {teamPlayers.length === 0 ? (
+                  <p style={{ margin: 0, color: '#666' }}>Noch keine Spieler erfasst.</p>
+                ) : (
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '0.5rem' }}>
+                    {teamPlayers.map((player) => {
+                      const edit = playerEdits[player.id];
+                      const isEditing = Boolean(edit?.editing);
+                      return (
+                        <li
+                          key={player.id}
+                          style={{
+                            border: '1px solid rgba(0,0,0,0.08)',
+                            borderRadius: '6px',
+                            padding: '0.6rem 0.75rem',
+                            background: 'rgba(255,255,255,0.7)'
+                          }}
+                        >
+                          {isEditing ? (
+                            <form
+                              onSubmit={(event) => {
+                                event.preventDefault();
+                                handlePlayerUpdateSubmit(player.id);
+                              }}
+                              style={{ display: 'grid', gap: '0.5rem' }}
+                            >
+                              <div style={{ display: 'grid', gap: '0.35rem', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
+                                <input
+                                  value={edit.name}
+                                  onChange={(event) => handlePlayerEditChange(player.id, 'name', event.target.value)}
+                                  placeholder="Name"
+                                  required
+                                />
+                                <input
+                                  value={edit.jerseyNumber}
+                                  onChange={(event) => handlePlayerEditChange(player.id, 'jerseyNumber', event.target.value)}
+                                  placeholder="Nr."
+                                />
+                                <input
+                                  value={edit.position}
+                                  onChange={(event) => handlePlayerEditChange(player.id, 'position', event.target.value)}
+                                  placeholder="Position"
+                                />
+                                <select
+                                  value={edit.teamId}
+                                  onChange={(event) => handlePlayerEditChange(player.id, 'teamId', event.target.value)}
+                                >
+                                  <option value="">Team wählen</option>
+                                  {teams.map((otherTeam) => (
+                                    <option key={otherTeam.id} value={otherTeam.id}>
+                                      {otherTeam.name}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                <button type="submit">Speichern</button>
+                                <button type="button" onClick={() => cancelPlayerEdit(player.id)}>Abbrechen</button>
+                              </div>
+                            </form>
+                          ) : (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                              <div style={{ display: 'grid', gap: '0.2rem' }}>
+                                <div style={{ fontWeight: 600 }}>
+                                  {player.name}
+                                  {player.jersey_number != null ? ` · #${player.jersey_number}` : ''}
+                                </div>
+                                {player.position ? (
+                                  <span style={{ fontSize: '0.8rem', opacity: 0.75 }}>{player.position}</span>
+                                ) : null}
+                              </div>
+                              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <button type="button" onClick={() => startPlayerEdit(player)}>Bearbeiten</button>
+                                <button
+                                  type="button"
+                                  onClick={() => handlePlayerDelete(player.id)}
+                                  style={{ background: '#d32f2f', color: '#fff' }}
+                                >
+                                  Löschen
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </article>
+            );
+          })}
+
+          {unassignedPlayers.length > 0 ? (
+            <article
+              style={{
+                border: '1px dashed rgba(0,0,0,0.2)',
+                borderRadius: '8px',
+                padding: '0.75rem 1rem',
+                background: 'rgba(255,255,255,0.5)',
+                display: 'grid',
+                gap: '0.5rem'
+              }}
+            >
+              <strong>Unzugeordnete Spieler</strong>
+              <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '0.5rem' }}>
+                {unassignedPlayers.map((player) => (
+                  <li key={player.id}>{player.name}</li>
+                ))}
+              </ul>
+            </article>
+          ) : null}
+        </div>
+      )}
+    </section>
+  );
+
   const teamsContent = (
     <section style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
       <h3>Teams verwalten</h3>
@@ -2254,8 +3051,9 @@ export default function Dashboard() {
   );
 
   const tabs = [
-    { id: 'control', label: 'Steuerung' },
+    { id: 'control', label: 'Live-Steuerung' },
     { id: 'history', label: 'Historie' },
+    { id: 'players', label: 'Spieler' },
     { id: 'teams', label: 'Teams' },
     { id: 'tournaments', label: 'Turniere' }
   ];
@@ -2506,14 +3304,18 @@ export default function Dashboard() {
         ))}
       </nav>
 
+      {scoreboardSummaryCard}
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         {activeTab === 'control'
           ? controlContent
           : activeTab === 'history'
             ? historyContent
-            : activeTab === 'teams'
-              ? teamsContent
-              : tournamentContent}
+            : activeTab === 'players'
+              ? playersContent
+              : activeTab === 'teams'
+                ? teamsContent
+                : tournamentContent}
       </div>
     </div>
   );

@@ -16,6 +16,16 @@ export {
 } from './teamsService.js';
 
 export {
+  listPlayers,
+  listPlayersByTeam,
+  createPlayer,
+  getPlayer,
+  updatePlayer,
+  movePlayer,
+  deletePlayer
+} from './playersService.js';
+
+export {
   createTournament,
   listTournaments,
   getTournament,
@@ -30,5 +40,6 @@ export {
   getTournamentStages,
   groupScheduleByPhase,
   computeGroupStandings,
-  getTournamentSummary
+  getTournamentSummary,
+  updateTournamentScheduleEntry
 } from './tournaments/index.js';

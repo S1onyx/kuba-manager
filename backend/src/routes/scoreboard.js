@@ -29,6 +29,7 @@ import {
   getTournamentSchedule,
   getTournamentStructureDetails,
   listGames,
+  listPlayersByTeam,
   saveGame,
   updateGame
 } from '../services/index.js';
@@ -45,7 +46,9 @@ router.post('/teams', async (req, res) => {
       teamAName,
       teamBName,
       teamAId,
-      teamBId
+      teamBId,
+      teamAPlayers,
+      teamBPlayers
     } = req.body ?? {};
 
     const payload = {};
@@ -62,10 +65,15 @@ router.post('/teams', async (req, res) => {
       }
       payload.teamAId = team.id;
       payload.teamAName = team.name;
+      payload.teamAPlayers = await listPlayersByTeam(team.id);
       provided = true;
     } else if (typeof teamAName === 'string' && teamAName.trim().length > 0) {
       payload.teamAName = teamAName;
       payload.teamAId = null;
+      payload.teamAPlayers = Array.isArray(teamAPlayers) ? teamAPlayers : [];
+      provided = true;
+    } else if (Array.isArray(teamAPlayers)) {
+      payload.teamAPlayers = teamAPlayers;
       provided = true;
     }
 
@@ -80,10 +88,15 @@ router.post('/teams', async (req, res) => {
       }
       payload.teamBId = team.id;
       payload.teamBName = team.name;
+      payload.teamBPlayers = await listPlayersByTeam(team.id);
       provided = true;
     } else if (typeof teamBName === 'string' && teamBName.trim().length > 0) {
       payload.teamBName = teamBName;
       payload.teamBId = null;
+      payload.teamBPlayers = Array.isArray(teamBPlayers) ? teamBPlayers : [];
+      provided = true;
+    } else if (Array.isArray(teamBPlayers)) {
+      payload.teamBPlayers = teamBPlayers;
       provided = true;
     }
 
@@ -100,7 +113,14 @@ router.post('/teams', async (req, res) => {
 });
 
 router.post('/score', (req, res) => {
-  const { team, points } = req.body ?? {};
+  const {
+    team,
+    points,
+    playerId,
+    shotType,
+    description,
+    affectStats
+  } = req.body ?? {};
 
   if (!team || !['a', 'b', 'A', 'B'].includes(team)) {
     return res.status(400).json({ message: 'Ungültiges Team. Erlaubt sind \"A\" oder \"B\".' });
@@ -111,8 +131,34 @@ router.post('/score', (req, res) => {
     return res.status(400).json({ message: 'Punkte müssen 1, 2 oder 3 sein.' });
   }
 
+  let resolvedPlayerId = null;
+  if (playerId !== undefined && playerId !== null && playerId !== '') {
+    const parsedPlayerId = Number(playerId);
+    if (!Number.isInteger(parsedPlayerId) || parsedPlayerId <= 0) {
+      return res.status(400).json({ message: 'Ungültige Spieler-ID.' });
+    }
+    const state = getScoreboardState();
+    const teamKey = String(team).toLowerCase() === 'b' ? 'b' : 'a';
+    const roster = teamKey === 'b' ? state.players?.b ?? [] : state.players?.a ?? [];
+    const exists = roster.some((player) => player.playerId === parsedPlayerId);
+    if (!exists) {
+      return res.status(400).json({ message: 'Spieler gehört nicht zum ausgewählten Team.' });
+    }
+    resolvedPlayerId = parsedPlayerId;
+  }
+
   const signedPoints = Math.sign(numericPoints || 1) * Math.abs(Math.trunc(numericPoints));
-  const nextState = addPoints(team, signedPoints);
+  const affectStatsNormalized =
+    affectStats === undefined || affectStats === null
+      ? undefined
+      : !['false', '0', 'no'].includes(String(affectStats).trim().toLowerCase());
+
+  const nextState = addPoints(team, signedPoints, {
+    playerId: resolvedPlayerId,
+    shotType,
+    description,
+    affectStats: affectStatsNormalized
+  });
   res.json(nextState);
 });
 
@@ -259,6 +305,9 @@ router.post('/schedule/select', async (req, res) => {
       return res.status(404).json({ message: 'Spiel konnte im Spielplan nicht gefunden werden.' });
     }
 
+    const homePlayers = match.home?.teamId ? await listPlayersByTeam(match.home.teamId) : [];
+    const awayPlayers = match.away?.teamId ? await listPlayersByTeam(match.away.teamId) : [];
+
     clearScoreboardTicker();
     const nextState = applyScheduleMatchSelection({
       tournamentId: tournament.id,
@@ -267,7 +316,9 @@ router.post('/schedule/select', async (req, res) => {
       stageLabel: match.stage_label,
       scheduleCode: match.code,
       home: match.home,
-      away: match.away
+      away: match.away,
+      homePlayers,
+      awayPlayers
     });
 
     res.json({
@@ -496,7 +547,7 @@ router.delete('/history/:id', async (req, res) => {
 });
 
 router.post('/penalties', (req, res) => {
-  const { team, name, seconds } = req.body ?? {};
+  const { team, name, seconds, playerId, description } = req.body ?? {};
 
   if (!team || !['a', 'b', 'A', 'B'].includes(team)) {
     return res.status(400).json({ message: 'Ungültiges Team. Erlaubt sind \"A\" oder \"B\".' });
@@ -506,7 +557,27 @@ router.post('/penalties', (req, res) => {
     return res.status(400).json({ message: 'seconds muss größer als 0 sein.' });
   }
 
-  const nextState = addPenalty(team, name, Number(seconds));
+  let resolvedPlayerId = null;
+  if (playerId !== undefined && playerId !== null && playerId !== '') {
+    const parsedPlayerId = Number(playerId);
+    if (!Number.isInteger(parsedPlayerId) || parsedPlayerId <= 0) {
+      return res.status(400).json({ message: 'Ungültige Spieler-ID.' });
+    }
+    const state = getScoreboardState();
+    const teamKey = String(team).toLowerCase() === 'b' ? 'b' : 'a';
+    const roster = teamKey === 'b' ? state.players?.b ?? [] : state.players?.a ?? [];
+    const exists = roster.some((player) => player.playerId === parsedPlayerId);
+    if (!exists) {
+      return res.status(400).json({ message: 'Spieler gehört nicht zum ausgewählten Team.' });
+    }
+    resolvedPlayerId = parsedPlayerId;
+  }
+
+  const label = typeof name === 'string' && name.trim().length > 0 ? name.trim() : undefined;
+  const nextState = addPenalty(team, label, Number(seconds), {
+    playerId: resolvedPlayerId,
+    description
+  });
   res.json(nextState);
 });
 

@@ -431,6 +431,40 @@ export async function setTournamentTeams(tournamentId, assignments = []) {
   return getTournamentStructureDetails(id);
 }
 
+function toScheduledTimestamp(value) {
+  if (value === null || value === undefined || value === '') {
+    return null;
+  }
+
+  const candidate = value instanceof Date ? value : new Date(value);
+  const timestamp = candidate.getTime();
+  return Number.isNaN(timestamp) ? null : timestamp;
+}
+
+function normalizeScheduledAtValue(input) {
+  if (input === null || input === undefined) {
+    return null;
+  }
+
+  if (typeof input === 'string') {
+    const trimmed = input.trim();
+    if (!trimmed) {
+      return null;
+    }
+    const timestamp = toScheduledTimestamp(trimmed);
+    if (timestamp === null) {
+      throw new Error('Ungültiger Zeitpunkt.');
+    }
+    return new Date(timestamp).toISOString();
+  }
+
+  const timestamp = toScheduledTimestamp(input);
+  if (timestamp === null) {
+    throw new Error('Ungültiger Zeitpunkt.');
+  }
+  return new Date(timestamp).toISOString();
+}
+
 function mapScheduleRow(row, teamsMap, matchLabelLookup, resultsByCode, groupStandingsMap) {
   const metadata = safeParse(row.metadata_json, {});
   const homeSource = safeParse(row.home_source, null);
@@ -483,6 +517,7 @@ function mapScheduleRow(row, teamsMap, matchLabelLookup, resultsByCode, groupSta
     code: row.code,
     home_slot: row.home_slot,
     away_slot: row.away_slot,
+    scheduled_at: row.scheduled_at ?? null,
     home_source: homeSource,
     away_source: awaySource,
     home_label: homeLabel,
@@ -537,7 +572,12 @@ export async function getTournamentSchedule(tournamentId) {
   const stmt = db.prepare(
     `SELECT * FROM tournament_schedule
      WHERE tournament_id = ?
-     ORDER BY stage_order ASC, match_order ASC, id ASC`
+     ORDER BY
+       CASE WHEN scheduled_at IS NULL OR TRIM(scheduled_at) = '' THEN 1 ELSE 0 END,
+       datetime(scheduled_at) ASC,
+       stage_order ASC,
+       match_order ASC,
+       id ASC`
   );
 
   const rawRows = [];
@@ -627,15 +667,28 @@ export async function getTournamentStages(tournamentId) {
 }
 
 function sortMatches(matches) {
-  return matches.slice().sort((a, b) => {
-    if ((a.round_number ?? 0) !== (b.round_number ?? 0)) {
-      return (a.round_number ?? 0) - (b.round_number ?? 0);
-    }
-    if ((a.match_order ?? 0) !== (b.match_order ?? 0)) {
-      return (a.match_order ?? 0) - (b.match_order ?? 0);
-    }
-    return a.id - b.id;
-  });
+  return matches
+    .slice()
+    .sort((a, b) => {
+      const timeA = toScheduledTimestamp(a?.scheduled_at);
+      const timeB = toScheduledTimestamp(b?.scheduled_at);
+      if (timeA !== null && timeB !== null && timeA !== timeB) {
+        return timeA - timeB;
+      }
+      if (timeA !== null && timeB === null) {
+        return -1;
+      }
+      if (timeA === null && timeB !== null) {
+        return 1;
+      }
+      if ((a.round_number ?? 0) !== (b.round_number ?? 0)) {
+        return (a.round_number ?? 0) - (b.round_number ?? 0);
+      }
+      if ((a.match_order ?? 0) !== (b.match_order ?? 0)) {
+        return (a.match_order ?? 0) - (b.match_order ?? 0);
+      }
+      return a.id - b.id;
+    });
 }
 
 export function groupScheduleByPhase(schedule = []) {
@@ -698,6 +751,76 @@ export function groupScheduleByPhase(schedule = []) {
   });
 
   return grouped;
+}
+
+export async function updateTournamentScheduleEntry(tournamentId, entryId, patch = {}) {
+  const numericTournamentId = Number(tournamentId);
+  if (!Number.isInteger(numericTournamentId) || numericTournamentId <= 0) {
+    throw new Error('Ungültige Turnier-ID.');
+  }
+
+  const numericEntryId = Number(entryId);
+  if (!Number.isInteger(numericEntryId) || numericEntryId <= 0) {
+    throw new Error('Ungültige Spielplan-ID.');
+  }
+
+  const { SQL, db } = await getConnection();
+  const selectStmt = db.prepare(
+    'SELECT * FROM tournament_schedule WHERE tournament_id = ? AND id = ?'
+  );
+
+  let existing = null;
+  try {
+    selectStmt.bind([numericTournamentId, numericEntryId]);
+    if (selectStmt.step()) {
+      existing = selectStmt.getAsObject();
+    }
+  } finally {
+    selectStmt.free();
+  }
+
+  if (!existing) {
+    return null;
+  }
+
+  const updates = {};
+
+  if (
+    Object.prototype.hasOwnProperty.call(patch, 'scheduledAt') ||
+    Object.prototype.hasOwnProperty.call(patch, 'scheduled_at')
+  ) {
+    const rawValue = patch.scheduledAt ?? patch.scheduled_at;
+    const normalized = normalizeScheduledAtValue(rawValue);
+    const current = existing.scheduled_at ?? null;
+    if (normalized !== current) {
+      updates.scheduled_at = normalized;
+    }
+  }
+
+  if (Object.keys(updates).length > 0) {
+    const assignments = Object.entries(updates);
+    const setClause = assignments.map(([key]) => `${key} = :${key}`).join(', ');
+    const params = {
+      ':tournament_id': numericTournamentId,
+      ':id': numericEntryId
+    };
+
+    assignments.forEach(([key, value]) => {
+      params[`:${key}`] = value;
+    });
+
+    db.run(
+      `UPDATE tournament_schedule
+       SET ${setClause}
+       WHERE tournament_id = :tournament_id AND id = :id`,
+      params
+    );
+
+    persistDatabase(db, SQL);
+  }
+
+  const schedule = await getTournamentSchedule(numericTournamentId);
+  return schedule.find((entry) => entry.id === numericEntryId) ?? null;
 }
 
 export async function getTournamentStructureDetails(tournamentId) {

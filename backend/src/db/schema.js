@@ -100,6 +100,16 @@ export default function initializeSchema(db) {
   );
   db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_tournament_schedule_code ON tournament_schedule (tournament_id, code)');
 
+  const scheduleInfo = db.exec('PRAGMA table_info(tournament_schedule)');
+  const scheduleColumns = (scheduleInfo[0]?.values ?? []).map(([, name]) => name);
+  const ensureScheduleColumn = (name, definition) => {
+    if (!scheduleColumns.includes(name)) {
+      db.exec(`ALTER TABLE tournament_schedule ADD COLUMN ${name} ${definition}`);
+    }
+  };
+
+  ensureScheduleColumn('scheduled_at', 'TEXT');
+
   db.exec(`
     CREATE TABLE IF NOT EXISTS teams (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -107,4 +117,19 @@ export default function initializeSchema(db) {
       created_at TEXT DEFAULT (datetime('now'))
     );
   `);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS team_players (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      team_id INTEGER NOT NULL,
+      name TEXT NOT NULL,
+      jersey_number INTEGER,
+      position TEXT,
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY(team_id) REFERENCES teams(id) ON DELETE CASCADE
+    );
+  `);
+
+  db.exec('CREATE INDEX IF NOT EXISTS idx_team_players_team ON team_players (team_id, name)');
 }

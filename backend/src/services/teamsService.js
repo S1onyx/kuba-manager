@@ -101,6 +101,7 @@ export async function deleteTeam(id) {
 
   const { SQL, db } = await getConnection();
   db.run('DELETE FROM teams WHERE id = ?', [existing.id]);
+  db.run('DELETE FROM team_players WHERE team_id = ?', [existing.id]);
   db.run('UPDATE games SET team_a_id = NULL WHERE team_a_id = ?', [existing.id]);
   db.run('UPDATE games SET team_b_id = NULL WHERE team_b_id = ?', [existing.id]);
   persistDatabase(db, SQL);

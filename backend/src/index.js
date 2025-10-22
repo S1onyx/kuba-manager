@@ -8,6 +8,7 @@ import setupSocket from './socket.js';
 import tournamentRoutes from './routes/tournaments.js';
 import publicRoutes from './routes/public.js';
 import teamRoutes from './routes/teams.js';
+import playerRoutes from './routes/players.js';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use('/api/scoreboard', scoreboardRoutes);
 app.use('/api/tournaments', tournamentRoutes);
 app.use('/api/public', publicRoutes);
 app.use('/api/teams', teamRoutes);
+app.use('/api/players', playerRoutes);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

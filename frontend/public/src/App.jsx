@@ -5,6 +5,7 @@ import StatHighlights from './components/StatHighlights.jsx';
 import TeamStatsGrid from './components/TeamStatsGrid.jsx';
 import SchedulePreview from './components/SchedulePreview.jsx';
 import RecentResults from './components/RecentResults.jsx';
+import PlayerStatsTable from './components/PlayerStatsTable.jsx';
 import Impressum from './components/Impressum.jsx';
 import { useScoreboardFeed } from './hooks/useScoreboardFeed.js';
 import { usePublicTournaments } from './hooks/usePublicTournaments.js';
@@ -12,7 +13,7 @@ import { useTournamentSummary } from './hooks/useTournamentSummary.js';
 
 export default function App() {
   const [selectedTournamentId, setSelectedTournamentId] = useState(null);
-  const [activeSummaryTab, setActiveSummaryTab] = useState('overview');
+  const [activeSummaryTab, setActiveSummaryTab] = useState('live');
   const [showImpressum, setShowImpressum] = useState(false);
 
   const selectedTournamentRef = useRef(null);
@@ -104,7 +105,7 @@ export default function App() {
   }, [scoreboard?.tournamentId, currentTournamentMeta, scoreboardPublic, publicTournaments]);
 
   useEffect(() => {
-    setActiveSummaryTab('overview');
+    setActiveSummaryTab('live');
     liveTabAutoRef.current = { lastApplied: null, suppressed: null };
   }, [selectedTournamentId]);
 
@@ -176,8 +177,12 @@ export default function App() {
   );
   const summaryTabs = [
     { id: 'live', label: 'Live' },
-    { id: 'overview', label: 'Übersicht' },
-    { id: 'schedule', label: 'Spielplan' }
+    { id: 'results', label: 'Letzte Ergebnisse' },
+    { id: 'schedule', label: 'Spielplan' },
+    { id: 'groups', label: 'Gruppen' },
+    { id: 'tournament', label: 'Turnierstatistik' },
+    { id: 'teams', label: 'Team-Stats' },
+    { id: 'players', label: 'Player-Stats' }
   ];
   const summaryTabButtonStyle = (active) => ({
     padding: '0.5rem 1rem',
@@ -189,6 +194,86 @@ export default function App() {
     letterSpacing: '0.05em',
     cursor: 'pointer'
   });
+
+  const summaryContent = useMemo(() => {
+    if (!tournamentSummary) {
+      return null;
+    }
+
+    if (activeSummaryTab === 'live') {
+      return (
+        <section style={{ display: 'grid', gap: '1.5rem' }}>
+          <CurrentMatchCard scoreboard={currentCardData} />
+          {showCurrentGroup ? (
+            <section style={{ display: 'grid', gap: '1.5rem' }}>
+              <h3 style={{ fontSize: '1.2rem', letterSpacing: '0.05em' }}>Aktuelle Gruppentabelle</h3>
+              <GroupStandingsCard
+                group={{
+                  label: formatGroupLabel(scoreboard?.stageLabel),
+                  standings: currentGroupStandings,
+                  recordedGamesCount
+                }}
+              />
+            </section>
+          ) : null}
+        </section>
+      );
+    }
+
+    if (activeSummaryTab === 'results') {
+      return <RecentResults games={tournamentSummary.recentGames} />;
+    }
+
+    if (activeSummaryTab === 'schedule') {
+      return <SchedulePreview schedule={tournamentSummary.schedule} />;
+    }
+
+    if (activeSummaryTab === 'groups') {
+      const groups = Array.isArray(tournamentSummary.groupStandings) ? tournamentSummary.groupStandings : [];
+      if (groups.length === 0) {
+        return <p style={{ opacity: 0.75 }}>Noch keine Gruppenergebnisse verfügbar.</p>;
+      }
+
+      return (
+        <section style={{ display: 'grid', gap: '1.25rem' }}>
+          <h2 style={{ fontSize: '1.4rem', letterSpacing: '0.05em' }}>Gruppenübersicht</h2>
+          <div
+            style={{
+              display: 'grid',
+              gap: '1.25rem',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))'
+            }}
+          >
+            {groups.map((group) => (
+              <GroupStandingsCard key={group.canonicalLabel} group={group} />
+            ))}
+          </div>
+        </section>
+      );
+    }
+
+    if (activeSummaryTab === 'tournament') {
+      return <StatHighlights totals={tournamentSummary.totals} />;
+    }
+
+    if (activeSummaryTab === 'teams') {
+      return <TeamStatsGrid stats={tournamentSummary.overallStats} />;
+    }
+
+    if (activeSummaryTab === 'players') {
+      return <PlayerStatsTable stats={tournamentSummary.playerStats} />;
+    }
+
+    return null;
+  }, [
+    activeSummaryTab,
+    currentCardData,
+    currentGroupStandings,
+    recordedGamesCount,
+    scoreboard,
+    showCurrentGroup,
+    tournamentSummary
+  ]);
 
   return (
     <>
@@ -305,47 +390,7 @@ export default function App() {
               ))}
             </div>
 
-            {activeSummaryTab === 'live' ? (
-              <section style={{ display: 'grid', gap: '1.5rem' }}>
-                <CurrentMatchCard scoreboard={currentCardData} />
-                {showCurrentGroup ? (
-                  <section style={{ display: 'grid', gap: '1.5rem' }}>
-                    <h3 style={{ fontSize: '1.2rem', letterSpacing: '0.05em' }}>Aktuelle Gruppentabelle</h3>
-                    <GroupStandingsCard
-                      group={{
-                        label: formatGroupLabel(scoreboard?.stageLabel),
-                        standings: currentGroupStandings,
-                        recordedGamesCount
-                      }}
-                    />
-                  </section>
-                ) : null}
-              </section>
-            ) : activeSummaryTab === 'overview' ? (
-              <>
-                <StatHighlights totals={tournamentSummary.totals} />
-                {Array.isArray(tournamentSummary.groupStandings) && tournamentSummary.groupStandings.length > 0 ? (
-                  <section style={{ display: 'grid', gap: '1.25rem' }}>
-                    <h2 style={{ fontSize: '1.4rem', letterSpacing: '0.05em' }}>Gruppenübersicht</h2>
-                    <div
-                      style={{
-                        display: 'grid',
-                        gap: '1.25rem',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))'
-                      }}
-                    >
-                      {tournamentSummary.groupStandings.map((group) => (
-                        <GroupStandingsCard key={group.canonicalLabel} group={group} />
-                      ))}
-                    </div>
-                  </section>
-                ) : null}
-                <TeamStatsGrid stats={tournamentSummary.overallStats} />
-                <RecentResults games={tournamentSummary.recentGames} />
-              </>
-            ) : (
-              <SchedulePreview schedule={tournamentSummary.schedule} />
-            )}
+            {summaryContent}
           </>
         ) : !loadingSummary && selectedTournamentId ? (
           <p style={{ opacity: 0.75 }}>

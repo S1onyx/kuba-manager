@@ -38,7 +38,8 @@ entsprechend an.
 - Turniere als öffentlich oder privat markieren – nur öffentliche Wettbewerbe erscheinen im Public-Dashboard
 - Spiele sichern (Teamnamen, Spielstand, Strafen, Zeiten) und im Admin-Dashboard in der Historie einsehen; über „Neues Spiel“ wird ein frisches Match mit Standardwerten vorbereitet
 - Sofortige Synchronisation zwischen Steuerpanel und Hallenanzeige via WebSocket
-- Öffentliche Turnierseite mit Live-Spielstand, automatischen Gruppentabellen, KO-Übersicht, Top-Team-Statistiken und den jüngsten Spielergebnissen; aktualisiert sich automatisch bei neuen Ergebnissen
+- Öffentliche Turnierseite mit Live-Spielstand, automatischen Gruppentabellen, KO-Übersicht sowie separaten Tabs für Ergebnisse, Spielplan, Team- und Spielerstatistiken; aktualisiert sich automatisch bei neuen Ereignissen
+- Pro Team 4–5 Spieler verwalten, Scoring- und Straf-Aktionen mit Spielern verknüpfen und aggregierte Statistiken im Dashboard auswerten
 
 
 ## Geplante Features
@@ -49,12 +50,20 @@ entsprechend an.
 - Es wird ein impressum benötigt, da die applikation gehostet werden soll.
 - Hosting: Alles soll in docker lauffähig sein. Dann über github workflow push auf dockerhub und dann update auf server. Mittels github workflows soll man die applikation auf dem server starten, stoppen und updaten können. Auf dem server soll dann einfach ein dockercompose file liegen. Denke am beten wäre caddy, aber keine Ahnung. Stell mir gerne Fragen, wenn irgendwas unklar ist. Ich habe einen vServer mit folgender ip: 46.224.14.124 Hierauf sollen später auch die verschiedenen interfaces über die ports erreichbar sein. Folgender Github Secrets stehen zu verfügung: DEPLOY_KEY, SSH_USER, SERVER_IP, DEPLOY_PATH. Auserdem habe ich einen deployment key auf github angelegt und diesen auch unter .ssh/kuba-deploy auf dem server gespeichert. So kann man also vom server aus das github repo pullen.
 - Jedes Team besteht aus 4-5 Playern, genaues Tracking implementieren wer wann und wie lange eine Strafe hat. Wer Wann einen Korb geworfen hat. Extra Tab im Public interface mit Player Statistiken. Erweiterte statistiken wären cool. Bitte public interface besser gliedern in mehr tabs, einmal live, dann letzte ergebnisse, dann spielplan, dann gruppenübersicht, dann tunierstatistik, dann team stats und player stats. oder so ähnlich, denke dir hier was cooles aus das alles übersichltich ist und für den user nicht zu viel auf einmal. Denke daran das das public interface meist auf handys angeschaut wird
+- Reglement im public dashboard
 - User Management mit Admin, User und Beamer Accounts. Bestätigung der Accounts durch den Admin. Login ins Admin Panel und Beamer Anzeige. Optionaler Login in Public Interface. Speicherung der Sessions in Cookies (24h)
 - Wettsystem: Eingeloggte User können virtuelle Coins auf den Sieger der geplanten matches setzen. Beim richtigen Tipp gewinn von Betrag X (guter Algorithums nötig). Eigener Tab mit Tippspieltabelle! Hier sollen user gerankt werden, wer am ende am besten getippt hat. (Gewinner tipp, unentschieden und genauer Endstand) Coins kann man nur durch Admins über das admin panel zugeschrieben bkeommen. Im admin panel soll das usermanagement sein.
 
 ## Deployment (Docker & Caddy)
 
 Das Repository enthält eine komplette Container-Orchestrierung mit Caddy als Reverse Proxy. Alle Services laufen in eigenen Images, die per GitHub Actions nach Docker Hub gepusht und anschließend automatisch auf dem Server aktualisiert werden können.
+
+## Spieler-Management & Statistiken
+
+- Im Admin-Dashboard gibt es einen eigenen Tab "Spieler", über den sich pro Team 4–5 Akteure mit Rückennummer und optionaler Position erfassen oder bearbeiten lassen.
+- Beim Buchen von Punkten oder Strafen kannst du nun einen Spieler auswählen; die Werte landen automatisch in den Team- und Spielerstatistiken. Negative Korrekturen beeinflussen die Statistiken nicht.
+- Öffentlichen Zuschauern stehen neue Tabs für Ergebnisse, Spielplan, Gruppenübersicht, Team- und Spielerstatistiken zur Verfügung – optimiert für mobile Geräte.
+- Die Spieler-Tabellen werden aus den gespeicherten Snapshot-Daten erzeugt; ein "Spiel beenden" konserviert die Werte dauerhaft in der Historie.
 
 ### Container-Layout & Ports
 

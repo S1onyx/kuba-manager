@@ -10,7 +10,8 @@ import {
   groupScheduleByPhase,
   listTournaments,
   setTournamentTeams,
-  updateTournament
+  updateTournament,
+  updateTournamentScheduleEntry
 } from '../services/index.js';
 
 const router = express.Router();
@@ -129,6 +130,37 @@ router.get('/:id/schedule', async (req, res) => {
   } catch (error) {
     console.error('Turnier-Spielplan konnte nicht geladen werden:', error);
     res.status(500).json({ message: 'Turnier-Spielplan konnte nicht geladen werden.' });
+  }
+});
+
+router.put('/:id/schedule/:scheduleId', async (req, res) => {
+  const tournamentId = Number(req.params.id);
+  if (!Number.isInteger(tournamentId) || tournamentId <= 0) {
+    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+  }
+
+  const scheduleId = Number(req.params.scheduleId);
+  if (!Number.isInteger(scheduleId) || scheduleId <= 0) {
+    return res.status(400).json({ message: 'Ungültige Spielplan-ID.' });
+  }
+
+  try {
+    const updated = await updateTournamentScheduleEntry(tournamentId, scheduleId, req.body ?? {});
+    if (!updated) {
+      return res.status(404).json({ message: 'Spielplan-Eintrag nicht gefunden.' });
+    }
+    res.json(updated);
+  } catch (error) {
+    console.error('Spielplan-Eintrag konnte nicht aktualisiert werden:', error);
+    const detail = error?.message ?? '';
+    const status =
+      typeof detail === 'string' && detail.includes('Ungültiger Zeitpunkt')
+        ? 400
+        : 500;
+    res.status(status).json({
+      message: 'Spielplan-Eintrag konnte nicht aktualisiert werden.',
+      detail: error.message
+    });
   }
 });
 

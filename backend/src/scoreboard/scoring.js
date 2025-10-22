@@ -1,6 +1,13 @@
-import { getState, notifySubscribers, snapshotState } from './stateStore.js';
+import {
+  getState,
+  notifySubscribers,
+  snapshotState,
+  registerScoreEvent,
+  resetScoreEventIds,
+  resetTeamStats
+} from './stateStore.js';
 
-export function addPoints(team, points) {
+export function addPoints(team, points, metadata = {}) {
   const state = getState();
   const normalized = Number(points);
   if (!Number.isFinite(normalized) || normalized === 0) {
@@ -8,10 +15,29 @@ export function addPoints(team, points) {
   }
 
   const delta = Math.trunc(normalized);
-  if (String(team).toLowerCase() === 'b') {
-    state.scoreB = Math.max(0, (state.scoreB || 0) + delta);
+  const teamKey = String(team).toLowerCase() === 'b' ? 'b' : 'a';
+  if (teamKey === 'b') {
+    const current = state.scoreB || 0;
+    const next = Math.max(0, current + delta);
+    const appliedDelta = next - current;
+    state.scoreB = next;
+    if (appliedDelta !== 0) {
+      registerScoreEvent(teamKey, appliedDelta, {
+        ...metadata,
+        type: appliedDelta >= 0 ? metadata.type ?? 'score' : 'adjustment'
+      });
+    }
   } else {
-    state.scoreA = Math.max(0, (state.scoreA || 0) + delta);
+    const current = state.scoreA || 0;
+    const next = Math.max(0, current + delta);
+    const appliedDelta = next - current;
+    state.scoreA = next;
+    if (appliedDelta !== 0) {
+      registerScoreEvent(teamKey, appliedDelta, {
+        ...metadata,
+        type: appliedDelta >= 0 ? metadata.type ?? 'score' : 'adjustment'
+      });
+    }
   }
 
   notifySubscribers();
@@ -44,6 +70,10 @@ export function resetScores() {
   const state = getState();
   state.scoreA = 0;
   state.scoreB = 0;
+  resetTeamStats('a');
+  resetTeamStats('b');
+  state.scoringLog = [];
+  resetScoreEventIds();
   notifySubscribers();
   return snapshotState();
 }

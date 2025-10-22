@@ -13,7 +13,8 @@ import {
   getTournamentStructureDetails,
   getTournamentSchedule,
   getTournamentStages,
-  groupScheduleByPhase
+  groupScheduleByPhase,
+  updateTournamentScheduleEntry
 } from './structure.js';
 import { computeGroupStandings } from './standings.js';
 import { getTournamentSummary } from './summary.js';
@@ -75,5 +76,6 @@ export {
   getTournamentStages,
   groupScheduleByPhase,
   computeGroupStandings,
-  getTournamentSummary
+  getTournamentSummary,
+  updateTournamentScheduleEntry
 };
