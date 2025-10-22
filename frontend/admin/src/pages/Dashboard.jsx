@@ -372,7 +372,8 @@ export default function Dashboard() {
           ? `${stageLabel}${roundNumber ? ` · Runde ${roundNumber}` : ''}`
           : stageLabel;
 
-      const scheduledLabel = entry.scheduled_at ? formatDateTime(entry.scheduled_at) : null;
+      const scheduledTimestamp = entry.scheduled_at ? Date.parse(entry.scheduled_at) : null;
+      const scheduledLabel = Number.isFinite(scheduledTimestamp) ? formatDateTime(entry.scheduled_at) : null;
       const detailParts = [];
       if (scheduledLabel) {
         detailParts.push(`Start ${scheduledLabel}`);
@@ -390,11 +391,24 @@ export default function Dashboard() {
         stageOrder: entry.stage_order ?? 0,
         matchOrder: entry.match_order ?? 0,
         round: roundNumber ?? null,
-        hasResult
+        hasResult,
+        scheduledTimestamp: Number.isFinite(scheduledTimestamp) ? scheduledTimestamp : null
       });
     });
 
     options.sort((a, b) => {
+      const hasTimeA = Number.isFinite(a.scheduledTimestamp);
+      const hasTimeB = Number.isFinite(b.scheduledTimestamp);
+      if (hasTimeA && hasTimeB && a.scheduledTimestamp !== b.scheduledTimestamp) {
+        return a.scheduledTimestamp - b.scheduledTimestamp;
+      }
+      if (hasTimeA && !hasTimeB) {
+        return -1;
+      }
+      if (!hasTimeA && hasTimeB) {
+        return 1;
+      }
+
       const rankDiff = (phaseRank[a.phase] ?? 99) - (phaseRank[b.phase] ?? 99);
       if (rankDiff !== 0) {
         return rankDiff;
