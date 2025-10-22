@@ -6,6 +6,7 @@ import TeamStatsGrid from './components/TeamStatsGrid.jsx';
 import SchedulePreview from './components/SchedulePreview.jsx';
 import RecentResults from './components/RecentResults.jsx';
 import PlayerStatsTable from './components/PlayerStatsTable.jsx';
+import Reglement from './components/Reglement.jsx';
 import Impressum from './components/Impressum.jsx';
 import { useScoreboardFeed } from './hooks/useScoreboardFeed.js';
 import { usePublicTournaments } from './hooks/usePublicTournaments.js';
@@ -15,6 +16,50 @@ export default function App() {
   const [selectedTournamentId, setSelectedTournamentId] = useState(null);
   const [activeSummaryTab, setActiveSummaryTab] = useState('live');
   const [showImpressum, setShowImpressum] = useState(false);
+  const [route, setRoute] = useState(resolveInitialRoute);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const handleHashChange = () => {
+      setRoute(resolveInitialRoute());
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, []);
+
+  const navigate = useCallback((hash) => {
+    const target = typeof hash === 'string' && hash.startsWith('#/') ? hash : '#/';
+    if (typeof window === 'undefined') {
+      setRoute(target);
+      return;
+    }
+    if (window.location.hash !== target) {
+      window.location.hash = target;
+    } else {
+      setRoute(target);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    window.scrollTo(0, 0);
+  }, [route]);
+
+  const isReglementView = route === '#/reglement';
+
+  const handleNavigateHome = useCallback(() => {
+    navigate('#/');
+  }, [navigate]);
+
+  const handleNavigateReglement = useCallback(() => {
+    navigate('#/reglement');
+  }, [navigate]);
 
   const selectedTournamentRef = useRef(null);
   const lastScoreboardTournamentIdRef = useRef(null);
@@ -194,6 +239,16 @@ export default function App() {
     letterSpacing: '0.05em',
     cursor: 'pointer'
   });
+  const topNavButtonStyle = (active) => ({
+    padding: '0.5rem 1.05rem',
+    borderRadius: '999px',
+    border: '1px solid rgba(255,255,255,0.3)',
+    background: active ? 'rgba(86, 160, 255, 0.35)' : 'transparent',
+    color: active ? '#dcefff' : '#f0f4ff',
+    fontWeight: active ? 600 : 500,
+    letterSpacing: '0.05em',
+    cursor: 'pointer'
+  });
 
   const summaryContent = useMemo(() => {
     if (!tournamentSummary) {
@@ -294,111 +349,141 @@ export default function App() {
         <p style={{ opacity: 0.75, fontSize: '1rem' }}>
           Live-Spielstand, Tabellen und Statistiken zum aktuell ausgewählten Turnier.
         </p>
-      </header>
-
-      {currentError ? (
-        <div style={{ padding: '1rem', borderRadius: '12px', background: 'rgba(255, 82, 82, 0.2)', color: '#ffd8d8' }}>
-          {currentError}
-        </div>
-      ) : null}
-
-      {showPrivateNotice ? (
         <div
           style={{
-            padding: '1rem',
-            borderRadius: '12px',
-            background: 'rgba(255, 171, 64, 0.18)',
-            color: '#ffe0b2',
-            textAlign: 'center'
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '0.75rem',
+            flexWrap: 'wrap',
+            marginTop: '0.25rem'
           }}
         >
-          Das Turnier „{currentTournamentMeta?.name || 'Aktuelles Turnier'}“ ist privat und erscheint nicht im öffentlichen
-          Dashboard.
-        </div>
-      ) : null}
-
-      <section style={{ display: 'grid', gap: '1rem' }}>
-        <h2 style={{ fontSize: '1.3rem', letterSpacing: '0.05em' }}>Öffentliche Turniere</h2>
-        {loadingTournaments ? (
-          <p style={{ opacity: 0.75 }}>Lade Turnierliste...</p>
-        ) : tournamentsError ? (
-          <p style={{ color: '#ffb0b0' }}>{tournamentsError}</p>
-        ) : publicTournaments.length === 0 ? (
-          <p style={{ opacity: 0.75 }}>Noch keine Turniere als öffentlich markiert.</p>
-        ) : (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
-            {publicTournaments.map((tournament) => {
-              const isSelected = selectedTournamentId === tournament.id;
-              const activeTournamentId = scoreboard?.tournamentId ?? currentTournamentMeta?.id;
-              const isLive = scoreboardPublic && activeTournamentId === tournament.id;
-              return (
-                <button
-                  key={tournament.id}
-                  type="button"
-                  onClick={() => handleTournamentSelect(tournament.id)}
-                  style={{
-                    padding: '0.6rem 1.1rem',
-                    borderRadius: '999px',
-                    border: '1px solid rgba(255,255,255,0.25)',
-                    background: isSelected ? 'rgba(86, 160, 255, 0.25)' : 'transparent',
-                    color: isSelected ? '#dcefff' : '#f0f4ff',
-                    fontWeight: isSelected ? 600 : 500,
-                    letterSpacing: '0.05em',
-                    cursor: 'pointer'
-                  }}
-                >
-                  {tournament.name}
-                  {isLive ? ' · Live' : ''}
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </section>
-
-      <section style={{ display: 'grid', gap: '2rem' }}>
-        {summaryError ? (
-          <div
-            style={{ padding: '1rem', borderRadius: '12px', background: 'rgba(255, 82, 82, 0.2)', color: '#ffd8d8' }}
+          <button
+            type="button"
+            onClick={handleNavigateHome}
+            style={topNavButtonStyle(!isReglementView)}
           >
-            {summaryError}
-          </div>
-        ) : null}
+            Übersicht
+          </button>
+          <button
+            type="button"
+            onClick={handleNavigateReglement}
+            style={topNavButtonStyle(isReglementView)}
+          >
+            Reglement
+          </button>
+        </div>
+      </header>
 
-        {loadingSummary && selectedTournamentId ? (
-          <p style={{ opacity: 0.75 }}>Lade Turnierstatistiken...</p>
-        ) : null}
-
-        {tournamentSummary ? (
-          <>
-            <header style={{ display: 'grid', gap: '0.35rem' }}>
-              <h2 style={{ fontSize: '1.45rem', letterSpacing: '0.05em' }}>{tournamentSummary.tournament?.name ?? 'Turnier'}</h2>
-              {scoreboardPublic && scoreboard?.tournamentId === tournamentSummary.tournament?.id ? (
-                <span style={{ fontSize: '0.85rem', opacity: 0.75 }}>Live aktuell ausgewählt</span>
-              ) : null}
-            </header>
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-              {summaryTabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => handleSummaryTabSelect(tab.id)}
-                  style={summaryTabButtonStyle(activeSummaryTab === tab.id)}
-                >
-                  {tab.label}
-                </button>
-              ))}
+      {isReglementView ? (
+        <Reglement />
+      ) : (
+        <>
+          {currentError ? (
+            <div style={{ padding: '1rem', borderRadius: '12px', background: 'rgba(255, 82, 82, 0.2)', color: '#ffd8d8' }}>
+              {currentError}
             </div>
+          ) : null}
 
-            {summaryContent}
-          </>
-        ) : !loadingSummary && selectedTournamentId ? (
-          <p style={{ opacity: 0.75 }}>
-            Für {selectedTournament?.name ?? 'dieses Turnier'} liegen noch keine gespeicherten Spiele vor. Ergebnisse
-            erscheinen automatisch, sobald Partien abgeschlossen werden.
-          </p>
-        ) : null}
-      </section>
+          {showPrivateNotice ? (
+            <div
+              style={{
+                padding: '1rem',
+                borderRadius: '12px',
+                background: 'rgba(255, 171, 64, 0.18)',
+                color: '#ffe0b2',
+                textAlign: 'center'
+              }}
+            >
+              Das Turnier „{currentTournamentMeta?.name || 'Aktuelles Turnier'}“ ist privat und erscheint nicht im öffentlichen
+              Dashboard.
+            </div>
+          ) : null}
+
+          <section style={{ display: 'grid', gap: '1rem' }}>
+            <h2 style={{ fontSize: '1.3rem', letterSpacing: '0.05em' }}>Öffentliche Turniere</h2>
+            {loadingTournaments ? (
+              <p style={{ opacity: 0.75 }}>Lade Turnierliste...</p>
+            ) : tournamentsError ? (
+              <p style={{ color: '#ffb0b0' }}>{tournamentsError}</p>
+            ) : publicTournaments.length === 0 ? (
+              <p style={{ opacity: 0.75 }}>Noch keine Turniere als öffentlich markiert.</p>
+            ) : (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+                {publicTournaments.map((tournament) => {
+                  const isSelected = selectedTournamentId === tournament.id;
+                  const activeTournamentId = scoreboard?.tournamentId ?? currentTournamentMeta?.id;
+                  const isLive = scoreboardPublic && activeTournamentId === tournament.id;
+                  return (
+                    <button
+                      key={tournament.id}
+                      type="button"
+                      onClick={() => handleTournamentSelect(tournament.id)}
+                      style={{
+                        padding: '0.6rem 1.1rem',
+                        borderRadius: '999px',
+                        border: '1px solid rgba(255,255,255,0.25)',
+                        background: isSelected ? 'rgba(86, 160, 255, 0.25)' : 'transparent',
+                        color: isSelected ? '#dcefff' : '#f0f4ff',
+                        fontWeight: isSelected ? 600 : 500,
+                        letterSpacing: '0.05em',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {tournament.name}
+                      {isLive ? ' · Live' : ''}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+
+          <section style={{ display: 'grid', gap: '2rem' }}>
+            {summaryError ? (
+              <div
+                style={{ padding: '1rem', borderRadius: '12px', background: 'rgba(255, 82, 82, 0.2)', color: '#ffd8d8' }}
+              >
+                {summaryError}
+              </div>
+            ) : null}
+
+            {loadingSummary && selectedTournamentId ? (
+              <p style={{ opacity: 0.75 }}>Lade Turnierstatistiken...</p>
+            ) : null}
+
+            {tournamentSummary ? (
+              <>
+                <header style={{ display: 'grid', gap: '0.35rem' }}>
+                  <h2 style={{ fontSize: '1.45rem', letterSpacing: '0.05em' }}>{tournamentSummary.tournament?.name ?? 'Turnier'}</h2>
+                  {scoreboardPublic && scoreboard?.tournamentId === tournamentSummary.tournament?.id ? (
+                    <span style={{ fontSize: '0.85rem', opacity: 0.75 }}>Live aktuell ausgewählt</span>
+                  ) : null}
+                </header>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  {summaryTabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => handleSummaryTabSelect(tab.id)}
+                      style={summaryTabButtonStyle(activeSummaryTab === tab.id)}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+
+                {summaryContent}
+              </>
+            ) : !loadingSummary && selectedTournamentId ? (
+              <p style={{ opacity: 0.75 }}>
+                Für {selectedTournament?.name ?? 'dieses Turnier'} liegen noch keine gespeicherten Spiele vor. Ergebnisse
+                erscheinen automatisch, sobald Partien abgeschlossen werden.
+              </p>
+            ) : null}
+          </section>
+        </>
+      )}
 
       <footer
         style={{
@@ -431,6 +516,14 @@ export default function App() {
     {showImpressum ? <Impressum onClose={() => setShowImpressum(false)} /> : null}
     </>
   );
+}
+
+function resolveInitialRoute() {
+  if (typeof window === 'undefined' || !window.location) {
+    return '#/';
+  }
+  const { hash } = window.location;
+  return hash && hash.startsWith('#/') ? hash : '#/';
 }
 
 function scorecardHasGroup(scoreboard, recordedGamesCount, standings, scoreboardPublic) {
