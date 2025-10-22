@@ -61,6 +61,10 @@ audio.kunstradbasketball.de {
     reverse_proxy backend:3000
   }
 
+  handle /media/* {
+    reverse_proxy backend:3000
+  }
+
   handle {
     reverse_proxy audio-frontend:80
   }
