@@ -6,6 +6,7 @@ import {
   fetchHistory,
   fetchScoreboard,
   finishGame,
+  saveCurrentGame,
   mutateScore,
   pauseScoreboardTimer,
   removePenalty,
@@ -1600,13 +1601,31 @@ export default function Dashboard() {
   }
 
   async function handleFinishGame() {
-    if (!window.confirm('Spielstand speichern und Spiel beenden?')) {
+    try {
+      const nextState = await finishGame();
+      if (nextState && typeof nextState === 'object') {
+        setScoreboard(nextState);
+      }
+      setManualDirty({ a: false, b: false });
+      updateMessage('info', 'Spiel beendet. Bitte bei Bedarf den Spielstand speichern.');
+    } catch (err) {
+      console.error(err);
+      updateMessage('error', 'Spiel konnte nicht beendet werden.');
+    }
+  }
+
+  async function handleSaveGame() {
+    if (scoreboard?.isRunning) {
+      updateMessage('error', 'Spiel läuft noch. Bitte zuerst beenden.');
+      return;
+    }
+
+    if (!window.confirm('Aktuellen Spielstand speichern?')) {
       return;
     }
 
     try {
-      await finishGame();
-      setManualDirty({ a: false, b: false });
+      await saveCurrentGame();
       updateMessage('info', 'Spiel gespeichert.');
       loadHistory();
       setActiveTab('history');
@@ -2753,7 +2772,14 @@ export default function Dashboard() {
 
         <div style={{ marginTop: '1rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           <button onClick={handleFinishGame} style={{ background: '#d32f2f', color: '#fff' }}>
-            Spiel beenden &amp; speichern
+            Spiel beenden
+          </button>
+          <button
+            onClick={handleSaveGame}
+            disabled={scoreboard.isRunning}
+            style={{ background: '#0b1a2b', color: '#fff' }}
+          >
+            Spiel speichern
           </button>
           <button onClick={handleNewGame}>Neues Spiel vorbereiten</button>
         </div>

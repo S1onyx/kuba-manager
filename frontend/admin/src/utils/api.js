@@ -142,6 +142,12 @@ export function finishGame() {
   });
 }
 
+export function saveCurrentGame() {
+  return request('/scoreboard/save', {
+    method: 'POST'
+  });
+}
+
 export function startNewGame() {
   return request('/scoreboard/game/new', {
     method: 'POST'

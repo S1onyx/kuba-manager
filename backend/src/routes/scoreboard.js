@@ -393,12 +393,11 @@ router.get('/structure', async (_req, res) => {
   }
 });
 
-router.post('/finish', async (_req, res) => {
+router.post('/finish', (_req, res) => {
   try {
     pauseTimer();
     clearScoreboardTicker();
     const snapshot = getScoreboardState();
-    const savedGame = await saveGame(snapshot);
     triggerAudioEvent('game_end', {
       teamA: snapshot.teamAName,
       teamB: snapshot.teamBName,
@@ -407,6 +406,17 @@ router.post('/finish', async (_req, res) => {
     }).catch((error) => {
       console.error('Audio-Trigger (game_end) fehlgeschlagen:', error);
     });
+    res.json(snapshot);
+  } catch (error) {
+    console.error('Spiel konnte nicht beendet werden:', error);
+    res.status(500).json({ message: 'Spiel konnte nicht beendet werden.' });
+  }
+});
+
+router.post('/save', async (_req, res) => {
+  try {
+    const snapshot = getScoreboardState();
+    const savedGame = await saveGame(snapshot);
     res.json(savedGame);
   } catch (error) {
     console.error('Spiel konnte nicht gespeichert werden:', error);
