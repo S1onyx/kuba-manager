@@ -19,7 +19,9 @@ export default function TimerControlCard() {
       handleNewGame,
       handleHalftimeSubmit,
       handleHalftimePauseSubmit,
-      handleExtraTimeSubmit,
+      handleExtraTimeSubmit
+    },
+    scoreboardState: {
       setTimerInput,
       setHalftimeInput,
       setHalftimePauseInput,
