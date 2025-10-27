@@ -8,6 +8,7 @@ Das Projekt besteht aus vier Oberflächen sowie einem kleinen Node.js-Backend:
 - `frontend/public`: Öffentliche Turnierübersicht mit Live-Spiel, Gruppen- und KO-Tabellen sowie Team-Statistiken (mobilfreundlich).
 - `frontend/audio`: Audio-Frontend auf einer eigenen Subdomain, das automatisch eingehende Spiel- und manuell ausgelöste Sounds abspielt.
 - `backend`: REST- und WebSocket-Server, der den Scoreboard-Zustand verwaltet.
+- `plausible-ce`: Docker-Konfiguration für die Self-Hosted-Plausible-Instanz auf `dashboard.kunstradbasketball.de`.
 
 ## Entwicklung starten
 
@@ -67,6 +68,7 @@ Das Repository enthält eine komplette Container-Orchestrierung mit Caddy als Re
 - `display-frontend` (Beameransicht, Port 8081)
 - `admin-frontend` (Scoreboard-Steuerung, Port 8082)
 - `audio-frontend` (Audio-Ausgabe, Port 8083)
+- `plausible` (Self-Hosted Plausible Dashboard, intern Port 8000 – extern über `dashboard.kunstradbasketball.de`)
 - `caddy` (Reverse Proxy, mapped Ports `80:80`, `8081:8081`, `8082:8082`, `8083:8083`, `3000:3000`)
 
 Caddy leitet `/api/*` auf das Backend durch und stellt die drei Oberflächen unter den genannten Ports bereit. HTTPS ist deaktiviert, damit die Dienste sofort per IP erreichbar sind; Zertifikate lassen sich jederzeit nachrüsten.
@@ -100,6 +102,9 @@ Die SQLite-Datenbank des Backends wird im Named Volume `backend-data` persistent
 - `SSH_USER`: Benutzername für den SSH-Login (z. B. `root` oder `deploy`)
 - `SERVER_IP`: `46.224.14.124`
 - `DEPLOY_PATH`: `/var/www/kuba`
+- `ADMIN_PANEL_USERNAME`: Login-Name für das Admin-Frontend
+- `ADMIN_PANEL_PASSWORD`: Passwort für das Admin-Frontend
+- `ADMIN_PANEL_SESSION_KEY`: Optional individueller Storage-Key für das Admin-Frontend (Fallback `kuba-admin-session`)
 
 ### GitHub Workflows
 
@@ -128,6 +133,24 @@ Damit entstehen dieselben Container wie in Produktion, ohne dass Images nach au�
 4. Ziehe die Änderungen auf dem Server (`git pull`), setze neue Images (`docker compose pull`) und starte den Proxy neu (`docker compose up -d`).
 
 Die Frontends verwenden künftig automatisch die aktuelle Ursprung-Domain für API-Aufrufe, solange sie unter Standardports (80/443) laufen; für lokale Entwicklung bleiben die bisherigen Ports unverändert.
+
+### Plausible Analytics Dashboard
+
+- DNS: Leite `dashboard.kunstradbasketball.de` via `A`-Record auf `46.224.14.124`.
+- Server-Umgebung: Ergänze `.env` im Deployment-Verzeichnis um (siehe `.env.example`):
+
+  ```env
+  PLAUSIBLE_BASE_URL=https://dashboard.kunstradbasketball.de
+  PLAUSIBLE_SECRET_KEY_BASE=<64-Byte-Secret>
+  PLAUSIBLE_DB_PASSWORD=<starkes Passwort>
+  PLAUSIBLE_DISABLE_REGISTRATION=true # nach dem ersten Admin-Account
+  ```
+
+- Optional: Hinterlege SMTP-Variablen (`PLAUSIBLE_MAILER_*`, `PLAUSIBLE_SMTP_*`), wenn Plausible Mails versenden soll.
+- Deployment: Die CI/CD-Pipeline baut weiterhin nur die eigenen Images; das Plausible-Image wird beim `docker compose pull` automatisch aus `ghcr.io/plausible/community-edition` geladen.
+- Robots: `dashboard.kunstradbasketball.de/robots.txt` liefert automatisch `Disallow: /`, damit das Analytics-Dashboard nicht indexiert wird.
+
+Nach dem Rollout kannst du dich auf `https://dashboard.kunstradbasketball.de/` einloggen, den ersten Benutzer anlegen und danach die Registrierung sperren (`PLAUSIBLE_DISABLE_REGISTRATION=true`).
 
 ## Impressum hinterlegen
 

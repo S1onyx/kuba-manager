@@ -34,6 +34,75 @@ services:
     networks:
       - app
 
+  plausible-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${PLAUSIBLE_DB_NAME:-plausible}
+      - POSTGRES_USER=${PLAUSIBLE_DB_USER:-plausible}
+      - POSTGRES_PASSWORD=${PLAUSIBLE_DB_PASSWORD:-plausible}
+    volumes:
+      - plausible-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PLAUSIBLE_DB_USER:-plausible} -d ${PLAUSIBLE_DB_NAME:-plausible}"]
+      start_period: 1m
+    networks:
+      - app
+
+  plausible-events-db:
+    image: clickhouse/clickhouse-server:24.12-alpine
+    restart: unless-stopped
+    environment:
+      - CLICKHOUSE_SKIP_USER_SETUP=1
+    volumes:
+      - plausible-event-data:/var/lib/clickhouse
+      - plausible-event-logs:/var/log/clickhouse-server
+      - ./plausible-ce/clickhouse/logs.xml:/etc/clickhouse-server/config.d/logs.xml:ro
+      - ./plausible-ce/clickhouse/ipv4-only.xml:/etc/clickhouse-server/config.d/ipv4-only.xml:ro
+      - ./plausible-ce/clickhouse/low-resources.xml:/etc/clickhouse-server/config.d/low-resources.xml:ro
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 -O - http://127.0.0.1:8123/ping || exit 1"]
+      start_period: 1m
+    networks:
+      - app
+
+  plausible:
+    image: ghcr.io/plausible/community-edition:v3.0.1
+    restart: unless-stopped
+    depends_on:
+      plausible-db:
+        condition: service_healthy
+      plausible-events-db:
+        condition: service_healthy
+    environment:
+      - BASE_URL=${PLAUSIBLE_BASE_URL}
+      - SECRET_KEY_BASE=${PLAUSIBLE_SECRET_KEY_BASE}
+      - DATABASE_URL=ecto://${PLAUSIBLE_DB_USER:-plausible}:${PLAUSIBLE_DB_PASSWORD:-plausible}@plausible-db:5432/${PLAUSIBLE_DB_NAME:-plausible}
+      - CLICKHOUSE_DATABASE_URL=http://plausible-events-db:8123/${PLAUSIBLE_CLICKHOUSE_DB:-plausible}
+      - HTTP_PORT=8000
+      - HTTPS_PORT=8443
+      - DISABLE_REGISTRATION=${PLAUSIBLE_DISABLE_REGISTRATION:-true}
+      - MAILER_ADAPTER=${PLAUSIBLE_MAILER_ADAPTER:-}
+      - MAILER_EMAIL=${PLAUSIBLE_MAILER_EMAIL:-}
+      - MAILER_NAME=${PLAUSIBLE_MAILER_NAME:-}
+      - SMTP_HOST_ADDR=${PLAUSIBLE_SMTP_HOST_ADDR:-}
+      - SMTP_HOST_PORT=${PLAUSIBLE_SMTP_HOST_PORT:-}
+      - SMTP_USER_NAME=${PLAUSIBLE_SMTP_USER_NAME:-}
+      - SMTP_USER_PWD=${PLAUSIBLE_SMTP_USER_PWD:-}
+      - SMTP_HOST_SSL_ENABLED=${PLAUSIBLE_SMTP_HOST_SSL_ENABLED:-false}
+    volumes:
+      - plausible-app-data:/var/lib/plausible
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    networks:
+      - app
+
   caddy:
     image: caddy:2.8-alpine
     restart: unless-stopped
@@ -43,6 +112,7 @@ services:
       - display-frontend
       - admin-frontend
       - audio-frontend
+      - plausible
     ports:
       - "80:80"
       - "443:443"
@@ -65,3 +135,7 @@ volumes:
   backend-data:
   caddy_data:
   caddy_config:
+  plausible-db-data:
+  plausible-event-data:
+  plausible-event-logs:
+  plausible-app-data:

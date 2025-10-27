@@ -70,6 +70,20 @@ audio.kunstradbasketball.de {
   }
 }
 
+dashboard.kunstradbasketball.de {
+  encode gzip zstd
+
+  handle /robots.txt {
+    respond "User-agent: *\nDisallow: /" 200 {
+      content_type text/plain
+    }
+  }
+
+  handle {
+    reverse_proxy plausible:8000
+  }
+}
+
 :8081 {
   encode gzip zstd
   handle /socket.io/* {
