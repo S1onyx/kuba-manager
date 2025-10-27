@@ -21,15 +21,21 @@ export const BACKEND_URL =
 const DEFAULT_ADMIN_USERNAME = 'admin';
 const DEFAULT_ADMIN_PASSWORD = 'kuba-manager';
 
-const envUsername = import.meta.env.VITE_ADMIN_USERNAME;
-const envPassword = import.meta.env.VITE_ADMIN_PASSWORD;
+const sanitizeTrimmed = (value) =>
+  typeof value === 'string' ? value.split(/\r?\n/)[0].trim() : '';
+const sanitizeRaw = (value) =>
+  typeof value === 'string' ? value.split(/\r?\n/)[0] : '';
+
+const envUsername = sanitizeTrimmed(import.meta.env.VITE_ADMIN_USERNAME);
+const envPassword = sanitizeRaw(import.meta.env.VITE_ADMIN_PASSWORD);
+const envSessionKey = sanitizeTrimmed(import.meta.env.VITE_ADMIN_SESSION_KEY);
 
 export const ADMIN_AUTH = {
-  username: envUsername && envUsername.trim().length > 0 ? envUsername.trim() : DEFAULT_ADMIN_USERNAME,
+  username: envUsername && envUsername.length > 0 ? envUsername : DEFAULT_ADMIN_USERNAME,
   password: envPassword && envPassword.length > 0 ? envPassword : DEFAULT_ADMIN_PASSWORD
 };
 
 export const ADMIN_SESSION_KEY =
-  import.meta.env.VITE_ADMIN_SESSION_KEY && import.meta.env.VITE_ADMIN_SESSION_KEY.trim().length > 0
-    ? import.meta.env.VITE_ADMIN_SESSION_KEY.trim()
+  envSessionKey && envSessionKey.length > 0
+    ? envSessionKey
     : 'kuba-admin-session';
