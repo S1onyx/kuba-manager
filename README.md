@@ -145,6 +145,7 @@ Die Frontends verwenden künftig automatisch die aktuelle Ursprung-Domain für A
   PLAUSIBLE_DB_PASSWORD=<starkes Passwort>
   PLAUSIBLE_CLICKHOUSE_DB=plausible
   PLAUSIBLE_DISABLE_REGISTRATION=true # nach dem ersten Admin-Account
+  PLAUSIBLE_LISTEN_IP=0.0.0.0
   ```
 
 - Optional: Hinterlege SMTP-Variablen (`PLAUSIBLE_MAILER_*`, `PLAUSIBLE_SMTP_*`), wenn Plausible Mails versenden soll.
