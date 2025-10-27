@@ -13,6 +13,7 @@ export default function AuthGate({ children }) {
   const [authorized, setAuthorized] = useState(false);
   const [checking, setChecking] = useState(true);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -74,7 +75,23 @@ export default function AuthGate({ children }) {
           </label>
           <label className="auth-card__field">
             <span>Passwort</span>
-            <input name="password" type="password" placeholder="Passwort" autoComplete="off" required />
+            <div className="auth-card__password">
+              <input
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Passwort"
+                autoComplete="off"
+                required
+              />
+              <button
+                type="button"
+                className="auth-card__toggle"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? 'Passwort verbergen' : 'Passwort anzeigen'}
+              >
+                {showPassword ? 'Verbergen' : 'Anzeigen'}
+              </button>
+            </div>
           </label>
           <div className="auth-card__actions">
             <button type="submit">Anmelden</button>

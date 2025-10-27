@@ -197,6 +197,35 @@ a {
   gap: 1rem;
 }
 
+.auth-card__password {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-card__password input {
+  width: 100%;
+  padding-right: 6.5rem;
+}
+
+.auth-card__toggle {
+  position: absolute;
+  right: 0.55rem;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0.3rem 0.75rem;
+  border-radius: 0.65rem;
+  font-size: 0.8rem;
+  background: rgba(76, 201, 255, 0.14);
+  border: 1px solid rgba(76, 201, 255, 0.28);
+  color: var(--text-primary);
+}
+
+.auth-card__toggle:hover {
+  background: rgba(76, 201, 255, 0.22);
+  border-color: rgba(76, 201, 255, 0.4);
+}
+
 .auth-card__error {
   margin: 0;
   padding: 0.65rem 0.85rem;
