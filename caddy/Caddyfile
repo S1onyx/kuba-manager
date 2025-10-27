@@ -74,9 +74,7 @@ dashboard.kunstradbasketball.de {
   encode gzip zstd
 
   handle /robots.txt {
-    respond "User-agent: *\nDisallow: /" 200 {
-      content_type text/plain
-    }
+    respond "User-agent: *\nDisallow: /" 200 text/plain
   }
 
   handle {
