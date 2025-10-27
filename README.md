@@ -147,6 +147,7 @@ Die Frontends verwenden künftig automatisch die aktuelle Ursprung-Domain für A
   ```
 
 - Optional: Hinterlege SMTP-Variablen (`PLAUSIBLE_MAILER_*`, `PLAUSIBLE_SMTP_*`), wenn Plausible Mails versenden soll.
+- Standardmäßig nutzt Plausible den `Bamboo.LocalAdapter` (keine ausgehenden Mails). Sobald du SMTP einsetzen möchtest, setze `PLAUSIBLE_MAILER_ADAPTER` und die passenden SMTP-Parameter in der `.env`.
 - Deployment: Die CI/CD-Pipeline baut weiterhin nur die eigenen Images; das Plausible-Image wird beim `docker compose pull` automatisch aus `ghcr.io/plausible/community-edition` geladen.
 - Robots: `dashboard.kunstradbasketball.de/robots.txt` liefert automatisch `Disallow: /`, damit das Analytics-Dashboard nicht indexiert wird.
 
