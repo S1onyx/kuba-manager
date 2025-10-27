@@ -21,14 +21,18 @@ export const BACKEND_URL =
 const DEFAULT_ADMIN_USERNAME = 'admin';
 const DEFAULT_ADMIN_PASSWORD = 'kuba-manager';
 
-const sanitizeTrimmed = (value) =>
-  typeof value === 'string' ? value.split(/\r?\n/)[0].trim() : '';
-const sanitizeRaw = (value) =>
-  typeof value === 'string' ? value.split(/\r?\n/)[0] : '';
+const normalize = (value, { trim = true } = {}) => {
+  if (typeof value !== 'string') {
+    return '';
+  }
+  const withRealNewlines = value.replace(/\\n/g, '\n');
+  const [firstLine] = withRealNewlines.split(/\r?\n/);
+  return trim ? firstLine.trim() : firstLine;
+};
 
-const envUsername = sanitizeTrimmed(import.meta.env.VITE_ADMIN_USERNAME);
-const envPassword = sanitizeRaw(import.meta.env.VITE_ADMIN_PASSWORD);
-const envSessionKey = sanitizeTrimmed(import.meta.env.VITE_ADMIN_SESSION_KEY);
+const envUsername = normalize(import.meta.env.VITE_ADMIN_USERNAME);
+const envPassword = normalize(import.meta.env.VITE_ADMIN_PASSWORD, { trim: false });
+const envSessionKey = normalize(import.meta.env.VITE_ADMIN_SESSION_KEY);
 
 export const ADMIN_AUTH = {
   username: envUsername && envUsername.length > 0 ? envUsername : DEFAULT_ADMIN_USERNAME,
