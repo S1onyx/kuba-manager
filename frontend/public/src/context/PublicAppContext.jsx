@@ -208,11 +208,6 @@ export function PublicAppProvider({ children }) {
 
   const handleSummaryTabSelect = useCallback(
     (tabId) => {
-      trackEvent('Summary Tab Selected', {
-        tab: tabId,
-        tournamentId: selectedTournamentId ?? 'none'
-      });
-
       if (tabId === 'live') {
         liveTabAutoRef.current = {
           lastApplied: scoreboard?.tournamentId ?? selectedTournamentId ?? null,
@@ -278,6 +273,14 @@ export function PublicAppProvider({ children }) {
       tournamentName: selectedTournamentName ?? 'unknown'
     });
   }, [route, isReglementView, activeSummaryTab, selectedTournamentId, selectedTournamentName]);
+
+  useEffect(() => {
+    trackEvent('Summary Tab Viewed', {
+      tab: activeSummaryTab,
+      tournamentId: selectedTournamentId ?? 'none',
+      tournamentName: selectedTournamentName ?? 'unknown'
+    });
+  }, [activeSummaryTab, selectedTournamentId, selectedTournamentName]);
 
   const showCurrentGroup = useMemo(
     () =>
