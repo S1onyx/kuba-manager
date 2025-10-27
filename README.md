@@ -143,6 +143,7 @@ Die Frontends verwenden künftig automatisch die aktuelle Ursprung-Domain für A
   PLAUSIBLE_BASE_URL=https://dashboard.kunstradbasketball.de
   PLAUSIBLE_SECRET_KEY_BASE=<64-Byte-Secret>
   PLAUSIBLE_DB_PASSWORD=<starkes Passwort>
+  PLAUSIBLE_CLICKHOUSE_DB=plausible
   PLAUSIBLE_DISABLE_REGISTRATION=true # nach dem ersten Admin-Account
   ```
 
