@@ -241,3 +241,16 @@ a {
   font-size: 0.85rem;
   color: var(--text-muted);
 }
+
+.auth-card__credentials {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.auth-card__credentials code {
+  background: rgba(15, 25, 40, 0.6);
+  border-radius: 0.45rem;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.85rem;
+}

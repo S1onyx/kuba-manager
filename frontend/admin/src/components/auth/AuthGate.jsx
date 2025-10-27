@@ -97,6 +97,13 @@ export default function AuthGate({ children }) {
             <button type="submit">Anmelden</button>
           </div>
         </form>
+        <p className="auth-card__info">
+          Du kannst Nutzername und Passwort über die Vite-Env-Variablen `VITE_ADMIN_USERNAME` und
+          `VITE_ADMIN_PASSWORD` festlegen.
+        </p>
+        <p className="auth-card__credentials">
+          Aktuelle Zugangsdaten: <code>{ADMIN_AUTH.username}</code> / <code>{ADMIN_AUTH.password}</code>
+        </p>
       </div>
     </div>
   );
