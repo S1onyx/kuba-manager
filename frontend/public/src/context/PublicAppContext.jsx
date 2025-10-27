@@ -5,6 +5,7 @@ import { useTournamentSummary } from '../hooks/useTournamentSummary.js';
 import { SUMMARY_TABS } from '../constants/tabs.js';
 import { resolveInitialRoute } from '../utils/navigation.js';
 import { scorecardHasGroup } from '../utils/summary.js';
+import { trackEvent, trackPageview } from '../utils/plausible.js';
 
 const PublicAppContext = createContext(null);
 
@@ -54,10 +55,18 @@ export function PublicAppProvider({ children }) {
   const isReglementView = route === '#/reglement';
 
   const handleNavigateHome = useCallback(() => {
+    trackEvent('Navigation', {
+      target: 'overview',
+      route: '#/'
+    });
     navigate('#/');
   }, [navigate]);
 
   const handleNavigateReglement = useCallback(() => {
+    trackEvent('Navigation', {
+      target: 'reglement',
+      route: '#/reglement'
+    });
     navigate('#/reglement');
   }, [navigate]);
 
@@ -79,6 +88,10 @@ export function PublicAppProvider({ children }) {
     (payload) => {
       refreshPublicTournaments();
       const activeId = selectedTournamentRef.current || payload?.tournamentId || null;
+      trackEvent('Scoreboard Update', {
+        tournamentId: payload?.tournamentId ?? activeId ?? 'unknown',
+        eventType: payload?.type ?? 'unknown'
+      });
       if (activeId) {
         refreshSummary(activeId);
       }
@@ -94,9 +107,26 @@ export function PublicAppProvider({ children }) {
     error: currentError
   } = useScoreboardFeed({ onScoreboardEvent: handleScoreboardEvent });
 
-  const handleTournamentSelect = useCallback((id) => {
-    setSelectedTournamentId(id);
-  }, []);
+  const handleTournamentSelect = useCallback(
+    (id) => {
+      if (id === selectedTournamentId) {
+        return;
+      }
+
+      if (id) {
+        const tournament = publicTournaments.find((item) => item.id === id) ?? null;
+        trackEvent('Tournament Selected', {
+          tournamentId: id,
+          tournamentName: tournament?.name ?? 'unknown'
+        });
+      } else {
+        trackEvent('Tournament Selection Cleared');
+      }
+
+      setSelectedTournamentId(id);
+    },
+    [publicTournaments, selectedTournamentId]
+  );
 
   useEffect(() => {
     selectedTournamentRef.current = selectedTournamentId ?? null;
@@ -178,6 +208,11 @@ export function PublicAppProvider({ children }) {
 
   const handleSummaryTabSelect = useCallback(
     (tabId) => {
+      trackEvent('Summary Tab Selected', {
+        tab: tabId,
+        tournamentId: selectedTournamentId ?? 'none'
+      });
+
       if (tabId === 'live') {
         liveTabAutoRef.current = {
           lastApplied: scoreboard?.tournamentId ?? selectedTournamentId ?? null,
@@ -205,6 +240,20 @@ export function PublicAppProvider({ children }) {
     };
   }, [showImpressum]);
 
+  const openImpressum = useCallback(() => {
+    if (!showImpressum) {
+      trackEvent('Impressum Opened');
+    }
+    setShowImpressum(true);
+  }, [showImpressum]);
+
+  const closeImpressum = useCallback(() => {
+    if (showImpressum) {
+      trackEvent('Impressum Closed');
+    }
+    setShowImpressum(false);
+  }, [showImpressum]);
+
   const currentCardData = scoreboardPublic ? scoreboard : null;
   const showPrivateNotice =
     Boolean(scoreboard?.tournamentId ?? currentTournamentMeta?.id) && !scoreboardPublic;
@@ -213,6 +262,22 @@ export function PublicAppProvider({ children }) {
     () => publicTournaments.find((tournament) => tournament.id === selectedTournamentId) ?? null,
     [publicTournaments, selectedTournamentId]
   );
+
+  const selectedTournamentName = selectedTournament?.name ?? null;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const normalizedPath =
+      route === '#/' || route === null ? '/' : `/${String(route).replace(/^#\//, '')}`;
+    trackPageview(normalizedPath, {
+      view: isReglementView ? 'reglement' : 'overview',
+      summaryTab: activeSummaryTab,
+      tournamentId: selectedTournamentId ?? 'none',
+      tournamentName: selectedTournamentName ?? 'unknown'
+    });
+  }, [route, isReglementView, activeSummaryTab, selectedTournamentId, selectedTournamentName]);
 
   const showCurrentGroup = useMemo(
     () =>
@@ -236,8 +301,8 @@ export function PublicAppProvider({ children }) {
       },
       impressum: {
         visible: showImpressum,
-        open: () => setShowImpressum(true),
-        close: () => setShowImpressum(false)
+        open: openImpressum,
+        close: closeImpressum
       },
       tournaments: {
         list: publicTournaments,
@@ -274,6 +339,8 @@ export function PublicAppProvider({ children }) {
       handleNavigateHome,
       handleNavigateReglement,
       showImpressum,
+      openImpressum,
+      closeImpressum,
       publicTournaments,
       selectedTournamentId,
       handleTournamentSelect,
