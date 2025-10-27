@@ -87,6 +87,7 @@ services:
       - HTTP_PORT=8000
       - HTTPS_PORT=8443
       - DISABLE_REGISTRATION=${PLAUSIBLE_DISABLE_REGISTRATION:-true}
+      - DISABLE_HTTPS=${PLAUSIBLE_DISABLE_HTTPS:-true}
       - MAILER_ADAPTER=${PLAUSIBLE_MAILER_ADAPTER:-Bamboo.LocalAdapter}
       - MAILER_EMAIL=${PLAUSIBLE_MAILER_EMAIL:-noreply@kunstradbasketball.de}
       - MAILER_NAME=${PLAUSIBLE_MAILER_NAME:-Kuba Manager Analytics}
