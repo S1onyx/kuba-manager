@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title>Kuba Manager Vorschau</title>
+  <desc>Social Sharing Vorschau für das Kuba Manager Public Dashboard</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#f97316" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)" rx="32" />
+  <g fill="#f9fafb">
+    <text x="80" y="230" font-family="Arial, Helvetica, sans-serif" font-size="120" font-weight="700" letter-spacing="2">
+      Kuba Manager
+    </text>
+    <text x="80" y="320" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="400" opacity="0.9">
+      Live-Spielstände · Tabellen · Statistiken
+    </text>
+  </g>
+  <g fill="none" stroke="#f9fafb" stroke-width="10" opacity="0.8">
+    <circle cx="990" cy="160" r="100" />
+    <path d="M920 100c32 140 140 160 140 160" />
+    <path d="M990 60v200" />
+    <path d="M890 160h200" />
+  </g>
+</svg>

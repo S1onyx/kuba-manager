@@ -3,6 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="canonical" href="%VITE_PUBLIC_CANONICAL_URL%" />
+    <link rel="alternate" href="%VITE_PUBLIC_CANONICAL_URL%" hreflang="de" />
+    <meta name="google-site-verification" content="%VITE_GOOGLE_SITE_VERIFICATION%" />
     <meta
       name="description"
       content="Live-Spielstände, Tabellen und Statistiken für Kunstrad-Basketball-Turniere – optimiert für mobile Zuschauer."
@@ -12,6 +15,7 @@
       content="Kunstrad, Basketball, Scoreboard, Live Ergebnisse, Turnierverwaltung, Kuba Manager"
     />
     <meta name="robots" content="index,follow" />
+    <meta name="googlebot" content="index,follow" />
     <meta name="theme-color" content="#f97316" />
     <meta property="og:title" content="Kuba Manager – Öffentliche Turnierübersicht" />
     <meta
@@ -19,10 +23,32 @@
       content="Verfolge Live-Spielstände und Turnierstatistiken des Kunstrad-Basketball bequem im Browser."
     />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Kuba Manager" />
+    <meta property="og:url" content="%VITE_PUBLIC_CANONICAL_URL%" />
+    <meta property="og:image" content="/og-image.svg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:locale" content="de_DE" />
     <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Kuba Manager – Öffentliche Turnierübersicht" />
+    <meta
+      name="twitter:description"
+      content="Live-Ergebnisse, Tabellen und Statistiken der Kunstrad-Basketball-Turniere in einem Dashboard."
+    />
+    <meta name="twitter:image" content="/og-image.svg" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Kuba Manager – Public</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SportsOrganization",
+        "name": "Kuba Manager",
+        "sport": "Basketball",
+        "description": "Digitale Live-Übersicht für Kunstrad-Basketball-Spiele mit Spielständen, Tabellen und Statistiken.",
+        "url": "%VITE_PUBLIC_CANONICAL_URL%",
+        "inLanguage": "de-DE"
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
