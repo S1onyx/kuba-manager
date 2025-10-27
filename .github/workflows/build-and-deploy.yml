@@ -66,6 +66,7 @@ jobs:
           context: ${{ matrix.context }}
           file: ${{ matrix.dockerfile }}
           push: true
+          build-args: ${{ matrix.component == 'admin' && format('VITE_ADMIN_USERNAME={0}\nVITE_ADMIN_PASSWORD={1}\nVITE_ADMIN_SESSION_KEY={2}', secrets.ADMIN_PANEL_USERNAME || 'admin', secrets.ADMIN_PANEL_PASSWORD || 'kuba-manager', secrets.ADMIN_PANEL_SESSION_KEY || 'kuba-admin-session') || '' }}
           tags: |
             ${{ env.REGISTRY }}/${{ matrix.image }}:${{ github.sha }}
             ${{ env.REGISTRY }}/${{ matrix.image }}:latest
