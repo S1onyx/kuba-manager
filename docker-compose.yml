@@ -85,9 +85,7 @@ services:
       - DATABASE_URL=ecto://${PLAUSIBLE_DB_USER:-plausible}:${PLAUSIBLE_DB_PASSWORD:-plausible}@plausible-db:5432/${PLAUSIBLE_DB_NAME:-plausible}
       - CLICKHOUSE_DATABASE_URL=http://plausible-events-db:8123/${PLAUSIBLE_CLICKHOUSE_DB:-plausible}
       - HTTP_PORT=8000
-      - HTTPS_PORT=8443
       - DISABLE_REGISTRATION=${PLAUSIBLE_DISABLE_REGISTRATION:-true}
-      - DISABLE_HTTPS=${PLAUSIBLE_DISABLE_HTTPS:-true}
       - MAILER_ADAPTER=${PLAUSIBLE_MAILER_ADAPTER:-Bamboo.LocalAdapter}
       - MAILER_EMAIL=${PLAUSIBLE_MAILER_EMAIL:-noreply@kunstradbasketball.de}
       - MAILER_NAME=${PLAUSIBLE_MAILER_NAME:-Kuba Manager Analytics}
