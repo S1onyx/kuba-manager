@@ -60,13 +60,29 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Prepare admin build args
+        if: matrix.component == 'admin'
+        id: admin_args
+        env:
+          ADMIN_USERNAME: ${{ secrets.ADMIN_PANEL_USERNAME || 'admin' }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PANEL_PASSWORD || 'kuba-manager' }}
+          ADMIN_SESSION_KEY: ${{ secrets.ADMIN_PANEL_SESSION_KEY || 'kuba-admin-session' }}
+        run: |
+          {
+            echo "args<<EOF"
+            echo "VITE_ADMIN_USERNAME=$ADMIN_USERNAME"
+            echo "VITE_ADMIN_PASSWORD=$ADMIN_PASSWORD"
+            echo "VITE_ADMIN_SESSION_KEY=$ADMIN_SESSION_KEY"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Build and push ${{ matrix.component }}
         uses: docker/build-push-action@v5
         with:
           context: ${{ matrix.context }}
           file: ${{ matrix.dockerfile }}
           push: true
-          build-args: ${{ matrix.component == 'admin' && format('VITE_ADMIN_USERNAME={0}\nVITE_ADMIN_PASSWORD={1}\nVITE_ADMIN_SESSION_KEY={2}', secrets.ADMIN_PANEL_USERNAME || 'admin', secrets.ADMIN_PANEL_PASSWORD || 'kuba-manager', secrets.ADMIN_PANEL_SESSION_KEY || 'kuba-admin-session') || '' }}
+          build-args: ${{ matrix.component == 'admin' && steps.admin_args.outputs.args || '' }}
           tags: |
             ${{ env.REGISTRY }}/${{ matrix.image }}:${{ github.sha }}
             ${{ env.REGISTRY }}/${{ matrix.image }}:latest
