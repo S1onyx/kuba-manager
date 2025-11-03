@@ -3,7 +3,7 @@ import { useScoreboardFeed } from '../hooks/useScoreboardFeed.js';
 import { usePublicTournaments } from '../hooks/usePublicTournaments.js';
 import { useTournamentSummary } from '../hooks/useTournamentSummary.js';
 import { SUMMARY_TABS } from '../constants/tabs.js';
-import { resolveInitialRoute } from '../utils/navigation.js';
+import { normalizeRoute, resolveInitialRoute } from '../utils/navigation.js';
 import { scorecardHasGroup } from '../utils/summary.js';
 import { trackEvent, trackPageview } from '../utils/plausible.js';
 
@@ -19,29 +19,28 @@ export function PublicAppProvider({ children }) {
   const lastScoreboardTournamentIdRef = useRef(null);
   const liveTabAutoRef = useRef({ lastApplied: null, suppressed: null });
 
-  const navigate = useCallback((hash) => {
-    const target = typeof hash === 'string' && hash.startsWith('#/') ? hash : '#/';
+  const navigate = useCallback((path) => {
+    const target = normalizeRoute(path);
     if (typeof window === 'undefined') {
       setRoute(target);
       return;
     }
-    if (window.location.hash !== target) {
-      window.location.hash = target;
-    } else {
-      setRoute(target);
+    if (window.location.pathname !== target) {
+      window.history.pushState({ path: target }, '', target);
     }
+    setRoute(target);
   }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
       return;
     }
-    const handleHashChange = () => {
+    const handlePopState = () => {
       setRoute(resolveInitialRoute());
     };
-    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handlePopState);
     return () => {
-      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener('popstate', handlePopState);
     };
   }, []);
 
@@ -52,22 +51,22 @@ export function PublicAppProvider({ children }) {
     window.scrollTo(0, 0);
   }, [route]);
 
-  const isReglementView = route === '#/reglement';
+  const isReglementView = route === '/reglement/';
 
   const handleNavigateHome = useCallback(() => {
     trackEvent('Navigation', {
       target: 'overview',
-      route: '#/'
+      route: '/'
     });
-    navigate('#/');
+    navigate('/');
   }, [navigate]);
 
   const handleNavigateReglement = useCallback(() => {
     trackEvent('Navigation', {
       target: 'reglement',
-      route: '#/reglement'
+      route: '/reglement/'
     });
-    navigate('#/reglement');
+    navigate('/reglement/');
   }, [navigate]);
 
   const {
@@ -264,8 +263,7 @@ export function PublicAppProvider({ children }) {
     if (typeof window === 'undefined') {
       return;
     }
-    const normalizedPath =
-      route === '#/' || route === null ? '/' : `/${String(route).replace(/^#\//, '')}`;
+    const normalizedPath = route ?? '/';
     trackPageview(normalizedPath, {
       view: isReglementView ? 'reglement' : 'overview',
       summaryTab: activeSummaryTab,
