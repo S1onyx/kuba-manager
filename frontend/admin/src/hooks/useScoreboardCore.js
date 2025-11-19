@@ -438,6 +438,38 @@ export default function useScoreboardCore({ updateMessage }) {
     [updateMessage]
   );
 
+  const handleExtraTimeAdjust = useCallback(
+    async (deltaSeconds) => {
+      if (!scoreboard) {
+        return false;
+      }
+
+      const delta = Number(deltaSeconds);
+      if (!Number.isFinite(delta) || delta === 0) {
+        return false;
+      }
+
+      const current = Number(scoreboard.extraSeconds ?? 0);
+      const nextValue = Math.max(0, current + delta);
+      if (nextValue === current) {
+        return false;
+      }
+
+      try {
+        await setExtraTime(nextValue);
+        setExtraDirty(false);
+        setExtraTimeInput(formatTime(nextValue));
+        updateMessage('info', `Nachspielzeit auf ${formatTime(nextValue)} gesetzt.`);
+        return true;
+      } catch (err) {
+        console.error(err);
+        updateMessage('error', 'Nachspielzeit konnte nicht gespeichert werden.');
+        return false;
+      }
+    },
+    [scoreboard, updateMessage, setExtraDirty, setExtraTimeInput]
+  );
+
   const handleTimerSubmit = useCallback(
     async (value) => {
       const seconds = parseTimerInput(value);
@@ -659,6 +691,7 @@ export default function useScoreboardCore({ updateMessage }) {
     handleHalftimeSubmit,
     handleHalftimePauseSubmit,
     handleExtraTimeSubmit,
+    handleExtraTimeAdjust,
     handleTimerSubmit,
     handleStart,
     handlePause,

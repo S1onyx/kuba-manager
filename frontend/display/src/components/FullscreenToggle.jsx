@@ -1,9 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
 const buttonBaseStyle = {
-  position: 'fixed',
-  top: '1.5rem',
-  right: '1.5rem',
   zIndex: 1000,
   padding: '0.65rem 1.1rem',
   borderRadius: '999px',
@@ -17,8 +14,10 @@ const buttonBaseStyle = {
   transition: 'transform 0.2s ease, opacity 0.2s ease'
 };
 
-export default function FullscreenToggle({ auto = false }) {
-  const [isFullscreen, setIsFullscreen] = useState(() => Boolean(document.fullscreenElement));
+export default function FullscreenToggle({ auto = false, fixed = true, style = {}, onChange }) {
+  const [isFullscreen, setIsFullscreen] = useState(() =>
+    typeof document !== 'undefined' ? Boolean(document.fullscreenElement) : false
+  );
   const [autoRequested, setAutoRequested] = useState(false);
 
   useEffect(() => {
@@ -47,10 +46,21 @@ export default function FullscreenToggle({ auto = false }) {
     return () => window.clearTimeout(timer);
   }, [auto, autoRequested, isFullscreen]);
 
-  const buttonStyle = useMemo(() => ({
-    ...buttonBaseStyle,
-    opacity: isFullscreen ? 0.75 : 1
-  }), [isFullscreen]);
+  useEffect(() => {
+    onChange?.(isFullscreen);
+  }, [onChange, isFullscreen]);
+
+  const buttonStyle = useMemo(() => {
+    const positioning = fixed
+      ? { position: 'fixed', top: '1.5rem', right: '1.5rem' }
+      : {};
+    return {
+      ...buttonBaseStyle,
+      ...positioning,
+      opacity: isFullscreen ? 0.75 : 1,
+      ...style
+    };
+  }, [fixed, isFullscreen, style]);
 
   const handleToggle = async () => {
     try {

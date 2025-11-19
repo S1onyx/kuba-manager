@@ -13,6 +13,7 @@ export const PENALTY_PRESETS = [
 
 export const CONTROL_TABS = [
   { id: 'control', label: 'Live-Steuerung' },
+  { id: 'schedule', label: 'Spieltermine' },
   { id: 'audio', label: 'Audio' },
   { id: 'history', label: 'Historie' },
   { id: 'players', label: 'Spieler' },

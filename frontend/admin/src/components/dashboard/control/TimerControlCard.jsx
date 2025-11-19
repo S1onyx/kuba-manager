@@ -19,7 +19,8 @@ export default function TimerControlCard() {
       handleNewGame,
       handleHalftimeSubmit,
       handleHalftimePauseSubmit,
-      handleExtraTimeSubmit
+      handleExtraTimeSubmit,
+      handleExtraTimeAdjust
     },
     scoreboardState: {
       setTimerInput,
@@ -165,6 +166,23 @@ export default function TimerControlCard() {
                 placeholder="z.B. 02:00"
               />
             </label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+              {[
+                { label: '-30s', value: -30 },
+                { label: '-10s', value: -10 },
+                { label: '+10s', value: 10 },
+                { label: '+30s', value: 30 }
+              ].map((option) => (
+                <button
+                  type="button"
+                  key={option.label}
+                  onClick={() => handleExtraTimeAdjust(option.value)}
+                  style={{ padding: '0.35rem 0.85rem', fontSize: '0.85rem' }}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
             <button type="submit">Speichern</button>
           </form>
         </div>

@@ -11,6 +11,18 @@ import {
 } from '../utils/formatters.js';
 import { createPenaltyForms } from '../utils/forms.js';
 
+const PHASES = new Set(['group', 'knockout', 'placement']);
+
+const normalizePhaseFilter = (value) => (PHASES.has(value) ? value : 'all');
+
+const extractTimePart = (value = '') => {
+  if (!value) {
+    return null;
+  }
+  const match = value.match(/T(\d{2}:\d{2})/);
+  return match ? match[1] : null;
+};
+
 export default function useScheduleManager({
   resolvedTournamentId,
   scoreboard,
@@ -30,6 +42,7 @@ export default function useScheduleManager({
   const [scheduleSelection, setScheduleSelection] = useState('');
   const [scheduleDrafts, setScheduleDrafts] = useState({});
   const [scheduleSaving, setScheduleSaving] = useState({});
+  const [bulkSaving, setBulkSaving] = useState(false);
 
   const refreshSchedule = useCallback(async () => {
     if (!resolvedTournamentId) {
@@ -192,6 +205,20 @@ export default function useScheduleManager({
     });
   }, [scheduleData?.raw]);
 
+  const getDraftValue = useCallback(
+    (entry, draftsOverride = scheduleDrafts) => {
+      if (!entry) {
+        return '';
+      }
+      const key = String(entry.id);
+      if (draftsOverride && Object.prototype.hasOwnProperty.call(draftsOverride, key)) {
+        return draftsOverride[key] ?? '';
+      }
+      return entry.scheduled_at ? formatDateTimeLocalInput(entry.scheduled_at) : '';
+    },
+    [scheduleDrafts]
+  );
+
   const handleScheduleDraftChange = useCallback((entryId, value) => {
     const key = String(entryId);
     setScheduleDrafts((prev) => ({
@@ -201,7 +228,8 @@ export default function useScheduleManager({
   }, []);
 
   const handleScheduleDraftSubmit = useCallback(
-    async (entryId, overrideValue = undefined) => {
+    async (entryId, overrideValue = undefined, options = {}) => {
+      const { silent = false, skipRefresh = false } = options;
       if (!resolvedTournamentId) {
         updateMessage('error', 'Bitte zuerst ein Turnier im Match-Kontext auswählen.');
         return false;
@@ -234,8 +262,12 @@ export default function useScheduleManager({
           ...prev,
           [key]: trimmed
         }));
-        updateMessage('info', normalized ? 'Spieltermin gespeichert.' : 'Spieltermin entfernt.');
-        await refreshSchedule();
+        if (!silent) {
+          updateMessage('info', normalized ? 'Spieltermin gespeichert.' : 'Spieltermin entfernt.');
+        }
+        if (!skipRefresh) {
+          await refreshSchedule();
+        }
         return true;
       } catch (err) {
         console.error(err);
@@ -248,10 +280,12 @@ export default function useScheduleManager({
             detail = err.message;
           }
         }
-        if (detail.includes('Ungültiger Zeitpunkt')) {
-          updateMessage('error', 'Bitte ein gültiges Datum/Uhrzeit auswählen.');
-        } else {
-          updateMessage('error', 'Spieltermin konnte nicht gespeichert werden.');
+        if (!silent) {
+          if (detail.includes('Ungültiger Zeitpunkt')) {
+            updateMessage('error', 'Bitte ein gültiges Datum/Uhrzeit auswählen.');
+          } else {
+            updateMessage('error', 'Spieltermin konnte nicht gespeichert werden.');
+          }
         }
         return false;
       } finally {
@@ -272,9 +306,190 @@ export default function useScheduleManager({
         ...prev,
         [key]: ''
       }));
-      await handleScheduleDraftSubmit(entryId, '');
+      await handleScheduleDraftSubmit(entryId, '', {});
     },
     [handleScheduleDraftSubmit]
+  );
+
+  const handleScheduleApplyDate = useCallback(
+    ({ date, phase = 'all' }) => {
+      const normalizedDate = typeof date === 'string' ? date.trim() : '';
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(normalizedDate)) {
+        updateMessage('error', 'Bitte ein gültiges Datum wählen (JJJJ-MM-TT).');
+        return false;
+      }
+      const normalizedPhase = normalizePhaseFilter(phase);
+      const targets = (scheduleData?.raw ?? []).filter(
+        (entry) => normalizedPhase === 'all' || entry.phase === normalizedPhase
+      );
+      if (targets.length === 0) {
+        updateMessage('error', 'Keine Spiele für den ausgewählten Bereich gefunden.');
+        return false;
+      }
+      setScheduleDrafts((prev) => {
+        const next = { ...prev };
+        targets.forEach((entry) => {
+          const key = String(entry.id);
+          const reference = prev && Object.prototype.hasOwnProperty.call(prev, key)
+            ? prev[key]
+            : entry.scheduled_at
+              ? formatDateTimeLocalInput(entry.scheduled_at)
+              : '';
+          const timePart = extractTimePart(reference) ?? '00:00';
+          next[key] = `${normalizedDate}T${timePart}`;
+        });
+        return next;
+      });
+      updateMessage('info', `Datum für ${targets.length} Spiele aktualisiert.`);
+      return true;
+    },
+    [scheduleData?.raw, updateMessage]
+  );
+
+  const handleScheduleAutoPlan = useCallback(
+    ({
+      start,
+      intervalMinutes,
+      breakAfter,
+      breakMinutes,
+      phase = 'all',
+      skipCompleted = true,
+      onlyEmpty = false
+    }) => {
+      const normalizedStart = typeof start === 'string' ? start.trim() : '';
+      if (!normalizedStart) {
+        updateMessage('error', 'Bitte einen Startzeitpunkt auswählen.');
+        return false;
+      }
+      const startDate = new Date(normalizedStart);
+      if (Number.isNaN(startDate.getTime())) {
+        updateMessage('error', 'Startzeitpunkt ist ungültig.');
+        return false;
+      }
+      const interval = Number(intervalMinutes);
+      if (!Number.isFinite(interval) || interval <= 0) {
+        updateMessage('error', 'Intervall muss größer als 0 sein.');
+        return false;
+      }
+
+      const normalizedPhase = normalizePhaseFilter(phase);
+      const entries = (scheduleChronological ?? []).filter((entry) => {
+        if (normalizedPhase !== 'all' && entry.phase !== normalizedPhase) {
+          return false;
+        }
+        if (skipCompleted && entry.result?.hasResult) {
+          return false;
+        }
+        const currentValue = getDraftValue(entry);
+        if (onlyEmpty && currentValue) {
+          return false;
+        }
+        return true;
+      });
+
+      if (entries.length === 0) {
+        updateMessage('error', 'Keine passenden Spiele für die automatische Planung gefunden.');
+        return false;
+      }
+
+      const parsedBreakAfter = Number(breakAfter);
+      const breakEvery = Number.isFinite(parsedBreakAfter) && parsedBreakAfter > 0 ? Math.trunc(parsedBreakAfter) : null;
+      const parsedBreakDuration = Number(breakMinutes);
+      const breakDurationMinutes =
+        breakEvery && Number.isFinite(parsedBreakDuration) && parsedBreakDuration > 0
+          ? Math.trunc(parsedBreakDuration)
+          : null;
+
+      let cursor = new Date(startDate);
+      const msPerInterval = Math.trunc(interval) * 60 * 1000;
+      const assignments = entries.map((entry, index) => {
+        const value = formatDateTimeLocalInput(cursor.toISOString());
+        const payload = { id: entry.id, value };
+        cursor = new Date(cursor.getTime() + msPerInterval);
+        if (breakEvery && breakDurationMinutes && (index + 1) % breakEvery === 0) {
+          cursor = new Date(cursor.getTime() + breakDurationMinutes * 60 * 1000);
+        }
+        return payload;
+      });
+
+      setScheduleDrafts((prev) => {
+        const next = { ...prev };
+        assignments.forEach(({ id, value }) => {
+          next[String(id)] = value;
+        });
+        return next;
+      });
+
+      updateMessage('info', `${assignments.length} Spiele automatisch geplant.`);
+      return true;
+    },
+    [scheduleChronological, getDraftValue, updateMessage]
+  );
+
+  const handleScheduleBulkPersist = useCallback(
+    async ({ phase = 'all' } = {}) => {
+      if (!resolvedTournamentId) {
+        updateMessage('error', 'Bitte zuerst ein Turnier im Match-Kontext auswählen.');
+        return false;
+      }
+      const normalizedPhase = normalizePhaseFilter(phase);
+      const targets = (scheduleChronological ?? []).filter(
+        (entry) => normalizedPhase === 'all' || entry.phase === normalizedPhase
+      );
+      if (targets.length === 0) {
+        updateMessage('error', 'Keine Spiele für den ausgewählten Bereich gefunden.');
+        return false;
+      }
+
+      const pending = targets.filter((entry) => {
+        const desired = getDraftValue(entry);
+        const current = entry.scheduled_at ? formatDateTimeLocalInput(entry.scheduled_at) : '';
+        return (desired || '') !== (current || '');
+      });
+
+      if (pending.length === 0) {
+        updateMessage('info', 'Keine Änderungen zum Speichern vorhanden.');
+        return true;
+      }
+
+      setBulkSaving(true);
+      let success = 0;
+      let failure = 0;
+
+      for (const entry of pending) {
+        const desired = getDraftValue(entry);
+        const result = await handleScheduleDraftSubmit(entry.id, desired, { silent: true, skipRefresh: true });
+        if (result) {
+          success += 1;
+        } else {
+          failure += 1;
+        }
+      }
+
+      setBulkSaving(false);
+      await refreshSchedule();
+
+      if (failure === 0) {
+        updateMessage('info', `${success} Spieltermine gespeichert.`);
+        return true;
+      }
+
+      if (success > 0) {
+        updateMessage('warning', `${success} gespeichert, ${failure} fehlgeschlagen.`);
+      } else {
+        updateMessage('error', 'Speichern der Spieltermine fehlgeschlagen.');
+      }
+
+      return false;
+    },
+    [
+      resolvedTournamentId,
+      scheduleChronological,
+      getDraftValue,
+      handleScheduleDraftSubmit,
+      refreshSchedule,
+      updateMessage
+    ]
   );
 
   const handleScheduleMatchApply = useCallback(
@@ -383,6 +598,10 @@ export default function useScheduleManager({
     handleScheduleDraftSubmit,
     handleScheduleDraftClear,
     handleScheduleMatchApply,
-    describeScheduleMatch
+    handleScheduleApplyDate,
+    handleScheduleAutoPlan,
+    handleScheduleBulkPersist,
+    describeScheduleMatch,
+    bulkSaving
   };
 }

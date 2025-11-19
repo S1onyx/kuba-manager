@@ -15,8 +15,12 @@ export function parseNonNegativeInt(value, fallback = 0) {
 
 export function normalizeClassificationMode(mode, fallback = 'top4') {
   const normalized = String(mode ?? fallback ?? 'top4').trim().toLowerCase();
-  if (normalized === 'top4' || normalized === 'all') {
-    return normalized;
+  if (normalized === 'top4') {
+    return 'top4';
+  }
+
+  if (normalized === 'all' || normalized === 'alle') {
+    return 'all';
   }
   throw new Error('Ungültiger Platzierungsmodus.');
 }

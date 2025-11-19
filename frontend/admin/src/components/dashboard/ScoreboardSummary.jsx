@@ -1,6 +1,12 @@
 import PanelCard from '../common/PanelCard.jsx';
 
-export default function ScoreboardSummary({ scoreboard, formattedRemaining, liveStateLabel }) {
+export default function ScoreboardSummary({
+  scoreboard,
+  formattedRemaining,
+  liveStateLabel,
+  onToggleDisplayView,
+  displayViewPending = false
+}) {
   if (!scoreboard) {
     return null;
   }
@@ -66,14 +72,39 @@ export default function ScoreboardSummary({ scoreboard, formattedRemaining, live
           flexWrap: 'wrap',
           gap: '1.25rem',
           fontSize: '0.9rem',
-          opacity: 0.83
+          opacity: 0.83,
+          alignItems: 'center',
+          justifyContent: 'space-between'
         }}
       >
-        <span>{tournamentBadge}</span>
-        {scoreboard.scheduleCode ? <span>Matchcode: {scoreboard.scheduleCode}</span> : null}
-        <span>
-          Anzeige: {scoreboard.displayView === 'bracket' ? 'Turnierbaum' : 'Live-Spielstand'}
-        </span>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
+          <span>{tournamentBadge}</span>
+          {scoreboard.scheduleCode ? <span>Matchcode: {scoreboard.scheduleCode}</span> : null}
+          <span>
+            Anzeige: {scoreboard.displayView === 'bracket' ? 'Turnierbaum' : 'Live-Spielstand'}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => onToggleDisplayView?.(scoreboard.displayView === 'bracket' ? 'scoreboard' : 'bracket')}
+          disabled={!onToggleDisplayView || displayViewPending}
+          style={{
+            borderRadius: '999px',
+            border: '1px solid rgba(255,255,255,0.35)',
+            background: 'transparent',
+            color: '#fff',
+            padding: '0.35rem 0.9rem',
+            fontSize: '0.85rem',
+            opacity: displayViewPending ? 0.6 : 1,
+            cursor: displayViewPending || !onToggleDisplayView ? 'not-allowed' : 'pointer'
+          }}
+        >
+          {displayViewPending
+            ? 'Wechsle...'
+            : scoreboard.displayView === 'bracket'
+              ? 'Live anzeigen'
+              : 'Turnierbaum anzeigen'}
+        </button>
       </div>
     </PanelCard>
   );

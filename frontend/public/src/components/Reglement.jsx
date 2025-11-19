@@ -1,43 +1,50 @@
-const containerStyle = {
-  background: 'rgba(0,0,0,0.24)',
-  borderRadius: '20px',
-  padding: '1.75rem',
+const wrapperStyle = {
   display: 'grid',
-  gap: '1.5rem',
-  lineHeight: 1.5
+  gap: '1.75rem'
 };
 
-const headerStyle = {
+const heroCardStyle = {
+  background: 'rgba(4, 12, 25, 0.7)',
+  borderRadius: '24px',
+  border: '1px solid rgba(255,255,255,0.08)',
+  padding: '1.8rem clamp(1.4rem, 4vw, 2.4rem)',
   display: 'grid',
-  gap: '0.5rem',
-  textAlign: 'center'
+  gap: '0.85rem',
+  boxShadow: '0 28px 60px rgba(2, 8, 20, 0.55)'
 };
 
-const titleStyle = {
+const heroTitleStyle = {
   margin: 0,
-  fontSize: '1.8rem',
+  fontSize: '1.9rem',
   letterSpacing: '0.08em',
   textTransform: 'uppercase'
 };
 
-const subtitleStyle = {
+const heroSubtitleStyle = {
   margin: 0,
-  fontSize: '0.95rem',
-  opacity: 0.75
+  fontSize: '1rem',
+  opacity: 0.78
+};
+
+const heroFootnoteStyle = {
+  margin: 0,
+  fontSize: '0.9rem',
+  opacity: 0.65
 };
 
 const sectionGridStyle = {
   display: 'grid',
-  gap: '1.25rem'
+  gap: '1.4rem'
 };
 
 const sectionCardStyle = {
-  background: 'rgba(0,0,0,0.18)',
-  borderRadius: '16px',
-  padding: '1.35rem',
+  background: 'rgba(5, 15, 30, 0.65)',
+  borderRadius: '18px',
+  border: '1px solid rgba(255,255,255,0.08)',
+  padding: '1.45rem 1.6rem',
   display: 'grid',
   gap: '0.95rem',
-  boxShadow: '0 10px 24px rgba(0,0,0,0.22)'
+  boxShadow: '0 18px 42px rgba(0,0,0,0.4)'
 };
 
 const sectionHeadingStyle = {
@@ -308,13 +315,19 @@ function renderBody(body) {
 
 export default function Reglement() {
   return (
-    <section style={containerStyle}>
-      <header style={headerStyle}>
-        <h2 style={titleStyle}>Reglement Kunstrad Basketball</h2>
-        <p style={subtitleStyle}>
-          Offizielles Regelwerk für Kunstrad-Basketball: Spielfeld, Ablauf, Fouls und Zuständigkeiten der Spielleitung.
+    <section style={wrapperStyle}>
+      <article style={heroCardStyle}>
+        <header style={{ display: 'grid', gap: '0.45rem' }}>
+          <h2 style={heroTitleStyle}>Reglement Kunstrad Basketball</h2>
+          <p style={heroSubtitleStyle}>
+            Offizielles Regelwerk für Kunstrad-Basketball: Spielfeld, Ablauf, Fouls und Zuständigkeiten der Spielleitung.
+          </p>
+        </header>
+        <p style={heroFootnoteStyle}>
+          Dieses Dokument dient als Leitfaden für Turnierleitung, Teams und Offizielle. Es ergänzt das Live-Dashboard,
+          damit alle Beteiligten dieselbe Basis haben.
         </p>
-      </header>
+      </article>
 
       <div style={sectionGridStyle}>
         {sections.map((section) => (

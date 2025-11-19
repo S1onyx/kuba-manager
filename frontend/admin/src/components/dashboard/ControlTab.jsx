@@ -1,7 +1,6 @@
 import DisplaySettingsCard from './control/DisplaySettingsCard.jsx';
 import MatchContextCard from './control/MatchContextCard.jsx';
 import ScheduleIntegrationCard from './control/ScheduleIntegrationCard.jsx';
-import SchedulePlannerCard from './control/SchedulePlannerCard.jsx';
 import TeamSelectionCard from './control/TeamSelectionCard.jsx';
 import ScoreControlCard from './control/ScoreControlCard.jsx';
 import TimerControlCard from './control/TimerControlCard.jsx';
@@ -13,7 +12,6 @@ export default function ControlTab() {
       <DisplaySettingsCard />
       <MatchContextCard />
       <ScheduleIntegrationCard />
-      <SchedulePlannerCard />
       <TeamSelectionCard />
       <ScoreControlCard />
       <TimerControlCard />

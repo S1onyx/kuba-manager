@@ -53,22 +53,6 @@ export function PublicAppProvider({ children }) {
 
   const isReglementView = route === '/reglement/';
 
-  const handleNavigateHome = useCallback(() => {
-    trackEvent('Navigation', {
-      target: 'overview',
-      route: '/'
-    });
-    navigate('/');
-  }, [navigate]);
-
-  const handleNavigateReglement = useCallback(() => {
-    trackEvent('Navigation', {
-      target: 'reglement',
-      route: '/reglement/'
-    });
-    navigate('/reglement/');
-  }, [navigate]);
-
   const {
     publicTournaments,
     error: tournamentsError,
@@ -207,7 +191,8 @@ export function PublicAppProvider({ children }) {
 
   const handleSummaryTabSelect = useCallback(
     (tabId) => {
-      if (tabId === 'live') {
+      const targetTab = tabId || 'live';
+      if (targetTab === 'live') {
         liveTabAutoRef.current = {
           lastApplied: scoreboard?.tournamentId ?? selectedTournamentId ?? null,
           suppressed: null
@@ -218,10 +203,27 @@ export function PublicAppProvider({ children }) {
           suppressed: selectedTournamentId ?? null
         };
       }
-      setActiveSummaryTab(tabId);
+
+      setActiveSummaryTab(targetTab);
     },
     [scoreboard?.tournamentId, selectedTournamentId]
   );
+
+  const handleNavigateHome = useCallback(() => {
+    trackEvent('Navigation', {
+      target: 'overview',
+      route: '/'
+    });
+    navigate('/');
+  }, [navigate]);
+
+  const handleNavigateReglement = useCallback(() => {
+    trackEvent('Navigation', {
+      target: 'reglement',
+      route: '/reglement/'
+    });
+    navigate('/reglement/');
+  }, [navigate]);
 
   useEffect(() => {
     if (!showImpressum) {

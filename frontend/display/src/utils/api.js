@@ -9,5 +9,16 @@ export async function fetchJson(endpoint, options) {
     error.status = response.status;
     throw error;
   }
+  if (response.status === 204) {
+    return null;
+  }
   return response.json();
+}
+
+export function updateDisplayView(view) {
+  return fetchJson('/scoreboard/display', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ view })
+  });
 }

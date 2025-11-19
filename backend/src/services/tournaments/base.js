@@ -1,7 +1,14 @@
 import { getConnection, persistDatabase } from '../../db/connection.js';
-import { normalizeTournamentPayload } from './helpers.js';
+import { normalizeClassificationMode, normalizeTournamentPayload } from './helpers.js';
 
 export function mapTournament(row) {
+  let classificationMode = 'top4';
+  try {
+    classificationMode = normalizeClassificationMode(row.classification_mode ?? 'top4');
+  } catch (error) {
+    classificationMode = 'top4';
+  }
+
   return {
     id: row.id,
     name: row.name,
@@ -9,7 +16,7 @@ export function mapTournament(row) {
     knockout_rounds: row.knockout_rounds ?? 0,
     is_public: Boolean(row.is_public),
     team_count: row.team_count ?? 0,
-    classification_mode: row.classification_mode ?? 'top4',
+    classification_mode: classificationMode,
     created_at: row.created_at
   };
 }

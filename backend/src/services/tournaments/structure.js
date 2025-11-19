@@ -13,9 +13,10 @@ import {
   createMatchCode,
   createGroupPositionSource,
   generateKnockoutStages,
-  highestPowerOfTwo,
+  generateClassificationStages,
   calculateQualifierDistribution,
-  resolveParticipantLabel
+  resolveParticipantLabel,
+  normalizeClassificationMode
 } from './helpers.js';
 
 export async function regenerateTournamentStructure(tournament) {
@@ -52,7 +53,12 @@ export async function regenerateTournamentStructure(tournament) {
     const teamsTotal = Math.max(0, Number(tournament.team_count) || 0);
     const groupCount = Math.max(1, Number(tournament.group_count) || 0);
     const knockoutRounds = Math.max(0, Number(tournament.knockout_rounds) || 0);
-    const classificationMode = String(tournament.classification_mode ?? 'top4').toLowerCase();
+    let classificationMode = 'top4';
+    try {
+      classificationMode = normalizeClassificationMode(tournament.classification_mode ?? 'top4');
+    } catch (error) {
+      classificationMode = 'top4';
+    }
 
     if (teamsTotal > 0) {
       insertTeamStmt = db.prepare(
@@ -142,39 +148,18 @@ export async function regenerateTournamentStructure(tournament) {
         });
       });
 
-      const initialTeamsCapacity = knockoutRounds > 0 ? 2 ** Math.max(0, knockoutRounds) : 0;
-      const highestPossible = highestPowerOfTwo(teamsTotal);
-      const knockoutEntrants = Math.min(initialTeamsCapacity, highestPossible);
+      const { knockoutEntrants, qualifiersByGroup } = calculateQualifierDistribution(
+        tournament,
+        groupLabels,
+        assignments
+      );
 
       if (knockoutEntrants >= 2) {
-        const qualifiersPerGroup = [];
-        const basePerGroup = Math.floor(knockoutEntrants / groupLabels.length);
-        let remainder = knockoutEntrants % groupLabels.length;
-
-        groupLabels.forEach((label, index) => {
-          const slots = assignments.get(label) ?? [];
-          let desired = basePerGroup + (remainder > 0 ? 1 : 0);
-          if (remainder > 0) {
-            remainder -= 1;
-          }
-          desired = Math.min(desired, slots.length);
-          qualifiersPerGroup[index] = desired;
-        });
-
-        let totalQualifiers = qualifiersPerGroup.reduce((acc, value) => acc + value, 0);
-        while (totalQualifiers > knockoutEntrants) {
-          for (let idx = qualifiersPerGroup.length - 1; idx >= 0 && totalQualifiers > knockoutEntrants; idx -= 1) {
-            if (qualifiersPerGroup[idx] > 0) {
-              qualifiersPerGroup[idx] -= 1;
-              totalQualifiers -= 1;
-            }
-          }
-        }
-
         const initialParticipants = [];
-        groupLabels.forEach((label, index) => {
-          const count = qualifiersPerGroup[index] ?? 0;
-          for (let pos = 1; pos <= count; pos += 1) {
+        groupLabels.forEach((label) => {
+          const qualifierInfo = qualifiersByGroup.get(label);
+          const qualifierCount = qualifierInfo?.count ?? 0;
+          for (let pos = 1; pos <= qualifierCount; pos += 1) {
             initialParticipants.push({
               source: createGroupPositionSource(label, pos),
               label: `Platz ${pos} Gruppe ${label}`
@@ -188,6 +173,32 @@ export async function regenerateTournamentStructure(tournament) {
             knockoutRounds,
             classificationMode
           });
+
+          if (classificationMode === 'all') {
+            const leftoverSources = [];
+            groupLabels.forEach((label) => {
+              const slots = assignments.get(label) ?? [];
+              const qualifierCount = qualifiersByGroup.get(label)?.count ?? 0;
+              for (let pos = qualifierCount + 1; pos <= slots.length; pos += 1) {
+                leftoverSources.push(createGroupPositionSource(label, pos));
+              }
+            });
+
+            if (leftoverSources.length >= 2) {
+              if (leftoverSources.length % 2 === 1) {
+                leftoverSources.pop();
+              }
+              if (leftoverSources.length >= 2) {
+                const basePlacement = Math.max(1, knockoutEntrants + 1);
+                const restStages = generateClassificationStages(
+                  leftoverSources,
+                  basePlacement,
+                  `PL-${basePlacement}`
+                );
+                placementStages.push(...restStages);
+              }
+            }
+          }
 
           const storeStages = (stages, phase) => {
             stages.forEach((stage, stageIdx) => {
@@ -911,6 +922,13 @@ export async function getTournamentStructureDetails(tournamentId) {
     return null;
   }
 
+  let normalizedClassificationMode = 'top4';
+  try {
+    normalizedClassificationMode = normalizeClassificationMode(tournament.classification_mode ?? 'top4');
+  } catch (error) {
+    normalizedClassificationMode = 'top4';
+  }
+
   const teams = await getTournamentTeams(id);
   const teamMap = new Map(teams.map((team) => [team.slot_number, team]));
 
@@ -1006,7 +1024,7 @@ export async function getTournamentStructureDetails(tournamentId) {
     knockout: {
       entrants: knockoutEntrants,
       rounds: Math.max(0, Number(tournament.knockout_rounds) || 0),
-      classificationMode: String(tournament.classification_mode ?? 'top4'),
+      classificationMode: normalizedClassificationMode,
       qualifiersPerGroup: groupLabels.map((label) => ({
         label,
         count: qualifiersByGroup.get(label)?.count ?? 0

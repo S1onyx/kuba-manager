@@ -8,6 +8,7 @@ import HistoryTab from '../components/dashboard/HistoryTab.jsx';
 import PlayersTab from '../components/dashboard/PlayersTab.jsx';
 import TeamsTab from '../components/dashboard/TeamsTab.jsx';
 import TournamentsTab from '../components/dashboard/TournamentsTab.jsx';
+import ScheduleTab from '../components/dashboard/ScheduleTab.jsx';
 import useFeedback from '../hooks/useFeedback.js';
 import useScoreboardCore from '../hooks/useScoreboardCore.js';
 import useMatchContext from '../hooks/useMatchContext.js';
@@ -92,6 +93,7 @@ export default function Dashboard() {
         handleHalftimeSubmit: scoreboardCtrl.handleHalftimeSubmit,
         handleHalftimePauseSubmit: scoreboardCtrl.handleHalftimePauseSubmit,
         handleExtraTimeSubmit: scoreboardCtrl.handleExtraTimeSubmit,
+        handleExtraTimeAdjust: scoreboardCtrl.handleExtraTimeAdjust,
         handleTimerSubmit: scoreboardCtrl.handleTimerSubmit,
         handleStart: scoreboardCtrl.handleStart,
         handlePause: scoreboardCtrl.handlePause,
@@ -168,12 +170,16 @@ export default function Dashboard() {
               scoreboard={scoreboardCtrl.scoreboard}
               formattedRemaining={scoreboardCtrl.formattedRemaining}
               liveStateLabel={scoreboardCtrl.liveStateLabel}
+              onToggleDisplayView={scoreboardCtrl.handleDisplayViewChange}
+              displayViewPending={scoreboardCtrl.displayViewPending}
             />
           ) : null
         }
       >
         {activeTab === 'control' ? (
           <ControlTab />
+        ) : activeTab === 'schedule' ? (
+          <ScheduleTab />
         ) : activeTab === 'audio' ? (
           <AudioTab />
         ) : activeTab === 'history' ? (

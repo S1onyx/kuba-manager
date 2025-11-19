@@ -88,9 +88,27 @@ function ensureTicker() {
           changed = true;
         }
       } else {
-        state.extraElapsedSeconds += 1;
-        state.isExtraTime = true;
-        changed = true;
+        const plannedExtra = Math.max(0, state.extraSeconds ?? 0);
+        if (plannedExtra > 0) {
+          state.extraElapsedSeconds += 1;
+          state.isExtraTime = true;
+          changed = true;
+        } else {
+          state.remainingSeconds = 0;
+          state.extraElapsedSeconds = 0;
+          state.isExtraTime = false;
+          state.isRunning = false;
+          changed = true;
+          stopTicker();
+          triggerAudioEvent('game_end', {
+            teamA: state.teamAName,
+            teamB: state.teamBName,
+            scoreA: state.scoreA,
+            scoreB: state.scoreB
+          }).catch((error) => {
+            console.error('Audio-Trigger (game_end) fehlgeschlagen:', error);
+          });
+        }
       }
 
       if (state.isRunning && tickPenalties(state)) {
