@@ -18,11 +18,18 @@ export default function PublicHeader() {
   });
 
   return (
-    <header style={{ display: 'grid', gap: '0.75rem', textAlign: 'center' }}>
-      <h1 style={{ fontSize: '2.8rem', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+    <header style={{ display: 'grid', gap: '0.75rem', textAlign: 'center', maxWidth: '960px', margin: '0 auto' }}>
+      <h1
+        style={{
+          fontSize: 'clamp(1.9rem, 6vw, 2.8rem)',
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          lineHeight: 1.2
+        }}
+      >
         Kunstrad Basketball – Public
       </h1>
-      <p style={{ opacity: 0.75, fontSize: '1rem' }}>
+      <p style={{ opacity: 0.75, fontSize: 'clamp(0.95rem, 3.2vw, 1.1rem)', lineHeight: 1.4 }}>
         Live-Spielstand, Tabellen und Statistiken zum aktuell ausgewählten Turnier.
       </p>
       <div

@@ -28,7 +28,7 @@ export default function AudioTab() {
   } = useDashboard();
 
   return (
-    <div style={{ display: 'grid', gap: '1.75rem' }}>
+    <div style={{ display: 'grid', gap: '1.75rem' }} className="audio-tab">
       <PanelCard
         title="Audio-Steuerung"
         description="Wähle Sounds für Spielereignisse oder löse Audios manuell aus – ideal für Moderation und Hallen-Atmosphäre."
@@ -44,24 +44,14 @@ export default function AudioTab() {
         {audioTriggers.length === 0 ? (
           <p style={{ margin: 0, opacity: 0.7 }}>Noch keine Audio-Trigger konfiguriert.</p>
         ) : (
-          <div style={{ display: 'grid', gap: '1.1rem' }}>
+          <div className="audio-trigger-list">
             {audioTriggers.map((trigger) => {
               const busy = Boolean(audioTriggerBusy[trigger.key] || audioUploadBusy[trigger.key]);
               const currentFile = trigger.file;
               return (
-                <article
-                  key={trigger.key}
-                  style={{
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    padding: '1rem 1.2rem',
-                    background: 'rgba(8, 20, 35, 0.55)',
-                    display: 'grid',
-                    gap: '0.75rem'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
-                    <div style={{ display: 'grid', gap: '0.25rem' }}>
+                <article key={trigger.key} className="audio-trigger-card">
+                  <div className="audio-trigger-card__header">
+                    <div className="audio-trigger-card__headerText">
                       <strong>{trigger.label}</strong>
                       {trigger.description ? (
                         <span style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>
@@ -73,23 +63,18 @@ export default function AudioTab() {
                       type="button"
                       onClick={() => handleAudioTriggerToggle(trigger.key, !trigger.is_active)}
                       disabled={busy}
-                      style={{
-                        padding: '0.45rem 1.1rem',
-                        borderRadius: '999px',
-                        background: trigger.is_active ? 'var(--accent)' : 'rgba(8, 20, 35, 0.65)',
-                        color: trigger.is_active ? '#041022' : 'var(--text-secondary)'
-                      }}
+                      className={`audio-trigger-card__toggle${trigger.is_active ? ' audio-trigger-card__toggle--active' : ''}`}
                     >
                       {trigger.is_active ? 'Aktiv' : 'Stumm'}
                     </button>
                   </div>
 
                   {currentFile ? (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.9rem' }}>
+                    <div className="audio-trigger-card__current">
+                      <span>
                         Aktueller Sound: <strong>{describeAudioFile(currentFile)}</strong>
                       </span>
-                      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      <div className="audio-trigger-card__currentButtons">
                         <button
                           type="button"
                           onClick={() => handleAudioTriggerPreview(trigger.key)}
@@ -110,8 +95,8 @@ export default function AudioTab() {
                     <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.7 }}>Keine Audiodatei zugewiesen.</p>
                   )}
 
-                  <div style={{ display: 'grid', gap: '0.65rem', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
-                    <label style={{ display: 'grid', gap: '0.3rem' }}>
+                  <div className="audio-trigger-card__inputs">
+                    <label className="audio-trigger-card__field">
                       Label (optional)
                       <input
                         value={audioTriggerLabels[trigger.key] ?? ''}
@@ -120,15 +105,7 @@ export default function AudioTab() {
                         disabled={audioUploadBusy[trigger.key]}
                       />
                     </label>
-                    <label
-                      style={{
-                        display: 'grid',
-                        gap: '0.3rem',
-                        border: '1px dashed rgba(255,255,255,0.14)',
-                        borderRadius: 'var(--radius-sm)',
-                        padding: '0.75rem'
-                      }}
-                    >
+                    <label className="audio-trigger-card__upload">
                       Neue Datei hochladen
                       <input
                         type="file"
@@ -143,7 +120,7 @@ export default function AudioTab() {
                         disabled={busy}
                       />
                     </label>
-                    <label style={{ display: 'grid', gap: '0.3rem' }}>
+                    <label className="audio-trigger-card__field">
                       Aus Bibliothek wählen
                       <select
                         value={currentFile?.id ?? ''}
@@ -174,9 +151,9 @@ export default function AudioTab() {
           onSubmit={(event) => {
             event.preventDefault();
           }}
-          style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', alignItems: 'center', marginBottom: '1rem' }}
+          className="audio-library-form"
         >
-          <label style={{ display: 'grid', gap: '0.3rem', minWidth: '220px' }}>
+          <label className="audio-library-form__field">
             Label (optional)
             <input
               value={audioLibraryUploadLabel}
@@ -184,15 +161,7 @@ export default function AudioTab() {
               placeholder="z. B. Intro Musik"
             />
           </label>
-          <label
-            style={{
-              display: 'grid',
-              gap: '0.3rem',
-              border: '1px dashed rgba(255,255,255,0.14)',
-              borderRadius: 'var(--radius-sm)',
-              padding: '0.75rem'
-            }}
-          >
+          <label className="audio-library-form__upload">
             Datei hochladen
             <input
               type="file"
@@ -215,25 +184,12 @@ export default function AudioTab() {
             {audioLibrary.map((file) => {
               const busy = Boolean(audioManualBusy[file.id]);
               return (
-                <article
-                  key={file.id}
-                  style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '0.75rem',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '0.75rem 1rem',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    background: 'rgba(8,20,35,0.45)'
-                  }}
-                >
-                  <div style={{ display: 'grid', gap: '0.2rem' }}>
+                <article key={file.id} className="audio-library-item">
+                  <div className="audio-library-item__info">
                     <strong>{describeAudioFile(file)}</strong>
                     <span style={{ fontSize: '0.82rem', opacity: 0.65 }}>{file.original_name}</span>
                   </div>
-                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <div className="audio-library-item__actions">
                     <button
                       type="button"
                       onClick={() => handleAudioLibraryPlay(file.id)}
