@@ -32,18 +32,22 @@ export default function Timer({
     statusColor = '#ff7043';
   }
 
+  const timeStyle = {
+    fontSize: '7rem',
+    fontWeight: '700',
+    letterSpacing: '0.08em',
+    textShadow: '0 0 25px rgba(0,0,0,0.6)',
+    fontVariantNumeric: 'tabular-nums',
+    fontFeatureSettings: '"tnum"',
+    fontFamily: "'Share Tech Mono', 'Roboto Mono', 'SFMono-Regular', 'Menlo', 'monospace'",
+    minWidth: extraElapsed ? '16ch' : '10ch',
+    display: 'inline-flex',
+    justifyContent: 'center'
+  };
+
   return (
     <div style={{ display: 'grid', gap: '1.5rem', justifyItems: 'center' }}>
-      <div
-        style={{
-          fontSize: '7rem',
-          fontWeight: '700',
-          letterSpacing: '0.08em',
-          textShadow: '0 0 25px rgba(0,0,0,0.6)'
-        }}
-      >
-        {timeDisplay}
-      </div>
+      <div style={timeStyle}>{timeDisplay}</div>
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
         <span

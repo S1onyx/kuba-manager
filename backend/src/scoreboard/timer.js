@@ -8,6 +8,36 @@ import { triggerAudioEvent } from '../audio/dispatcher.js';
 
 let ticker = null;
 
+function createAudioContext(state) {
+  return {
+    teamA: state.teamAName,
+    teamB: state.teamBName,
+    scoreA: state.scoreA,
+    scoreB: state.scoreB,
+    remainingSeconds: state.remainingSeconds
+  };
+}
+
+function triggerPauseTone(context) {
+  triggerAudioEvent('game_pause', context).catch((error) => {
+    console.error('Audio-Trigger (game_pause) fehlgeschlagen:', error);
+  });
+}
+
+function triggerStartTone(context) {
+  triggerAudioEvent('game_start', context)
+    .then((payload) => {
+      if (payload) {
+        return;
+      }
+      triggerPauseTone(context);
+    })
+    .catch((error) => {
+      console.error('Audio-Trigger (game_start) fehlgeschlagen:', error);
+      triggerPauseTone(context);
+    });
+}
+
 function stopTicker() {
   if (ticker) {
     clearInterval(ticker);
@@ -86,6 +116,7 @@ function ensureTicker() {
           }
           ensureTicker();
           changed = true;
+          triggerPauseTone(createAudioContext(state));
         }
       } else {
         const plannedExtra = Math.max(0, state.extraSeconds ?? 0);
@@ -224,13 +255,7 @@ export function startTimer() {
   state.isRunning = true;
   ensureTicker();
   notifySubscribers();
-  triggerAudioEvent('game_start', {
-    teamA: state.teamAName,
-    teamB: state.teamBName,
-    remainingSeconds: state.remainingSeconds
-  }).catch((error) => {
-    console.error('Audio-Trigger (game_start) fehlgeschlagen:', error);
-  });
+  triggerStartTone(createAudioContext(state));
   return snapshotState();
 }
 
@@ -245,13 +270,7 @@ export function pauseTimer() {
     stopTicker();
   }
   notifySubscribers();
-  triggerAudioEvent('game_pause', {
-    teamA: state.teamAName,
-    teamB: state.teamBName,
-    remainingSeconds: state.remainingSeconds
-  }).catch((error) => {
-    console.error('Audio-Trigger (game_pause) fehlgeschlagen:', error);
-  });
+  triggerPauseTone(createAudioContext(state));
   return snapshotState();
 }
 
