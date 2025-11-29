@@ -4,6 +4,7 @@ export default function useDisplayScaling(dependencies = []) {
   const rootRef = useRef(null);
   const contentRef = useRef(null);
   const [scale, setScale] = useState(1);
+  const scaleRef = useRef(1);
 
   useEffect(() => {
     const updateScale = () => {
@@ -26,7 +27,10 @@ export default function useDisplayScaling(dependencies = []) {
       const availableHeight = Math.max(container.clientHeight - paddingY, 50);
       const nextScale = Math.min(availableWidth / contentWidth, availableHeight / contentHeight);
       const clamped = Math.max(Math.min(nextScale, 1.6), 0.45);
-      setScale(clamped);
+      if (Math.abs(clamped - scaleRef.current) > 0.0005) {
+        scaleRef.current = clamped;
+        setScale(clamped);
+      }
     };
 
     updateScale();

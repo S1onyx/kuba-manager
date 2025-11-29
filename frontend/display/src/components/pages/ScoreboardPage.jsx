@@ -2,6 +2,7 @@ import Scoreboard from '../Scoreboard.jsx';
 import Timer from '../Timer.jsx';
 import PenaltiesSection from '../scoreboard/PenaltiesSection.jsx';
 import StandingsSection from '../scoreboard/StandingsSection.jsx';
+import useLocalTimer from '../../hooks/useLocalTimer.js';
 import { formatStageDescription, formatTime } from '../../utils/formatting.js';
 
 const pageStyle = {
@@ -23,6 +24,7 @@ export default function ScoreboardPage({
   standingsError,
   standingsLoading
 }) {
+  const { remainingSeconds, extraElapsedSeconds, halftimePauseRemaining } = useLocalTimer(scoreboard);
   const score = {
     teamA: scoreboard?.scoreA ?? 0,
     teamB: scoreboard?.scoreB ?? 0
@@ -33,18 +35,15 @@ export default function ScoreboardPage({
     teamB: scoreboard?.teamBName ?? 'Team B'
   };
 
-  const formattedRemaining = formatTime(scoreboard?.remainingSeconds ?? 0);
+  const formattedRemaining = formatTime(remainingSeconds);
   const extraExpected =
     scoreboard && (scoreboard.extraSeconds ?? 0) !== 0 ? formatTime(scoreboard.extraSeconds ?? 0) : null;
-  const extraElapsed =
-    scoreboard && (scoreboard.extraElapsedSeconds ?? 0) !== 0
-      ? formatTime(scoreboard.extraElapsedSeconds ?? 0)
-      : null;
+  const extraElapsed = extraElapsedSeconds > 0 ? formatTime(extraElapsedSeconds) : null;
   const halftimeFormatted =
     scoreboard?.halftimeSeconds ? formatTime(scoreboard.halftimeSeconds) : null;
   const isHalftimeBreak = Boolean(scoreboard?.isHalftimeBreak);
   const halftimeBreakRemaining = isHalftimeBreak
-    ? formatTime(scoreboard?.halftimePauseRemaining ?? 0)
+    ? formatTime(halftimePauseRemaining)
     : null;
   const isExtraTime = Boolean(scoreboard?.isExtraTime);
   const currentHalf = scoreboard?.currentHalf ?? 1;

@@ -30,10 +30,14 @@ export default function useStandingsData(scoreboard) {
       return;
     }
 
-    const shouldFetch =
-      contextKeyRef.current !== contextKey ||
-      standings === null ||
-      lastFetchSignatureRef.current !== scoreboardSignature;
+    const hasStandings = standings !== null;
+    const contextChanged = contextKeyRef.current !== contextKey;
+    const signatureChanged = lastFetchSignatureRef.current !== scoreboardSignature;
+    const shouldFetch = contextChanged || !hasStandings || signatureChanged;
+
+    if (scoreboard?.isRunning && hasStandings && !contextChanged) {
+      return;
+    }
 
     if (!shouldFetch || !scoreboardSignature) {
       return;
@@ -82,7 +86,8 @@ export default function useStandingsData(scoreboard) {
     scoreboard?.stageLabel,
     scoreboard?.scoreA,
     scoreboard?.scoreB,
-    scoreboard?.lastUpdated
+    scoreboard?.lastUpdated,
+    scoreboard?.isRunning
   ]);
 
   return {

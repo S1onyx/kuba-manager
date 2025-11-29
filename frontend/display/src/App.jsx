@@ -70,7 +70,6 @@ export default function App() {
   const scaleDependencies = useMemo(
     () => [
       effectiveDisplayView,
-      scoreboard?.lastUpdated,
       structure?.tournament?.id,
       structure?.groups?.length,
       structure?.schedule?.knockout?.length,
@@ -79,7 +78,6 @@ export default function App() {
     ],
     [
       effectiveDisplayView,
-      scoreboard?.lastUpdated,
       structure?.tournament?.id,
       structure?.groups?.length,
       structure?.schedule?.knockout?.length,

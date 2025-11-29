@@ -40,9 +40,11 @@ export default function Timer({
     fontVariantNumeric: 'tabular-nums',
     fontFeatureSettings: '"tnum"',
     fontFamily: "'Share Tech Mono', 'Roboto Mono', 'SFMono-Regular', 'Menlo', 'monospace'",
-    minWidth: extraElapsed ? '16ch' : '10ch',
+    width: '18ch',
     display: 'inline-flex',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    whiteSpace: 'nowrap',
+    textAlign: 'center'
   };
 
   return (
