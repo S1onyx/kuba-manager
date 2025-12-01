@@ -15,7 +15,7 @@ import {
   generateKnockoutStages,
   generateClassificationStages,
   calculateQualifierDistribution,
-  resolveParticipantLabel,
+  resolveParticipantDetails,
   normalizeClassificationMode
 } from './helpers.js';
 
@@ -476,27 +476,32 @@ function normalizeScheduledAtValue(input) {
   return new Date(timestamp).toISOString();
 }
 
-function mapScheduleRow(row, teamsMap, matchLabelLookup, resultsByCode, groupStandingsMap) {
+function mapScheduleRow(row, teamsMap, teamsByName, matchLabelLookup, resultsByCode, groupStandingsMap) {
   const metadata = safeParse(row.metadata_json, {});
   const homeSource = safeParse(row.home_source, null);
   const awaySource = safeParse(row.away_source, null);
 
-  const homeLabel = resolveParticipantLabel({
+  const homeDetails = resolveParticipantDetails({
     slot: row.home_slot,
     source: homeSource,
     teamsMap,
+    teamsByName,
     matchLabelLookup,
     resultsByCode,
     groupStandingsMap
   });
-  const awayLabel = resolveParticipantLabel({
+  const awayDetails = resolveParticipantDetails({
     slot: row.away_slot,
     source: awaySource,
     teamsMap,
+    teamsByName,
     matchLabelLookup,
     resultsByCode,
     groupStandingsMap
   });
+
+  const homeLabel = homeDetails.label;
+  const awayLabel = awayDetails.label;
 
   const homeRecord = row.home_slot ? teamsMap.get(row.home_slot) : null;
   const awayRecord = row.away_slot ? teamsMap.get(row.away_slot) : null;
@@ -510,6 +515,8 @@ function mapScheduleRow(row, teamsMap, matchLabelLookup, resultsByCode, groupSta
             gameId: resultRecord.id,
             teamAName: resultRecord.team_a,
             teamBName: resultRecord.team_b,
+            teamAId: resultRecord.team_a_id,
+            teamBId: resultRecord.team_b_id,
             scoreA: resultRecord.score_a,
             scoreB: resultRecord.score_b,
             finishedAt: resultRecord.created_at
@@ -537,17 +544,23 @@ function mapScheduleRow(row, teamsMap, matchLabelLookup, resultsByCode, groupSta
     home: {
       slot: row.home_slot,
       source: homeSource,
-      teamId: homeRecord?.team_id ?? null,
-      teamName: homeRecord?.team_name ?? null,
-      placeholder: homeRecord?.placeholder ?? (row.home_slot ? defaultSlotPlaceholder(row.home_slot) : null),
+      teamId: homeDetails.teamId ?? homeRecord?.team_id ?? null,
+      teamName: homeDetails.teamName ?? homeRecord?.team_name ?? null,
+      placeholder:
+        homeDetails.placeholder ??
+        homeRecord?.placeholder ??
+        (row.home_slot ? defaultSlotPlaceholder(row.home_slot) : null),
       label: homeLabel
     },
     away: {
       slot: row.away_slot,
       source: awaySource,
-      teamId: awayRecord?.team_id ?? null,
-      teamName: awayRecord?.team_name ?? null,
-      placeholder: awayRecord?.placeholder ?? (row.away_slot ? defaultSlotPlaceholder(row.away_slot) : null),
+      teamId: awayDetails.teamId ?? awayRecord?.team_id ?? null,
+      teamName: awayDetails.teamName ?? awayRecord?.team_name ?? null,
+      placeholder:
+        awayDetails.placeholder ??
+        awayRecord?.placeholder ??
+        (row.away_slot ? defaultSlotPlaceholder(row.away_slot) : null),
       label: awayLabel
     },
     result
@@ -557,12 +570,27 @@ function mapScheduleRow(row, teamsMap, matchLabelLookup, resultsByCode, groupSta
 export async function getTournamentSchedule(tournamentId) {
   const teams = await getTournamentTeams(tournamentId);
   const teamsMap = new Map(teams.map((team) => [team.slot_number, team]));
+  const teamsByName = new Map();
+  const normalizeName = (value) => {
+    const raw = String(value ?? '').trim().toLowerCase();
+    return raw || null;
+  };
+  teams.forEach((team) => {
+    const normalizedName = normalizeName(team.team_name);
+    if (normalizedName && !teamsByName.has(normalizedName)) {
+      teamsByName.set(normalizedName, team);
+    }
+    const normalizedPlaceholder = normalizeName(team.placeholder);
+    if (normalizedPlaceholder && !teamsByName.has(normalizedPlaceholder)) {
+      teamsByName.set(normalizedPlaceholder, team);
+    }
+  });
 
   const { db } = await getConnection();
   const resultLookup = new Map();
 
   const resultsStmt = db.prepare(
-    `SELECT schedule_code, id, team_a, team_b, score_a, score_b, created_at
+    `SELECT schedule_code, id, team_a, team_b, team_a_id, team_b_id, score_a, score_b, created_at
      FROM games
      WHERE tournament_id = ? AND schedule_code IS NOT NULL
      ORDER BY datetime(created_at) ASC, id ASC`
@@ -676,7 +704,7 @@ export async function getTournamentSchedule(tournamentId) {
   }
 
   return rawRows.map((row) =>
-    mapScheduleRow(row, teamsMap, matchLabelLookup, resultLookup, groupStandingsMap)
+    mapScheduleRow(row, teamsMap, teamsByName, matchLabelLookup, resultLookup, groupStandingsMap)
   );
 }
 

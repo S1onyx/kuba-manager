@@ -357,76 +357,123 @@ export function generateKnockoutStages({ initialParticipants, knockoutRounds, cl
   return { mainStages, placementStages };
 }
 
-export function resolveParticipantLabel({
+function lookupTeamRecordByName(lookupMap, name) {
+  if (!lookupMap || !name) {
+    return null;
+  }
+  const normalized = String(name ?? '').trim().toLowerCase();
+  if (!normalized) {
+    return null;
+  }
+  return lookupMap.get(normalized) ?? null;
+}
+
+function wrapTeamDetails({ label, teamId, teamName, placeholder }) {
+  const normalizedLabel = label && String(label).trim() ? String(label).trim() : '';
+  const normalizedPlaceholder = placeholder && String(placeholder).trim() ? String(placeholder).trim() : null;
+  return {
+    label: normalizedLabel,
+    teamId: teamId ?? null,
+    teamName: teamName && String(teamName).trim() ? String(teamName).trim() : null,
+    placeholder: normalizedPlaceholder ?? (normalizedLabel || null)
+  };
+}
+
+export function resolveParticipantDetails({
   slot,
   source,
   teamsMap,
+  teamsByName,
   matchLabelLookup,
   resultsByCode,
   groupStandingsMap
 }) {
   if (slot) {
-    const team = teamsMap.get(slot);
+    const team = teamsMap?.get ? teamsMap.get(slot) : null;
     if (team) {
-      return team.team_name || team.placeholder || `Team ${slot}`;
+      const label = team.team_name || team.placeholder || `Team ${slot}`;
+      return wrapTeamDetails({
+        label,
+        teamId: team.team_id ?? null,
+        teamName: team.team_name ?? null,
+        placeholder: team.placeholder ?? label
+      });
     }
-    return `Team ${slot}`;
+    const fallback = `Team ${slot}`;
+    return wrapTeamDetails({ label: fallback, placeholder: fallback });
   }
 
-  if (source) {
-    if (source.type === 'previousMatch' && resultsByCode) {
-      const reference = resultsByCode.get(source.code);
-      if (reference) {
-        const scoreA = Number(reference.score_a ?? 0);
-        const scoreB = Number(reference.score_b ?? 0);
-        const teamA = reference.team_a ?? '';
-        const teamB = reference.team_b ?? '';
+  if (!source) {
+    return wrapTeamDetails({ label: '' });
+  }
 
-        if (source.result === 'winner') {
-          if (scoreA > scoreB) {
-            return teamA || descriptorLabelFromSource(source, matchLabelLookup);
-          }
-          if (scoreB > scoreA) {
-            return teamB || descriptorLabelFromSource(source, matchLabelLookup);
-          }
+  const descriptor = descriptorLabelFromSource(source, matchLabelLookup);
+
+  if (source.type === 'previousMatch' && resultsByCode) {
+    const reference = resultsByCode.get(source.code);
+    if (reference) {
+      const scoreA = Number(reference.score_a ?? 0);
+      const scoreB = Number(reference.score_b ?? 0);
+      const teamA = reference.team_a ?? '';
+      const teamB = reference.team_b ?? '';
+      const teamAId = reference.team_a_id ?? null;
+      const teamBId = reference.team_b_id ?? null;
+
+      if (scoreA !== scoreB && source.result) {
+        const pickWinner = source.result === 'winner';
+        const favorTeamA = pickWinner ? scoreA > scoreB : scoreA < scoreB;
+        const resolved = favorTeamA
+          ? { name: teamA, id: teamAId }
+          : { name: teamB, id: teamBId };
+
+        if (resolved.name) {
+          const record = lookupTeamRecordByName(teamsByName, resolved.name);
+          return wrapTeamDetails({
+            label: resolved.name,
+            teamId: resolved.id ?? record?.team_id ?? null,
+            teamName: resolved.name,
+            placeholder: record?.placeholder ?? resolved.name
+          });
         }
-
-        if (source.result === 'loser') {
-          if (scoreA > scoreB) {
-            return teamB || descriptorLabelFromSource(source, matchLabelLookup);
-          }
-          if (scoreB > scoreA) {
-            return teamA || descriptorLabelFromSource(source, matchLabelLookup);
-          }
+        if (resolved.id !== null && resolved.id !== undefined) {
+          return wrapTeamDetails({ label: descriptor, teamId: resolved.id, teamName: descriptor });
         }
       }
     }
+  }
 
-    if (source.type === 'groupPosition' && groupStandingsMap) {
-      const canonical = canonicalGroupLabel(source.group);
-      if (canonical) {
-        const entry = groupStandingsMap.get(canonical);
-        const wrapper =
-          entry && !Array.isArray(entry)
-            ? entry
-            : {
-                standings: Array.isArray(entry) ? entry : [],
-                isComplete: false
-              };
-        const standings = Array.isArray(wrapper.standings) ? wrapper.standings : [];
-        if (standings.length >= source.position) {
-          const standingEntry = standings[source.position - 1];
-          if (standingEntry?.team) {
-            return standingEntry.team;
-          }
+  if (source.type === 'groupPosition' && groupStandingsMap) {
+    const canonical = canonicalGroupLabel(source.group);
+    if (canonical) {
+      const entry = groupStandingsMap.get(canonical);
+      const wrapper =
+        entry && !Array.isArray(entry)
+          ? entry
+          : {
+              standings: Array.isArray(entry) ? entry : [],
+              isComplete: false
+            };
+      const standings = Array.isArray(wrapper.standings) ? wrapper.standings : [];
+      if (standings.length >= source.position) {
+        const standingEntry = standings[source.position - 1];
+        if (standingEntry?.team) {
+          const record = lookupTeamRecordByName(teamsByName, standingEntry.team);
+          return wrapTeamDetails({
+            label: standingEntry.team,
+            teamId: record?.team_id ?? null,
+            teamName: standingEntry.team,
+            placeholder: record?.placeholder ?? standingEntry.team
+          });
         }
       }
     }
-
-    return descriptorLabelFromSource(source, matchLabelLookup);
   }
 
-  return '';
+  return wrapTeamDetails({ label: descriptor });
+}
+
+export function resolveParticipantLabel(options) {
+  return resolveParticipantDetails(options).label;
 }
 
 export function calculateQualifierDistribution(tournament, groupLabels, assignments) {
