@@ -414,8 +414,7 @@ export function resolveParticipantLabel({
                 isComplete: false
               };
         const standings = Array.isArray(wrapper.standings) ? wrapper.standings : [];
-        const isComplete = Boolean(wrapper.isComplete);
-        if (isComplete && standings.length >= source.position) {
+        if (standings.length >= source.position) {
           const standingEntry = standings[source.position - 1];
           if (standingEntry?.team) {
             return standingEntry.team;
