@@ -18,7 +18,8 @@ import {
   applyScheduleMatchSelection,
   startTimer,
   normalizeGroupStageLabel,
-  setDisplayView
+  setDisplayView,
+  bumpScheduleVersion
 } from '../scoreboard/index.js';
 import {
   computeGroupStandings,
@@ -417,6 +418,7 @@ router.post('/save', async (_req, res) => {
   try {
     const snapshot = getScoreboardState();
     const savedGame = await saveGame(snapshot);
+    bumpScheduleVersion();
     res.json(savedGame);
   } catch (error) {
     console.error('Spiel konnte nicht gespeichert werden:', error);
@@ -540,6 +542,7 @@ router.put('/history/:id', async (req, res) => {
     if (!updatedGame) {
       return res.status(404).json({ message: 'Spiel nicht gefunden.' });
     }
+    bumpScheduleVersion();
     res.json(updatedGame);
   } catch (error) {
     console.error('Spiel konnte nicht aktualisiert werden:', error);
@@ -558,6 +561,7 @@ router.delete('/history/:id', async (req, res) => {
     if (!deleted) {
       return res.status(404).json({ message: 'Spiel nicht gefunden.' });
     }
+    bumpScheduleVersion();
     res.status(204).end();
   } catch (error) {
     console.error('Spiel konnte nicht gelöscht werden:', error);

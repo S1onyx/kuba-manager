@@ -53,7 +53,8 @@ export default function Dashboard() {
     setManualDirty: scoreboardCtrl.setManualDirty,
     setContextForm: matchContext.setContextForm,
     setContextFormDirty: matchContext.setContextFormDirty,
-    updateMessage: feedback.updateMessage
+    updateMessage: feedback.updateMessage,
+    refreshScheduleDependencies: [scoreboardCtrl.scoreboard?.scheduleVersion ?? 0]
   });
   const historyManager = useHistoryManager({ updateMessage: feedback.updateMessage });
   const playerManager = usePlayerManager({

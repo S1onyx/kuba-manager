@@ -150,6 +150,10 @@ function createDefaultState(overrides = {}) {
     stageType: null,
     stageLabel: '',
     scheduleCode: null,
+    scheduleVersion:
+      overrides.scheduleVersion !== undefined && overrides.scheduleVersion !== null
+        ? Math.max(0, Math.trunc(Number(overrides.scheduleVersion) || 0))
+        : 0,
     displayView: DEFAULT_DISPLAY_VIEW,
     lastUpdated: new Date().toISOString(),
     players: {
@@ -563,6 +567,13 @@ export function resetPenaltyIds() {
 
 export function resetScoreEventIds() {
   nextScoreEventId = 1;
+}
+
+export function bumpScheduleVersion() {
+  const current = Number(state.scheduleVersion) || 0;
+  state.scheduleVersion = current + 1;
+  notifySubscribers();
+  return state.scheduleVersion;
 }
 
 export function resetState(overrides = {}) {

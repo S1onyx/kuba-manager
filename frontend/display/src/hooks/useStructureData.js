@@ -5,19 +5,27 @@ export default function useStructureData(scoreboard, displayView) {
   const [structure, setStructure] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const contextRef = useRef({ tournamentId: null });
+  const contextRef = useRef({ tournamentId: null, version: null });
+
+  const activeTournamentId = scoreboard?.tournamentId ?? null;
+  const scheduleVersion = Number.isFinite(Number(scoreboard?.scheduleVersion))
+    ? Number(scoreboard.scheduleVersion)
+    : 0;
 
   useEffect(() => {
-    if (displayView !== 'bracket' || !scoreboard?.tournamentId) {
-      contextRef.current = { tournamentId: null };
+    if (displayView !== 'bracket' || !activeTournamentId) {
+      contextRef.current = { tournamentId: null, version: null };
       setStructure(null);
       setError('');
       setLoading(false);
       return;
     }
 
-    const activeTournamentId = scoreboard.tournamentId;
-    if (contextRef.current.tournamentId === activeTournamentId && structure) {
+    const alreadyLoaded =
+      structure &&
+      contextRef.current.tournamentId === activeTournamentId &&
+      contextRef.current.version === scheduleVersion;
+    if (alreadyLoaded) {
       return;
     }
 
@@ -29,7 +37,7 @@ export default function useStructureData(scoreboard, displayView) {
         if (cancelled) return;
         setStructure(data?.structure ?? null);
         setError('');
-        contextRef.current = { tournamentId: activeTournamentId };
+        contextRef.current = { tournamentId: activeTournamentId, version: scheduleVersion };
       })
       .catch((err) => {
         console.error(err);
@@ -46,7 +54,7 @@ export default function useStructureData(scoreboard, displayView) {
     return () => {
       cancelled = true;
     };
-  }, [displayView, scoreboard?.tournamentId, structure]);
+  }, [displayView, activeTournamentId, scheduleVersion, structure]);
 
   return {
     structure,
