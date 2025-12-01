@@ -27,6 +27,27 @@ export async function getTournamentSummary(tournamentId) {
   const scheduleEntries = await getTournamentSchedule(tournament.id);
   const schedule = groupScheduleByPhase(scheduleEntries);
 
+  const makeTeamKey = (teamId, teamName) => {
+    const numeric = Number(teamId);
+    if (Number.isInteger(numeric) && numeric > 0) {
+      return `id:${numeric}`;
+    }
+    const normalized = String(teamName ?? '').trim().toLowerCase();
+    return `name:${normalized}`;
+  };
+
+  const playerTotals = new Map();
+  const teamGameCounts = new Map();
+  const placementAssignments = new Map();
+
+  const incrementTeamGames = (teamId, teamName) => {
+    const key = makeTeamKey(teamId, teamName);
+    teamGameCounts.set(key, (teamGameCounts.get(key) || 0) + 1);
+  };
+
+  const accumulatePenaltySeconds = (entries = []) =>
+    entries.reduce((sum, entry) => sum + (entry.totalSeconds ?? entry.remainingSeconds ?? 0), 0);
+
   const rosterByTeamId = new Map();
   const uniqueTeamIds = Array.from(
     new Set(
@@ -49,6 +70,103 @@ export async function getTournamentSummary(tournamentId) {
     );
   }
 
+  const participantLookup = new Map();
+  participants.forEach((participant) => {
+    const key = makeTeamKey(participant.team_id, participant.team_name || participant.placeholder);
+    participantLookup.set(key, participant);
+  });
+
+  const resolveTeamIdentity = (teamId, teamName) => {
+    const key = makeTeamKey(teamId, teamName);
+    const participant = participantLookup.get(key);
+    const resolvedName = teamName || participant?.team_name || participant?.placeholder || 'Team';
+    const numericId = Number(teamId);
+    const resolvedId =
+      Number.isInteger(numericId) && numericId > 0
+        ? numericId
+        : participant?.team_id ?? null;
+    return {
+      key,
+      teamId: resolvedId,
+      teamName: resolvedName
+    };
+  };
+
+  const findPlacementKey = (teamId, teamName, fallbackKey) => {
+    if (teamId) {
+      const idKey = makeTeamKey(teamId, null);
+      if (placementAssignments.has(idKey)) {
+        return idKey;
+      }
+    }
+    const normalizedName = String(teamName ?? '').trim().toLowerCase();
+    if (normalizedName) {
+      for (const [key, entry] of placementAssignments.entries()) {
+        const entryName = String(entry.teamName ?? '').trim().toLowerCase();
+        if (entryName && entryName === normalizedName) {
+          return key;
+        }
+      }
+    }
+    return fallbackKey;
+  };
+
+  const registerPlacementResult = (teamIdentity, placement, meta = {}) => {
+    if (!teamIdentity || !teamIdentity.key || !placement || placement <= 0) {
+      return;
+    }
+    const actualKey = findPlacementKey(teamIdentity.teamId, teamIdentity.teamName, teamIdentity.key);
+    const existing = placementAssignments.get(actualKey);
+    if (existing && existing.placement <= placement) {
+      return;
+    }
+    placementAssignments.set(actualKey, {
+      placement,
+      teamId: teamIdentity.teamId ?? existing?.teamId ?? null,
+      teamName: teamIdentity.teamName,
+      decidedBy: meta.decidedBy ?? '',
+      opponent: meta.opponent ?? '',
+      score: meta.score ?? ''
+    });
+  };
+
+  const parsePlacementRange = (label) => {
+    if (!label) return null;
+    const match = label.match(/platz\s*(\d+)\s*(?:\/|\-)\s*(\d+)/i);
+    if (!match) {
+      return null;
+    }
+    const a = Number(match[1]);
+    const b = Number(match[2]);
+    if (!Number.isFinite(a) || !Number.isFinite(b)) {
+      return null;
+    }
+    return [Math.min(a, b), Math.max(a, b)];
+  };
+
+  const determineOutcome = (game) => {
+    const scoreA = Number(game.score_a ?? 0);
+    const scoreB = Number(game.score_b ?? 0);
+    if (scoreA === scoreB) {
+      return null;
+    }
+    const winnerSide = scoreA > scoreB ? 'a' : 'b';
+    const loserSide = winnerSide === 'a' ? 'b' : 'a';
+    const winner = resolveTeamIdentity(
+      winnerSide === 'a' ? game.team_a_id : game.team_b_id,
+      winnerSide === 'a' ? game.team_a : game.team_b
+    );
+    const loser = resolveTeamIdentity(
+      loserSide === 'a' ? game.team_a_id : game.team_b_id,
+      loserSide === 'a' ? game.team_a : game.team_b
+    );
+    return {
+      winner,
+      loser,
+      scoreLine: `${scoreA}:${scoreB}`
+    };
+  };
+
   const totals = {
     totalGames: games.length,
     totalGoals: 0,
@@ -58,26 +176,6 @@ export async function getTournamentSummary(tournamentId) {
   };
 
   const overallStatsMap = new Map();
-
-const playerTotals = new Map();
-const teamGameCounts = new Map();
-
-const incrementTeamGames = (teamId, teamName) => {
-  const key = makeTeamKey(teamId, teamName);
-  teamGameCounts.set(key, (teamGameCounts.get(key) || 0) + 1);
-};
-
-const accumulatePenaltySeconds = (entries = []) =>
-  entries.reduce((sum, entry) => sum + (entry.totalSeconds ?? entry.remainingSeconds ?? 0), 0);
-
-const makeTeamKey = (teamId, teamName) => {
-  const numeric = Number(teamId);
-  if (Number.isInteger(numeric) && numeric > 0) {
-    return `id:${numeric}`;
-  }
-  const normalized = String(teamName ?? '').trim().toLowerCase();
-  return `name:${normalized}`;
-};
 
 const makePlayerKey = (teamId, teamName, stat) => {
   if (stat.playerId != null) {
@@ -188,6 +286,32 @@ const registerPlayerStats = (teamId, teamName, stats = []) => {
 
     incrementTeamGames(game.team_a_id, game.team_a);
     incrementTeamGames(game.team_b_id, game.team_b);
+
+    const outcome = determineOutcome(game);
+    if (outcome) {
+      const label = game.stage_label || '';
+      const range = parsePlacementRange(label);
+      const metaWinner = {
+        decidedBy: label,
+        opponent: outcome.loser.teamName,
+        score: outcome.scoreLine
+      };
+      const metaLoser = {
+        decidedBy: label,
+        opponent: outcome.winner.teamName,
+        score: outcome.scoreLine
+      };
+      if (range) {
+        registerPlacementResult(outcome.winner, range[0], metaWinner);
+        registerPlacementResult(outcome.loser, range[1], metaLoser);
+      } else if (
+        game.stage_type === 'knockout' &&
+        (label || '').trim().toLowerCase() === 'finale'
+      ) {
+        registerPlacementResult(outcome.winner, 1, metaWinner);
+        registerPlacementResult(outcome.loser, 2, metaLoser);
+      }
+    }
   });
 
   participants.forEach((participant) => {
@@ -272,6 +396,37 @@ const topThreePointers = playerOverview
     return a.name.localeCompare(b.name, 'de', { sensitivity: 'base' });
   })
   .slice(0, 15);
+
+  const usedPlacements = new Set();
+  placementAssignments.forEach((entry) => {
+    usedPlacements.add(entry.placement);
+  });
+
+  const claimPlacement = () => {
+    let candidate = 1;
+    while (usedPlacements.has(candidate)) {
+      candidate += 1;
+    }
+    usedPlacements.add(candidate);
+    return candidate;
+  };
+
+  const ensurePlacementForKey = (key, teamName, teamId, sourceLabel) => {
+    const actualKey = findPlacementKey(teamId, teamName, key);
+    if (placementAssignments.has(actualKey)) {
+      return;
+    }
+    const placement = claimPlacement();
+    placementAssignments.set(actualKey, {
+      placement,
+      teamId: Number.isInteger(Number(teamId)) && Number(teamId) > 0 ? Number(teamId) : null,
+      teamName: teamName || 'Team',
+      decidedBy: sourceLabel,
+      opponent: '',
+      score: ''
+    });
+  };
+
   const overallStats = Array.from(overallStatsMap.values());
   overallStats.sort((a, b) => {
     if (b.points !== a.points) return b.points - a.points;
@@ -279,6 +434,21 @@ const topThreePointers = playerOverview
     if (b.goalsFor !== a.goalsFor) return b.goalsFor - a.goalsFor;
     return a.team.localeCompare(b.team, 'de', { sensitivity: 'base' });
   });
+
+  overallStats.forEach((entry) => {
+    const key = makeTeamKey(null, entry.team);
+    ensurePlacementForKey(key, entry.team, null, 'Gesamtbilanz');
+  });
+
+  participants.forEach((participant) => {
+    const name = participant.team_name || participant.placeholder || `Team ${participant.slot_number}`;
+    const key = makeTeamKey(participant.team_id, name);
+    ensurePlacementForKey(key, name, participant.team_id, 'Teilnehmer');
+  });
+
+  const finalPlacements = Array.from(placementAssignments.values()).sort(
+    (a, b) => a.placement - b.placement
+  );
 
   const groupLabelMap = new Map();
   const distinctFromGames = collectDistinctGroupLabels(games);
@@ -344,7 +514,6 @@ const topThreePointers = playerOverview
   const recentGames = games
     .slice()
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .slice(0, 10)
     .map((game) => ({
       id: game.id,
       stageType: game.stage_type,
@@ -375,6 +544,7 @@ const topThreePointers = playerOverview
       },
       players: playerOverview
     },
+    finalPlacements,
     participants: participants.map((participant) => ({
       slot: participant.slot_number,
       name: participant.team_name,

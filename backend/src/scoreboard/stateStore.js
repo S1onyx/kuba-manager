@@ -150,6 +150,7 @@ function createDefaultState(overrides = {}) {
     stageType: null,
     stageLabel: '',
     scheduleCode: null,
+    tournamentCompleted: Boolean(overrides.tournamentCompleted ?? false),
     scheduleVersion:
       overrides.scheduleVersion !== undefined && overrides.scheduleVersion !== null
         ? Math.max(0, Math.trunc(Number(overrides.scheduleVersion) || 0))
@@ -567,6 +568,17 @@ export function resetPenaltyIds() {
 
 export function resetScoreEventIds() {
   nextScoreEventId = 1;
+}
+
+export function setTournamentCompleted(flag) {
+  const state = getState();
+  const normalized = Boolean(flag);
+  if (state.tournamentCompleted === normalized) {
+    return snapshotState();
+  }
+  state.tournamentCompleted = normalized;
+  notifySubscribers();
+  return snapshotState();
 }
 
 export function bumpScheduleVersion() {

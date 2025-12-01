@@ -9,6 +9,7 @@ import useDisplayScaling from './hooks/useDisplayScaling.js';
 import useScoreboardData from './hooks/useScoreboardData.js';
 import useStandingsData from './hooks/useStandingsData.js';
 import useStructureData from './hooks/useStructureData.js';
+import useTournamentSummaryData from './hooks/useTournamentSummaryData.js';
 
 export default function App() {
   useBodyScrollLock();
@@ -67,6 +68,12 @@ export default function App() {
     loading: structureLoading
   } = useStructureData(scoreboard, effectiveDisplayView);
 
+  const {
+    summary: tournamentSummary,
+    error: tournamentSummaryError,
+    loading: tournamentSummaryLoading
+  } = useTournamentSummaryData(scoreboard);
+
   const scaleDependencies = useMemo(
     () => [
       effectiveDisplayView,
@@ -109,6 +116,9 @@ export default function App() {
         standingsMeta={standingsMeta}
         standingsError={standingsError}
         standingsLoading={standingsLoading}
+        tournamentSummary={tournamentSummary}
+        summaryError={tournamentSummaryError}
+        summaryLoading={tournamentSummaryLoading}
       />
     );
 

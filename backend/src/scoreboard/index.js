@@ -1,4 +1,9 @@
-import { snapshotState, normalizeGroupStageLabel, bumpScheduleVersion } from './stateStore.js';
+import {
+  snapshotState,
+  normalizeGroupStageLabel,
+  bumpScheduleVersion,
+  setTournamentCompleted
+} from './stateStore.js';
 import { setDisplayView } from './display.js';
 import { registerScoreboardSocket } from './socket.js';
 import { setTeams, setMatchContext, applyScheduleMatchSelection } from './teams.js';
@@ -39,5 +44,6 @@ export {
   resetGame,
   normalizeGroupStageLabel,
   setDisplayView,
-  bumpScheduleVersion
+  bumpScheduleVersion,
+  setTournamentCompleted
 };

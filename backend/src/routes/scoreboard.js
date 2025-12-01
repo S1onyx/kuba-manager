@@ -19,7 +19,8 @@ import {
   startTimer,
   normalizeGroupStageLabel,
   setDisplayView,
-  bumpScheduleVersion
+  bumpScheduleVersion,
+  setTournamentCompleted
 } from '../scoreboard/index.js';
 import {
   computeGroupStandings,
@@ -32,7 +33,8 @@ import {
   listGames,
   listPlayersByTeam,
   saveGame,
-  updateGame
+  updateGame,
+  setTournamentCompletionStatus
 } from '../services/index.js';
 import { triggerAudioEvent } from '../audio/dispatcher.js';
 
@@ -210,6 +212,7 @@ router.post('/context', async (req, res) => {
     const { tournamentId, stageType, stageLabel } = req.body ?? {};
     let resolvedTournamentId = null;
     let resolvedTournamentName = '';
+    let resolvedTournamentCompleted = false;
 
     if (tournamentId !== null && tournamentId !== undefined && tournamentId !== '') {
       const parsedId = Number(tournamentId);
@@ -224,6 +227,7 @@ router.post('/context', async (req, res) => {
 
       resolvedTournamentId = tournament.id;
       resolvedTournamentName = tournament.name;
+      resolvedTournamentCompleted = Boolean(tournament.is_completed);
     }
 
     if (stageType) {
@@ -249,14 +253,16 @@ router.post('/context', async (req, res) => {
         tournamentId: resolvedTournamentId,
         tournamentName: resolvedTournamentName,
         stageType: normalizedStageType,
-        stageLabel: normalizedLabel
+        stageLabel: normalizedLabel,
+        tournamentCompleted: resolvedTournamentCompleted
       });
     } else {
       setMatchContext({
         tournamentId: resolvedTournamentId,
         tournamentName: resolvedTournamentName,
         stageType: null,
-        stageLabel: ''
+        stageLabel: '',
+        tournamentCompleted: resolvedTournamentCompleted
       });
     }
 
@@ -278,6 +284,23 @@ router.post('/display', (req, res) => {
     }
     console.error('Anzeige-Modus konnte nicht gesetzt werden:', error);
     res.status(500).json({ message: 'Anzeige-Modus konnte nicht gesetzt werden.' });
+  }
+});
+
+router.post('/tournament/completion', async (req, res) => {
+  const { completed } = req.body ?? {};
+  const snapshot = getScoreboardState();
+  if (!snapshot.tournamentId) {
+    return res.status(400).json({ message: 'Kein Turnier im Scoreboard gesetzt.' });
+  }
+  try {
+    const desired = completed === undefined ? true : Boolean(completed);
+    await setTournamentCompletionStatus(snapshot.tournamentId, desired);
+    const nextState = setTournamentCompleted(desired);
+    res.json(nextState);
+  } catch (error) {
+    console.error('Turnierstatus konnte nicht gesetzt werden:', error);
+    res.status(500).json({ message: 'Turnierstatus konnte nicht gesetzt werden.' });
   }
 });
 
@@ -320,7 +343,8 @@ router.post('/schedule/select', async (req, res) => {
       home: match.home,
       away: match.away,
       homePlayers,
-      awayPlayers
+      awayPlayers,
+      tournamentCompleted: Boolean(tournament.is_completed)
     });
 
     res.json({

@@ -600,6 +600,7 @@ export default function useScoreboardCore({ updateMessage }) {
     [scoreboard?.displayView, updateMessage]
   );
 
+
   const refreshActiveTeams = useCallback(async () => {
     if (!scoreboard) {
       return;

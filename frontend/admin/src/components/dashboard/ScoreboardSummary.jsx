@@ -83,28 +83,35 @@ export default function ScoreboardSummary({
           <span>
             Anzeige: {scoreboard.displayView === 'bracket' ? 'Turnierbaum' : 'Live-Spielstand'}
           </span>
+          {scoreboard.tournamentId ? (
+            <span style={{ fontWeight: 600 }}>
+              Turnierstatus: {scoreboard.tournamentCompleted ? 'abgeschlossen' : 'läuft'}
+            </span>
+          ) : null}
         </div>
-        <button
-          type="button"
-          onClick={() => onToggleDisplayView?.(scoreboard.displayView === 'bracket' ? 'scoreboard' : 'bracket')}
-          disabled={!onToggleDisplayView || displayViewPending}
-          style={{
-            borderRadius: '999px',
-            border: '1px solid rgba(255,255,255,0.35)',
-            background: 'transparent',
-            color: '#fff',
-            padding: '0.35rem 0.9rem',
-            fontSize: '0.85rem',
-            opacity: displayViewPending ? 0.6 : 1,
-            cursor: displayViewPending || !onToggleDisplayView ? 'not-allowed' : 'pointer'
-          }}
-        >
-          {displayViewPending
-            ? 'Wechsle...'
-            : scoreboard.displayView === 'bracket'
-              ? 'Live anzeigen'
-              : 'Turnierbaum anzeigen'}
-        </button>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
+          <button
+            type="button"
+            onClick={() => onToggleDisplayView?.(scoreboard.displayView === 'bracket' ? 'scoreboard' : 'bracket')}
+            disabled={!onToggleDisplayView || displayViewPending}
+            style={{
+              borderRadius: '999px',
+              border: '1px solid rgba(255,255,255,0.35)',
+              background: 'transparent',
+              color: '#fff',
+              padding: '0.35rem 0.9rem',
+              fontSize: '0.85rem',
+              opacity: displayViewPending ? 0.6 : 1,
+              cursor: displayViewPending || !onToggleDisplayView ? 'not-allowed' : 'pointer'
+            }}
+          >
+            {displayViewPending
+              ? 'Wechsle...'
+              : scoreboard.displayView === 'bracket'
+                ? 'Live anzeigen'
+                : 'Turnierbaum anzeigen'}
+          </button>
+        </div>
       </div>
     </PanelCard>
   );

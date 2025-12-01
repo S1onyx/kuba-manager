@@ -11,8 +11,10 @@ import {
   listTournaments,
   setTournamentTeams,
   updateTournament,
-  updateTournamentScheduleEntry
+  updateTournamentScheduleEntry,
+  setTournamentCompletionStatus
 } from '../services/index.js';
+import { getScoreboardState, setTournamentCompleted } from '../scoreboard/index.js';
 
 const router = express.Router();
 
@@ -77,6 +79,33 @@ router.put('/:id', async (req, res) => {
   } catch (error) {
     console.error('Turnier konnte nicht aktualisiert werden:', error);
     res.status(400).json({ message: 'Turnier konnte nicht aktualisiert werden.', detail: error.message });
+  }
+});
+
+router.post('/:id/completion', async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+  }
+
+  const { completed } = req.body ?? {};
+  const desired = completed === undefined ? true : Boolean(completed);
+
+  try {
+    const updated = await setTournamentCompletionStatus(id, desired);
+    if (!updated) {
+      return res.status(404).json({ message: 'Turnier nicht gefunden.' });
+    }
+
+    const snapshot = getScoreboardState();
+    if (snapshot.tournamentId === id) {
+      setTournamentCompleted(desired);
+    }
+
+    res.json(updated);
+  } catch (error) {
+    console.error('Turnierstatus konnte nicht aktualisiert werden:', error);
+    res.status(500).json({ message: 'Turnierstatus konnte nicht aktualisiert werden.' });
   }
 });
 

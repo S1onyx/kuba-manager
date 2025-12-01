@@ -41,7 +41,8 @@ export {
   groupScheduleByPhase,
   computeGroupStandings,
   getTournamentSummary,
-  updateTournamentScheduleEntry
+  updateTournamentScheduleEntry,
+  setTournamentCompletionStatus
 } from './tournaments/index.js';
 
 export {

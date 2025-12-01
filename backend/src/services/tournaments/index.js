@@ -4,7 +4,8 @@ import {
   getTournament,
   updateTournamentRecord,
   deleteTournamentCascade,
-  listPublicTournaments
+  listPublicTournaments,
+  setTournamentCompletionStatus
 } from './base.js';
 import {
   regenerateTournamentStructure,
@@ -39,6 +40,7 @@ export async function createTournament(payload = {}) {
 }
 
 export { listTournaments, getTournament, listPublicTournaments };
+export { setTournamentCompletionStatus };
 
 export async function updateTournament(id, patch = {}) {
   const existing = await getTournament(id);

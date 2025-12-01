@@ -116,7 +116,10 @@ export function setTeams({
   return snapshotState();
 }
 
-export function setMatchContext({ tournamentId, tournamentName, stageType, stageLabel }, options = {}) {
+export function setMatchContext(
+  { tournamentId, tournamentName, stageType, stageLabel, tournamentCompleted },
+  options = {}
+) {
   const state = getState();
   const normalizedId = tournamentId != null && tournamentId !== '' ? Number(tournamentId) : null;
   if (normalizedId !== null && (!Number.isInteger(normalizedId) || normalizedId <= 0)) {
@@ -146,6 +149,7 @@ export function setMatchContext({ tournamentId, tournamentName, stageType, stage
   state.tournamentName = normalizedId ? (tournamentName ?? '') : '';
   state.stageType = normalizedStageType;
   state.stageLabel = normalizedStageType ? finalLabel : '';
+  state.tournamentCompleted = Boolean(tournamentCompleted) && Boolean(normalizedId);
 
   if (!options.preserveScheduleCode && state.scheduleCode) {
     state.scheduleCode = null;
@@ -188,7 +192,8 @@ export function applyScheduleMatchSelection({
   home,
   away,
   homePlayers = [],
-  awayPlayers = []
+  awayPlayers = [],
+  tournamentCompleted = false
 }) {
   const state = getState();
   const normalizedTournamentId =
@@ -222,6 +227,7 @@ export function applyScheduleMatchSelection({
   setTeamPlayers('b', awayPlayers, { teamName: state.teamBName });
 
   state.scheduleCode = scheduleCode ?? null;
+  state.tournamentCompleted = Boolean(tournamentCompleted);
 
   state.scoreA = 0;
   state.scoreB = 0;
@@ -241,6 +247,7 @@ export function applyScheduleMatchSelection({
   resetScoreEventIds();
   state.scoringLog = [];
   state.penaltyLog = [];
+  state.tournamentCompleted = false;
 
   notifySubscribers();
   return snapshotState();

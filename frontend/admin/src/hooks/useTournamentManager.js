@@ -4,7 +4,8 @@ import {
   deleteTournament,
   fetchTournaments,
   updateMatchContext,
-  updateTournament
+  updateTournament,
+  setTournamentCompletionStatus
 } from '../utils/api.js';
 
 export default function useTournamentManager({
@@ -27,6 +28,7 @@ export default function useTournamentManager({
   });
   const [tournamentEdits, setTournamentEdits] = useState({});
   const [expandedTournamentId, setExpandedTournamentId] = useState(null);
+  const [tournamentCompletionSaving, setTournamentCompletionSaving] = useState({});
 
   const loadTournaments = useCallback(() => {
     setTournamentsLoading(true);
@@ -182,6 +184,30 @@ export default function useTournamentManager({
     setExpandedTournamentId((prev) => (prev === id ? null : id));
   }, []);
 
+  const handleTournamentCompletionChange = useCallback(
+    async (id, completed) => {
+      const key = String(id);
+      setTournamentCompletionSaving((prev) => ({ ...prev, [key]: true }));
+      try {
+        await setTournamentCompletionStatus(id, completed);
+        loadTournaments();
+        updateMessage('info', completed ? 'Turnier abgeschlossen.' : 'Turnier wieder geöffnet.');
+        return true;
+      } catch (error) {
+        console.error(error);
+        updateMessage('error', 'Turnierstatus konnte nicht aktualisiert werden.');
+        return false;
+      } finally {
+        setTournamentCompletionSaving((prev) => {
+          const next = { ...prev };
+          delete next[key];
+          return next;
+        });
+      }
+    },
+    [loadTournaments, updateMessage]
+  );
+
   return {
     tournaments,
     tournamentsLoading,
@@ -200,6 +226,8 @@ export default function useTournamentManager({
     handleTournamentDelete,
     handleTournamentDetailsToggle,
     setTournamentForm,
-    setTournamentEdits
+    setTournamentEdits,
+    handleTournamentCompletionChange,
+    tournamentCompletionSaving
   };
 }

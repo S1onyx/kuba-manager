@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { useScoreboardFeed } from '../hooks/useScoreboardFeed.js';
 import { usePublicTournaments } from '../hooks/usePublicTournaments.js';
 import { useTournamentSummary } from '../hooks/useTournamentSummary.js';
-import { SUMMARY_TABS } from '../constants/tabs.js';
+import { SUMMARY_TABS, COMPLETED_SUMMARY_TABS } from '../constants/tabs.js';
 import { normalizeRoute, resolveInitialRoute } from '../utils/navigation.js';
 import { scorecardHasGroup } from '../utils/summary.js';
 import { trackEvent, trackPageview } from '../utils/plausible.js';
@@ -163,8 +163,33 @@ export function PublicAppProvider({ children }) {
     liveTabAutoRef.current = { lastApplied: null, suppressed: null };
   }, [selectedTournamentId]);
 
+  const selectedTournament = useMemo(
+    () => publicTournaments.find((tournament) => tournament.id === selectedTournamentId) ?? null,
+    [publicTournaments, selectedTournamentId]
+  );
+
+  const tournamentCompleted = Boolean(
+    tournamentSummary?.tournament?.is_completed ?? selectedTournament?.is_completed ?? false
+  );
+
+  const availableSummaryTabs = useMemo(
+    () => (tournamentCompleted ? COMPLETED_SUMMARY_TABS : SUMMARY_TABS),
+    [tournamentCompleted]
+  );
+
+  const liveTabVisible = useMemo(
+    () => availableSummaryTabs.some((tab) => tab.id === 'live'),
+    [availableSummaryTabs]
+  );
+
   useEffect(() => {
-    if (!scoreboardPublic) {
+    if (!availableSummaryTabs.some((tab) => tab.id === activeSummaryTab)) {
+      setActiveSummaryTab(availableSummaryTabs[0]?.id ?? 'results');
+    }
+  }, [availableSummaryTabs, activeSummaryTab]);
+
+  useEffect(() => {
+    if (!scoreboardPublic || !liveTabVisible) {
       liveTabAutoRef.current = { lastApplied: null, suppressed: null };
       return;
     }
@@ -191,7 +216,7 @@ export function PublicAppProvider({ children }) {
 
   const handleSummaryTabSelect = useCallback(
     (tabId) => {
-      const targetTab = tabId || 'live';
+      const targetTab = tabId || availableSummaryTabs[0]?.id || 'live';
       if (targetTab === 'live') {
         liveTabAutoRef.current = {
           lastApplied: scoreboard?.tournamentId ?? selectedTournamentId ?? null,
@@ -206,7 +231,7 @@ export function PublicAppProvider({ children }) {
 
       setActiveSummaryTab(targetTab);
     },
-    [scoreboard?.tournamentId, selectedTournamentId]
+    [scoreboard?.tournamentId, selectedTournamentId, availableSummaryTabs]
   );
 
   const handleNavigateHome = useCallback(() => {
@@ -253,11 +278,6 @@ export function PublicAppProvider({ children }) {
   const currentCardData = scoreboardPublic ? scoreboard : null;
   const showPrivateNotice =
     Boolean(scoreboard?.tournamentId ?? currentTournamentMeta?.id) && !scoreboardPublic;
-
-  const selectedTournament = useMemo(
-    () => publicTournaments.find((tournament) => tournament.id === selectedTournamentId) ?? null,
-    [publicTournaments, selectedTournamentId]
-  );
 
   const selectedTournamentName = selectedTournament?.name ?? null;
 
@@ -315,7 +335,7 @@ export function PublicAppProvider({ children }) {
         error: tournamentsError
       },
       summary: {
-        tabs: SUMMARY_TABS,
+        tabs: availableSummaryTabs,
         activeTab: activeSummaryTab,
         selectTab: handleSummaryTabSelect,
         tournamentSummary,
@@ -325,7 +345,8 @@ export function PublicAppProvider({ children }) {
         currentCardData,
         selectedTournament,
         showPrivateNotice,
-        scoreboardPublic
+        scoreboardPublic,
+        tournamentCompleted
       },
       scoreboardState: {
         scoreboard,
@@ -351,6 +372,7 @@ export function PublicAppProvider({ children }) {
       tournamentsError,
       activeSummaryTab,
       handleSummaryTabSelect,
+      availableSummaryTabs,
       tournamentSummary,
       loadingSummary,
       summaryError,
@@ -363,7 +385,8 @@ export function PublicAppProvider({ children }) {
       currentGroupStandings,
       recordedGamesCount,
       currentTournamentMeta,
-      currentError
+      currentError,
+      tournamentCompleted
     ]
   );
 

@@ -250,6 +250,13 @@ export function setDisplayView(view) {
   });
 }
 
+export function setTournamentCompletionStatus(id, completed) {
+  return request(`/tournaments/${id}/completion`, {
+    method: 'POST',
+    body: JSON.stringify({ completed })
+  });
+}
+
 export function selectScheduleMatch(tournamentId, scheduleCode) {
   return request('/scoreboard/schedule/select', {
     method: 'POST',

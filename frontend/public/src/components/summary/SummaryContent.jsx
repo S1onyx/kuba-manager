@@ -7,6 +7,7 @@ import SchedulePreview from '../SchedulePreview.jsx';
 import StatHighlights from '../StatHighlights.jsx';
 import TeamStatsGrid from '../TeamStatsGrid.jsx';
 import PlayerStatsTable from '../PlayerStatsTable.jsx';
+import TournamentFinalOverview from '../TournamentFinalOverview.jsx';
 
 export default function SummaryContent() {
   const {
@@ -41,6 +42,10 @@ export default function SummaryContent() {
         ) : null}
       </section>
     );
+  }
+
+  if (activeTab === 'final') {
+    return <TournamentFinalOverview summary={tournamentSummary} />;
   }
 
   if (activeTab === 'results') {

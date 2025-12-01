@@ -2,6 +2,7 @@ import Scoreboard from '../Scoreboard.jsx';
 import Timer from '../Timer.jsx';
 import PenaltiesSection from '../scoreboard/PenaltiesSection.jsx';
 import StandingsSection from '../scoreboard/StandingsSection.jsx';
+import TournamentSummaryView from '../summary/TournamentSummaryView.jsx';
 import useLocalTimer from '../../hooks/useLocalTimer.js';
 import { formatStageDescription, formatTime } from '../../utils/formatting.js';
 
@@ -22,7 +23,10 @@ export default function ScoreboardPage({
   standings,
   standingsMeta,
   standingsError,
-  standingsLoading
+  standingsLoading,
+  tournamentSummary,
+  summaryError,
+  summaryLoading
 }) {
   const { remainingSeconds, extraElapsedSeconds, halftimePauseRemaining } = useLocalTimer(scoreboard);
   const score = {
@@ -54,6 +58,17 @@ export default function ScoreboardPage({
   const stageDescription = formatStageDescription(scoreboard?.stageType, stageLabel);
   const showStandingsSection =
     scoreboard?.stageType === 'group' && Array.isArray(standings) && standings.length > 0;
+
+  if (scoreboard?.tournamentCompleted) {
+    return (
+      <TournamentSummaryView
+        scoreboard={scoreboard}
+        summary={tournamentSummary}
+        loading={summaryLoading}
+        error={summaryError}
+      />
+    );
+  }
 
   return (
     <div style={pageStyle}>

@@ -19,7 +19,9 @@ export default function TournamentsTab() {
       handleTournamentEditChange,
       cancelTournamentEdit,
       handleTournamentSave,
-      handleTournamentDelete
+      handleTournamentDelete,
+      handleTournamentCompletionChange,
+      tournamentCompletionSaving
     },
     tournamentStructure,
     teams
@@ -113,6 +115,9 @@ export default function TournamentsTab() {
               const edit = tournamentEdits[tournament.id];
               const isEditing = Boolean(edit);
               const isExpanded = expandedTournamentId === tournament.id;
+              const completionSaving = Boolean(
+                tournamentCompletionSaving?.[String(tournament.id)] ?? false
+              );
 
               return (
                 <div
@@ -197,6 +202,9 @@ export default function TournamentsTab() {
                       <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>
                         Status: {tournament.is_public ? 'öffentlich' : 'privat'}
                       </span>
+                      <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>
+                        Turnier: {tournament.is_completed ? 'abgeschlossen' : 'läuft'}
+                      </span>
                     </div>
                   )}
 
@@ -227,6 +235,27 @@ export default function TournamentsTab() {
                         </button>
                       </>
                     )}
+                    <button
+                      type="button"
+                      onClick={() => handleTournamentCompletionChange(tournament.id, !tournament.is_completed)}
+                      disabled={completionSaving}
+                      style={{
+                        borderRadius: '999px',
+                        border: '1px solid rgba(255,255,255,0.35)',
+                        background: tournament.is_completed ? 'rgba(0, 180, 120, 0.25)' : 'transparent',
+                        color: '#fff',
+                        padding: '0.35rem 0.9rem',
+                        fontSize: '0.85rem',
+                        opacity: completionSaving ? 0.6 : 1,
+                        cursor: completionSaving ? 'not-allowed' : 'pointer'
+                      }}
+                    >
+                      {completionSaving
+                        ? 'Aktualisiere...'
+                        : tournament.is_completed
+                          ? 'Turnier wieder öffnen'
+                          : 'Turnier abschließen'}
+                    </button>
                   </div>
 
                   {isExpanded ? (

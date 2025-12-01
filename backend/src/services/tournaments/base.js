@@ -15,6 +15,7 @@ export function mapTournament(row) {
     group_count: row.group_count ?? 0,
     knockout_rounds: row.knockout_rounds ?? 0,
     is_public: Boolean(row.is_public),
+    is_completed: Boolean(row.is_completed),
     team_count: row.team_count ?? 0,
     classification_mode: classificationMode,
     created_at: row.created_at
@@ -102,6 +103,17 @@ export async function updateTournamentRecord(id, patch = {}, defaults = {}) {
 
   persistDatabase(db, SQL);
   return normalized;
+}
+
+export async function setTournamentCompletionStatus(id, completed) {
+  const numeric = Number(id);
+  if (!Number.isInteger(numeric) || numeric <= 0) {
+    throw new Error('Ungültige Turnier-ID.');
+  }
+  const { SQL, db } = await getConnection();
+  db.run('UPDATE tournaments SET is_completed = ? WHERE id = ?', [completed ? 1 : 0, numeric]);
+  persistDatabase(db, SQL);
+  return getTournament(numeric);
 }
 
 export async function deleteTournamentCascade(id) {

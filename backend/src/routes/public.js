@@ -40,6 +40,7 @@ function sanitizeScoreboardState(state) {
     tournamentName: state.tournamentName,
     stageType: state.stageType,
     stageLabel: state.stageLabel,
+    tournamentCompleted: state.tournamentCompleted,
     penalties: state.penalties,
     displayView: state.displayView,
     lastUpdated: state.lastUpdated,
