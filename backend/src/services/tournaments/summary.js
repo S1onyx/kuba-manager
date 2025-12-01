@@ -1,5 +1,6 @@
 import { getTournament } from './base.js';
 import { listGamesByTournament } from '../gamesService.js';
+import { listPlayersByTeam } from '../playersService.js';
 import {
   getTournamentTeams,
   getTournamentSchedule,
@@ -25,6 +26,28 @@ export async function getTournamentSummary(tournamentId) {
   const participants = await getTournamentTeams(tournament.id);
   const scheduleEntries = await getTournamentSchedule(tournament.id);
   const schedule = groupScheduleByPhase(scheduleEntries);
+
+  const rosterByTeamId = new Map();
+  const uniqueTeamIds = Array.from(
+    new Set(
+      participants
+        .map((participant) => Number(participant.team_id))
+        .filter((teamId) => Number.isInteger(teamId) && teamId > 0)
+    )
+  );
+  if (uniqueTeamIds.length > 0) {
+    await Promise.all(
+      uniqueTeamIds.map(async (teamId) => {
+        try {
+          const roster = await listPlayersByTeam(teamId);
+          rosterByTeamId.set(teamId, Array.isArray(roster) ? roster : []);
+        } catch (error) {
+          console.error('Spieler konnten nicht geladen werden:', error);
+          rosterByTeamId.set(teamId, []);
+        }
+      })
+    );
+  }
 
   const totals = {
     totalGames: games.length,
@@ -57,7 +80,7 @@ const registerPlayerStats = (teamId, teamName, stats = []) => {
   }
 
   stats
-    .filter((stat) => stat && !stat.isTeamTotal)
+    .filter((stat) => stat && !stat.isTeamTotal && !stat.isUnknown)
     .forEach((stat) => {
       const impact =
         (stat.points ?? 0) !== 0 ||
@@ -145,6 +168,42 @@ const registerPlayerStats = (teamId, teamName, stats = []) => {
       game.score_a ?? 0,
       penalties.b?.length ?? 0
     );
+  });
+
+  participants.forEach((participant) => {
+    const teamId = Number(participant.team_id);
+    if (!Number.isInteger(teamId) || teamId <= 0) {
+      return;
+    }
+    const roster = rosterByTeamId.get(teamId) || [];
+    const teamName = participant.team_name || participant.placeholder || `Team ${participant.slot_number}`;
+    roster.forEach((player) => {
+      const placeholderStat = {
+        playerId: player.id,
+        jerseyNumber: player.jersey_number,
+        name: player.name
+      };
+      const key = makePlayerKey(teamId, teamName, placeholderStat);
+      if (!playerTotals.has(key)) {
+        playerTotals.set(key, {
+          key,
+          playerId: player.id,
+          teamId,
+          teamName,
+          name: player.name,
+          displayName: player.name,
+          jerseyNumber: player.jersey_number ?? null,
+          position: player.position ?? '',
+          points: 0,
+          scores: 0,
+          breakdown: { '1': 0, '2': 0, '3': 0 },
+          penalties: 0,
+          penaltySeconds: 0,
+          games: 0,
+          lastScoreAt: null
+        });
+      }
+    });
   });
 
 

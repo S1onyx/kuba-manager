@@ -161,7 +161,7 @@ export default function PlayerStatsTable({ stats }) {
     });
   }, [allPlayers, sortConfig]);
 
-  const tableEntries = sortedPlayers.slice(0, 20);
+  const tableEntries = sortedPlayers;
 
   const renderSortIndicator = (key) => {
     if (sortConfig?.key !== key) {
