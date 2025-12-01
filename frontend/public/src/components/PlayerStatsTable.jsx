@@ -1,3 +1,5 @@
+import { useMemo, useState } from 'react';
+
 const gridLayout = {
   display: 'grid',
   gap: '1.15rem'
@@ -19,6 +21,21 @@ const leaderCardStyle = {
 };
 
 const responsiveStyles = `
+  .player-sort-button {
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+
+  .player-sort-button:hover {
+    background: rgba(255,255,255,0.22) !important;
+    border-color: rgba(255,255,255,0.55) !important;
+  }
+
+  .player-sort-button:focus-visible {
+    outline: 2px solid rgba(255,255,255,0.9);
+    outline-offset: 2px;
+  }
+
   @media (max-width: 768px) {
     .player-leader__card {
       padding: 0.85rem 0.95rem;
@@ -59,7 +76,37 @@ function LeaderList({ title, entries = [], valueLabel }) {
   );
 }
 
+const sortButtonStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '0.35rem',
+  background: 'rgba(255,255,255,0.06)',
+  border: '1px solid rgba(255,255,255,0.18)',
+  borderRadius: '999px',
+  padding: '0.25rem 0.65rem',
+  margin: 0,
+  color: 'inherit',
+  font: 'inherit',
+  cursor: 'pointer',
+  transition: 'background 0.2s ease, border-color 0.2s ease',
+  width: '100%'
+};
+
+const SORTABLE_KEYS = ['name', 'teamName', 'points', 'games', 'pointsPerGame', 'penalties', 'penaltySeconds'];
+
+const getSortableValue = (player, key) => {
+  if (key === 'name') {
+    return String(player.name ?? '').toLowerCase();
+  }
+  if (key === 'teamName') {
+    return String(player.teamName ?? '').toLowerCase();
+  }
+  return Number(player[key] ?? 0);
+};
+
 export default function PlayerStatsTable({ stats }) {
+  const [sortConfig, setSortConfig] = useState({ key: 'points', direction: 'desc' });
+
   if (!stats) {
     return <p style={{ opacity: 0.75 }}>Noch keine Spielerstatistiken verfügbar.</p>;
   }
@@ -78,7 +125,60 @@ export default function PlayerStatsTable({ stats }) {
     return <p style={{ opacity: 0.75 }}>Noch keine Spielerstatistiken verfügbar.</p>;
   }
 
-  const tableEntries = allPlayers.slice(0, 20);
+  const handleSortChange = (key) => {
+    if (!SORTABLE_KEYS.includes(key)) {
+      return;
+    }
+
+    setSortConfig((prev) => {
+      if (prev?.key === key) {
+        return {
+          key,
+          direction: prev.direction === 'asc' ? 'desc' : 'asc'
+        };
+      }
+      return { key, direction: 'desc' };
+    });
+  };
+
+  const sortedPlayers = useMemo(() => {
+    if (!Array.isArray(allPlayers)) {
+      return [];
+    }
+    const entries = allPlayers.slice();
+    const { key, direction } = sortConfig || {};
+    if (!key || !SORTABLE_KEYS.includes(key)) {
+      return entries;
+    }
+    const multiplier = direction === 'asc' ? 1 : -1;
+    return entries.sort((a, b) => {
+      const aVal = getSortableValue(a, key);
+      const bVal = getSortableValue(b, key);
+      if (typeof aVal === 'string' || typeof bVal === 'string') {
+        return aVal.localeCompare(bVal, 'de', { sensitivity: 'base' }) * multiplier;
+      }
+      return (aVal - bVal) * multiplier;
+    });
+  }, [allPlayers, sortConfig]);
+
+  const tableEntries = sortedPlayers.slice(0, 20);
+
+  const renderSortIndicator = (key) => {
+    if (sortConfig?.key !== key) {
+      return null;
+    }
+    return sortConfig.direction === 'asc' ? '↑' : '↓';
+  };
+
+  const buildSortButtonStyle = (key, alignment = 'left') => ({
+    ...sortButtonStyle,
+    justifyContent: alignment === 'right' ? 'flex-end' : 'flex-start',
+    textAlign: alignment === 'right' ? 'right' : 'left',
+    background:
+      sortConfig?.key === key ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)',
+    borderColor:
+      sortConfig?.key === key ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.18)'
+  });
 
   return (
     <section style={gridLayout}>
@@ -112,13 +212,76 @@ export default function PlayerStatsTable({ stats }) {
           <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '560px' }}>
             <thead>
               <tr style={{ textAlign: 'left', opacity: 0.75, fontSize: '0.85rem' }}>
-                <th style={{ padding: '0.75rem 1rem' }}>Spieler</th>
-                <th style={{ padding: '0.75rem 1rem' }}>Team</th>
-                <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>Punkte</th>
-                <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>Spiele</th>
-                <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>Punkte/Spiel</th>
-                <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>Strafen</th>
-                <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>Strafsek.</th>
+                <th style={{ padding: '0.75rem 1rem' }}>
+                  <button
+                    type="button"
+                    className="player-sort-button"
+                    style={buildSortButtonStyle('name')}
+                    onClick={() => handleSortChange('name')}
+                  >
+                    Spieler {renderSortIndicator('name')}
+                  </button>
+                </th>
+                <th style={{ padding: '0.75rem 1rem' }}>
+                  <button
+                    type="button"
+                    className="player-sort-button"
+                    style={buildSortButtonStyle('teamName')}
+                    onClick={() => handleSortChange('teamName')}
+                  >
+                    Team {renderSortIndicator('teamName')}
+                  </button>
+                </th>
+                <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
+                  <button
+                    type="button"
+                    className="player-sort-button"
+                    style={buildSortButtonStyle('points', 'right')}
+                    onClick={() => handleSortChange('points')}
+                  >
+                    Punkte {renderSortIndicator('points')}
+                  </button>
+                </th>
+                <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
+                  <button
+                    type="button"
+                    className="player-sort-button"
+                    style={buildSortButtonStyle('games', 'right')}
+                    onClick={() => handleSortChange('games')}
+                  >
+                    Spiele {renderSortIndicator('games')}
+                  </button>
+                </th>
+                <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
+                  <button
+                    type="button"
+                    className="player-sort-button"
+                    style={buildSortButtonStyle('pointsPerGame', 'right')}
+                    onClick={() => handleSortChange('pointsPerGame')}
+                  >
+                    Punkte/Spiel {renderSortIndicator('pointsPerGame')}
+                  </button>
+                </th>
+                <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
+                  <button
+                    type="button"
+                    className="player-sort-button"
+                    style={buildSortButtonStyle('penalties', 'right')}
+                    onClick={() => handleSortChange('penalties')}
+                  >
+                    Strafen {renderSortIndicator('penalties')}
+                  </button>
+                </th>
+                <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
+                  <button
+                    type="button"
+                    className="player-sort-button"
+                    style={buildSortButtonStyle('penaltySeconds', 'right')}
+                    onClick={() => handleSortChange('penaltySeconds')}
+                  >
+                    Strafsek. {renderSortIndicator('penaltySeconds')}
+                  </button>
+                </th>
               </tr>
             </thead>
             <tbody>
