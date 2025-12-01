@@ -60,9 +60,24 @@ export async function getTournamentSummary(tournamentId) {
   const overallStatsMap = new Map();
 
 const playerTotals = new Map();
+const teamGameCounts = new Map();
+
+const incrementTeamGames = (teamId, teamName) => {
+  const key = makeTeamKey(teamId, teamName);
+  teamGameCounts.set(key, (teamGameCounts.get(key) || 0) + 1);
+};
 
 const accumulatePenaltySeconds = (entries = []) =>
   entries.reduce((sum, entry) => sum + (entry.totalSeconds ?? entry.remainingSeconds ?? 0), 0);
+
+const makeTeamKey = (teamId, teamName) => {
+  const numeric = Number(teamId);
+  if (Number.isInteger(numeric) && numeric > 0) {
+    return `id:${numeric}`;
+  }
+  const normalized = String(teamName ?? '').trim().toLowerCase();
+  return `name:${normalized}`;
+};
 
 const makePlayerKey = (teamId, teamName, stat) => {
   if (stat.playerId != null) {
@@ -93,6 +108,7 @@ const registerPlayerStats = (teamId, teamName, stats = []) => {
       }
 
       const key = makePlayerKey(teamId, teamName, stat);
+      const teamKey = makeTeamKey(teamId, teamName);
       let aggregate = playerTotals.get(key);
       if (!aggregate) {
         aggregate = {
@@ -100,6 +116,7 @@ const registerPlayerStats = (teamId, teamName, stats = []) => {
           playerId: stat.playerId ?? null,
           teamId: teamId ?? null,
           teamName: teamName ?? '',
+          teamKey,
           name: stat.name ?? stat.displayName ?? 'Unbekannt',
           displayName: stat.displayName ?? stat.name ?? 'Unbekannt',
           jerseyNumber: stat.jerseyNumber ?? stat.jersey_number ?? null,
@@ -168,6 +185,9 @@ const registerPlayerStats = (teamId, teamName, stats = []) => {
       game.score_a ?? 0,
       penalties.b?.length ?? 0
     );
+
+    incrementTeamGames(game.team_a_id, game.team_a);
+    incrementTeamGames(game.team_b_id, game.team_b);
   });
 
   participants.forEach((participant) => {
@@ -177,6 +197,7 @@ const registerPlayerStats = (teamId, teamName, stats = []) => {
     }
     const roster = rosterByTeamId.get(teamId) || [];
     const teamName = participant.team_name || participant.placeholder || `Team ${participant.slot_number}`;
+    const teamKey = makeTeamKey(teamId, teamName);
     roster.forEach((player) => {
       const placeholderStat = {
         playerId: player.id,
@@ -190,6 +211,7 @@ const registerPlayerStats = (teamId, teamName, stats = []) => {
           playerId: player.id,
           teamId,
           teamName,
+          teamKey,
           name: player.name,
           displayName: player.name,
           jerseyNumber: player.jersey_number ?? null,
@@ -210,9 +232,13 @@ const registerPlayerStats = (teamId, teamName, stats = []) => {
 
 const playerOverview = Array.from(playerTotals.values());
 playerOverview.forEach((entry) => {
-  entry.pointsPerGame = entry.games > 0 ? entry.points / entry.games : 0;
-  entry.scoresPerGame = entry.games > 0 ? entry.scores / entry.games : 0;
-  entry.penaltySecondsPerGame = entry.games > 0 ? entry.penaltySeconds / entry.games : 0;
+  const teamKey = entry.teamKey ?? makeTeamKey(entry.teamId, entry.teamName);
+  const totalGames = teamGameCounts.get(teamKey) ?? 0;
+  entry.games = totalGames;
+  entry.pointsPerGame = totalGames > 0 ? entry.points / totalGames : 0;
+  entry.scoresPerGame = totalGames > 0 ? entry.scores / totalGames : 0;
+  entry.penaltySecondsPerGame = totalGames > 0 ? entry.penaltySeconds / totalGames : 0;
+  delete entry.teamKey;
 });
 
 const topScorers = playerOverview
