@@ -53,7 +53,12 @@ export default function SummaryContent() {
   }
 
   if (activeTab === 'schedule') {
-    return <SchedulePreview schedule={tournamentSummary.schedule} />;
+    return (
+      <SchedulePreview
+        schedule={tournamentSummary.schedule}
+        activeScheduleCode={currentCardData?.scheduleCode ?? scoreboard?.scheduleCode ?? null}
+      />
+    );
   }
 
   if (activeTab === 'groups') {

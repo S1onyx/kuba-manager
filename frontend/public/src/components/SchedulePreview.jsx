@@ -334,8 +334,15 @@ function buildTimelineEntries(schedule) {
       return;
     }
     const scheduledRaw = match.scheduled_at ?? match.scheduledAt ?? null;
+    const matchCode =
+      match.code ??
+      match.metadata?.code ??
+      match.metadata?.schedule_code ??
+      match.metadata?.scheduleCode ??
+      null;
     const entry = {
       key: match.id ?? `${meta.phase || 'match'}-${fallbackIndex++}`,
+      code: matchCode ? String(matchCode) : null,
       home: match.home_label ?? match.home ?? match.team_a ?? '',
       away: match.away_label ?? match.away ?? match.team_b ?? '',
       result: match.result ?? null,
@@ -402,18 +409,22 @@ function buildTimelineEntries(schedule) {
     }));
 }
 
-function renderTimelineRow(entry, nextKey, nowTs, formatDateTime) {
+function renderTimelineRow(entry, nextKey, nowTs, formatDateTime, activeKey) {
   const scheduledLabel = entry.timestamp !== null ? formatDateTime(entry.scheduledRaw) : null;
   const isPast = entry.timestamp !== null && entry.timestamp < nowTs;
+  const isActive = Boolean(activeKey && entry.key === activeKey);
   const classNames = ['schedule-timeline__row', 'schedule-timeline__item'];
-  if (isPast) {
+  if (isPast && !isActive) {
     classNames.push('schedule-timeline__item--past');
   }
-  if (entry.key === nextKey) {
+  if (!activeKey && entry.key === nextKey) {
     classNames.push('schedule-timeline__item--next');
   }
   if (entry.timestamp === null) {
     classNames.push('schedule-timeline__item--unscheduled');
+  }
+  if (isActive) {
+    classNames.push('schedule-timeline__item--now');
   }
   const scoreLabel = entry.result?.hasResult
     ? `${entry.result.scoreA ?? 0} : ${entry.result.scoreB ?? 0}`
@@ -463,51 +474,69 @@ function renderTimelineRow(entry, nextKey, nowTs, formatDateTime) {
         {entry.metadata?.description ? (
           <span className="schedule-timeline__note">{entry.metadata.description}</span>
         ) : null}
+        {isActive ? (
+          <span className="schedule-timeline__now-hint">Wir befinden uns hier.</span>
+        ) : null}
         {metaParts.length ? <span className="schedule-timeline__meta">{metaParts.join(' · ')}</span> : null}
       </div>
     </div>
   );
 }
 
-function TimelineSchedule({ entries, formatDateTime }) {
+function TimelineSchedule({ entries, formatDateTime, activeScheduleCode }) {
   const nowTs = Date.now();
   const hasTimeInfo = entries.some((entry) => entry.timestamp !== null);
   const nextEntry = entries.find((entry) => entry.timestamp !== null && entry.timestamp >= nowTs);
   const nextKey = nextEntry?.key ?? null;
+  const normalizedActiveCode =
+    typeof activeScheduleCode === 'string' && activeScheduleCode.trim().length > 0
+      ? activeScheduleCode.trim().toLowerCase()
+      : null;
+  const activeEntry = normalizedActiveCode
+    ? entries.find((entry) => (entry.code ?? '').toLowerCase() === normalizedActiveCode)
+    : null;
+  const activeKey = activeEntry?.key ?? null;
   const rows = [];
-  let nowInserted = !hasTimeInfo;
 
-  const renderNowRow = (suffix) => (
-    <div
-      key={`timeline-now-${suffix}`}
-      className="schedule-timeline__row schedule-timeline__item schedule-timeline__item--now"
-    >
-      <div className="schedule-timeline__time">
-        <strong>Jetzt</strong>
-        <span style={{ fontSize: '0.85rem', opacity: 0.8 }}>{formatDateTime(new Date())}</span>
-      </div>
-      <div className="schedule-timeline__marker">
-        <span className="schedule-timeline__dot" />
-      </div>
-      <div className="schedule-timeline__details">
-        <span className="schedule-timeline__now-hint">Wir befinden uns hier.</span>
-        <span className="schedule-timeline__meta">
-          Darunter findest du sofort die nächste angesetzte Partie – darüber liegen die bereits gespielten Spiele.
-        </span>
-      </div>
-    </div>
-  );
+  if (activeKey) {
+    entries.forEach((entry) => {
+      rows.push(renderTimelineRow(entry, nextKey, nowTs, formatDateTime, activeKey));
+    });
+  } else {
+    let nowInserted = !hasTimeInfo;
 
-  entries.forEach((entry) => {
-    if (!nowInserted && entry.timestamp !== null && entry.timestamp >= nowTs) {
-      rows.push(renderNowRow(entry.key));
-      nowInserted = true;
+    const renderNowRow = (suffix) => (
+      <div
+        key={`timeline-now-${suffix}`}
+        className="schedule-timeline__row schedule-timeline__item schedule-timeline__item--now"
+      >
+        <div className="schedule-timeline__time">
+          <strong>Jetzt</strong>
+          <span style={{ fontSize: '0.85rem', opacity: 0.8 }}>{formatDateTime(new Date())}</span>
+        </div>
+        <div className="schedule-timeline__marker">
+          <span className="schedule-timeline__dot" />
+        </div>
+        <div className="schedule-timeline__details">
+          <span className="schedule-timeline__now-hint">Wir befinden uns hier.</span>
+          <span className="schedule-timeline__meta">
+            Darunter findest du sofort die nächste angesetzte Partie – darüber liegen die bereits gespielten Spiele.
+          </span>
+        </div>
+      </div>
+    );
+
+    entries.forEach((entry) => {
+      if (!nowInserted && entry.timestamp !== null && entry.timestamp >= nowTs) {
+        rows.push(renderNowRow(entry.key));
+        nowInserted = true;
+      }
+      rows.push(renderTimelineRow(entry, nextKey, nowTs, formatDateTime, null));
+    });
+
+    if (!nowInserted && hasTimeInfo) {
+      rows.push(renderNowRow('end'));
     }
-    rows.push(renderTimelineRow(entry, nextKey, nowTs, formatDateTime));
-  });
-
-  if (!nowInserted && hasTimeInfo) {
-    rows.push(renderNowRow('end'));
   }
 
   return (
@@ -529,7 +558,7 @@ function TimelineSchedule({ entries, formatDateTime }) {
   );
 }
 
-export default function SchedulePreview({ schedule }) {
+export default function SchedulePreview({ schedule, activeScheduleCode = null }) {
   const [viewMode, setViewMode] = useState(scheduleViewModes[0]?.id ?? 'timeline');
   const timelineEntries = useMemo(() => (schedule ? buildTimelineEntries(schedule) : []), [schedule]);
 
@@ -584,7 +613,11 @@ export default function SchedulePreview({ schedule }) {
       ) : (
         <>
           {viewMode === 'timeline' ? (
-            <TimelineSchedule entries={timelineEntries} formatDateTime={formatMatchDateTime} />
+            <TimelineSchedule
+              entries={timelineEntries}
+              formatDateTime={formatMatchDateTime}
+              activeScheduleCode={activeScheduleCode}
+            />
           ) : (
             <>
               {renderGroupSchedule(schedule.group, formatMatchDateTime)}
