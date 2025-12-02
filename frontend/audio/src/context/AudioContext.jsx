@@ -4,11 +4,14 @@ import useSocketConnection from '../hooks/useSocketConnection.js';
 import useAudioPlayback from '../hooks/useAudioPlayback.js';
 import useAudioDevices from '../hooks/useAudioDevices.js';
 import useEventLog from '../hooks/useEventLog.js';
+import useVolumePreferences from '../hooks/useVolumePreferences.js';
+import { VOLUME_CATEGORIES } from '../constants/volume.js';
 
 const AudioContext = createContext(null);
 
 export function AudioProvider({ children }) {
   const { connected } = useSocketConnection();
+  const { volumeSettings, setVolumeSetting } = useVolumePreferences();
 
   const {
     audioElementRef,
@@ -18,7 +21,7 @@ export function AudioProvider({ children }) {
     setPlaybackError,
     enqueuePlayback,
     initializeAudioChain
-  } = useAudioPlayback();
+  } = useAudioPlayback(volumeSettings);
 
   const {
     audioDevices,
@@ -87,6 +90,11 @@ export function AudioProvider({ children }) {
       },
       media: {
         audioElementRef
+      },
+      volume: {
+        settings: volumeSettings,
+        categories: VOLUME_CATEGORIES,
+        setVolume: setVolumeSetting
       }
     }),
     [
@@ -99,7 +107,9 @@ export function AudioProvider({ children }) {
       deviceError,
       selectDevice,
       events,
-      audioElementRef
+      audioElementRef,
+      volumeSettings,
+      setVolumeSetting
     ]
   );
 
