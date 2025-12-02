@@ -65,6 +65,11 @@ export default function TimerControlCard() {
             <span style={{ fontSize: '0.85rem', opacity: 0.65 }}>
               Halbzeit bei {formatTime(scoreboard.halftimeSeconds ?? 0)} · Pause {formatTime(scoreboard.halftimePauseSeconds ?? 0)}
             </span>
+            {scoreboard.isHalftimeBreak ? (
+              <span style={{ fontSize: '0.85rem', opacity: 0.75 }}>
+                Halbzeitpause läuft · Rest: {formatTime(scoreboard.halftimePauseRemaining ?? 0)} (Auto-Start)
+              </span>
+            ) : null}
             {(scoreboard.extraSeconds ?? 0) > 0 || (scoreboard.extraElapsedSeconds ?? 0) > 0 ? (
               <span style={{ fontSize: '0.85rem', opacity: 0.65 }}>
                 Nachspielzeit geplant {formatTime(scoreboard.extraSeconds ?? 0)} · gelaufen {formatTime(scoreboard.extraElapsedSeconds ?? 0)}

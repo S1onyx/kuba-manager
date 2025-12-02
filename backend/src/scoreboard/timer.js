@@ -88,12 +88,17 @@ function ensureTicker() {
       if (state.halftimePauseRemaining > 0) {
         state.halftimePauseRemaining = Math.max(0, state.halftimePauseRemaining - 1);
         changed = true;
+      }
 
-        if (state.halftimePauseRemaining === 0) {
-          stopTicker();
+      if (state.halftimePauseRemaining === 0) {
+        if (state.isHalftimeBreak) {
+          state.isHalftimeBreak = false;
+          if (!state.isRunning) {
+            state.isRunning = true;
+            changed = true;
+            triggerStartTone(createAudioContext(state));
+          }
         }
-      } else {
-        stopTicker();
       }
     } else if (state.isRunning) {
       if (state.remainingSeconds > 0) {

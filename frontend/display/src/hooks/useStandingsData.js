@@ -35,7 +35,7 @@ export default function useStandingsData(scoreboard) {
     const signatureChanged = lastFetchSignatureRef.current !== scoreboardSignature;
     const shouldFetch = contextChanged || !hasStandings || signatureChanged;
 
-    if (scoreboard?.isRunning && hasStandings && !contextChanged) {
+    if ((scoreboard?.isRunning || scoreboard?.isHalftimeBreak) && hasStandings && !contextChanged) {
       return;
     }
 
@@ -87,7 +87,8 @@ export default function useStandingsData(scoreboard) {
     scoreboard?.scoreA,
     scoreboard?.scoreB,
     scoreboard?.lastUpdated,
-    scoreboard?.isRunning
+    scoreboard?.isRunning,
+    scoreboard?.isHalftimeBreak
   ]);
 
   return {

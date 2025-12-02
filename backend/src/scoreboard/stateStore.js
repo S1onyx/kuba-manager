@@ -137,8 +137,8 @@ function createDefaultState(overrides = {}) {
       b: []
     },
     halftimeSeconds: DEFAULT_DURATION_SECONDS / 2,
-    halftimePauseSeconds: 60,
-    halftimePauseRemaining: 60,
+    halftimePauseSeconds: 45,
+    halftimePauseRemaining: 45,
     extraSeconds: 0,
     extraElapsedSeconds: 0,
     halftimeTriggered: false,
