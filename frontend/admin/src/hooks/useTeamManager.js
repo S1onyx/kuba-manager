@@ -8,8 +8,10 @@ export default function useTeamManager({ updateMessage }) {
   const [teamCreateName, setTeamCreateName] = useState('');
   const [teamEdits, setTeamEdits] = useState({});
 
-  const loadTeams = useCallback(() => {
-    setTeamsLoading(true);
+  const loadTeams = useCallback((showLoader = false) => {
+    if (showLoader) {
+      setTeamsLoading(true);
+    }
     fetchTeams()
       .then((data) => {
         setTeams(data);
@@ -19,12 +21,14 @@ export default function useTeamManager({ updateMessage }) {
         setTeamsError('Teams konnten nicht geladen werden.');
       })
       .finally(() => {
-        setTeamsLoading(false);
+        if (showLoader) {
+          setTeamsLoading(false);
+        }
       });
   }, []);
 
   useEffect(() => {
-    loadTeams();
+    loadTeams(true);
   }, [loadTeams]);
 
   const handleTeamCreateSubmit = useCallback(

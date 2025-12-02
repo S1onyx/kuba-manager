@@ -30,8 +30,10 @@ export default function useTournamentManager({
   const [expandedTournamentId, setExpandedTournamentId] = useState(null);
   const [tournamentCompletionSaving, setTournamentCompletionSaving] = useState({});
 
-  const loadTournaments = useCallback(() => {
-    setTournamentsLoading(true);
+  const loadTournaments = useCallback((showLoader = false) => {
+    if (showLoader) {
+      setTournamentsLoading(true);
+    }
     fetchTournaments()
       .then((data) => {
         setTournaments(data);
@@ -41,12 +43,14 @@ export default function useTournamentManager({
         setTournamentsError('Turniere konnten nicht geladen werden.');
       })
       .finally(() => {
-        setTournamentsLoading(false);
+        if (showLoader) {
+          setTournamentsLoading(false);
+        }
       });
   }, []);
 
   useEffect(() => {
-    loadTournaments();
+    loadTournaments(true);
   }, [loadTournaments]);
 
   const handleTournamentFormChange = useCallback((field, value) => {

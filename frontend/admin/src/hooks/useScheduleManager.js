@@ -44,7 +44,7 @@ export default function useScheduleManager({
   const [scheduleSaving, setScheduleSaving] = useState({});
   const [bulkSaving, setBulkSaving] = useState(false);
 
-  const refreshSchedule = useCallback(async () => {
+  const refreshSchedule = useCallback(async (showLoader = false) => {
     if (!resolvedTournamentId) {
       setScheduleData(null);
       setScheduleError('');
@@ -52,7 +52,9 @@ export default function useScheduleManager({
       return true;
     }
 
-    setScheduleLoading(true);
+    if (showLoader) {
+      setScheduleLoading(true);
+    }
     try {
       const data = await fetchTournamentSchedule(resolvedTournamentId);
       setScheduleData(data ?? null);
@@ -64,12 +66,14 @@ export default function useScheduleManager({
       setScheduleError('Spielplan konnte nicht geladen werden.');
       return false;
     } finally {
-      setScheduleLoading(false);
+      if (showLoader) {
+        setScheduleLoading(false);
+      }
     }
   }, [resolvedTournamentId]);
 
   useEffect(() => {
-    refreshSchedule();
+    refreshSchedule(true);
   }, [refreshSchedule, ...refreshScheduleDependencies]);
 
   useEffect(() => {

@@ -61,17 +61,29 @@ export default function useTournamentStructure({
   }, []);
 
   const loadTournamentStructure = useCallback(
-    async (id) => {
+    async (id, options = {}) => {
       if (!id) {
+        setTournamentStructure(null);
+        setStructureTournamentId(null);
+        setStructureError('');
+        setSlotAssignments({});
+        setSlotInitialAssignments({});
         return;
       }
 
-      setStructureLoading(true);
+      const showLoader = Boolean(options.showLoader);
+      const resetState = Boolean(options.reset);
+
+      if (showLoader) {
+        setStructureLoading(true);
+      }
       setStructureError('');
-      setTournamentStructure(null);
-      setStructureTournamentId(null);
-      setSlotAssignments({});
-      setSlotInitialAssignments({});
+      if (resetState) {
+        setTournamentStructure(null);
+        setStructureTournamentId(null);
+        setSlotAssignments({});
+        setSlotInitialAssignments({});
+      }
 
       try {
         const data = await fetchTournamentStructure(id);
@@ -81,12 +93,16 @@ export default function useTournamentStructure({
       } catch (error) {
         console.error(error);
         setStructureError('Turnierstruktur konnte nicht geladen werden.');
-        setTournamentStructure(null);
-        setStructureTournamentId(null);
-        setSlotAssignments({});
-        setSlotInitialAssignments({});
+        if (resetState) {
+          setTournamentStructure(null);
+          setStructureTournamentId(null);
+          setSlotAssignments({});
+          setSlotInitialAssignments({});
+        }
       } finally {
-        setStructureLoading(false);
+        if (showLoader) {
+          setStructureLoading(false);
+        }
       }
     },
     [initializeSlotAssignments]
@@ -101,7 +117,7 @@ export default function useTournamentStructure({
       setSlotInitialAssignments({});
       return;
     }
-    loadTournamentStructure(expandedTournamentId);
+    loadTournamentStructure(expandedTournamentId, { showLoader: true, reset: true });
   }, [expandedTournamentId, loadTournamentStructure]);
 
   const handleSlotNameChange = useCallback((slotNumber, value) => {

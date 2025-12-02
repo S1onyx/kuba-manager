@@ -13,8 +13,10 @@ export default function useHistoryManager({ updateMessage }) {
   const [editingGameId, setEditingGameId] = useState(null);
   const [editForm, setEditForm] = useState(null);
 
-  const loadHistory = useCallback(() => {
-    setHistoryLoading(true);
+  const loadHistory = useCallback((showLoader = false) => {
+    if (showLoader) {
+      setHistoryLoading(true);
+    }
     fetchHistory()
       .then((data) => {
         setHistory(data);
@@ -24,12 +26,14 @@ export default function useHistoryManager({ updateMessage }) {
         setHistoryError('Historie konnte nicht geladen werden.');
       })
       .finally(() => {
-        setHistoryLoading(false);
+        if (showLoader) {
+          setHistoryLoading(false);
+        }
       });
   }, []);
 
   useEffect(() => {
-    loadHistory();
+    loadHistory(true);
   }, [loadHistory]);
 
   const startHistoryEdit = useCallback((game) => {

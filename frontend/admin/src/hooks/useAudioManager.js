@@ -22,26 +22,33 @@ export default function useAudioManager({ updateMessage }) {
   const [audioTriggerLabels, setAudioTriggerLabels] = useState({});
   const [audioLibraryUploadLabel, setAudioLibraryUploadLabel] = useState('');
 
-  const loadAudioData = useCallback(async () => {
-    setAudioLoading(true);
-    setAudioError('');
-    try {
-      const [triggersResponse, libraryResponse] = await Promise.all([
-        fetchAudioTriggers(),
-        fetchAudioLibrary()
-      ]);
-      setAudioTriggers(triggersResponse?.triggers ?? []);
-      setAudioLibrary(libraryResponse?.files ?? []);
-    } catch (err) {
-      console.error('Audiodaten konnten nicht geladen werden.', err);
-      setAudioError('Audiodaten konnten nicht geladen werden.');
-    } finally {
-      setAudioLoading(false);
-    }
-  }, []);
+  const loadAudioData = useCallback(
+    async (showLoader = false) => {
+      if (showLoader) {
+        setAudioLoading(true);
+      }
+      setAudioError('');
+      try {
+        const [triggersResponse, libraryResponse] = await Promise.all([
+          fetchAudioTriggers(),
+          fetchAudioLibrary()
+        ]);
+        setAudioTriggers(triggersResponse?.triggers ?? []);
+        setAudioLibrary(libraryResponse?.files ?? []);
+      } catch (err) {
+        console.error('Audiodaten konnten nicht geladen werden.', err);
+        setAudioError('Audiodaten konnten nicht geladen werden.');
+      } finally {
+        if (showLoader) {
+          setAudioLoading(false);
+        }
+      }
+    },
+    []
+  );
 
   useEffect(() => {
-    loadAudioData();
+    loadAudioData(true);
   }, [loadAudioData]);
 
   const handleAudioTriggerLabelChange = useCallback((key, value) => {

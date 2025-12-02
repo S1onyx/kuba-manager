@@ -13,8 +13,10 @@ export default function usePlayerManager({ updateMessage, loadPlayersDependencie
   const [playerCreate, setPlayerCreate] = useState({ teamId: '', name: '', jerseyNumber: '', position: '' });
   const [playerEdits, setPlayerEdits] = useState({});
 
-  const loadPlayers = useCallback(() => {
-    setPlayersLoading(true);
+  const loadPlayers = useCallback((showLoader = false) => {
+    if (showLoader) {
+      setPlayersLoading(true);
+    }
     fetchPlayers()
       .then((data) => {
         setPlayers(data);
@@ -24,12 +26,14 @@ export default function usePlayerManager({ updateMessage, loadPlayersDependencie
         setPlayersError('Spieler konnten nicht geladen werden.');
       })
       .finally(() => {
-        setPlayersLoading(false);
+        if (showLoader) {
+          setPlayersLoading(false);
+        }
       });
   }, []);
 
   useEffect(() => {
-    loadPlayers();
+    loadPlayers(true);
   }, [loadPlayers, ...loadPlayersDependencies]);
 
   const handlePlayerCreateChange = useCallback((field, value) => {
