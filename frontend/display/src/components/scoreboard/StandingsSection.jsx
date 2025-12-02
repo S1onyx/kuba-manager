@@ -9,7 +9,7 @@ const sectionStyle = {
 const headerStyle = {
   textAlign: 'left',
   marginBottom: '1rem',
-  fontSize: '2rem'
+  fontSize: 'clamp(1.2rem, 2.5vw, 2rem)'
 };
 
 export default function StandingsSection({ visible, meta, loading, error, standings }) {

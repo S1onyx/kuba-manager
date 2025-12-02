@@ -11,7 +11,13 @@ export default function GroupStandings({ standings }) {
 
   return (
     <div style={{ overflowX: 'auto' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '1.2rem' }}>
+      <table
+        style={{
+          width: '100%',
+          borderCollapse: 'collapse',
+          fontSize: 'clamp(0.9rem, 1.2vw, 1.2rem)'
+        }}
+      >
         <thead>
           <tr>
             <th style={cellStyle}>#</th>

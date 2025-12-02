@@ -4,18 +4,8 @@ import PenaltiesSection from '../scoreboard/PenaltiesSection.jsx';
 import StandingsSection from '../scoreboard/StandingsSection.jsx';
 import TournamentSummaryView from '../summary/TournamentSummaryView.jsx';
 import useLocalTimer from '../../hooks/useLocalTimer.js';
+import useMediaQuery from '../../hooks/useMediaQuery.js';
 import { formatStageDescription, formatTime } from '../../utils/formatting.js';
-
-const pageStyle = {
-  width: '1600px',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  padding: '2.5rem 3rem',
-  gap: '2.2rem',
-  boxSizing: 'border-box',
-  color: '#ffffff'
-};
 
 export default function ScoreboardPage({
   scoreboard,
@@ -28,6 +18,8 @@ export default function ScoreboardPage({
   summaryError,
   summaryLoading
 }) {
+  const isCompact = useMediaQuery('(max-width: 1100px)');
+  const isMobile = useMediaQuery('(max-width: 720px)');
   const { remainingSeconds, extraElapsedSeconds, halftimePauseRemaining } = useLocalTimer(scoreboard);
   const score = {
     teamA: scoreboard?.scoreA ?? 0,
@@ -70,12 +62,33 @@ export default function ScoreboardPage({
     );
   }
 
+  const containerStyle = {
+    width: '100%',
+    maxWidth: '1600px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: isCompact ? 'stretch' : 'center',
+    padding: isMobile
+      ? '1.5rem clamp(0.75rem, 4vw, 1.5rem)'
+      : isCompact
+        ? '2rem clamp(1rem, 4vw, 2.25rem)'
+        : '2.5rem 3rem',
+    gap: isMobile ? '1.5rem' : '2.2rem',
+    boxSizing: 'border-box',
+    color: '#ffffff'
+  };
+
+  const titleFontSize = isMobile ? '2.8rem' : isCompact ? '3.8rem' : '4.5rem';
+  const tournamentFontSize = isMobile ? '1.8rem' : isCompact ? '2.1rem' : '2.4rem';
+  const stageFontSize = isMobile ? '1.2rem' : isCompact ? '1.4rem' : '1.6rem';
+  const matchcodeFontSize = isMobile ? '0.9rem' : '1.1rem';
+
   return (
-    <div style={pageStyle}>
+    <div style={containerStyle}>
       <header style={{ textAlign: 'center' }}>
         <h1
           style={{
-            fontSize: '4.5rem',
+            fontSize: titleFontSize,
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
             marginBottom: '1rem'
@@ -91,7 +104,7 @@ export default function ScoreboardPage({
           {tournamentName ? (
             <h2
               style={{
-                fontSize: '2.4rem',
+                fontSize: tournamentFontSize,
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
                 marginBottom: '0.5rem'
@@ -103,7 +116,7 @@ export default function ScoreboardPage({
           {stageDescription ? (
             <p
               style={{
-                fontSize: '1.6rem',
+                fontSize: stageFontSize,
                 opacity: 0.85,
                 display: 'flex',
                 flexDirection: 'column',
@@ -112,7 +125,7 @@ export default function ScoreboardPage({
             >
               <span>{stageDescription}</span>
               {scoreboard?.scheduleCode ? (
-                <span style={{ fontSize: '1.1rem', opacity: 0.7, letterSpacing: '0.12em' }}>
+                <span style={{ fontSize: matchcodeFontSize, opacity: 0.7, letterSpacing: '0.12em' }}>
                   Matchcode {scoreboard.scheduleCode}
                 </span>
               ) : null}

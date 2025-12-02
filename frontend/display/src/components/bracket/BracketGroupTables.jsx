@@ -1,17 +1,17 @@
 const containerStyle = {
   width: '100%',
   display: 'grid',
-  gap: '1.5rem'
+  gap: 'clamp(1.2rem, 3vw, 1.5rem)'
 };
 
 const gridStyle = {
   display: 'grid',
-  gap: '1.5rem',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))'
+  gap: 'clamp(1rem, 3vw, 1.5rem)',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))'
 };
 
 const cardStyle = {
-  padding: '1.25rem',
+  padding: 'clamp(1rem, 2.5vw, 1.25rem)',
   borderRadius: '18px',
   background: 'rgba(0, 0, 0, 0.28)',
   boxShadow: '0 12px 30px rgba(0,0,0,0.25)',
@@ -22,14 +22,14 @@ const cardStyle = {
 
 const headerStyle = {
   margin: 0,
-  fontSize: '1.4rem',
+  fontSize: 'clamp(1.1rem, 2.6vw, 1.4rem)',
   textTransform: 'uppercase',
   letterSpacing: '0.08em'
 };
 
 const metaStyle = {
   margin: 0,
-  fontSize: '0.95rem',
+  fontSize: 'clamp(0.85rem, 2vw, 0.95rem)',
   opacity: 0.75,
   letterSpacing: '0.04em'
 };
@@ -41,7 +41,7 @@ const tableWrapperStyle = {
 const tableStyle = {
   width: '100%',
   borderCollapse: 'collapse',
-  fontSize: '0.95rem'
+  fontSize: 'clamp(0.85rem, 2vw, 0.95rem)'
 };
 
 const cellStyle = {
@@ -67,7 +67,9 @@ export default function BracketGroupTables({ groups }) {
   if (!Array.isArray(groups) || groups.length === 0) {
     return (
       <section style={containerStyle}>
-        <h2 style={{ margin: 0, fontSize: '1.8rem', letterSpacing: '0.06em' }}>Gruppenphase</h2>
+        <h2 style={{ margin: 0, fontSize: 'clamp(1.3rem, 2.6vw, 1.8rem)', letterSpacing: '0.06em' }}>
+          Gruppenphase
+        </h2>
         <p style={{ margin: 0, opacity: 0.8 }}>Noch keine Gruppendaten vorhanden.</p>
       </section>
     );
@@ -75,7 +77,9 @@ export default function BracketGroupTables({ groups }) {
 
   return (
     <section style={containerStyle}>
-      <h2 style={{ margin: 0, fontSize: '1.8rem', letterSpacing: '0.06em' }}>Gruppenphase</h2>
+      <h2 style={{ margin: 0, fontSize: 'clamp(1.3rem, 2.6vw, 1.8rem)', letterSpacing: '0.06em' }}>
+        Gruppenphase
+      </h2>
       <div style={gridStyle}>
         {groups.map((group) => {
           const entries = group?.standings?.entries ?? [];

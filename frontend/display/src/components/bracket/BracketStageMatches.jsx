@@ -1,3 +1,5 @@
+import useMediaQuery from '../../hooks/useMediaQuery.js';
+
 function resolveParticipantName(entry, fallback) {
   if (!entry) {
     return fallback || '—';
@@ -12,17 +14,17 @@ function resolveParticipantName(entry, fallback) {
 const sectionStyle = {
   width: '100%',
   display: 'grid',
-  gap: '1.5rem'
+  gap: 'clamp(1.1rem, 3vw, 1.5rem)'
 };
 
 const stagesGridStyle = {
   display: 'grid',
-  gap: '1.25rem',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))'
+  gap: 'clamp(1rem, 2.5vw, 1.25rem)',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))'
 };
 
 const stageCardStyle = {
-  padding: '1.2rem',
+  padding: 'clamp(1rem, 2.5vw, 1.2rem)',
   borderRadius: '18px',
   background: 'rgba(0,0,0,0.28)',
   boxShadow: '0 12px 30px rgba(0,0,0,0.25)',
@@ -33,7 +35,7 @@ const stageCardStyle = {
 
 const stageHeaderStyle = {
   margin: 0,
-  fontSize: '1.35rem',
+  fontSize: 'clamp(1.1rem, 2.4vw, 1.35rem)',
   textTransform: 'uppercase',
   letterSpacing: '0.07em'
 };
@@ -98,6 +100,8 @@ export default function BracketStageMatches({ title, stages }) {
   const validStages = Array.isArray(stages)
     ? stages.filter((stage) => Array.isArray(stage.matches) && stage.matches.length > 0)
     : [];
+  const isCompact = useMediaQuery('(max-width: 1100px)');
+  const isStacked = useMediaQuery('(max-width: 720px)');
 
   if (validStages.length === 0) {
     return null;
@@ -105,7 +109,7 @@ export default function BracketStageMatches({ title, stages }) {
 
   return (
     <section style={sectionStyle}>
-      <h2 style={{ margin: 0, fontSize: '1.8rem', letterSpacing: '0.06em' }}>{title}</h2>
+      <h2 style={{ margin: 0, fontSize: 'clamp(1.3rem, 2.6vw, 1.8rem)', letterSpacing: '0.06em' }}>{title}</h2>
       <div style={stagesGridStyle}>
         {validStages.map((stage) => (
           <article key={stage.stage_label || stage.label} style={stageCardStyle}>
@@ -116,7 +120,9 @@ export default function BracketStageMatches({ title, stages }) {
                 <div>
                   <h3 style={stageHeaderStyle}>{stage.stage_label || stage.label || 'Phase'}</h3>
                   {roundNumber ? (
-                    <p style={{ margin: 0, opacity: 0.7, fontSize: '0.9rem' }}>Runde {roundNumber}</p>
+                    <p style={{ margin: 0, opacity: 0.7, fontSize: 'clamp(0.8rem, 2vw, 0.9rem)' }}>
+                      Runde {roundNumber}
+                    </p>
                   ) : null}
                 </div>
               );
@@ -151,12 +157,49 @@ export default function BracketStageMatches({ title, stages }) {
                 const metaLine = metaSegments.join(' · ');
 
                 return (
-                  <div key={match.id ?? match.code ?? `${homeName}-${awayName}`} style={matchRowStyle}>
-                    <div style={teamStyle}>{homeName}</div>
-                    <div style={scoreStyle}>{scoreDisplay}</div>
-                    <div style={{ ...teamStyle, textAlign: 'right' }}>{awayName}</div>
+                  <div
+                    key={match.id ?? match.code ?? `${homeName}-${awayName}`}
+                    style={{
+                      ...matchRowStyle,
+                      gridTemplateColumns: isStacked ? '1fr' : matchRowStyle.gridTemplateColumns,
+                      gap: isStacked ? '0.5rem' : matchRowStyle.gap,
+                      textAlign: isStacked ? 'center' : 'left'
+                    }}
+                  >
+                    <div
+                      style={{
+                        ...teamStyle,
+                        fontSize: isCompact ? '1rem' : teamStyle.fontSize,
+                        textAlign: isStacked ? 'center' : 'left'
+                      }}
+                    >
+                      {homeName}
+                    </div>
+                    <div
+                      style={{
+                        ...scoreStyle,
+                        fontSize: isCompact ? '1rem' : scoreStyle.fontSize
+                      }}
+                    >
+                      {scoreDisplay}
+                    </div>
+                    <div
+                      style={{
+                        ...teamStyle,
+                        fontSize: isCompact ? '1rem' : teamStyle.fontSize,
+                        textAlign: isStacked ? 'center' : 'right'
+                      }}
+                    >
+                      {awayName}
+                    </div>
                     {metaLine ? (
-                      <div style={{ gridColumn: '1 / -1', ...codeStyle }}>
+                      <div
+                        style={{
+                          gridColumn: '1 / -1',
+                          ...codeStyle,
+                          textAlign: 'center'
+                        }}
+                      >
                         {metaLine}
                       </div>
                     ) : null}

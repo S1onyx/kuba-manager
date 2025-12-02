@@ -32,7 +32,7 @@ const penaltyItemStyle = {
   background: 'rgba(255,255,255,0.12)',
   padding: '0.6rem 0.9rem',
   borderRadius: '10px',
-  fontSize: '1.2rem'
+  fontSize: 'clamp(1rem, 1.2vw, 1.2rem)'
 };
 
 function PenaltyList({ entries }) {

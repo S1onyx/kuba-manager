@@ -23,7 +23,7 @@ body {
 .card {
   background: rgba(255, 255, 255, 0.08);
   border-radius: 18px;
-  padding: 1.35rem;
+  padding: clamp(1rem, 3vw, 1.35rem);
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
   display: grid;
   gap: 0.9rem;
@@ -103,4 +103,35 @@ label select:focus {
 label select:disabled {
   cursor: not-allowed;
   opacity: 0.55;
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    padding: clamp(1rem, 6vw, 2rem);
+  }
+
+  .event-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  label select {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .app-shell {
+    gap: 1.2rem;
+  }
+
+  .button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .event-row {
+    gap: 0.4rem;
+  }
 }

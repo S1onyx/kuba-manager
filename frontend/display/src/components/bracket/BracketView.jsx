@@ -3,7 +3,7 @@ import BracketStageMatches from './BracketStageMatches.jsx';
 
 const containerStyle = {
   display: 'grid',
-  gap: '2.5rem'
+  gap: 'clamp(1.5rem, 4vw, 2.5rem)'
 };
 
 const headerStyle = {
@@ -14,14 +14,14 @@ const headerStyle = {
 
 const titleStyle = {
   margin: 0,
-  fontSize: '2.4rem',
+  fontSize: 'clamp(1.6rem, 3.5vw, 2.4rem)',
   textTransform: 'uppercase',
   letterSpacing: '0.08em'
 };
 
 const subtitleStyle = {
   margin: 0,
-  fontSize: '1rem',
+  fontSize: 'clamp(0.85rem, 2.5vw, 1rem)',
   opacity: 0.75,
   letterSpacing: '0.08em'
 };

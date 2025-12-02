@@ -14,7 +14,7 @@ export default function PanelCard({ title, description, action, children, tone }
         borderRadius: 'var(--radius-lg)',
         border: `1px solid ${borderColor}`,
         background,
-        padding: '1.5rem 1.75rem',
+        padding: 'clamp(1.1rem, 3.5vw, 1.5rem) clamp(1.2rem, 4vw, 1.75rem)',
         display: 'grid',
         gap: '1.25rem'
       }}

@@ -6,6 +6,7 @@ import BracketPage from './components/pages/BracketPage.jsx';
 import ScoreboardPage from './components/pages/ScoreboardPage.jsx';
 import useBodyScrollLock from './hooks/useBodyScrollLock.js';
 import useDisplayScaling from './hooks/useDisplayScaling.js';
+import useMediaQuery from './hooks/useMediaQuery.js';
 import useScoreboardData from './hooks/useScoreboardData.js';
 import useStandingsData from './hooks/useStandingsData.js';
 import useStructureData from './hooks/useStructureData.js';
@@ -13,6 +14,7 @@ import useTournamentSummaryData from './hooks/useTournamentSummaryData.js';
 
 export default function App() {
   useBodyScrollLock();
+  const isNarrowScreen = useMediaQuery('(max-width: 900px)');
 
   const { scoreboard, error: scoreboardError } = useScoreboardData();
   const displayView = scoreboard?.displayView ?? 'scoreboard';
@@ -126,11 +128,16 @@ export default function App() {
     <div
       style={{
         position: 'fixed',
-        top: '1.5rem',
-        right: '1.5rem',
+        top: isNarrowScreen ? '0.75rem' : '1.5rem',
+        right: isNarrowScreen ? '0.5rem' : '1.5rem',
+        left: isNarrowScreen ? '0.5rem' : 'auto',
         display: 'flex',
-        flexDirection: 'column',
-        gap: '0.75rem'
+        flexDirection: isNarrowScreen ? 'row' : 'column',
+        flexWrap: 'wrap',
+        justifyContent: isNarrowScreen ? 'center' : 'flex-start',
+        gap: isNarrowScreen ? '0.5rem' : '0.75rem',
+        width: isNarrowScreen ? 'calc(100vw - 1rem)' : 'auto',
+        zIndex: 5
       }}
     >
       <DisplayViewToggle displayView={displayView} />
