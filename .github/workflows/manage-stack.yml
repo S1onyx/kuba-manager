@@ -122,31 +122,57 @@ jobs:
                 " 2>/dev/null || true
                 ;;
               clickhouse-nuke)
-                CH="docker exec kuba-plausible-events-db-1 clickhouse-client"
                 echo "=== Disk before ==="
                 df -h /
-                echo ""
-                echo "=== Truncating ClickHouse system log tables ==="
+
+                VOLUME_PATH=$(docker volume inspect kuba_plausible-event-data --format '{{.Mountpoint}}')
+                echo "ClickHouse volume: $VOLUME_PATH"
+
+                echo "=== Stopping ClickHouse container ==="
+                docker stop kuba-plausible-events-db-1
+
+                echo "=== Deleting system log data directories ==="
                 for TBL in text_log metric_log asynchronous_metric_log query_log query_metric_log part_log trace_log processors_profile_log error_log asynchronous_insert_log; do
-                  echo "Truncating system.$TBL ..."
-                  $CH --query "TRUNCATE TABLE IF EXISTS system.$TBL" 2>&1 || echo "  failed: $TBL"
+                  DIR="$VOLUME_PATH/store"
+                  # ClickHouse stores tables under store/ with UUID-based paths
+                  # Also try the legacy data/ path
+                  find "$VOLUME_PATH/data/system/$TBL" -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} + 2>/dev/null && echo "Cleared data/system/$TBL" || true
+                  find "$VOLUME_PATH/shadow" -mindepth 1 -maxdepth 1 -exec rm -rf {} + 2>/dev/null || true
                 done
-                echo ""
-                echo "=== Dropping old plausible partitions ==="
-                CUTOFF=$(date -d '90 days ago' +%Y%m 2>/dev/null || date -v-90d +%Y%m)
-                echo "Cutoff: $CUTOFF"
-                for TBL in events events_v2 sessions sessions_v2 imported_visitors imported_sources imported_pages imported_entry_pages imported_exit_pages imported_locations imported_devices imported_browsers imported_operating_systems imported_custom_events; do
-                  PARTS=$($CH --database plausible --query "
-                    SELECT DISTINCT partition FROM system.parts
-                    WHERE database='plausible' AND table='$TBL' AND active=1 AND partition < '$CUTOFF'
-                  " 2>/dev/null || true)
-                  for PART in $PARTS; do
-                    echo "Dropping plausible.$TBL partition $PART ..."
-                    $CH --database plausible --query "ALTER TABLE $TBL DROP PARTITION '$PART'" 2>&1 || echo "  failed"
-                  done
+
+                # Also clear via store/ UUID paths (ClickHouse 24.x layout)
+                echo "=== Clearing store/ paths for system tables ==="
+                if [ -f "$VOLUME_PATH/metadata/system/text_log.sql" ]; then
+                  UUID=$(grep -o "UUID '[^']*'" "$VOLUME_PATH/metadata/system/text_log.sql" | head -1 | cut -d"'" -f2)
+                  if [ -n "$UUID" ]; then
+                    PREFIX=$(echo "$UUID" | cut -c1-3)
+                    rm -rf "$VOLUME_PATH/store/$PREFIX/$UUID" 2>/dev/null && echo "Cleared text_log store $UUID" || true
+                  fi
+                fi
+
+                for TBL in text_log metric_log asynchronous_metric_log query_log query_metric_log part_log trace_log processors_profile_log error_log asynchronous_insert_log; do
+                  if [ -f "$VOLUME_PATH/metadata/system/$TBL.sql" ]; then
+                    UUID=$(grep -o "UUID '[^']*'" "$VOLUME_PATH/metadata/system/$TBL.sql" | head -1 | cut -d"'" -f2)
+                    if [ -n "$UUID" ]; then
+                      PREFIX=$(echo "$UUID" | cut -c1-3)
+                      STORE_DIR="$VOLUME_PATH/store/$PREFIX/$UUID"
+                      if [ -d "$STORE_DIR" ]; then
+                        find "$STORE_DIR" -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} + 2>/dev/null
+                        echo "Cleared $TBL (UUID $UUID)"
+                      fi
+                    fi
+                  fi
                 done
-                echo ""
-                echo "=== Disk after ==="
+
+                echo "=== Disk after file deletion ==="
+                df -h /
+
+                echo "=== Starting ClickHouse container ==="
+                docker start kuba-plausible-events-db-1
+                sleep 10
+                docker ps | grep clickhouse
+
+                echo "=== Disk final ==="
                 df -h /
                 ;;
               *)
