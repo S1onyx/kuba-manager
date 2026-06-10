@@ -16,6 +16,8 @@ on:
           - status
           - cleanup
           - disk-usage
+          - clickhouse-debug
+          - clickhouse-nuke
 
 jobs:
   manage:
@@ -89,6 +91,69 @@ jobs:
                 echo ""
                 echo "=== Largest directories in /var ==="
                 du -sh /var/* 2>/dev/null | sort -rh | head -10 || true
+                ;;
+              clickhouse-debug)
+                CH="docker exec kuba-plausible-events-db-1 clickhouse-client"
+                echo "=== All databases ==="
+                $CH --query "SHOW DATABASES" 2>/dev/null || true
+                echo ""
+                echo "=== All tables in plausible DB ==="
+                $CH --query "SHOW TABLES FROM plausible" 2>/dev/null || true
+                echo ""
+                echo "=== Partitions with sizes ==="
+                $CH --query "
+                  SELECT database, table, partition,
+                    formatReadableSize(sum(bytes_on_disk)) AS size,
+                    count() AS parts
+                  FROM system.parts
+                  WHERE active = 1
+                  GROUP BY database, table, partition
+                  ORDER BY database, table, partition
+                " 2>/dev/null || true
+                echo ""
+                echo "=== Total ClickHouse disk usage by table ==="
+                $CH --query "
+                  SELECT database, table,
+                    formatReadableSize(sum(bytes_on_disk)) AS total_size
+                  FROM system.parts
+                  WHERE active = 1
+                  GROUP BY database, table
+                  ORDER BY sum(bytes_on_disk) DESC
+                " 2>/dev/null || true
+                ;;
+              clickhouse-nuke)
+                CH="docker exec kuba-plausible-events-db-1 clickhouse-client"
+                echo "=== Partitions before ==="
+                $CH --query "
+                  SELECT database, table, partition,
+                    formatReadableSize(sum(bytes_on_disk)) AS size
+                  FROM system.parts
+                  WHERE active = 1
+                  GROUP BY database, table, partition
+                  ORDER BY database, table, partition
+                " 2>/dev/null || true
+                echo ""
+                echo "=== Dropping ALL partitions older than 90 days ==="
+                CUTOFF=$(date -d '90 days ago' +%Y%m 2>/dev/null || date -v-90d +%Y%m)
+                echo "Cutoff: $CUTOFF"
+                $CH --query "
+                  SELECT DISTINCT database, table, partition
+                  FROM system.parts
+                  WHERE active = 1 AND partition < '$CUTOFF'
+                  ORDER BY database, table, partition
+                " 2>/dev/null | while IFS=$'\t' read -r DB TBL PART; do
+                  echo "Dropping $DB.$TBL partition $PART ..."
+                  docker exec kuba-plausible-events-db-1 clickhouse-client \
+                    --database "$DB" \
+                    --query "ALTER TABLE $TBL DROP PARTITION '$PART'" 2>/dev/null || \
+                  docker exec kuba-plausible-events-db-1 clickhouse-client \
+                    --database "$DB" \
+                    --query "ALTER TABLE $TBL DROP PARTITION $PART" 2>/dev/null || \
+                  echo "  skipped"
+                done
+                echo ""
+                echo "=== Disk after ==="
+                df -h /
                 ;;
               *)
                 echo "Unsupported command: ${{ inputs.command }}"
