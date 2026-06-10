@@ -123,33 +123,27 @@ jobs:
                 ;;
               clickhouse-nuke)
                 CH="docker exec kuba-plausible-events-db-1 clickhouse-client"
-                echo "=== Partitions before ==="
-                $CH --query "
-                  SELECT database, table, partition,
-                    formatReadableSize(sum(bytes_on_disk)) AS size
-                  FROM system.parts
-                  WHERE active = 1
-                  GROUP BY database, table, partition
-                  ORDER BY database, table, partition
-                " 2>/dev/null || true
+                echo "=== Disk before ==="
+                df -h /
                 echo ""
-                echo "=== Dropping ALL partitions older than 90 days ==="
+                echo "=== Truncating ClickHouse system log tables ==="
+                for TBL in text_log metric_log asynchronous_metric_log query_log query_metric_log part_log trace_log processors_profile_log error_log asynchronous_insert_log; do
+                  echo "Truncating system.$TBL ..."
+                  $CH --query "TRUNCATE TABLE IF EXISTS system.$TBL" 2>&1 || echo "  failed: $TBL"
+                done
+                echo ""
+                echo "=== Dropping old plausible partitions ==="
                 CUTOFF=$(date -d '90 days ago' +%Y%m 2>/dev/null || date -v-90d +%Y%m)
                 echo "Cutoff: $CUTOFF"
-                $CH --query "
-                  SELECT DISTINCT database, table, partition
-                  FROM system.parts
-                  WHERE active = 1 AND partition < '$CUTOFF'
-                  ORDER BY database, table, partition
-                " 2>/dev/null | while IFS=$'\t' read -r DB TBL PART; do
-                  echo "Dropping $DB.$TBL partition $PART ..."
-                  docker exec kuba-plausible-events-db-1 clickhouse-client \
-                    --database "$DB" \
-                    --query "ALTER TABLE $TBL DROP PARTITION '$PART'" 2>/dev/null || \
-                  docker exec kuba-plausible-events-db-1 clickhouse-client \
-                    --database "$DB" \
-                    --query "ALTER TABLE $TBL DROP PARTITION $PART" 2>/dev/null || \
-                  echo "  skipped"
+                for TBL in events events_v2 sessions sessions_v2 imported_visitors imported_sources imported_pages imported_entry_pages imported_exit_pages imported_locations imported_devices imported_browsers imported_operating_systems imported_custom_events; do
+                  PARTS=$($CH --database plausible --query "
+                    SELECT DISTINCT partition FROM system.parts
+                    WHERE database='plausible' AND table='$TBL' AND active=1 AND partition < '$CUTOFF'
+                  " 2>/dev/null || true)
+                  for PART in $PARTS; do
+                    echo "Dropping plausible.$TBL partition $PART ..."
+                    $CH --database plausible --query "ALTER TABLE $TBL DROP PARTITION '$PART'" 2>&1 || echo "  failed"
+                  done
                 done
                 echo ""
                 echo "=== Disk after ==="

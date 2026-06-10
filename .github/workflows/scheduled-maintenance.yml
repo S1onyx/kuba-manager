@@ -32,29 +32,25 @@ jobs:
               ORDER BY table, partition
             " 2>/dev/null || echo "Could not query system.parts"
 
-            # Drop partitions older than 90 days (YYYYMM format)
+            echo "=== Truncating ClickHouse system log tables ==="
+            for TBL in text_log metric_log asynchronous_metric_log query_log query_metric_log part_log trace_log processors_profile_log error_log asynchronous_insert_log; do
+              echo "Truncating system.$TBL ..."
+              $CH --query "TRUNCATE TABLE IF EXISTS system.$TBL" 2>&1 || echo "  failed: $TBL"
+            done
+
+            # Drop plausible partitions older than 90 days
             CUTOFF=$(date -d '90 days ago' +%Y%m 2>/dev/null || date -v-90d +%Y%m)
             echo ""
-            echo "Cutoff: $CUTOFF (dropping anything older)"
+            echo "Cutoff: $CUTOFF (dropping plausible partitions older than 90 days)"
 
-            for TABLE in events events_v2 imported_visitors imported_sources imported_pages imported_entry_pages imported_exit_pages imported_locations imported_devices imported_browsers imported_operating_systems; do
-              PARTITIONS=$($CH --query "
-                SELECT DISTINCT partition
-                FROM system.parts
-                WHERE database = 'plausible' AND table = '$TABLE' AND active = 1
-                  AND partition < '$CUTOFF'
-                ORDER BY partition
+            for TABLE in events events_v2 sessions sessions_v2 imported_visitors imported_sources imported_pages imported_entry_pages imported_exit_pages imported_locations imported_devices imported_browsers imported_operating_systems imported_custom_events; do
+              PARTITIONS=$($CH --database plausible --query "
+                SELECT DISTINCT partition FROM system.parts
+                WHERE database='plausible' AND table='$TABLE' AND active=1 AND partition < '$CUTOFF'
               " 2>/dev/null || true)
-
-              if [ -z "$PARTITIONS" ]; then
-                continue
-              fi
-
               for PART in $PARTITIONS; do
-                echo "Dropping $TABLE partition $PART..."
-                $CH --query "ALTER TABLE $TABLE DROP PARTITION '$PART'" 2>/dev/null || \
-                $CH --query "ALTER TABLE $TABLE DROP PARTITION $PART" 2>/dev/null || \
-                echo "  skipped $PART"
+                echo "Dropping plausible.$TABLE partition $PART..."
+                $CH --database plausible --query "ALTER TABLE $TABLE DROP PARTITION '$PART'" 2>&1 || echo "  failed"
               done
             done
 
