@@ -35,7 +35,7 @@ jobs:
 
             case "${{ inputs.command }}" in
               start)
-                git fetch origin main && git checkout main && git pull origin main
+                git fetch origin main && git checkout main && git reset --hard origin/main
                 docker compose up -d
                 ;;
               stop)
@@ -46,7 +46,7 @@ jobs:
                 docker compose up -d
                 ;;
               update)
-                git fetch origin main && git checkout main && git pull origin main
+                git fetch origin main && git checkout main && git reset --hard origin/main
                 docker compose pull
                 docker compose up -d --remove-orphans
                 ;;
