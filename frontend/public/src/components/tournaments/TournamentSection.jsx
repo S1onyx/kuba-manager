@@ -9,7 +9,7 @@ export default function TournamentSection() {
 
   if (loading) {
     return (
-      <SectionWrapper title="Öffentliche Turniere">
+      <SectionWrapper title="Turniere">
         <p style={{ opacity: 0.75 }}>Lade Turnierliste...</p>
       </SectionWrapper>
     );
@@ -17,7 +17,7 @@ export default function TournamentSection() {
 
   if (error) {
     return (
-      <SectionWrapper title="Öffentliche Turniere">
+      <SectionWrapper title="Turniere">
         <p style={{ color: '#ffb0b0' }}>{error}</p>
       </SectionWrapper>
     );
@@ -25,43 +25,117 @@ export default function TournamentSection() {
 
   if (!list || list.length === 0) {
     return (
-      <SectionWrapper title="Öffentliche Turniere">
+      <SectionWrapper title="Turniere">
         <p style={{ opacity: 0.75 }}>Noch keine Turniere als öffentlich markiert.</p>
       </SectionWrapper>
     );
   }
 
   const activeTournamentId = scoreboard?.tournamentId ?? currentTournamentMeta?.id;
+  const activeTournaments = list.filter((t) => t.status === 'active' || !t.status);
+  const plannedTournaments = list.filter((t) => t.status === 'planned');
 
   return (
-    <SectionWrapper title="Öffentliche Turniere">
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
-        {list.map((tournament) => {
-          const isSelected = selectedId === tournament.id;
-          const isLive = scoreboardPublic && activeTournamentId === tournament.id;
-          return (
-            <button
-              key={tournament.id}
-              type="button"
-              onClick={() => select(tournament.id)}
-              style={{
-                padding: '0.6rem 1.1rem',
-                borderRadius: '999px',
-                border: '1px solid rgba(255,255,255,0.25)',
-                background: isSelected ? 'rgba(86, 160, 255, 0.25)' : 'transparent',
-                color: isSelected ? '#dcefff' : '#f0f4ff',
-                fontWeight: isSelected ? 600 : 500,
-                letterSpacing: '0.05em',
-                cursor: 'pointer'
-              }}
-            >
-              {tournament.name}
-              {isLive ? ' · Live' : ''}
-            </button>
-          );
-        })}
+    <>
+      {activeTournaments.length > 0 && (
+        <SectionWrapper title="Turniere">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+            {activeTournaments.map((tournament) => {
+              const isSelected = selectedId === tournament.id;
+              const isLive = scoreboardPublic && activeTournamentId === tournament.id;
+              return (
+                <button
+                  key={tournament.id}
+                  type="button"
+                  onClick={() => select(tournament.id)}
+                  style={{
+                    padding: '0.6rem 1.1rem',
+                    borderRadius: '999px',
+                    border: '1px solid rgba(255,255,255,0.25)',
+                    background: isSelected ? 'rgba(86, 160, 255, 0.25)' : 'transparent',
+                    color: isSelected ? '#dcefff' : '#f0f4ff',
+                    fontWeight: isSelected ? 600 : 500,
+                    letterSpacing: '0.05em',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {tournament.name}
+                  {isLive ? ' · Live' : ''}
+                </button>
+              );
+            })}
+          </div>
+        </SectionWrapper>
+      )}
+
+      {plannedTournaments.length > 0 && (
+        <SectionWrapper title="Kommende Turniere">
+          <div
+            style={{
+              display: 'grid',
+              gap: '0.75rem',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))'
+            }}
+          >
+            {plannedTournaments.map((tournament) => (
+              <PlannedTournamentCard key={tournament.id} tournament={tournament} />
+            ))}
+          </div>
+        </SectionWrapper>
+      )}
+    </>
+  );
+}
+
+function PlannedTournamentCard({ tournament }) {
+  const formattedDate = tournament.planned_at
+    ? new Date(tournament.planned_at).toLocaleDateString('de-DE', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+    : null;
+
+  return (
+    <div
+      style={{
+        background: 'rgba(0,0,0,0.35)',
+        borderRadius: '16px',
+        padding: '1.25rem 1.5rem',
+        display: 'grid',
+        gap: '0.5rem',
+        border: '1px solid rgba(255,255,255,0.08)'
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+        <span style={{ fontWeight: 600, fontSize: '1rem' }}>{tournament.name}</span>
+        <span
+          style={{
+            display: 'inline-block',
+            padding: '0.2rem 0.65rem',
+            borderRadius: '999px',
+            background: 'rgba(255,171,64,0.2)',
+            color: '#ffd180',
+            fontSize: '0.75rem',
+            letterSpacing: '0.08em'
+          }}
+        >
+          Geplant
+        </span>
       </div>
-    </SectionWrapper>
+      {formattedDate && (
+        <p style={{ opacity: 0.8, fontSize: '0.9rem', margin: 0 }}>{formattedDate}</p>
+      )}
+      {tournament.location && (
+        <p style={{ opacity: 0.65, fontSize: '0.875rem', margin: 0 }}>{tournament.location}</p>
+      )}
+      {tournament.description && (
+        <p style={{ opacity: 0.6, fontSize: '0.85rem', margin: 0, marginTop: '0.25rem' }}>
+          {tournament.description}
+        </p>
+      )}
+    </div>
   );
 }
 

@@ -18,6 +18,7 @@ on:
           - disk-usage
           - clickhouse-debug
           - clickhouse-nuke
+          - caddy-reload
 
 jobs:
   manage:
@@ -155,6 +156,10 @@ jobs:
                 sleep 10
                 docker compose ps
                 set -e
+                ;;
+              caddy-reload)
+                docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile
+                docker compose exec caddy caddy certificates
                 ;;
               *)
                 echo "Unsupported command: ${{ inputs.command }}"
