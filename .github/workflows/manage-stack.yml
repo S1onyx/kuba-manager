@@ -19,6 +19,7 @@ on:
           - clickhouse-debug
           - clickhouse-nuke
           - caddy-reload
+          - caddy-nuke-certs
 
 jobs:
   manage:
@@ -173,6 +174,27 @@ jobs:
                 echo ""
                 echo "=== Caddy list-certificates ==="
                 docker compose exec caddy caddy list-certificates 2>/dev/null || true
+                ;;
+              caddy-nuke-certs)
+                echo "=== Stopping Caddy ==="
+                docker compose stop caddy
+                echo ""
+                echo "=== Clearing corrupt certificate data ==="
+                docker run --rm -v kuba_caddy_data:/data alpine sh -c "
+                  echo 'Before:' && find /data/caddy/certificates -type f 2>/dev/null | wc -l && echo 'files'
+                  rm -rf /data/caddy/certificates
+                  echo 'Cleared certificates dir'
+                "
+                echo ""
+                echo "=== Restarting Caddy (will request fresh certs from Let's Encrypt) ==="
+                docker compose start caddy
+                sleep 15
+                echo ""
+                echo "=== Caddy logs after cert reset ==="
+                timeout 15 docker logs --tail=60 kuba-caddy-1 2>&1 || true
+                echo ""
+                echo "=== Certificate files after ==="
+                docker compose exec caddy find /data/caddy/certificates -type f -name "*.crt" 2>/dev/null | head -20 || true
                 ;;
               *)
                 echo "Unsupported command: ${{ inputs.command }}"
