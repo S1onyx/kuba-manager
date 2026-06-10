@@ -126,54 +126,38 @@ jobs:
                 df -h /
 
                 VOLUME_PATH=$(docker volume inspect kuba_plausible-event-data --format '{{.Mountpoint}}')
-                echo "ClickHouse volume: $VOLUME_PATH"
+                echo "Volume: $VOLUME_PATH"
 
-                echo "=== Stopping ClickHouse container ==="
-                docker stop kuba-plausible-events-db-1
+                echo "=== Force stopping ClickHouse ==="
+                docker kill kuba-plausible-events-db-1 2>/dev/null || true
+                docker rm -f kuba-plausible-events-db-1 2>/dev/null || true
+                sleep 3
 
-                echo "=== Deleting system log data directories ==="
+                echo "=== Volume top-level structure ==="
+                du -sh "$VOLUME_PATH"/*/  2>/dev/null | sort -rh | head -20
+
+                echo "=== Finding system log table directories ==="
                 for TBL in text_log metric_log asynchronous_metric_log query_log query_metric_log part_log trace_log processors_profile_log error_log asynchronous_insert_log; do
-                  DIR="$VOLUME_PATH/store"
-                  # ClickHouse stores tables under store/ with UUID-based paths
-                  # Also try the legacy data/ path
-                  find "$VOLUME_PATH/data/system/$TBL" -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} + 2>/dev/null && echo "Cleared data/system/$TBL" || true
-                  find "$VOLUME_PATH/shadow" -mindepth 1 -maxdepth 1 -exec rm -rf {} + 2>/dev/null || true
-                done
-
-                # Also clear via store/ UUID paths (ClickHouse 24.x layout)
-                echo "=== Clearing store/ paths for system tables ==="
-                if [ -f "$VOLUME_PATH/metadata/system/text_log.sql" ]; then
-                  UUID=$(grep -o "UUID '[^']*'" "$VOLUME_PATH/metadata/system/text_log.sql" | head -1 | cut -d"'" -f2)
-                  if [ -n "$UUID" ]; then
-                    PREFIX=$(echo "$UUID" | cut -c1-3)
-                    rm -rf "$VOLUME_PATH/store/$PREFIX/$UUID" 2>/dev/null && echo "Cleared text_log store $UUID" || true
-                  fi
-                fi
-
-                for TBL in text_log metric_log asynchronous_metric_log query_log query_metric_log part_log trace_log processors_profile_log error_log asynchronous_insert_log; do
-                  if [ -f "$VOLUME_PATH/metadata/system/$TBL.sql" ]; then
-                    UUID=$(grep -o "UUID '[^']*'" "$VOLUME_PATH/metadata/system/$TBL.sql" | head -1 | cut -d"'" -f2)
-                    if [ -n "$UUID" ]; then
-                      PREFIX=$(echo "$UUID" | cut -c1-3)
-                      STORE_DIR="$VOLUME_PATH/store/$PREFIX/$UUID"
-                      if [ -d "$STORE_DIR" ]; then
-                        find "$STORE_DIR" -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} + 2>/dev/null
-                        echo "Cleared $TBL (UUID $UUID)"
-                      fi
-                    fi
+                  DIRS=$(find "$VOLUME_PATH" -type d -name "$TBL" 2>/dev/null)
+                  if [ -n "$DIRS" ]; then
+                    echo "$DIRS" | while read -r DIR; do
+                      echo "Found $TBL at: $DIR"
+                      echo "  Size: $(du -sh "$DIR" 2>/dev/null | cut -f1)"
+                      find "$DIR" -mindepth 1 -delete 2>/dev/null && echo "  Cleared!" || true
+                    done
+                  else
+                    echo "Not found: $TBL"
                   fi
                 done
 
-                echo "=== Disk after file deletion ==="
+                echo "=== Disk after deletion ==="
                 df -h /
 
-                echo "=== Starting ClickHouse container ==="
-                docker start kuba-plausible-events-db-1
-                sleep 10
-                docker ps | grep clickhouse
-
-                echo "=== Disk final ==="
-                df -h /
+                echo "=== Restarting full stack ==="
+                cd ${{ secrets.DEPLOY_PATH }}
+                docker compose up -d
+                sleep 15
+                docker compose ps
                 ;;
               *)
                 echo "Unsupported command: ${{ inputs.command }}"
