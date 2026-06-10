@@ -158,8 +158,18 @@ jobs:
                 set -e
                 ;;
               caddy-reload)
-                docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile
-                docker compose exec caddy caddy certificates
+                echo "=== Caddy logs (last 50 lines) ==="
+                docker compose logs --tail=50 caddy
+                echo ""
+                echo "=== Reloading Caddy config ==="
+                docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile || true
+                echo ""
+                echo "=== Certificates ==="
+                docker compose exec caddy caddy certificates || true
+                echo ""
+                echo "=== Caddy logs after reload ==="
+                sleep 5
+                docker compose logs --tail=30 caddy
                 ;;
               *)
                 echo "Unsupported command: ${{ inputs.command }}"
