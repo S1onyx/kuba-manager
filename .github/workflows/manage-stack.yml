@@ -46,7 +46,11 @@ jobs:
                 docker compose up -d
                 ;;
               update)
-                git fetch origin main && git checkout main && git reset --hard origin/main
+                git fetch origin main && git checkout main
+                for f in plausible-ce/clickhouse/ipv4-only.xml plausible-ce/clickhouse/logs.xml plausible-ce/clickhouse/low-resources.xml; do
+                  [ -d "$f" ] && rm -rf "$f" && echo "Removed dir $f" || true
+                done
+                git reset --hard origin/main
                 docker compose pull
                 docker compose up -d --remove-orphans
                 ;;
