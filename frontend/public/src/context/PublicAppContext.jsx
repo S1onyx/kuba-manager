@@ -154,7 +154,9 @@ export function PublicAppProvider({ children }) {
         return prev;
       }
 
-      return publicTournaments.length > 0 ? publicTournaments[0].id : null;
+      const active = publicTournaments.filter((t) => t.status === 'active' || !t.status);
+      const pool = active.length > 0 ? active : publicTournaments;
+      return pool[pool.length - 1]?.id ?? null;
     });
   }, [scoreboard?.tournamentId, currentTournamentMeta, scoreboardPublic, publicTournaments]);
 

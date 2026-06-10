@@ -1,5 +1,6 @@
 import { getConnection, persistDatabase } from '../../db/connection.js';
 import { normalizeClassificationMode, normalizeTournamentPayload } from './helpers.js';
+import { getAudioFileById } from '../audio/index.js';
 
 export function mapTournament(row) {
   let classificationMode = 'top4';
@@ -158,5 +159,12 @@ export async function deleteTournamentCascade(id) {
 
 export async function listPublicTournaments() {
   const all = await listTournaments();
-  return all.filter((tournament) => tournament.is_public);
+  const visible = all.filter((tournament) => tournament.is_public);
+  return Promise.all(
+    visible.map(async (t) => {
+      if (!t.poster_file_id) return t;
+      const file = await getAudioFileById(t.poster_file_id);
+      return { ...t, poster_url: file ? `/media/audio/${encodeURIComponent(file.file_name)}` : null };
+    })
+  );
 }

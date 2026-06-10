@@ -43,6 +43,7 @@ export default function TournamentSection() {
             {activeTournaments.map((tournament) => {
               const isSelected = selectedId === tournament.id;
               const isLive = scoreboardPublic && activeTournamentId === tournament.id;
+              const isCompleted = tournament.is_completed;
               return (
                 <button
                   key={tournament.id}
@@ -53,14 +54,14 @@ export default function TournamentSection() {
                     borderRadius: '999px',
                     border: '1px solid rgba(255,255,255,0.25)',
                     background: isSelected ? 'rgba(86, 160, 255, 0.25)' : 'transparent',
-                    color: isSelected ? '#dcefff' : '#f0f4ff',
+                    color: isSelected ? '#dcefff' : isCompleted ? 'rgba(255,255,255,0.45)' : '#f0f4ff',
                     fontWeight: isSelected ? 600 : 500,
                     letterSpacing: '0.05em',
                     cursor: 'pointer'
                   }}
                 >
                   {tournament.name}
-                  {isLive ? ' · Live' : ''}
+                  {isLive ? ' · Live' : isCompleted ? ' · Abgeschlossen' : ''}
                 </button>
               );
             })}
@@ -102,39 +103,51 @@ function PlannedTournamentCard({ tournament }) {
       style={{
         background: 'rgba(0,0,0,0.35)',
         borderRadius: '16px',
-        padding: '1.25rem 1.5rem',
-        display: 'grid',
-        gap: '0.5rem',
+        overflow: 'hidden',
         border: '1px solid rgba(255,255,255,0.08)'
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
-        <span style={{ fontWeight: 600, fontSize: '1rem' }}>{tournament.name}</span>
-        <span
+      {tournament.poster_url && (
+        <img
+          src={tournament.poster_url}
+          alt={`Plakat ${tournament.name}`}
           style={{
-            display: 'inline-block',
-            padding: '0.2rem 0.65rem',
-            borderRadius: '999px',
-            background: 'rgba(255,171,64,0.2)',
-            color: '#ffd180',
-            fontSize: '0.75rem',
-            letterSpacing: '0.08em'
+            width: '100%',
+            maxHeight: '260px',
+            objectFit: 'cover',
+            display: 'block'
           }}
-        >
-          Geplant
-        </span>
+        />
+      )}
+      <div style={{ padding: '1.25rem 1.5rem', display: 'grid', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+          <span style={{ fontWeight: 600, fontSize: '1rem' }}>{tournament.name}</span>
+          <span
+            style={{
+              display: 'inline-block',
+              padding: '0.2rem 0.65rem',
+              borderRadius: '999px',
+              background: 'rgba(255,171,64,0.2)',
+              color: '#ffd180',
+              fontSize: '0.75rem',
+              letterSpacing: '0.08em'
+            }}
+          >
+            Geplant
+          </span>
+        </div>
+        {formattedDate && (
+          <p style={{ opacity: 0.8, fontSize: '0.9rem', margin: 0 }}>{formattedDate}</p>
+        )}
+        {tournament.location && (
+          <p style={{ opacity: 0.65, fontSize: '0.875rem', margin: 0 }}>{tournament.location}</p>
+        )}
+        {tournament.description && (
+          <p style={{ opacity: 0.6, fontSize: '0.85rem', margin: 0, marginTop: '0.25rem' }}>
+            {tournament.description}
+          </p>
+        )}
       </div>
-      {formattedDate && (
-        <p style={{ opacity: 0.8, fontSize: '0.9rem', margin: 0 }}>{formattedDate}</p>
-      )}
-      {tournament.location && (
-        <p style={{ opacity: 0.65, fontSize: '0.875rem', margin: 0 }}>{tournament.location}</p>
-      )}
-      {tournament.description && (
-        <p style={{ opacity: 0.6, fontSize: '0.85rem', margin: 0, marginTop: '0.25rem' }}>
-          {tournament.description}
-        </p>
-      )}
     </div>
   );
 }
