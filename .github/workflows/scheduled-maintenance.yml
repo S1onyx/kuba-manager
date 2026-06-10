@@ -7,54 +7,56 @@ on:
 
 jobs:
   clickhouse-purge:
-    name: Purge old Plausible events
+    name: Purge ClickHouse logs and old events
     runs-on: ubuntu-latest
     steps:
-      - name: Drop partitions older than 90 days
+      - name: Clear system logs and old plausible partitions
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.DEPLOY_KEY }}
           script: |
-            set -e
-            CH="docker exec kuba-plausible-events-db-1 clickhouse-client --database plausible"
-
+            set +e
             echo "=== Disk before ==="
             df -h /
 
-            echo "=== All partitions in plausible DB ==="
-            $CH --query "
-              SELECT table, partition, formatReadableSize(sum(bytes_on_disk)) AS size
-              FROM system.parts
-              WHERE database = 'plausible' AND active = 1
-              GROUP BY table, partition
-              ORDER BY table, partition
-            " 2>/dev/null || echo "Could not query system.parts"
+            VOLUME_PATH=$(docker volume inspect kuba_plausible-event-data --format '{{.Mountpoint}}')
+            AVAIL=$(df / --output=avail | tail -1)
+            CH="docker exec kuba-plausible-events-db-1 clickhouse-client"
 
-            echo "=== Truncating ClickHouse system log tables ==="
-            for TBL in text_log metric_log asynchronous_metric_log query_log query_metric_log part_log trace_log processors_profile_log error_log asynchronous_insert_log; do
-              echo "Truncating system.$TBL ..."
-              $CH --query "TRUNCATE TABLE IF EXISTS system.$TBL" 2>&1 || echo "  failed: $TBL"
-            done
-
-            # Drop plausible partitions older than 90 days
-            CUTOFF=$(date -d '90 days ago' +%Y%m 2>/dev/null || date -v-90d +%Y%m)
-            echo ""
-            echo "Cutoff: $CUTOFF (dropping plausible partitions older than 90 days)"
-
-            for TABLE in events events_v2 sessions sessions_v2 imported_visitors imported_sources imported_pages imported_entry_pages imported_exit_pages imported_locations imported_devices imported_browsers imported_operating_systems imported_custom_events; do
-              PARTITIONS=$($CH --database plausible --query "
-                SELECT DISTINCT partition FROM system.parts
-                WHERE database='plausible' AND table='$TABLE' AND active=1 AND partition < '$CUTOFF'
-              " 2>/dev/null || true)
-              for PART in $PARTITIONS; do
-                echo "Dropping plausible.$TABLE partition $PART..."
-                $CH --database plausible --query "ALTER TABLE $TABLE DROP PARTITION '$PART'" 2>&1 || echo "  failed"
+            if [ "$AVAIL" -gt 1048576 ]; then
+              echo "=== Truncating system log tables via client ==="
+              for TBL in text_log metric_log asynchronous_metric_log query_log query_metric_log part_log trace_log processors_profile_log error_log asynchronous_insert_log; do
+                $CH --query "TRUNCATE TABLE IF EXISTS system.$TBL" 2>/dev/null && echo "Truncated $TBL" || echo "Skipped $TBL"
               done
-            done
 
-            echo ""
+              CUTOFF=$(date -d '90 days ago' +%Y%m 2>/dev/null || date -v-90d +%Y%m)
+              echo "Dropping plausible partitions older than $CUTOFF"
+              for TBL in events_v2 sessions_v2 imported_visitors imported_sources imported_pages imported_entry_pages imported_exit_pages imported_locations imported_devices imported_browsers imported_operating_systems imported_custom_events; do
+                PARTS=$($CH --database plausible --query "SELECT DISTINCT partition FROM system.parts WHERE database='plausible' AND table='$TBL' AND active=1 AND partition < '$CUTOFF'" 2>/dev/null || true)
+                for PART in $PARTS; do
+                  $CH --database plausible --query "ALTER TABLE $TBL DROP PARTITION '$PART'" 2>/dev/null && echo "Dropped plausible.$TBL $PART" || true
+                done
+              done
+            else
+              echo "=== Disk full — stopping container, deleting log files directly ==="
+              docker kill kuba-plausible-events-db-1 2>/dev/null
+              docker rm -f kuba-plausible-events-db-1 2>/dev/null
+              sleep 3
+
+              for TBL in text_log metric_log asynchronous_metric_log query_log query_metric_log part_log trace_log processors_profile_log error_log asynchronous_insert_log; do
+                while IFS= read -r -d '' DIR; do
+                  echo "Clearing $TBL at $DIR"
+                  find "$DIR" -mindepth 1 -delete 2>/dev/null
+                done < <(find "$VOLUME_PATH" -type d -name "$TBL" -print0 2>/dev/null)
+              done
+
+              cd ${{ secrets.DEPLOY_PATH }}
+              docker compose up -d
+              sleep 15
+            fi
+
             echo "=== Disk after ==="
             df -h /
 
@@ -70,6 +72,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.DEPLOY_KEY }}
           script: |
+            set +e
             AVAIL_BEFORE=$(df / --output=avail | tail -1)
 
             docker image prune -af --filter "until=168h" || true
@@ -108,7 +111,6 @@ jobs:
             if [ "$USED_PCT" -ge 80 ]; then
               echo ""
               echo "CRITICAL: Disk at ${USED_PCT}% after cleanup (${AVAIL_GB} GB free)."
-              echo "Action required: reduce PLAUSIBLE_RETENTION_DAYS in docker-compose.yml or expand disk."
               exit 1
             fi
 
