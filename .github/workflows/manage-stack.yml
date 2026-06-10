@@ -47,9 +47,9 @@ jobs:
                 ;;
               update)
                 git fetch origin main && git checkout main
-                for f in plausible-ce/clickhouse/ipv4-only.xml plausible-ce/clickhouse/logs.xml plausible-ce/clickhouse/low-resources.xml; do
-                  [ -d "$f" ] && rm -rf "$f" && echo "Removed dir $f" || true
-                done
+                docker run --rm -v "$PWD/plausible-ce:/target" alpine \
+                  sh -c "rm -rf /target/clickhouse/ipv4-only.xml /target/clickhouse/logs.xml /target/clickhouse/low-resources.xml" \
+                  2>/dev/null || true
                 git reset --hard origin/main
                 docker compose pull
                 docker compose up -d --remove-orphans

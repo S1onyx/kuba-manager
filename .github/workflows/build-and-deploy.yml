@@ -120,10 +120,10 @@ jobs:
             cd ${{ secrets.DEPLOY_PATH }}
             git fetch origin main
             git checkout main
-            # Remove dirs that git wants to replace with files (created by Docker bind-mount)
-            for f in plausible-ce/clickhouse/ipv4-only.xml plausible-ce/clickhouse/logs.xml plausible-ce/clickhouse/low-resources.xml; do
-              [ -d "$f" ] && rm -rf "$f" && echo "Removed dir $f" || true
-            done
+            # Remove root-owned dirs Docker created instead of files for bind-mounts
+            docker run --rm -v "$PWD/plausible-ce:/target" alpine \
+              sh -c "rm -rf /target/clickhouse/ipv4-only.xml /target/clickhouse/logs.xml /target/clickhouse/low-resources.xml" \
+              2>/dev/null || true
             git reset --hard origin/main
             docker image prune -f || true
             docker compose pull
