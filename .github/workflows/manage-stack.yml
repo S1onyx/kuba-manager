@@ -122,42 +122,37 @@ jobs:
                 " 2>/dev/null || true
                 ;;
               clickhouse-nuke)
-                echo "=== Disk before ==="
+                set +e
                 df -h /
 
                 VOLUME_PATH=$(docker volume inspect kuba_plausible-event-data --format '{{.Mountpoint}}')
                 echo "Volume: $VOLUME_PATH"
 
-                echo "=== Force stopping ClickHouse ==="
-                docker kill kuba-plausible-events-db-1 2>/dev/null || true
-                docker rm -f kuba-plausible-events-db-1 2>/dev/null || true
+                docker kill kuba-plausible-events-db-1 2>/dev/null
+                docker rm -f kuba-plausible-events-db-1 2>/dev/null
                 sleep 3
 
-                echo "=== Volume top-level structure ==="
-                du -sh "$VOLUME_PATH"/*/  2>/dev/null | sort -rh | head -20
+                echo "=== Top-level volume dirs ==="
+                ls -la "$VOLUME_PATH/" 2>/dev/null
 
-                echo "=== Finding system log table directories ==="
+                echo "=== Finding and clearing system log dirs ==="
                 for TBL in text_log metric_log asynchronous_metric_log query_log query_metric_log part_log trace_log processors_profile_log error_log asynchronous_insert_log; do
-                  DIRS=$(find "$VOLUME_PATH" -type d -name "$TBL" 2>/dev/null)
-                  if [ -n "$DIRS" ]; then
-                    echo "$DIRS" | while read -r DIR; do
-                      echo "Found $TBL at: $DIR"
-                      echo "  Size: $(du -sh "$DIR" 2>/dev/null | cut -f1)"
-                      find "$DIR" -mindepth 1 -delete 2>/dev/null && echo "  Cleared!" || true
-                    done
-                  else
-                    echo "Not found: $TBL"
-                  fi
+                  while IFS= read -r -d '' DIR; do
+                    echo "Clearing $TBL at $DIR"
+                    find "$DIR" -mindepth 1 -delete 2>/dev/null
+                    echo "  done"
+                  done < <(find "$VOLUME_PATH" -type d -name "$TBL" -print0 2>/dev/null)
                 done
 
-                echo "=== Disk after deletion ==="
+                echo "=== Disk after ==="
                 df -h /
 
-                echo "=== Restarting full stack ==="
+                echo "=== Restarting stack ==="
                 cd ${{ secrets.DEPLOY_PATH }}
                 docker compose up -d
-                sleep 15
+                sleep 10
                 docker compose ps
+                set -e
                 ;;
               *)
                 echo "Unsupported command: ${{ inputs.command }}"
