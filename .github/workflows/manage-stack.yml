@@ -161,15 +161,18 @@ jobs:
                 echo "=== Caddy logs (last 50 lines) ==="
                 timeout 10 docker logs --tail=50 kuba-caddy-1 2>&1 || true
                 echo ""
-                echo "=== Reloading Caddy config ==="
-                docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile || true
+                echo "=== Restarting Caddy to pick up new config ==="
+                docker compose restart caddy
+                sleep 8
                 echo ""
-                echo "=== Certificates ==="
-                docker compose exec caddy caddy certificates || true
+                echo "=== Caddy logs after restart ==="
+                timeout 10 docker logs --tail=50 kuba-caddy-1 2>&1 || true
                 echo ""
-                echo "=== Caddy logs after reload ==="
-                sleep 5
-                timeout 10 docker logs --tail=30 kuba-caddy-1 2>&1 || true
+                echo "=== Certificate files ==="
+                docker compose exec caddy find /data/caddy/certificates -type f -name "*.crt" 2>/dev/null | head -20 || true
+                echo ""
+                echo "=== Caddy list-certificates ==="
+                docker compose exec caddy caddy list-certificates 2>/dev/null || true
                 ;;
               *)
                 echo "Unsupported command: ${{ inputs.command }}"
