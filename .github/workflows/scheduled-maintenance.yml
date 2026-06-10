@@ -1,0 +1,67 @@
+name: Scheduled Maintenance
+
+on:
+  schedule:
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    name: Cleanup server disk
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prune unused Docker resources
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            set -eo pipefail
+            echo "=== Disk before cleanup ==="
+            df -h /
+
+            AVAIL_BEFORE=$(df / --output=avail | tail -1)
+
+            docker image prune -af --filter "until=168h" || true
+            docker container prune -f || true
+            docker builder prune -af || true
+            docker network prune -f || true
+
+            AVAIL_AFTER=$(df / --output=avail | tail -1)
+            FREED=$(( (AVAIL_AFTER - AVAIL_BEFORE) / 1024 ))
+            echo ""
+            echo "=== Disk after cleanup ==="
+            df -h /
+            echo "Freed: ~${FREED} MB"
+
+  disk-alert:
+    name: Disk space check
+    runs-on: ubuntu-latest
+    needs: cleanup
+    steps:
+      - name: Check disk usage and alert if critical
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            AVAIL=$(df / --output=avail | tail -1)
+            TOTAL=$(df / --output=size | tail -1)
+            USED_PCT=$(( (TOTAL - AVAIL) * 100 / TOTAL ))
+            AVAIL_GB=$(( AVAIL / 1024 / 1024 ))
+
+            echo "Disk usage: ${USED_PCT}% (${AVAIL_GB} GB free)"
+
+            echo "=== Volume sizes ==="
+            docker system df --format "{{.Type}}\t{{.Size}}" 2>/dev/null || true
+
+            if [ "$USED_PCT" -ge 85 ]; then
+              echo ""
+              echo "WARNING: Disk usage at ${USED_PCT}%. Largest volumes:"
+              docker system df -v 2>/dev/null | grep -E "kuba_plausible|kuba_backend" | sort -k4 -rh | head -5 || true
+              echo ""
+              echo "Consider reducing PLAUSIBLE_RETENTION_DAYS in docker-compose.yml"
+              exit 1
+            fi

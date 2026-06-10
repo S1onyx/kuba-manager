@@ -94,6 +94,21 @@ jobs:
     needs: build-and-push
     if: github.event_name != 'workflow_dispatch' || inputs.skip_deploy != 'true'
     steps:
+      - name: Check disk space before deploy
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            AVAIL=$(df / --output=avail | tail -1)
+            AVAIL_GB=$(( AVAIL / 1024 / 1024 ))
+            echo "Available disk space: ${AVAIL_GB} GB"
+            if [ "$AVAIL" -lt 2097152 ]; then
+              echo "ERROR: Less than 2 GB free on disk. Run 'cleanup' via manage-stack first."
+              exit 1
+            fi
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.2
         with:
@@ -106,5 +121,6 @@ jobs:
             git fetch origin main
             git checkout main
             git pull origin main
+            docker image prune -f || true
             docker compose pull
             docker compose up -d --remove-orphans
