@@ -121,9 +121,8 @@ jobs:
             git fetch origin main
             git checkout main
             # Remove root-owned dirs Docker created instead of files for bind-mounts
-            docker run --rm -v "$PWD/plausible-ce:/target" alpine \
-              sh -c "rm -rf /target/clickhouse/ipv4-only.xml /target/clickhouse/logs.xml /target/clickhouse/low-resources.xml" \
-              2>/dev/null || true
+            DEPLOY=${{ secrets.DEPLOY_PATH }}
+            docker run --rm -v "${DEPLOY}:/repo" alpine sh -c "rm -rf /repo/plausible-ce"
             git reset --hard origin/main
             docker image prune -f || true
             docker compose pull

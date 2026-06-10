@@ -47,9 +47,7 @@ jobs:
                 ;;
               update)
                 git fetch origin main && git checkout main
-                docker run --rm -v "$PWD/plausible-ce:/target" alpine \
-                  sh -c "rm -rf /target/clickhouse/ipv4-only.xml /target/clickhouse/logs.xml /target/clickhouse/low-resources.xml" \
-                  2>/dev/null || true
+                docker run --rm -v "${{ secrets.DEPLOY_PATH }}:/repo" alpine sh -c "rm -rf /repo/plausible-ce"
                 git reset --hard origin/main
                 docker compose pull
                 docker compose up -d --remove-orphans
