@@ -2,8 +2,22 @@
   admin off
 }
 
+http://kunstradbasketball.de, http://www.kunstradbasketball.de,
+http://display.kunstradbasketball.de, http://admin.kunstradbasketball.de,
+http://audio.kunstradbasketball.de, http://dashboard.kunstradbasketball.de {
+  redir https://{host}{uri} 301
+}
+
 kunstradbasketball.de, www.kunstradbasketball.de {
   encode gzip zstd
+
+  header {
+    Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "SAMEORIGIN"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    -Server
+  }
 
   handle /api/* {
     reverse_proxy backend:3000
@@ -21,6 +35,14 @@ kunstradbasketball.de, www.kunstradbasketball.de {
 display.kunstradbasketball.de {
   encode gzip zstd
 
+  header {
+    Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "SAMEORIGIN"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    -Server
+  }
+
   handle /api/* {
     reverse_proxy backend:3000
   }
@@ -37,6 +59,14 @@ display.kunstradbasketball.de {
 admin.kunstradbasketball.de {
   encode gzip zstd
 
+  header {
+    Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "SAMEORIGIN"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    -Server
+  }
+
   handle /api/* {
     reverse_proxy backend:3000
   }
@@ -52,6 +82,14 @@ admin.kunstradbasketball.de {
 
 audio.kunstradbasketball.de {
   encode gzip zstd
+
+  header {
+    Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "SAMEORIGIN"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    -Server
+  }
 
   handle /api/* {
     reverse_proxy backend:3000
@@ -72,6 +110,14 @@ audio.kunstradbasketball.de {
 
 dashboard.kunstradbasketball.de {
   encode gzip zstd
+
+  header {
+    Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "SAMEORIGIN"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    -Server
+  }
 
   handle /robots.txt {
     header Content-Type text/plain

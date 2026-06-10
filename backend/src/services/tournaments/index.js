@@ -29,8 +29,11 @@ export async function createTournament(payload = {}) {
   try {
     const tournament = await getTournament(id);
     if (tournament) {
-      await regenerateTournamentStructure(tournament);
-      return (await getTournament(id)) ?? tournament;
+      if (tournament.status !== 'planned') {
+        await regenerateTournamentStructure(tournament);
+        return (await getTournament(id)) ?? tournament;
+      }
+      return tournament;
     }
     return null;
   } catch (error) {

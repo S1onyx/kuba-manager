@@ -39,6 +39,10 @@ export function sanitizeTournamentBooleans(flag, fallback = false) {
 }
 
 export function validateTournamentNumbers({ groupCount, knockoutRounds, teamCount }) {
+  if (teamCount === 0 && groupCount === 0) {
+    return;
+  }
+
   if (groupCount < 1) {
     throw new Error('Es muss mindestens eine Gruppe geben.');
   }
@@ -64,6 +68,9 @@ export function normalizeTournamentPayload(payload = {}, defaults = {}) {
     throw new Error('Turniername darf nicht leer sein.');
   }
 
+  const rawStatus = payload.status !== undefined ? payload.status : (defaults.status ?? 'active');
+  const status = rawStatus === 'planned' ? 'planned' : 'active';
+
   const groupCount = parseNonNegativeInt(payload.group_count, defaults.group_count ?? 0);
   const knockoutRounds = parseNonNegativeInt(payload.knockout_rounds, defaults.knockout_rounds ?? 0);
   const teamCount = parseNonNegativeInt(payload.team_count, defaults.team_count ?? 0);
@@ -74,15 +81,30 @@ export function normalizeTournamentPayload(payload = {}, defaults = {}) {
     payload.is_public !== undefined ? payload.is_public : defaults.is_public ?? false
   );
 
-  validateTournamentNumbers({ groupCount, knockoutRounds, teamCount });
+  if (status !== 'planned') {
+    validateTournamentNumbers({ groupCount, knockoutRounds, teamCount });
+  }
+
+  const plannedAt = payload.planned_at !== undefined ? (payload.planned_at ?? null) : (defaults.planned_at ?? null);
+  const description = payload.description !== undefined ? (payload.description ?? null) : (defaults.description ?? null);
+  const location = payload.location !== undefined ? (payload.location ?? null) : (defaults.location ?? null);
+  const posterFileId =
+    payload.poster_file_id !== undefined
+      ? (payload.poster_file_id === null ? null : Number(payload.poster_file_id) || null)
+      : (defaults.poster_file_id ?? null);
 
   return {
     name,
+    status,
     groupCount,
     knockoutRounds,
     teamCount,
     classification,
-    isPublic
+    isPublic,
+    plannedAt,
+    description,
+    location,
+    posterFileId
   };
 }
 

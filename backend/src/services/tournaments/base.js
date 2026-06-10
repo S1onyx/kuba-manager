@@ -18,7 +18,12 @@ export function mapTournament(row) {
     is_completed: Boolean(row.is_completed),
     team_count: row.team_count ?? 0,
     classification_mode: classificationMode,
-    created_at: row.created_at
+    created_at: row.created_at,
+    status: row.status ?? 'active',
+    planned_at: row.planned_at ?? null,
+    description: row.description ?? null,
+    location: row.location ?? null,
+    poster_file_id: row.poster_file_id ?? null
   };
 }
 
@@ -58,8 +63,8 @@ export async function insertTournament(payload) {
   const { SQL, db } = await getConnection();
 
   const stmt = db.prepare(`
-    INSERT INTO tournaments (name, group_count, knockout_rounds, is_public, team_count, classification_mode)
-    VALUES (:name, :group_count, :knockout_rounds, :is_public, :team_count, :classification_mode)
+    INSERT INTO tournaments (name, group_count, knockout_rounds, is_public, team_count, classification_mode, status, planned_at, description, location, poster_file_id)
+    VALUES (:name, :group_count, :knockout_rounds, :is_public, :team_count, :classification_mode, :status, :planned_at, :description, :location, :poster_file_id)
   `);
 
   let newId = null;
@@ -70,7 +75,12 @@ export async function insertTournament(payload) {
       ':knockout_rounds': normalized.knockoutRounds,
       ':is_public': normalized.isPublic ? 1 : 0,
       ':team_count': normalized.teamCount,
-      ':classification_mode': normalized.classification
+      ':classification_mode': normalized.classification,
+      ':status': normalized.status,
+      ':planned_at': normalized.plannedAt,
+      ':description': normalized.description,
+      ':location': normalized.location,
+      ':poster_file_id': normalized.posterFileId
     });
     stmt.step();
     newId = db.exec('SELECT last_insert_rowid() as id')[0].values[0][0];
@@ -88,7 +98,8 @@ export async function updateTournamentRecord(id, patch = {}, defaults = {}) {
 
   db.run(
     `UPDATE tournaments
-     SET name = ?, group_count = ?, knockout_rounds = ?, is_public = ?, team_count = ?, classification_mode = ?
+     SET name = ?, group_count = ?, knockout_rounds = ?, is_public = ?, team_count = ?, classification_mode = ?,
+         status = ?, planned_at = ?, description = ?, location = ?, poster_file_id = ?
      WHERE id = ?`,
     [
       normalized.name,
@@ -97,6 +108,11 @@ export async function updateTournamentRecord(id, patch = {}, defaults = {}) {
       normalized.isPublic ? 1 : 0,
       normalized.teamCount,
       normalized.classification,
+      normalized.status,
+      normalized.plannedAt,
+      normalized.description,
+      normalized.location,
+      normalized.posterFileId,
       id
     ]
   );

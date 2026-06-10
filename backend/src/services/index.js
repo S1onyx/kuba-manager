@@ -56,6 +56,7 @@ export {
   deleteAudioFile,
   upsertTriggerFileFromUpload,
   storeLibraryUpload,
+  storePosterUpload,
   getAudioStorageDirectory,
   getActiveTriggerWithFile,
   ensureScoreTriggerForTeam

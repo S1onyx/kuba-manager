@@ -5,7 +5,8 @@ import {
   fetchTournaments,
   updateMatchContext,
   updateTournament,
-  setTournamentCompletionStatus
+  setTournamentCompletionStatus,
+  uploadTournamentPoster
 } from '../utils/api.js';
 
 export default function useTournamentManager({
@@ -20,6 +21,10 @@ export default function useTournamentManager({
   const [tournamentsError, setTournamentsError] = useState('');
   const [tournamentForm, setTournamentForm] = useState({
     name: '',
+    status: 'active',
+    planned_at: '',
+    description: '',
+    location: '',
     group_count: '',
     knockout_rounds: '',
     team_count: '',
@@ -68,6 +73,10 @@ export default function useTournamentManager({
       try {
         await createTournament({
           name: tournamentForm.name,
+          status: tournamentForm.status || 'active',
+          planned_at: tournamentForm.planned_at || null,
+          description: tournamentForm.description || null,
+          location: tournamentForm.location || null,
           group_count: Number(tournamentForm.group_count || 0),
           knockout_rounds: Number(tournamentForm.knockout_rounds || 0),
           team_count: Number(tournamentForm.team_count || 0),
@@ -76,6 +85,10 @@ export default function useTournamentManager({
         });
         setTournamentForm({
           name: '',
+          status: 'active',
+          planned_at: '',
+          description: '',
+          location: '',
           group_count: '',
           knockout_rounds: '',
           team_count: '',
@@ -99,6 +112,10 @@ export default function useTournamentManager({
       ...prev,
       [tournament.id]: {
         name: tournament.name,
+        status: tournament.status ?? 'active',
+        planned_at: tournament.planned_at ?? '',
+        description: tournament.description ?? '',
+        location: tournament.location ?? '',
         group_count: String(tournament.group_count ?? 0),
         knockout_rounds: String(tournament.knockout_rounds ?? 0),
         team_count: String(tournament.team_count ?? 0),
@@ -134,6 +151,10 @@ export default function useTournamentManager({
       try {
         await updateTournament(id, {
           name: draft.name,
+          status: draft.status || 'active',
+          planned_at: draft.planned_at || null,
+          description: draft.description || null,
+          location: draft.location || null,
           group_count: Number(draft.group_count || 0),
           knockout_rounds: Number(draft.knockout_rounds || 0),
           team_count: Number(draft.team_count || 0),
@@ -212,6 +233,20 @@ export default function useTournamentManager({
     [loadTournaments, updateMessage]
   );
 
+  const handlePosterUpload = useCallback(
+    async (tournamentId, file) => {
+      try {
+        await uploadTournamentPoster(tournamentId, file);
+        loadTournaments();
+        updateMessage('info', 'Plakat hochgeladen.');
+      } catch (err) {
+        console.error(err);
+        updateMessage('error', 'Plakat konnte nicht hochgeladen werden.');
+      }
+    },
+    [loadTournaments, updateMessage]
+  );
+
   return {
     tournaments,
     tournamentsLoading,
@@ -232,6 +267,7 @@ export default function useTournamentManager({
     setTournamentForm,
     setTournamentEdits,
     handleTournamentCompletionChange,
-    tournamentCompletionSaving
+    tournamentCompletionSaving,
+    handlePosterUpload
   };
 }

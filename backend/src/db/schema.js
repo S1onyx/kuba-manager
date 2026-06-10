@@ -66,6 +66,11 @@ export default function initializeSchema(db) {
   ensureTournamentColumn('team_count', 'INTEGER DEFAULT 0');
   ensureTournamentColumn('classification_mode', "TEXT DEFAULT 'top4'");
   ensureTournamentColumn('is_completed', 'INTEGER DEFAULT 0');
+  ensureTournamentColumn('status', "TEXT DEFAULT 'active'");
+  ensureTournamentColumn('planned_at', 'TEXT');
+  ensureTournamentColumn('description', 'TEXT');
+  ensureTournamentColumn('location', 'TEXT');
+  ensureTournamentColumn('poster_file_id', 'INTEGER');
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS tournament_teams (

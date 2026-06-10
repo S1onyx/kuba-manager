@@ -36,6 +36,16 @@ export default function TournamentsTab() {
         <form onSubmit={handleTournamentFormSubmit} style={{ display: 'grid', gap: '1rem' }}>
           <div style={{ display: 'grid', gap: '0.85rem', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
             <label style={{ display: 'grid', gap: '0.3rem' }}>
+              Status
+              <select
+                value={tournamentForm.status}
+                onChange={(event) => handleTournamentFormChange('status', event.target.value)}
+              >
+                <option value="active">Aktiv</option>
+                <option value="planned">Geplant</option>
+              </select>
+            </label>
+            <label style={{ display: 'grid', gap: '0.3rem' }}>
               Turniername
               <input
                 value={tournamentForm.name}
@@ -44,46 +54,86 @@ export default function TournamentsTab() {
                 required
               />
             </label>
-            <label style={{ display: 'grid', gap: '0.3rem' }}>
-              Gruppen
-              <input
-                type="number"
-                min="0"
-                value={tournamentForm.group_count}
-                onChange={(event) => handleTournamentFormChange('group_count', event.target.value)}
-              />
-            </label>
-            <label style={{ display: 'grid', gap: '0.3rem' }}>
-              KO-Runden
-              <input
-                type="number"
-                min="0"
-                value={tournamentForm.knockout_rounds}
-                onChange={(event) => handleTournamentFormChange('knockout_rounds', event.target.value)}
-              />
-            </label>
-            <label style={{ display: 'grid', gap: '0.3rem' }}>
-              Mannschaften
-              <input
-                type="number"
-                min="0"
-                value={tournamentForm.team_count}
-                onChange={(event) => handleTournamentFormChange('team_count', event.target.value)}
-              />
-            </label>
-            <label style={{ display: 'grid', gap: '0.3rem' }}>
-              Platzierungsmodus
-              <select
-                value={tournamentForm.classification_mode}
-                onChange={(event) => handleTournamentFormChange('classification_mode', event.target.value)}
-              >
-                {TOURNAMENT_CLASSIFICATION_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+            {tournamentForm.status === 'planned' && (
+              <label style={{ display: 'grid', gap: '0.3rem' }}>
+                Datum / Uhrzeit
+                <input
+                  type="datetime-local"
+                  value={tournamentForm.planned_at}
+                  onChange={(event) => handleTournamentFormChange('planned_at', event.target.value)}
+                />
+              </label>
+            )}
+            {tournamentForm.status === 'planned' && (
+              <label style={{ display: 'grid', gap: '0.3rem' }}>
+                Ort
+                <input
+                  type="text"
+                  value={tournamentForm.location}
+                  onChange={(event) => handleTournamentFormChange('location', event.target.value)}
+                  placeholder="Veranstaltungsort"
+                />
+              </label>
+            )}
+            {tournamentForm.status === 'planned' && (
+              <label style={{ display: 'grid', gap: '0.3rem', gridColumn: '1 / -1' }}>
+                Beschreibung
+                <textarea
+                  value={tournamentForm.description}
+                  onChange={(event) => handleTournamentFormChange('description', event.target.value)}
+                  placeholder="Kurzbeschreibung des Turniers"
+                  rows={3}
+                />
+              </label>
+            )}
+            {tournamentForm.status !== 'planned' && (
+              <label style={{ display: 'grid', gap: '0.3rem' }}>
+                Gruppen
+                <input
+                  type="number"
+                  min="0"
+                  value={tournamentForm.group_count}
+                  onChange={(event) => handleTournamentFormChange('group_count', event.target.value)}
+                />
+              </label>
+            )}
+            {tournamentForm.status !== 'planned' && (
+              <label style={{ display: 'grid', gap: '0.3rem' }}>
+                KO-Runden
+                <input
+                  type="number"
+                  min="0"
+                  value={tournamentForm.knockout_rounds}
+                  onChange={(event) => handleTournamentFormChange('knockout_rounds', event.target.value)}
+                />
+              </label>
+            )}
+            {tournamentForm.status !== 'planned' && (
+              <label style={{ display: 'grid', gap: '0.3rem' }}>
+                Mannschaften
+                <input
+                  type="number"
+                  min="0"
+                  value={tournamentForm.team_count}
+                  onChange={(event) => handleTournamentFormChange('team_count', event.target.value)}
+                />
+              </label>
+            )}
+            {tournamentForm.status !== 'planned' && (
+              <label style={{ display: 'grid', gap: '0.3rem' }}>
+                Platzierungsmodus
+                <select
+                  value={tournamentForm.classification_mode}
+                  onChange={(event) => handleTournamentFormChange('classification_mode', event.target.value)}
+                >
+                  {TOURNAMENT_CLASSIFICATION_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
             <label style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '1.65rem' }}>
               <input
                 type="checkbox"
@@ -133,54 +183,105 @@ export default function TournamentsTab() {
                 >
                   {isEditing ? (
                     <div style={{ display: 'grid', gap: '0.75rem' }}>
-                      <input
-                        value={edit.name}
-                        onChange={(event) => handleTournamentEditChange(tournament.id, 'name', event.target.value)}
-                      />
                       <div style={{ display: 'grid', gap: '0.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
                         <label>
-                          Gruppen
-                          <input
-                            type="number"
-                            min="0"
-                            value={edit.group_count}
-                            onChange={(event) => handleTournamentEditChange(tournament.id, 'group_count', event.target.value)}
-                          />
-                        </label>
-                        <label>
-                          KO-Runden
-                          <input
-                            type="number"
-                            min="0"
-                            value={edit.knockout_rounds}
-                            onChange={(event) => handleTournamentEditChange(tournament.id, 'knockout_rounds', event.target.value)}
-                          />
-                        </label>
-                      </div>
-                      <div style={{ display: 'grid', gap: '0.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
-                        <label>
-                          Mannschaften
-                          <input
-                            type="number"
-                            min="0"
-                            value={edit.team_count}
-                            onChange={(event) => handleTournamentEditChange(tournament.id, 'team_count', event.target.value)}
-                          />
-                        </label>
-                        <label>
-                          Platzierungsmodus
+                          Status
                           <select
-                            value={edit.classification_mode}
-                            onChange={(event) => handleTournamentEditChange(tournament.id, 'classification_mode', event.target.value)}
+                            value={edit.status}
+                            onChange={(event) => handleTournamentEditChange(tournament.id, 'status', event.target.value)}
                           >
-                            {TOURNAMENT_CLASSIFICATION_OPTIONS.map((option) => (
-                              <option key={option.value} value={option.value}>
-                                {option.label}
-                              </option>
-                            ))}
+                            <option value="active">Aktiv</option>
+                            <option value="planned">Geplant</option>
                           </select>
                         </label>
+                        <label>
+                          Turniername
+                          <input
+                            value={edit.name}
+                            onChange={(event) => handleTournamentEditChange(tournament.id, 'name', event.target.value)}
+                          />
+                        </label>
                       </div>
+                      {edit.status === 'planned' && (
+                        <div style={{ display: 'grid', gap: '0.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
+                          <label>
+                            Datum / Uhrzeit
+                            <input
+                              type="datetime-local"
+                              value={edit.planned_at}
+                              onChange={(event) => handleTournamentEditChange(tournament.id, 'planned_at', event.target.value)}
+                            />
+                          </label>
+                          <label>
+                            Ort
+                            <input
+                              type="text"
+                              value={edit.location}
+                              onChange={(event) => handleTournamentEditChange(tournament.id, 'location', event.target.value)}
+                              placeholder="Veranstaltungsort"
+                            />
+                          </label>
+                        </div>
+                      )}
+                      {edit.status === 'planned' && (
+                        <label>
+                          Beschreibung
+                          <textarea
+                            value={edit.description}
+                            onChange={(event) => handleTournamentEditChange(tournament.id, 'description', event.target.value)}
+                            placeholder="Kurzbeschreibung des Turniers"
+                            rows={3}
+                          />
+                        </label>
+                      )}
+                      {edit.status !== 'planned' && (
+                        <div style={{ display: 'grid', gap: '0.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
+                          <label>
+                            Gruppen
+                            <input
+                              type="number"
+                              min="0"
+                              value={edit.group_count}
+                              onChange={(event) => handleTournamentEditChange(tournament.id, 'group_count', event.target.value)}
+                            />
+                          </label>
+                          <label>
+                            KO-Runden
+                            <input
+                              type="number"
+                              min="0"
+                              value={edit.knockout_rounds}
+                              onChange={(event) => handleTournamentEditChange(tournament.id, 'knockout_rounds', event.target.value)}
+                            />
+                          </label>
+                        </div>
+                      )}
+                      {edit.status !== 'planned' && (
+                        <div style={{ display: 'grid', gap: '0.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
+                          <label>
+                            Mannschaften
+                            <input
+                              type="number"
+                              min="0"
+                              value={edit.team_count}
+                              onChange={(event) => handleTournamentEditChange(tournament.id, 'team_count', event.target.value)}
+                            />
+                          </label>
+                          <label>
+                            Platzierungsmodus
+                            <select
+                              value={edit.classification_mode}
+                              onChange={(event) => handleTournamentEditChange(tournament.id, 'classification_mode', event.target.value)}
+                            >
+                              {TOURNAMENT_CLASSIFICATION_OPTIONS.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                        </div>
+                      )}
                       <label style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                         <input
                           type="checkbox"
@@ -192,15 +293,61 @@ export default function TournamentsTab() {
                     </div>
                   ) : (
                     <div style={{ display: 'grid', gap: '0.35rem' }}>
-                      <strong>{tournament.name}</strong>
-                      <span style={{ fontSize: '0.9rem', opacity: 0.75 }}>
-                        Gruppen: {tournament.group_count ?? 0} · KO-Runden: {tournament.knockout_rounds ?? 0}
-                      </span>
-                      <span style={{ fontSize: '0.9rem', opacity: 0.75 }}>
-                        Teams: {tournament.team_count ?? 0} · Platzierungen: {tournament.classification_mode === 'all' ? 'alle Plätze' : 'Top 4'}
-                      </span>
+                      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <strong>{tournament.name}</strong>
+                        {tournament.status === 'planned' ? (
+                          <span style={{
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            padding: '0.15rem 0.55rem',
+                            borderRadius: '999px',
+                            background: 'rgba(251, 191, 36, 0.2)',
+                            color: '#fbbf24',
+                            border: '1px solid rgba(251, 191, 36, 0.4)'
+                          }}>
+                            Geplant
+                          </span>
+                        ) : (
+                          <span style={{
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            padding: '0.15rem 0.55rem',
+                            borderRadius: '999px',
+                            background: 'rgba(59, 130, 246, 0.2)',
+                            color: '#93c5fd',
+                            border: '1px solid rgba(59, 130, 246, 0.4)'
+                          }}>
+                            Aktiv
+                          </span>
+                        )}
+                      </div>
+                      {tournament.planned_at && (
+                        <span style={{ fontSize: '0.85rem', opacity: 0.8 }}>
+                          {(() => { try { return new Date(tournament.planned_at).toLocaleString('de-DE'); } catch { return tournament.planned_at; } })()}
+                        </span>
+                      )}
+                      {tournament.location && (
+                        <span style={{ fontSize: '0.85rem', opacity: 0.75 }}>
+                          {tournament.location}
+                        </span>
+                      )}
+                      {tournament.description && (
+                        <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>
+                          {tournament.description.length > 80 ? tournament.description.slice(0, 80) + '…' : tournament.description}
+                        </span>
+                      )}
+                      {tournament.status !== 'planned' && (
+                        <>
+                          <span style={{ fontSize: '0.9rem', opacity: 0.75 }}>
+                            Gruppen: {tournament.group_count ?? 0} · KO-Runden: {tournament.knockout_rounds ?? 0}
+                          </span>
+                          <span style={{ fontSize: '0.9rem', opacity: 0.75 }}>
+                            Teams: {tournament.team_count ?? 0} · Platzierungen: {tournament.classification_mode === 'all' ? 'alle Plätze' : 'Top 4'}
+                          </span>
+                        </>
+                      )}
                       <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>
-                        Status: {tournament.is_public ? 'öffentlich' : 'privat'}
+                        Sichtbarkeit: {tournament.is_public ? 'öffentlich' : 'privat'}
                       </span>
                       <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>
                         Turnier: {tournament.is_completed ? 'abgeschlossen' : 'läuft'}

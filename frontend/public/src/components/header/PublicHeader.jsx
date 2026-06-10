@@ -6,48 +6,28 @@ export default function PublicHeader() {
     isReglementView
   } = usePublicApp();
 
-  const buttonStyle = (active) => ({
-    padding: '0.5rem 1.05rem',
-    borderRadius: '999px',
-    border: '1px solid rgba(255,255,255,0.3)',
-    background: active ? 'rgba(86, 160, 255, 0.35)' : 'transparent',
-    color: active ? '#dcefff' : '#f0f4ff',
-    fontWeight: active ? 600 : 500,
-    letterSpacing: '0.05em',
-    cursor: 'pointer'
-  });
-
   return (
-    <header style={{ display: 'grid', gap: '0.75rem', textAlign: 'center', maxWidth: '960px', margin: '0 auto' }}>
-      <h1
-        style={{
-          fontSize: 'clamp(1.9rem, 6vw, 2.8rem)',
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          lineHeight: 1.2
-        }}
-      >
-        Kunstrad Basketball – Public
-      </h1>
-      <p style={{ opacity: 0.75, fontSize: 'clamp(0.95rem, 3.2vw, 1.1rem)', lineHeight: 1.4 }}>
+    <header className="public-header">
+      <h1 className="public-header__title">Kunstrad Basketball</h1>
+      <p className="public-header__subtitle">
         Live-Spielstand, Tabellen und Statistiken zum aktuell ausgewählten Turnier.
       </p>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '0.75rem',
-          flexWrap: 'wrap',
-          marginTop: '0.25rem'
-        }}
-      >
-        <button type="button" onClick={goHome} style={buttonStyle(!isReglementView)}>
-          Übersicht
+      <nav className="public-header__nav">
+        <button
+          type="button"
+          onClick={goHome}
+          className={`pill-btn${!isReglementView ? ' pill-btn--active' : ''}`}
+        >
+          Spielplan
         </button>
-        <button type="button" onClick={goReglement} style={buttonStyle(isReglementView)}>
+        <button
+          type="button"
+          onClick={goReglement}
+          className={`pill-btn${isReglementView ? ' pill-btn--active' : ''}`}
+        >
           Reglement
         </button>
-      </div>
+      </nav>
     </header>
   );
 }

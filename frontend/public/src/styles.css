@@ -3,19 +3,32 @@
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: #050d1a;
   color: #f5f9ff;
-}
-
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-:root {
-  color-scheme: dark;
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #050d1a;
-  color: #f5f9ff;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+
+  --color-bg: #050d1a;
+  --color-text: #f5f9ff;
+  --color-text-muted: rgba(245, 249, 255, 0.65);
+  --color-text-dim: rgba(240, 244, 255, 0.75);
+  --color-border: rgba(255, 255, 255, 0.12);
+  --color-border-hover: rgba(255, 255, 255, 0.25);
+  --color-surface: rgba(255, 255, 255, 0.04);
+  --color-surface-hover: rgba(255, 255, 255, 0.07);
+  --color-accent: #56a0ff;
+  --color-accent-bg: rgba(86, 160, 255, 0.35);
+  --color-accent-text: #dcefff;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+
+  --space-xs: 0.35rem;
+  --space-sm: 0.6rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 2.5rem;
 }
 
 *, *::before, *::after {
@@ -80,6 +93,91 @@ table {
   outline-offset: 2px;
 }
 
+/* ─── Layout ──────────────────────────────────────────────────── */
+
+.public-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding: var(--space-2xl) clamp(1.5rem, 4vw, 4rem);
+}
+
+/* ─── Header ──────────────────────────────────────────────────── */
+
+.public-header {
+  display: grid;
+  gap: 0.75rem;
+  text-align: center;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.public-header__title {
+  font-size: clamp(1.9rem, 6vw, 2.8rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.public-header__subtitle {
+  opacity: 0.75;
+  font-size: clamp(0.95rem, 3.2vw, 1.1rem);
+  line-height: 1.4;
+}
+
+.public-header__nav {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+/* ─── Pill button ─────────────────────────────────────────────── */
+
+.pill-btn {
+  padding: 0.5rem 1.05rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: var(--color-text);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.pill-btn--active {
+  background: var(--color-accent-bg);
+  color: var(--color-accent-text);
+  font-weight: 600;
+}
+
+/* ─── Footer ──────────────────────────────────────────────────── */
+
+.public-footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: var(--space-md) 0 0;
+}
+
+.public-footer__btn {
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: transparent;
+  color: var(--color-text);
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* ─── Responsive ──────────────────────────────────────────────── */
+
 @media (max-width: 768px) {
   :root {
     font-size: 15px;
@@ -89,7 +187,7 @@ table {
     background: radial-gradient(circle at top, #1f3b73 0%, #0b1a2b 45%, #050d1a 100%);
   }
 
-  .public-app {
+  .public-layout {
     gap: 1.75rem;
     padding: 1.8rem clamp(1.1rem, 4vw, 2rem);
   }
@@ -100,7 +198,7 @@ table {
     font-size: 14px;
   }
 
-  .public-app {
+  .public-layout {
     padding: 1.5rem clamp(1rem, 5vw, 1.6rem);
     gap: 1.5rem;
   }
@@ -111,7 +209,7 @@ table {
     font-size: 13px;
   }
 
-  .public-app {
+  .public-layout {
     padding: 1.35rem 1rem 2rem;
     gap: 1.35rem;
   }

@@ -1,4 +1,5 @@
 import express from 'express';
+import multer from 'multer';
 import {
   createTournament,
   deleteTournament,
@@ -12,9 +13,12 @@ import {
   setTournamentTeams,
   updateTournament,
   updateTournamentScheduleEntry,
-  setTournamentCompletionStatus
+  setTournamentCompletionStatus,
+  storePosterUpload
 } from '../services/index.js';
 import { getScoreboardState, setTournamentCompleted } from '../scoreboard/index.js';
+
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
 const router = express.Router();
 
@@ -47,7 +51,7 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { name, group_count, knockout_rounds, is_public, team_count, classification_mode } = req.body ?? {};
+  const { name, group_count, knockout_rounds, is_public, team_count, classification_mode, status, planned_at, description, location } = req.body ?? {};
   try {
     const tournament = await createTournament({
       name,
@@ -55,7 +59,11 @@ router.post('/', async (req, res) => {
       knockout_rounds,
       is_public,
       team_count,
-      classification_mode
+      classification_mode,
+      status,
+      planned_at,
+      description,
+      location
     });
     res.status(201).json(tournament);
   } catch (error) {
@@ -70,8 +78,20 @@ router.put('/:id', async (req, res) => {
     return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
   }
 
+  const { name, group_count, knockout_rounds, is_public, team_count, classification_mode, status, planned_at, description, location } = req.body ?? {};
   try {
-    const updated = await updateTournament(id, req.body ?? {});
+    const updated = await updateTournament(id, {
+      name,
+      group_count,
+      knockout_rounds,
+      is_public,
+      team_count,
+      classification_mode,
+      status,
+      planned_at,
+      description,
+      location
+    });
     if (!updated) {
       return res.status(404).json({ message: 'Turnier nicht gefunden.' });
     }
@@ -79,6 +99,42 @@ router.put('/:id', async (req, res) => {
   } catch (error) {
     console.error('Turnier konnte nicht aktualisiert werden:', error);
     res.status(400).json({ message: 'Turnier konnte nicht aktualisiert werden.', detail: error.message });
+  }
+});
+
+router.post('/:id/poster', upload.single('file'), async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+  }
+
+  const file = req.file;
+  if (!file) {
+    return res.status(400).json({ message: 'Bitte eine Bilddatei hochladen.' });
+  }
+
+  if (!file.mimetype.startsWith('image/')) {
+    return res.status(400).json({ message: 'Es werden nur Bilddateien unterstützt.' });
+  }
+
+  try {
+    const tournament = await getTournament(id);
+    if (!tournament) {
+      return res.status(404).json({ message: 'Turnier nicht gefunden.' });
+    }
+
+    const record = await storePosterUpload({
+      buffer: file.buffer,
+      originalName: file.originalname || 'poster',
+      mimeType: file.mimetype,
+      label: tournament.name
+    });
+
+    const updated = await updateTournament(id, { poster_file_id: record.id });
+    res.json(updated);
+  } catch (error) {
+    console.error('Turnier-Poster konnte nicht gespeichert werden:', error);
+    res.status(400).json({ message: error.message || 'Turnier-Poster konnte nicht gespeichert werden.' });
   }
 });
 

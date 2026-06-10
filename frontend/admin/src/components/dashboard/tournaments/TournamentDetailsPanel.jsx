@@ -1,11 +1,26 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import PanelCard from '../../common/PanelCard.jsx';
+import { useDashboard } from '../../../context/DashboardContext.jsx';
 
 export default function TournamentDetailsPanel({
   tournament,
   structureState,
   teams
 }) {
+  const { tournaments: { handlePosterUpload } } = useDashboard();
+  const [posterFile, setPosterFile] = useState(null);
+
+  const handlePosterFileSelect = (event) => {
+    setPosterFile(event.target.files[0] ?? null);
+  };
+
+  const handlePosterUploadClick = () => {
+    if (posterFile) {
+      handlePosterUpload(tournament.id, posterFile);
+      setPosterFile(null);
+    }
+  };
+
   const {
     activeStructure,
     structureLoading,
@@ -66,6 +81,30 @@ export default function TournamentDetailsPanel({
             Struktur laden
           </button>
         </div>
+      </PanelCard>
+    );
+  }
+
+  if (tournament.status === 'planned') {
+    return (
+      <PanelCard title={`Turnierdetails – ${tournament.name}`} description="Geplantes Turnier">
+        <p style={{ margin: 0, opacity: 0.8 }}>
+          Geplantes Turnier — noch keine Struktur verfügbar.
+        </p>
+        <section style={{ display: 'grid', gap: '0.65rem', marginTop: '0.75rem' }}>
+          <h3 style={{ margin: 0, fontSize: '1rem' }}>Plakat</h3>
+          {tournament.poster_file_id ? (
+            <p style={{ margin: 0, opacity: 0.8 }}>Plakat hochgeladen ✓</p>
+          ) : (
+            <p style={{ margin: 0, opacity: 0.6 }}>Noch kein Plakat.</p>
+          )}
+          <input type="file" accept="image/*" onChange={handlePosterFileSelect} />
+          <div>
+            <button type="button" onClick={handlePosterUploadClick} disabled={!posterFile}>
+              Hochladen
+            </button>
+          </div>
+        </section>
       </PanelCard>
     );
   }

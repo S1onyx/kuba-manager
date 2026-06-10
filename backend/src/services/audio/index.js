@@ -8,7 +8,7 @@ const AUDIO_DIR = path.join(databasePaths.dataDir, 'audio');
 fs.mkdirSync(AUDIO_DIR, { recursive: true });
 
 function sanitizeUsage(input) {
-  const allowed = new Set(['library', 'trigger']);
+  const allowed = new Set(['library', 'trigger', 'poster']);
   const normalized = String(input ?? '').toLowerCase();
   return allowed.has(normalized) ? normalized : 'library';
 }
@@ -430,4 +430,29 @@ export async function storeLibraryUpload(uploadMeta) {
     label: uploadMeta.label ?? null,
     usage: 'library'
   });
+}
+
+export async function storePosterUpload(uploadMeta) {
+  if (!uploadMeta.buffer || !uploadMeta.buffer.length) {
+    throw new Error('Die Datei ist leer.');
+  }
+
+  const fileName = generateFileName(uploadMeta.originalName);
+  const targetPath = path.join(AUDIO_DIR, fileName);
+  await fsPromises.writeFile(targetPath, uploadMeta.buffer);
+
+  try {
+    const record = await createAudioFileRecord({
+      label: uploadMeta.label ?? null,
+      originalName: uploadMeta.originalName,
+      fileName,
+      mimeType: uploadMeta.mimeType,
+      sizeBytes: uploadMeta.buffer.length,
+      usage: 'poster'
+    });
+    return record;
+  } catch (error) {
+    await fsPromises.unlink(targetPath).catch(() => {});
+    throw error;
+  }
 }

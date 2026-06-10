@@ -362,3 +362,9 @@ export function updateTournamentTeams(id, assignments) {
     body: JSON.stringify({ assignments })
   });
 }
+
+export function uploadTournamentPoster(id, file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  return request(`/tournaments/${id}/poster`, { method: 'POST', body: formData });
+}
