@@ -14,13 +14,15 @@ on:
           - restart
           - update
           - status
+          - cleanup
+          - disk-usage
 
 jobs:
   manage:
     runs-on: ubuntu-latest
     steps:
       - name: Execute ${{ inputs.command }} on server
-        uses: appleboy/ssh-action@v0.1.10
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SSH_USER }}
@@ -28,12 +30,10 @@ jobs:
           script: |
             set -eo pipefail
             cd ${{ secrets.DEPLOY_PATH }}
-            git fetch origin main
-            git checkout main
-            git pull origin main
 
             case "${{ inputs.command }}" in
               start)
+                git fetch origin main && git checkout main && git pull origin main
                 docker compose up -d
                 ;;
               stop)
@@ -44,11 +44,51 @@ jobs:
                 docker compose up -d
                 ;;
               update)
+                git fetch origin main && git checkout main && git pull origin main
                 docker compose pull
                 docker compose up -d --remove-orphans
                 ;;
               status)
+                echo "=== Container Status ==="
                 docker compose ps
+                echo ""
+                echo "=== Disk Usage ==="
+                df -h /
+                echo ""
+                echo "=== Docker Disk Usage ==="
+                docker system df
+                ;;
+              cleanup)
+                echo "=== Disk before cleanup ==="
+                df -h /
+                echo ""
+                echo "Removing unused Docker images (not used by running containers)..."
+                docker image prune -af --filter "until=24h" || true
+                echo ""
+                echo "Removing stopped containers..."
+                docker container prune -f || true
+                echo ""
+                echo "Removing unused build cache..."
+                docker builder prune -af || true
+                echo ""
+                echo "Removing unused networks..."
+                docker network prune -f || true
+                echo ""
+                echo "=== Disk after cleanup ==="
+                df -h /
+                echo ""
+                echo "=== Docker Disk Usage after ==="
+                docker system df
+                ;;
+              disk-usage)
+                echo "=== System Disk ==="
+                df -h /
+                echo ""
+                echo "=== Docker Disk Usage ==="
+                docker system df -v 2>/dev/null | head -60
+                echo ""
+                echo "=== Largest directories in /var ==="
+                du -sh /var/* 2>/dev/null | sort -rh | head -10 || true
                 ;;
               *)
                 echo "Unsupported command: ${{ inputs.command }}"
