@@ -16,7 +16,18 @@ import {
   setTournamentCompletionStatus,
   storePosterUpload
 } from '../services/index.js';
+import { getAudioFileById } from '../services/audio/index.js';
 import { getScoreboardState, setTournamentCompleted } from '../scoreboard/index.js';
+
+async function withPosterUrl(tournament) {
+  if (!tournament || !tournament.poster_file_id) return tournament;
+  const file = await getAudioFileById(tournament.poster_file_id);
+  return { ...tournament, poster_url: file ? `/media/audio/${encodeURIComponent(file.file_name)}` : null };
+}
+
+async function withPosterUrls(tournaments) {
+  return Promise.all(tournaments.map(withPosterUrl));
+}
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
@@ -24,7 +35,7 @@ const router = express.Router();
 
 router.get('/', async (_req, res) => {
   try {
-    const tournaments = await listTournaments();
+    const tournaments = await withPosterUrls(await listTournaments());
     res.json(tournaments);
   } catch (error) {
     console.error('Turniere konnten nicht geladen werden:', error);
@@ -43,7 +54,7 @@ router.get('/:id', async (req, res) => {
     if (!tournament) {
       return res.status(404).json({ message: 'Turnier nicht gefunden.' });
     }
-    res.json(tournament);
+    res.json(await withPosterUrl(tournament));
   } catch (error) {
     console.error('Turnier konnte nicht geladen werden:', error);
     res.status(500).json({ message: 'Turnier konnte nicht geladen werden.' });
@@ -95,7 +106,7 @@ router.put('/:id', async (req, res) => {
     if (!updated) {
       return res.status(404).json({ message: 'Turnier nicht gefunden.' });
     }
-    res.json(updated);
+    res.json(await withPosterUrl(updated));
   } catch (error) {
     console.error('Turnier konnte nicht aktualisiert werden:', error);
     res.status(400).json({ message: 'Turnier konnte nicht aktualisiert werden.', detail: error.message });
@@ -131,7 +142,7 @@ router.post('/:id/poster', upload.single('file'), async (req, res) => {
     });
 
     const updated = await updateTournament(id, { poster_file_id: record.id });
-    res.json(updated);
+    res.json(await withPosterUrl(updated));
   } catch (error) {
     console.error('Turnier-Poster konnte nicht gespeichert werden:', error);
     res.status(400).json({ message: error.message || 'Turnier-Poster konnte nicht gespeichert werden.' });
