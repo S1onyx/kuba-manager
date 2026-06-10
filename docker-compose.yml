@@ -90,7 +90,7 @@ services:
       - MAILER_ADAPTER=${PLAUSIBLE_MAILER_ADAPTER:-Bamboo.LocalAdapter}
       - MAILER_EMAIL=${PLAUSIBLE_MAILER_EMAIL:-noreply@kunstradbasketball.de}
       - MAILER_NAME=${PLAUSIBLE_MAILER_NAME:-Kuba Manager Analytics}
-      - RETENTION_DAYS=${PLAUSIBLE_RETENTION_DAYS:-365}
+      - RETENTION_DAYS=${PLAUSIBLE_RETENTION_DAYS:-90}
     volumes:
       - plausible-app-data:/var/lib/plausible
     ulimits:

@@ -10,7 +10,7 @@ jobs:
     name: Purge old Plausible events
     runs-on: ubuntu-latest
     steps:
-      - name: Drop old partitions (no extra disk needed)
+      - name: Drop partitions older than 90 days
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.SERVER_IP }}
@@ -23,20 +23,21 @@ jobs:
             echo "=== Disk before ==="
             df -h /
 
-            echo "=== Available partitions ==="
+            echo "=== All partitions in plausible DB ==="
             $CH --query "
-              SELECT table, partition, sum(bytes_on_disk) AS bytes
+              SELECT table, partition, formatReadableSize(sum(bytes_on_disk)) AS size
               FROM system.parts
               WHERE database = 'plausible' AND active = 1
               GROUP BY table, partition
               ORDER BY table, partition
-            " 2>/dev/null || true
+            " 2>/dev/null || echo "Could not query system.parts"
 
-            # Drop partitions older than 365 days (format: YYYYMM)
-            CUTOFF=$(date -d '365 days ago' +%Y%m 2>/dev/null || date -v-365d +%Y%m)
-            echo "Dropping partitions older than: $CUTOFF"
+            # Drop partitions older than 90 days (YYYYMM format)
+            CUTOFF=$(date -d '90 days ago' +%Y%m 2>/dev/null || date -v-90d +%Y%m)
+            echo ""
+            echo "Cutoff: $CUTOFF (dropping anything older)"
 
-            for TABLE in events events_v2; do
+            for TABLE in events events_v2 imported_visitors imported_sources imported_pages imported_entry_pages imported_exit_pages imported_locations imported_devices imported_browsers imported_operating_systems; do
               PARTITIONS=$($CH --query "
                 SELECT DISTINCT partition
                 FROM system.parts
@@ -46,7 +47,6 @@ jobs:
               " 2>/dev/null || true)
 
               if [ -z "$PARTITIONS" ]; then
-                echo "No old partitions in $TABLE"
                 continue
               fi
 
@@ -54,11 +54,12 @@ jobs:
                 echo "Dropping $TABLE partition $PART..."
                 $CH --query "ALTER TABLE $TABLE DROP PARTITION '$PART'" 2>/dev/null || \
                 $CH --query "ALTER TABLE $TABLE DROP PARTITION $PART" 2>/dev/null || \
-                echo "  skipped $PART (may not exist)"
+                echo "  skipped $PART"
               done
             done
 
-            echo "=== Disk after partition drop ==="
+            echo ""
+            echo "=== Disk after ==="
             df -h /
 
   docker-cleanup:
