@@ -10,41 +10,56 @@ jobs:
     name: Purge old Plausible events
     runs-on: ubuntu-latest
     steps:
-      - name: Delete events older than 365 days and reclaim space
+      - name: Drop old partitions (no extra disk needed)
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.DEPLOY_KEY }}
           script: |
-            set -eo pipefail
-
+            set -e
             CH="docker exec kuba-plausible-events-db-1 clickhouse-client --database plausible"
 
-            echo "=== ClickHouse volume before ==="
-            du -sh $(docker volume inspect kuba_plausible-event-data --format '{{.Mountpoint}}') 2>/dev/null || docker system df -v | grep plausible-event
+            echo "=== Disk before ==="
+            df -h /
 
-            echo "=== Row count before ==="
-            $CH --query "SELECT count() FROM events" 2>/dev/null || echo "Table 'events' not found, trying events_v2..."
-            $CH --query "SELECT count() FROM events_v2" 2>/dev/null || true
+            echo "=== Available partitions ==="
+            $CH --query "
+              SELECT table, partition, sum(bytes_on_disk) AS bytes
+              FROM system.parts
+              WHERE database = 'plausible' AND active = 1
+              GROUP BY table, partition
+              ORDER BY table, partition
+            " 2>/dev/null || true
 
-            echo "=== Deleting events older than 365 days ==="
-            $CH --query "ALTER TABLE events DELETE WHERE timestamp < now() - INTERVAL 365 DAY" 2>/dev/null || true
-            $CH --query "ALTER TABLE events_v2 DELETE WHERE timestamp < now() - INTERVAL 365 DAY" 2>/dev/null || true
+            # Drop partitions older than 365 days (format: YYYYMM)
+            CUTOFF=$(date -d '365 days ago' +%Y%m 2>/dev/null || date -v-365d +%Y%m)
+            echo "Dropping partitions older than: $CUTOFF"
 
-            echo "Waiting for mutations to complete..."
-            sleep 30
+            for TABLE in events events_v2; do
+              PARTITIONS=$($CH --query "
+                SELECT DISTINCT partition
+                FROM system.parts
+                WHERE database = 'plausible' AND table = '$TABLE' AND active = 1
+                  AND partition < '$CUTOFF'
+                ORDER BY partition
+              " 2>/dev/null || true)
 
-            echo "=== Optimizing tables to reclaim disk space ==="
-            $CH --query "OPTIMIZE TABLE events FINAL" 2>/dev/null || true
-            $CH --query "OPTIMIZE TABLE events_v2 FINAL" 2>/dev/null || true
+              if [ -z "$PARTITIONS" ]; then
+                echo "No old partitions in $TABLE"
+                continue
+              fi
 
-            echo "=== Row count after ==="
-            $CH --query "SELECT count() FROM events" 2>/dev/null || true
-            $CH --query "SELECT count() FROM events_v2" 2>/dev/null || true
+              for PART in $PARTITIONS; do
+                echo "Dropping $TABLE partition $PART..."
+                $CH --query "ALTER TABLE $TABLE DROP PARTITION '$PART'" 2>/dev/null || \
+                $CH --query "ALTER TABLE $TABLE DROP PARTITION $PART" 2>/dev/null || \
+                echo "  skipped $PART (may not exist)"
+              done
+            done
 
-            echo "=== ClickHouse volume after ==="
-            du -sh $(docker volume inspect kuba_plausible-event-data --format '{{.Mountpoint}}') 2>/dev/null || docker system df -v | grep plausible-event
+            echo "=== Disk after partition drop ==="
+            df -h /
 
   docker-cleanup:
     name: Prune unused Docker resources
@@ -58,7 +73,6 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.DEPLOY_KEY }}
           script: |
-            set -eo pipefail
             AVAIL_BEFORE=$(df / --output=avail | tail -1)
 
             docker image prune -af --filter "until=168h" || true
@@ -76,7 +90,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: docker-cleanup
     steps:
-      - name: Fail workflow if disk still critical
+      - name: Fail if disk still critical after cleanup
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.SERVER_IP }}
@@ -96,8 +110,8 @@ jobs:
 
             if [ "$USED_PCT" -ge 80 ]; then
               echo ""
-              echo "CRITICAL: Disk still at ${USED_PCT}% after cleanup (${AVAIL_GB} GB free)."
-              echo "Action required: reduce PLAUSIBLE_RETENTION_DAYS or expand disk."
+              echo "CRITICAL: Disk at ${USED_PCT}% after cleanup (${AVAIL_GB} GB free)."
+              echo "Action required: reduce PLAUSIBLE_RETENTION_DAYS in docker-compose.yml or expand disk."
               exit 1
             fi
 
