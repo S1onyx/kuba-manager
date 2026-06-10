@@ -6,11 +6,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  cleanup:
-    name: Cleanup server disk
+  clickhouse-purge:
+    name: Purge old Plausible events
     runs-on: ubuntu-latest
     steps:
-      - name: Prune unused Docker resources
+      - name: Delete events older than 365 days and reclaim space
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.SERVER_IP }}
@@ -18,9 +18,47 @@ jobs:
           key: ${{ secrets.DEPLOY_KEY }}
           script: |
             set -eo pipefail
-            echo "=== Disk before cleanup ==="
-            df -h /
 
+            CH="docker exec kuba-plausible-events-db-1 clickhouse-client --database plausible"
+
+            echo "=== ClickHouse volume before ==="
+            du -sh $(docker volume inspect kuba_plausible-event-data --format '{{.Mountpoint}}') 2>/dev/null || docker system df -v | grep plausible-event
+
+            echo "=== Row count before ==="
+            $CH --query "SELECT count() FROM events" 2>/dev/null || echo "Table 'events' not found, trying events_v2..."
+            $CH --query "SELECT count() FROM events_v2" 2>/dev/null || true
+
+            echo "=== Deleting events older than 365 days ==="
+            $CH --query "ALTER TABLE events DELETE WHERE timestamp < now() - INTERVAL 365 DAY" 2>/dev/null || true
+            $CH --query "ALTER TABLE events_v2 DELETE WHERE timestamp < now() - INTERVAL 365 DAY" 2>/dev/null || true
+
+            echo "Waiting for mutations to complete..."
+            sleep 30
+
+            echo "=== Optimizing tables to reclaim disk space ==="
+            $CH --query "OPTIMIZE TABLE events FINAL" 2>/dev/null || true
+            $CH --query "OPTIMIZE TABLE events_v2 FINAL" 2>/dev/null || true
+
+            echo "=== Row count after ==="
+            $CH --query "SELECT count() FROM events" 2>/dev/null || true
+            $CH --query "SELECT count() FROM events_v2" 2>/dev/null || true
+
+            echo "=== ClickHouse volume after ==="
+            du -sh $(docker volume inspect kuba_plausible-event-data --format '{{.Mountpoint}}') 2>/dev/null || docker system df -v | grep plausible-event
+
+  docker-cleanup:
+    name: Prune unused Docker resources
+    runs-on: ubuntu-latest
+    needs: clickhouse-purge
+    steps:
+      - name: Remove dangling images, stopped containers, build cache
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            set -eo pipefail
             AVAIL_BEFORE=$(df / --output=avail | tail -1)
 
             docker image prune -af --filter "until=168h" || true
@@ -30,17 +68,15 @@ jobs:
 
             AVAIL_AFTER=$(df / --output=avail | tail -1)
             FREED=$(( (AVAIL_AFTER - AVAIL_BEFORE) / 1024 ))
-            echo ""
-            echo "=== Disk after cleanup ==="
+            echo "Docker cleanup freed: ~${FREED} MB"
             df -h /
-            echo "Freed: ~${FREED} MB"
 
-  disk-alert:
-    name: Disk space check
+  disk-check:
+    name: Assert disk usage under 80%
     runs-on: ubuntu-latest
-    needs: cleanup
+    needs: docker-cleanup
     steps:
-      - name: Check disk usage and alert if critical
+      - name: Fail workflow if disk still critical
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.SERVER_IP }}
@@ -52,16 +88,17 @@ jobs:
             USED_PCT=$(( (TOTAL - AVAIL) * 100 / TOTAL ))
             AVAIL_GB=$(( AVAIL / 1024 / 1024 ))
 
-            echo "Disk usage: ${USED_PCT}% (${AVAIL_GB} GB free)"
+            echo "=== Final disk state ==="
+            df -h /
+            echo ""
+            echo "Docker volumes:"
+            docker system df -v 2>/dev/null | grep kuba | sort -k4 -rh | head -10 || true
 
-            echo "=== Volume sizes ==="
-            docker system df --format "{{.Type}}\t{{.Size}}" 2>/dev/null || true
-
-            if [ "$USED_PCT" -ge 85 ]; then
+            if [ "$USED_PCT" -ge 80 ]; then
               echo ""
-              echo "WARNING: Disk usage at ${USED_PCT}%. Largest volumes:"
-              docker system df -v 2>/dev/null | grep -E "kuba_plausible|kuba_backend" | sort -k4 -rh | head -5 || true
-              echo ""
-              echo "Consider reducing PLAUSIBLE_RETENTION_DAYS in docker-compose.yml"
+              echo "CRITICAL: Disk still at ${USED_PCT}% after cleanup (${AVAIL_GB} GB free)."
+              echo "Action required: reduce PLAUSIBLE_RETENTION_DAYS or expand disk."
               exit 1
             fi
+
+            echo "OK: Disk at ${USED_PCT}% (${AVAIL_GB} GB free)."
