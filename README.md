@@ -108,10 +108,44 @@ Die SQLite-Datenbank des Backends wird im Named Volume `backend-data` persistent
 
 ### GitHub Workflows
 
-- **Build and Deploy Containers** (`.github/workflows/build-and-deploy.yml`)  
-  Läuft automatisch auf `main`-Pushes oder manuell. Baut alle Images (`backend`, `public`, `display`, `admin`), pusht sie nach Docker Hub (`latest` + Commit-SHA) und führt danach das Deployment-Skript auf dem Server aus.
-- **Manage Remote Stack** (`.github/workflows/manage-stack.yml`)  
-  Manueller Workflow mit Aktionen `start`, `stop`, `restart`, `update`, `status`. Ideal, um den Stack remote zu steuern, ohne sich per SSH einzuloggen.
+#### Build and Deploy Containers (`.github/workflows/build-and-deploy.yml`)
+
+Läuft automatisch auf `main`-Pushes oder manuell über "Run workflow".  
+Baut alle Images (`backend`, `public`, `display`, `admin`, `audio`), pusht sie nach Docker Hub (`latest` + Commit-SHA) und aktualisiert danach den Stack auf dem Server.  
+Optional: `skip_deploy = true` → nur bauen & pushen, kein Deployment.
+
+> Bricht ab, falls weniger als 2 GB freier Speicher auf dem Server vorhanden sind. In diesem Fall zuerst `cleanup` über **Manage Remote Stack** ausführen.
+
+---
+
+#### Manage Remote Stack (`.github/workflows/manage-stack.yml`)
+
+Manueller Workflow zum Steuern des Produktions-Stacks ohne SSH-Login. Aktion über das Dropdown "command" wählen:
+
+| Aktion | Beschreibung |
+|---|---|
+| `start` | Zieht aktuellen Stand von `origin/main` und startet alle Container. |
+| `stop` | Fährt alle Container herunter (`docker compose down`). |
+| `restart` | Stop + Start ohne Update. |
+| `update` | Holt neuen Code + Images und startet den Stack neu (wie ein manuelles Deployment). |
+| `status` | Zeigt Container-Status, Festplatten- und Docker-Speichernutzung. |
+| `cleanup` | Löscht ungenutzte Docker-Images, gestoppte Container und Build-Cache. Gibt Speicher frei, ohne laufende Daten zu berühren. |
+| `disk-usage` | Detaillierte Speicherübersicht: Systemfestplatte, Docker-Volumes, größte Verzeichnisse. |
+| `clickhouse-debug` | Zeigt alle ClickHouse-Datenbanken/-Tabellen und die Speichernutzung pro Tabelle. Hilfreich zur Diagnose, wenn Plausible zu viel Platz verbraucht. |
+| `clickhouse-nuke` | **Notfall-Aktion**: Stoppt ClickHouse, löscht alle System-Log-Tabellen direkt auf dem Dateisystem und startet den Stack neu. Benutze das, wenn die Festplatte voll ist und TRUNCATE fehlschlägt. Plausible-Eventdaten bleiben erhalten. |
+| `caddy-reload` | Lädt die Caddy-Konfiguration neu (nach Änderungen am Caddyfile), zeigt Zertifikatsstatus und Logs zur HTTPS-Diagnose. |
+
+---
+
+#### Scheduled Maintenance (`.github/workflows/scheduled-maintenance.yml`)
+
+Läuft automatisch **jeden Sonntag um 03:00 UTC** (oder manuell über "Run workflow").  
+Stellt sicher, dass die Festplatte nicht volläuft:
+
+1. **ClickHouse-Purge**: Kürzt System-Log-Tabellen (text_log, metric_log, etc.) und löscht Plausible-Partitionen älter als 90 Tage.  
+   Ist die Platte voll (< 1 GB frei), stoppt ClickHouse und räumt direkt auf dem Dateisystem auf.
+2. **Docker-Cleanup**: Löscht ungenutzte Images, Container, Build-Cache und Netzwerke.
+3. **Disk-Check**: Schlägt fehl (roter Build), falls die Festplatte nach dem Aufräumen noch ≥ 80 % belegt ist – so bekommst du frühzeitig eine Warnung.
 
 ### Lokaler Test mit Docker
 

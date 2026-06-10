@@ -159,7 +159,7 @@ jobs:
                 ;;
               caddy-reload)
                 echo "=== Caddy logs (last 50 lines) ==="
-                docker compose logs --tail=50 caddy
+                timeout 10 docker logs --tail=50 kuba-caddy-1 2>&1 || true
                 echo ""
                 echo "=== Reloading Caddy config ==="
                 docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile || true
@@ -169,7 +169,7 @@ jobs:
                 echo ""
                 echo "=== Caddy logs after reload ==="
                 sleep 5
-                docker compose logs --tail=30 caddy
+                timeout 10 docker logs --tail=30 kuba-caddy-1 2>&1 || true
                 ;;
               *)
                 echo "Unsupported command: ${{ inputs.command }}"
