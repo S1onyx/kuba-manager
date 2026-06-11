@@ -69,12 +69,21 @@ export default function TournamentDetailPage({ tournamentId }) {
       {tournament && (
         <>
           {tournament.poster_url && (
-            tournament.poster_url.match(/\.pdf(\?|$)/i) ? (
-              <iframe
-                src={tournament.poster_url}
-                title={`Plakat ${tournament.name}`}
-                style={{ width: '100%', height: '600px', border: 'none', borderRadius: '16px', background: 'rgba(0,0,0,0.3)' }}
-              />
+            tournament.poster_mime_type === 'application/pdf' ? (
+              <object
+                data={tournament.poster_url}
+                type="application/pdf"
+                style={{ width: '100%', aspectRatio: '1 / 1.414', borderRadius: '16px', background: 'rgba(0,0,0,0.15)', display: 'block' }}
+              >
+                <a
+                  href={tournament.poster_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ display: 'block', padding: '1.5rem', textAlign: 'center', color: '#7cb9ff' }}
+                >
+                  Plakat als PDF öffnen
+                </a>
+              </object>
             ) : (
               <img
                 src={tournament.poster_url}

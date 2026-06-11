@@ -19,7 +19,11 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 
 async function withPosterUrl(tournament) {
   if (!tournament || !tournament.poster_file_id) return tournament;
   const file = await getAudioFileById(tournament.poster_file_id);
-  return { ...tournament, poster_url: file ? `/media/audio/${encodeURIComponent(file.file_name)}` : null };
+  return {
+    ...tournament,
+    poster_url: file ? `/media/audio/${encodeURIComponent(file.file_name)}` : null,
+    poster_mime_type: file?.mime_type ?? null
+  };
 }
 
 const router = express.Router();

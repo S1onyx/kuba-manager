@@ -197,8 +197,16 @@ export default function TournamentDetailsPanel({
             <section style={{ display: 'grid', gap: '0.65rem' }}>
               <h3 style={{ margin: 0, fontSize: '1rem' }}>Plakat</h3>
               {tournament.poster_url ? (
-                tournament.poster_url.match(/\.pdf(\?|$)/i) ? (
-                  <iframe src={tournament.poster_url} title="Aktuelles Plakat" style={{ width: '100%', height: '340px', border: 'none', borderRadius: '8px', background: 'rgba(0,0,0,0.3)' }} />
+                tournament.poster_mime_type === 'application/pdf' ? (
+                  <object
+                    data={tournament.poster_url}
+                    type="application/pdf"
+                    style={{ width: '100%', aspectRatio: '1 / 1.414', borderRadius: '8px', background: 'rgba(0,0,0,0.3)', display: 'block' }}
+                  >
+                    <a href={tournament.poster_url} target="_blank" rel="noopener noreferrer" style={{ display: 'block', padding: '1rem', textAlign: 'center', color: '#7cb9ff' }}>
+                      PDF öffnen
+                    </a>
+                  </object>
                 ) : (
                   <img src={tournament.poster_url} alt="Aktuelles Plakat" style={{ maxWidth: '100%', maxHeight: '240px', objectFit: 'contain', borderRadius: '8px', background: 'rgba(0,0,0,0.3)' }} />
                 )
