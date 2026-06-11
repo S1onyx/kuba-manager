@@ -1,18 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import PanelCard from '../../common/PanelCard.jsx';
 import { useDashboard } from '../../../context/DashboardContext.jsx';
-import { fetchRegistrations, updateRegistrationStatus } from '../../../utils/api.js';
+import { fetchRegistrations, updateRegistrationStatus, activateTournament } from '../../../utils/api.js';
 
 export default function TournamentDetailsPanel({
   tournament,
   structureState,
   teams
 }) {
-  const { tournaments: { handlePosterUpload } } = useDashboard();
+  const { tournaments: { handlePosterUpload, loadTournaments } } = useDashboard();
   const [posterFile, setPosterFile] = useState(null);
   const [registrations, setRegistrations] = useState([]);
   const [regLoading, setRegLoading] = useState(false);
   const [regTab, setRegTab] = useState(false);
+  const [activating, setActivating] = useState(false);
 
   const loadRegistrations = useCallback(() => {
     setRegLoading(true);
@@ -29,6 +30,20 @@ export default function TournamentDetailsPanel({
   const handleStatusChange = async (regId, status) => {
     await updateRegistrationStatus(tournament.id, regId, status);
     loadRegistrations();
+  };
+
+  const handleActivate = async () => {
+    const confirmed = registrations.filter((r) => r.status === 'confirmed').length;
+    if (!window.confirm(`Turnier aktivieren? ${confirmed} bestätigte Teams werden übernommen. Status wechselt zu "Aktiv" und die Struktur wird generiert.`)) return;
+    setActivating(true);
+    try {
+      await activateTournament(tournament.id);
+      loadTournaments();
+    } catch (err) {
+      alert(err.message || 'Aktivierung fehlgeschlagen.');
+    } finally {
+      setActivating(false);
+    }
   };
 
   const handlePosterFileSelect = (event) => {
@@ -161,6 +176,16 @@ export default function TournamentDetailsPanel({
 
         {regTab && (
           <div style={{ display: 'grid', gap: '0.75rem' }}>
+            {registrations.filter((r) => r.status === 'confirmed').length >= 2 && (
+              <button
+                type="button"
+                onClick={handleActivate}
+                disabled={activating}
+                style={{ padding: '0.55rem 1.25rem', borderRadius: '8px', border: 'none', background: 'rgba(64,200,120,0.3)', color: '#7dffb3', fontWeight: 600, cursor: activating ? 'not-allowed' : 'pointer', justifySelf: 'start' }}
+              >
+                {activating ? 'Wird aktiviert...' : `🚀 Turnier aktivieren (${registrations.filter((r) => r.status === 'confirmed').length} Teams)`}
+              </button>
+            )}
             {regLoading && <p style={{ margin: 0, opacity: 0.6 }}>Lade Anmeldungen...</p>}
             {!regLoading && registrations.length === 0 && <p style={{ margin: 0, opacity: 0.6 }}>Noch keine Anmeldungen.</p>}
             {registrations.map((reg) => (

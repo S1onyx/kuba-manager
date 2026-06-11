@@ -369,6 +369,10 @@ export function uploadTournamentPoster(id, file) {
   return request(`/tournaments/${id}/poster`, { method: 'POST', body: formData });
 }
 
+export function activateTournament(id) {
+  return request(`/tournaments/${id}/activate`, { method: 'POST' });
+}
+
 export function fetchRegistrations(tournamentId) {
   return request(`/tournaments/${tournamentId}/registrations`);
 }

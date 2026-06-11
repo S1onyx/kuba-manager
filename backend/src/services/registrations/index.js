@@ -77,6 +77,7 @@ export async function listRegistrations(tournamentId) {
         players: JSON.parse(row.players_json || '[]'),
         audioNotes: row.audio_notes,
         status: row.status,
+        teamId: row.team_id ?? null,
         createdAt: row.created_at,
         audioFiles: row.audio_files
           ? row.audio_files.split(';;').map((s) => {
@@ -90,6 +91,104 @@ export async function listRegistrations(tournamentId) {
     stmt.free();
   }
   return rows;
+}
+
+export async function getRegistration(id) {
+  const { db } = await getConnection();
+  const stmt = db.prepare('SELECT * FROM tournament_registrations WHERE id = ?');
+  try {
+    stmt.bind([id]);
+    const row = stmt.step() ? stmt.getAsObject() : null;
+    if (!row) return null;
+    return {
+      id: row.id,
+      tournamentId: row.tournament_id,
+      teamName: row.team_name,
+      contactName: row.contact_name,
+      contactEmail: row.contact_email,
+      players: JSON.parse(row.players_json || '[]'),
+      audioNotes: row.audio_notes,
+      status: row.status,
+      teamId: row.team_id ?? null,
+      createdAt: row.created_at
+    };
+  } finally {
+    stmt.free();
+  }
+}
+
+// Upserts a team by name, returns team id
+function upsertTeam(db, SQL, teamName) {
+  db.run(
+    `INSERT INTO teams (name) VALUES (?) ON CONFLICT(name) DO UPDATE SET name = excluded.name`,
+    [teamName]
+  );
+  const result = db.exec('SELECT id FROM teams WHERE name = ?', [teamName]);
+  return result[0]?.values[0][0] ?? null;
+}
+
+// Finds the next free slot in tournament_teams for this tournament
+function nextFreeSlot(db, tournamentId) {
+  const result = db.exec(
+    'SELECT COALESCE(MAX(slot_number), 0) + 1 FROM tournament_teams WHERE tournament_id = ?',
+    [tournamentId]
+  );
+  return result[0]?.values[0][0] ?? 1;
+}
+
+export async function confirmRegistration(regId) {
+  const reg = await getRegistration(regId);
+  if (!reg) throw new Error('Anmeldung nicht gefunden.');
+
+  const { SQL, db } = await getConnection();
+
+  // Upsert team
+  const teamId = upsertTeam(db, SQL, reg.teamName);
+
+  // Add to tournament_teams if not already there
+  const existing = db.exec(
+    'SELECT id FROM tournament_teams WHERE tournament_id = ? AND team_id = ?',
+    [reg.tournamentId, teamId]
+  );
+  if (!existing[0]?.values?.length) {
+    const slot = nextFreeSlot(db, reg.tournamentId);
+    db.run(
+      'INSERT INTO tournament_teams (tournament_id, slot_number, team_id, placeholder) VALUES (?, ?, ?, ?)',
+      [reg.tournamentId, slot, teamId, reg.teamName]
+    );
+  }
+
+  // Update registration
+  db.run(
+    'UPDATE tournament_registrations SET status = ?, team_id = ? WHERE id = ?',
+    ['confirmed', teamId, regId]
+  );
+
+  persistDatabase(db, SQL);
+  return { ...reg, status: 'confirmed', teamId };
+}
+
+export async function rejectRegistration(regId) {
+  const reg = await getRegistration(regId);
+  if (!reg) throw new Error('Anmeldung nicht gefunden.');
+
+  const { SQL, db } = await getConnection();
+
+  // Remove from tournament_teams if present and was confirmed via this registration
+  if (reg.teamId) {
+    db.run(
+      'DELETE FROM tournament_teams WHERE tournament_id = ? AND team_id = ?',
+      [reg.tournamentId, reg.teamId]
+    );
+  }
+
+  db.run(
+    'UPDATE tournament_registrations SET status = ?, team_id = NULL WHERE id = ?',
+    ['rejected', regId]
+  );
+
+  persistDatabase(db, SQL);
+  return { ...reg, status: 'rejected' };
 }
 
 export async function updateRegistrationStatus(id, status) {

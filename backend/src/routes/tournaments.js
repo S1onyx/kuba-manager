@@ -1,6 +1,7 @@
 import express from 'express';
 import multer from 'multer';
-import { listRegistrations, updateRegistrationStatus } from '../services/registrations/index.js';
+import { listRegistrations, confirmRegistration, rejectRegistration, updateRegistrationStatus } from '../services/registrations/index.js';
+import { sendRegistrationApproved, sendRegistrationRejected } from '../services/mail/index.js';
 import {
   createTournament,
   deleteTournament,
@@ -316,6 +317,43 @@ router.put('/:id/teams', async (req, res) => {
   }
 });
 
+router.post('/:id/activate', async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+  }
+  try {
+    const tournament = await getTournament(id);
+    if (!tournament) return res.status(404).json({ message: 'Turnier nicht gefunden.' });
+    if (tournament.status !== 'planned') return res.status(400).json({ message: 'Turnier ist nicht im Status "geplant".' });
+
+    // Count confirmed teams
+    const { db } = await (await import('../db/connection.js')).getConnection();
+    const result = db.exec(
+      'SELECT COUNT(*) FROM tournament_teams WHERE tournament_id = ?',
+      [id]
+    );
+    const teamCount = result[0]?.values[0][0] ?? 0;
+
+    if (teamCount < 2) {
+      return res.status(400).json({ message: `Mindestens 2 bestätigte Teams nötig (aktuell: ${teamCount}).` });
+    }
+
+    const updated = await updateTournament(id, {
+      ...tournament,
+      status: 'active',
+      team_count: teamCount,
+      group_count: tournament.group_count || 1,
+      knockout_rounds: tournament.knockout_rounds || 0
+    });
+
+    res.json(await withPosterUrl(updated));
+  } catch (error) {
+    console.error('Turnier konnte nicht aktiviert werden:', error);
+    res.status(500).json({ message: error.message || 'Turnier konnte nicht aktiviert werden.' });
+  }
+});
+
 router.get('/:id/registrations', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
@@ -331,6 +369,7 @@ router.get('/:id/registrations', async (req, res) => {
 });
 
 router.patch('/:id/registrations/:regId', async (req, res) => {
+  const tournamentId = Number(req.params.id);
   const regId = Number(req.params.regId);
   const { status } = req.body ?? {};
   if (!Number.isInteger(regId) || regId <= 0) {
@@ -341,10 +380,22 @@ router.patch('/:id/registrations/:regId', async (req, res) => {
     return res.status(400).json({ message: 'Ungültiger Status.' });
   }
   try {
-    await updateRegistrationStatus(regId, status);
+    const tournament = await getTournament(tournamentId);
+
+    if (status === 'confirmed') {
+      const reg = await confirmRegistration(regId);
+      sendRegistrationApproved({ to: reg.contactEmail, tournamentName: tournament?.name ?? '', teamName: reg.teamName, contactName: reg.contactName }).catch(console.error);
+    } else if (status === 'rejected') {
+      const reg = await rejectRegistration(regId);
+      sendRegistrationRejected({ to: reg.contactEmail, tournamentName: tournament?.name ?? '', teamName: reg.teamName, contactName: reg.contactName }).catch(console.error);
+    } else {
+      await updateRegistrationStatus(regId, status);
+    }
+
     res.json({ ok: true });
   } catch (error) {
-    res.status(500).json({ message: 'Status konnte nicht aktualisiert werden.' });
+    console.error('Status konnte nicht aktualisiert werden:', error);
+    res.status(500).json({ message: error.message || 'Status konnte nicht aktualisiert werden.' });
   }
 });
 
