@@ -3,6 +3,7 @@ import { promises as fsPromises } from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { databasePaths, getConnection, persistDatabase } from '../../db/connection.js';
+import { getAudioStorageDirectory, createAudioFileRecord } from '../audio/index.js';
 
 const REG_AUDIO_DIR = path.join(databasePaths.dataDir, 'registration-audio');
 fs.mkdirSync(REG_AUDIO_DIR, { recursive: true });
@@ -165,6 +166,40 @@ export async function confirmRegistration(regId) {
   );
 
   persistDatabase(db, SQL);
+
+  // Copy Korbhymne to audio storage and register as audio file for this team
+  try {
+    const audioStmt = db.prepare(
+      'SELECT file_name, original_name FROM registration_audio_files WHERE registration_id = ? LIMIT 1'
+    );
+    let audioRow = null;
+    try {
+      audioStmt.bind([regId]);
+      if (audioStmt.step()) audioRow = audioStmt.getAsObject();
+    } finally {
+      audioStmt.free();
+    }
+
+    if (audioRow) {
+      const srcPath = path.join(REG_AUDIO_DIR, audioRow.file_name);
+      const ext = path.extname(audioRow.file_name);
+      const destName = `${crypto.randomBytes(8).toString('hex')}${ext}`;
+      const destPath = path.join(getAudioStorageDirectory(), destName);
+      await fsPromises.copyFile(srcPath, destPath);
+      const stat = await fsPromises.stat(destPath);
+      await createAudioFileRecord({
+        label: `Korbhymne – ${reg.teamName}`,
+        originalName: audioRow.original_name,
+        fileName: destName,
+        mimeType: 'audio/mpeg',
+        sizeBytes: stat.size,
+        usage: 'library'
+      });
+    }
+  } catch (audioErr) {
+    console.error('[registrations] Korbhymne konnte nicht kopiert werden:', audioErr);
+  }
+
   return { ...reg, status: 'confirmed', teamId };
 }
 

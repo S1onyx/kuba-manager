@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { submitRegistration } from '../../api.js';
 
-const POSITIONS = ['', 'Aufbau', 'Flügel', 'Center', 'Guard'];
-
 function emptyPlayer() {
-  return { name: '', jerseyNumber: '', position: '' };
+  return { name: '', jerseyNumber: '' };
 }
 
 export default function RegistrationForm({ tournament, onSuccess }) {
@@ -12,8 +10,7 @@ export default function RegistrationForm({ tournament, onSuccess }) {
   const [contactName, setContactName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [players, setPlayers] = useState([emptyPlayer(), emptyPlayer(), emptyPlayer(), emptyPlayer(), emptyPlayer()]);
-  const [audioNotes, setAudioNotes] = useState('');
-  const [audioFiles, setAudioFiles] = useState([]);
+  const [audioFile, setAudioFile] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -26,8 +23,8 @@ export default function RegistrationForm({ tournament, onSuccess }) {
     setError('');
 
     const validPlayers = players.filter((p) => p.name.trim());
-    if (validPlayers.length < 1) {
-      setError('Bitte mindestens einen Spieler eintragen.');
+    if (validPlayers.length < 4) {
+      setError('Bitte mindestens 4 Spieler eintragen.');
       return;
     }
 
@@ -36,10 +33,7 @@ export default function RegistrationForm({ tournament, onSuccess }) {
     fd.append('contact_name', contactName.trim());
     fd.append('contact_email', contactEmail.trim());
     fd.append('players', JSON.stringify(validPlayers));
-    fd.append('audio_notes', audioNotes);
-    for (const file of audioFiles) {
-      fd.append('audio', file);
-    }
+    if (audioFile) fd.append('audio', audioFile);
 
     setSubmitting(true);
     try {
@@ -88,7 +82,7 @@ export default function RegistrationForm({ tournament, onSuccess }) {
       <section style={{ display: 'grid', gap: '0.75rem' }}>
         <h3 style={{ margin: 0, fontSize: '1rem', opacity: 0.9 }}>Spieler (4 Pflicht, 1 optional)</h3>
         {players.map((p, i) => (
-          <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '0.5rem', alignItems: 'end' }}>
+          <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 80px', gap: '0.5rem', alignItems: 'end' }}>
             <label style={labelStyle}>
               {i < 4 ? `Spieler ${i + 1} *` : `Spieler ${i + 1} (optional)`}
               <input
@@ -99,49 +93,36 @@ export default function RegistrationForm({ tournament, onSuccess }) {
                 placeholder="Name"
               />
             </label>
-            <label style={{ ...labelStyle, width: '70px' }}>
-              #
+            <label style={{ ...labelStyle }}>
+              Nummer
               <input
-                style={{ ...inputStyle, width: '70px' }}
+                style={{ ...inputStyle }}
                 type="number"
                 min="0"
                 max="99"
                 value={p.jerseyNumber}
                 onChange={(e) => updatePlayer(i, 'jerseyNumber', e.target.value)}
-                placeholder="Nr."
+                placeholder="#"
               />
-            </label>
-            <label style={{ ...labelStyle, width: '110px' }}>
-              Position
-              <select style={{ ...inputStyle, width: '110px' }} value={p.position} onChange={(e) => updatePlayer(i, 'position', e.target.value)}>
-                {POSITIONS.map((pos) => <option key={pos} value={pos}>{pos || '–'}</option>)}
-              </select>
             </label>
           </div>
         ))}
       </section>
 
       <section style={{ display: 'grid', gap: '0.75rem' }}>
-        <h3 style={{ margin: 0, fontSize: '1rem', opacity: 0.9 }}>Audio-Wünsche</h3>
+        <h3 style={{ margin: 0, fontSize: '1rem', opacity: 0.9 }}>Korbhymne</h3>
         <label style={labelStyle}>
-          MP3-Dateien hochladen (max. 5, je 20 MB)
+          MP3 hochladen (max. 20 MB)
           <input
             type="file"
             accept="audio/mpeg,audio/mp3,.mp3"
-            multiple
-            onChange={(e) => setAudioFiles(Array.from(e.target.files).slice(0, 5))}
+            onChange={(e) => setAudioFile(e.target.files[0] ?? null)}
             style={{ ...inputStyle, padding: '0.4rem' }}
           />
         </label>
-        <label style={labelStyle}>
-          Anmerkungen zu den Sounds (optional)
-          <textarea
-            style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }}
-            value={audioNotes}
-            onChange={(e) => setAudioNotes(e.target.value)}
-            placeholder="z. B. Einlaufmusik für welches Team, Zeitpunkt, ..."
-          />
-        </label>
+        {audioFile && (
+          <p style={{ margin: 0, opacity: 0.6, fontSize: '0.8rem' }}>Ausgewählt: {audioFile.name}</p>
+        )}
       </section>
 
       {error && (
