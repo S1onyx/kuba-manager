@@ -177,15 +177,15 @@ export async function confirmRegistration(regId) {
 
   persistDatabase(db, SQL);
 
-  // 5. Copy Korbhymne into audio library (fire-and-forget)
-  _copyKorbhymneAsync(db, regId, reg.teamName).catch((err) =>
+  // 5. Copy Korbhymne into audio library and wire trigger (fire-and-forget)
+  _copyKorbhymneAsync(regId, reg.teamName, teamId).catch((err) =>
     console.error('[registrations] Korbhymne copy failed:', err)
   );
 
   return { ...reg, status: 'confirmed', teamId };
 }
 
-async function _copyKorbhymneAsync(db, regId, teamName) {
+async function _copyKorbhymneAsync(regId, teamName, teamId) {
   // Re-read audio file from DB using fresh connection to avoid stale state
   const { db: freshDb } = await getConnection();
   const stmt = freshDb.prepare(
@@ -210,13 +210,28 @@ async function _copyKorbhymneAsync(db, regId, teamName) {
   const stat = await fsPromises.stat(destPath);
 
   const { SQL: SQL2, db: db2 } = await getConnection();
+
+  // Insert into audio_files
   db2.run(
     `INSERT INTO audio_files (label, original_name, file_name, mime_type, size_bytes, usage, created_at, updated_at)
      VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
     [`Korbhymne – ${teamName}`, audioRow.original_name, destName, 'audio/mpeg', stat.size, 'library']
   );
+  const audioFileId = db2.exec('SELECT last_insert_rowid() as id')[0].values[0][0];
+
+  // Ensure score trigger exists for this team and assign the anthem
+  const triggerKey = `score_team_${teamId}`;
+  const triggerLabel = `Korb ${teamName}`;
+  // Upsert trigger record
+  db2.run(
+    `INSERT INTO audio_triggers (key, label, description, is_active, audio_file_id, updated_at)
+     VALUES (?, ?, ?, 1, ?, datetime('now'))
+     ON CONFLICT(key) DO UPDATE SET audio_file_id = excluded.audio_file_id, updated_at = datetime('now')`,
+    [triggerKey, triggerLabel, 'Korbhymne (automatisch)', audioFileId]
+  );
+
   persistDatabase(db2, SQL2);
-  console.log(`[registrations] Korbhymne für "${teamName}" in Audio-Bibliothek eingetragen: ${destName}`);
+  console.log(`[registrations] Korbhymne für "${teamName}" → Trigger ${triggerKey} (file_id=${audioFileId})`);
 }
 
 export async function rejectRegistration(regId) {

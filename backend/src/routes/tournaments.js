@@ -342,24 +342,45 @@ router.post('/:id/activate', async (req, res) => {
     if (!tournament) return res.status(404).json({ message: 'Turnier nicht gefunden.' });
     if (tournament.status !== 'planned') return res.status(400).json({ message: 'Turnier ist nicht im Status "geplant".' });
 
-    // Count confirmed teams
-    const { db } = await (await import('../db/connection.js')).getConnection();
-    const result = db.exec(
-      'SELECT COUNT(*) FROM tournament_teams WHERE tournament_id = ?',
-      [id]
-    );
-    const teamCount = result[0]?.values[0][0] ?? 0;
+    const { group_count, knockout_rounds, teams: teamsPayload } = req.body ?? {};
+    const conn = await import('../db/connection.js');
+    const { SQL, db } = await conn.getConnection();
 
-    if (teamCount < 2) {
-      return res.status(400).json({ message: `Mindestens 2 bestätigte Teams nötig (aktuell: ${teamCount}).` });
+    // Apply team slot assignments from payload
+    // teamsPayload: [{ slot_number, team_id, name }]
+    if (Array.isArray(teamsPayload) && teamsPayload.length > 0) {
+      // Clear existing slots
+      db.run('DELETE FROM tournament_teams WHERE tournament_id = ?', [id]);
+      for (const t of teamsPayload) {
+        const slot = Number(t.slot_number);
+        const teamName = String(t.name || '').trim();
+        if (!slot || !teamName) continue;
+        let teamId = t.team_id ? Number(t.team_id) : null;
+        if (!teamId && teamName) {
+          // Upsert team by name
+          db.run('INSERT INTO teams (name) VALUES (?) ON CONFLICT(name) DO UPDATE SET name = excluded.name', [teamName]);
+          const r = db.exec('SELECT id FROM teams WHERE name = ?', [teamName]);
+          teamId = r[0]?.values[0][0] ?? null;
+        }
+        db.run(
+          'INSERT OR REPLACE INTO tournament_teams (tournament_id, slot_number, team_id, placeholder) VALUES (?, ?, ?, ?)',
+          [id, slot, teamId, teamName]
+        );
+      }
+      conn.persistDatabase(db, SQL);
+    }
+
+    const finalTeamCount = db.exec('SELECT COUNT(*) FROM tournament_teams WHERE tournament_id = ?', [id])[0]?.values[0][0] ?? 0;
+    if (finalTeamCount < 2) {
+      return res.status(400).json({ message: `Mindestens 2 Teams nötig (aktuell: ${finalTeamCount}).` });
     }
 
     const updated = await updateTournament(id, {
       ...tournament,
       status: 'active',
-      team_count: teamCount,
-      group_count: tournament.group_count || 1,
-      knockout_rounds: tournament.knockout_rounds || 0
+      team_count: finalTeamCount,
+      group_count: group_count ? Number(group_count) : (tournament.group_count || 1),
+      knockout_rounds: knockout_rounds !== undefined ? Number(knockout_rounds) : (tournament.knockout_rounds || 0)
     });
 
     res.json(await withPosterUrl(updated));

@@ -14,6 +14,10 @@ export default function TournamentDetailsPanel({
   const [regLoading, setRegLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('info');
   const [activating, setActivating] = useState(false);
+  const [showActivateForm, setShowActivateForm] = useState(false);
+  const [activateGroupCount, setActivateGroupCount] = useState('1');
+  const [activateKoRounds, setActivateKoRounds] = useState('0');
+  const [activateTeams, setActivateTeams] = useState([]);
   const [statusChanging, setStatusChanging] = useState(null);
   const [statusError, setStatusError] = useState('');
   const [closingReg, setClosingReg] = useState(false);
@@ -55,12 +59,37 @@ export default function TournamentDetailsPanel({
     }
   };
 
+  const openActivateForm = () => {
+    const confirmed = registrations
+      .filter((r) => r.status === 'confirmed')
+      .map((r, i) => ({ slot_number: i + 1, team_id: r.teamId, name: r.teamName }));
+    setActivateTeams(confirmed.length > 0 ? confirmed : [{ slot_number: 1, team_id: null, name: '' }]);
+    setActivateGroupCount(String(tournament.group_count || 1));
+    setActivateKoRounds(String(tournament.knockout_rounds || 0));
+    setShowActivateForm(true);
+  };
+
+  const addActivateTeamSlot = () => {
+    setActivateTeams((prev) => [...prev, { slot_number: prev.length + 1, team_id: null, name: '' }]);
+  };
+
+  const removeActivateTeamSlot = (idx) => {
+    setActivateTeams((prev) => prev.filter((_, i) => i !== idx).map((t, i) => ({ ...t, slot_number: i + 1 })));
+  };
+
+  const updateActivateTeam = (idx, field, value) => {
+    setActivateTeams((prev) => prev.map((t, i) => i === idx ? { ...t, [field]: value } : t));
+  };
+
   const handleActivate = async () => {
-    const confirmed = registrations.filter((r) => r.status === 'confirmed').length;
-    if (!window.confirm(`Turnier aktivieren? ${confirmed} bestätigte Teams werden übernommen. Status wechselt zu "Aktiv" und die Struktur wird generiert.`)) return;
     setActivating(true);
     try {
-      await activateTournament(tournament.id);
+      await activateTournament(tournament.id, {
+        group_count: Number(activateGroupCount),
+        knockout_rounds: Number(activateKoRounds),
+        teams: activateTeams.filter((t) => t.name.trim())
+      });
+      setShowActivateForm(false);
       loadTournaments();
     } catch (err) {
       alert(err.message || 'Aktivierung fehlgeschlagen.');
@@ -214,15 +243,66 @@ export default function TournamentDetailsPanel({
               </button>
             </div>
             {statusError && <p style={{ margin: 0, color: '#ffb0b0', fontSize: '0.85rem' }}>{statusError}</p>}
-            {registrations.filter((r) => r.status === 'confirmed').length >= 2 && (
+            {!showActivateForm && (
               <button
                 type="button"
-                onClick={handleActivate}
-                disabled={activating}
-                style={{ padding: '0.55rem 1.25rem', borderRadius: '8px', border: 'none', background: 'rgba(64,200,120,0.3)', color: '#7dffb3', fontWeight: 600, cursor: activating ? 'not-allowed' : 'pointer', justifySelf: 'start' }}
+                onClick={openActivateForm}
+                style={{ padding: '0.55rem 1.25rem', borderRadius: '8px', border: 'none', background: 'rgba(64,200,120,0.25)', color: '#7dffb3', fontWeight: 600, cursor: 'pointer', justifySelf: 'start' }}
               >
-                {activating ? 'Wird aktiviert...' : `🚀 Turnier aktivieren (${registrations.filter((r) => r.status === 'confirmed').length} Teams)`}
+                🚀 Turnier aktivieren
               </button>
+            )}
+
+            {showActivateForm && (
+              <div style={{ background: 'rgba(0,0,0,0.3)', borderRadius: '12px', padding: '1.25rem', display: 'grid', gap: '1rem', border: '1px solid rgba(64,200,120,0.2)' }}>
+                <h3 style={{ margin: 0, fontSize: '1rem' }}>Turnier-Konfiguration</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                  <label style={{ display: 'grid', gap: '0.3rem', fontSize: '0.875rem' }}>
+                    Gruppen
+                    <input type="number" min="1" value={activateGroupCount} onChange={(e) => setActivateGroupCount(e.target.value)}
+                      style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff' }} />
+                  </label>
+                  <label style={{ display: 'grid', gap: '0.3rem', fontSize: '0.875rem' }}>
+                    KO-Runden
+                    <input type="number" min="0" value={activateKoRounds} onChange={(e) => setActivateKoRounds(e.target.value)}
+                      style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff' }} />
+                  </label>
+                </div>
+
+                <div style={{ display: 'grid', gap: '0.5rem' }}>
+                  <p style={{ margin: 0, fontSize: '0.875rem', opacity: 0.7 }}>Teams ({activateTeams.length})</p>
+                  {activateTeams.map((t, idx) => (
+                    <div key={idx} style={{ display: 'grid', gridTemplateColumns: 'auto 1fr auto', gap: '0.5rem', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.8rem', opacity: 0.5, minWidth: '20px' }}>{idx + 1}.</span>
+                      <input
+                        value={t.name}
+                        onChange={(e) => updateActivateTeam(idx, 'name', e.target.value)}
+                        placeholder="Teamname"
+                        style={{ padding: '0.45rem 0.6rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: t.team_id ? 'rgba(64,200,120,0.08)' : 'rgba(255,255,255,0.06)', color: '#fff', fontSize: '0.875rem' }}
+                      />
+                      <button type="button" onClick={() => removeActivateTeamSlot(idx)}
+                        style={{ padding: '0.3rem 0.5rem', borderRadius: '6px', border: '1px solid rgba(255,100,100,0.3)', background: 'transparent', color: 'rgba(255,100,100,0.8)', cursor: 'pointer', fontSize: '0.8rem' }}>
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                  <button type="button" onClick={addActivateTeamSlot}
+                    style={{ padding: '0.4rem', borderRadius: '6px', border: '1px dashed rgba(255,255,255,0.2)', background: 'transparent', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', fontSize: '0.85rem' }}>
+                    + Team hinzufügen
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button type="button" onClick={handleActivate} disabled={activating}
+                    style={{ padding: '0.55rem 1.25rem', borderRadius: '8px', border: 'none', background: activating ? 'rgba(64,200,120,0.15)' : 'rgba(64,200,120,0.4)', color: '#7dffb3', fontWeight: 600, cursor: activating ? 'not-allowed' : 'pointer' }}>
+                    {activating ? 'Wird aktiviert...' : '🚀 Jetzt aktivieren'}
+                  </button>
+                  <button type="button" onClick={() => setShowActivateForm(false)}
+                    style={{ padding: '0.55rem 1rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'transparent', color: '#fff', cursor: 'pointer' }}>
+                    Abbrechen
+                  </button>
+                </div>
+              </div>
             )}
             {regLoading && <p style={{ margin: 0, opacity: 0.6 }}>Lade Anmeldungen...</p>}
             {!regLoading && registrations.length === 0 && <p style={{ margin: 0, opacity: 0.6 }}>Noch keine Anmeldungen.</p>}
