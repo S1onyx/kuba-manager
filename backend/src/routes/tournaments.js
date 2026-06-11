@@ -31,7 +31,7 @@ async function withPosterUrls(tournaments) {
   return Promise.all(tournaments.map(withPosterUrl));
 }
 
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
 
 const router = express.Router();
 
@@ -133,8 +133,8 @@ router.post('/:id/poster', upload.single('file'), async (req, res) => {
     return res.status(400).json({ message: 'Bitte eine Bilddatei hochladen.' });
   }
 
-  if (!file.mimetype.startsWith('image/')) {
-    return res.status(400).json({ message: 'Es werden nur Bilddateien unterstützt.' });
+  if (!file.mimetype.startsWith('image/') && file.mimetype !== 'application/pdf') {
+    return res.status(400).json({ message: 'Es werden nur Bild- und PDF-Dateien unterstützt.' });
   }
 
   try {

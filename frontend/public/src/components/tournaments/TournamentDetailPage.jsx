@@ -69,11 +69,19 @@ export default function TournamentDetailPage({ tournamentId }) {
       {tournament && (
         <>
           {tournament.poster_url && (
-            <img
-              src={tournament.poster_url}
-              alt={`Plakat ${tournament.name}`}
-              style={{ width: '100%', maxHeight: '400px', objectFit: 'cover', borderRadius: '16px' }}
-            />
+            tournament.poster_url.match(/\.pdf(\?|$)/i) ? (
+              <iframe
+                src={tournament.poster_url}
+                title={`Plakat ${tournament.name}`}
+                style={{ width: '100%', height: '600px', border: 'none', borderRadius: '16px', background: 'rgba(0,0,0,0.3)' }}
+              />
+            ) : (
+              <img
+                src={tournament.poster_url}
+                alt={`Plakat ${tournament.name}`}
+                style={{ width: '100%', maxHeight: '600px', objectFit: 'contain', borderRadius: '16px', background: 'rgba(0,0,0,0.15)' }}
+              />
+            )
           )}
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>

@@ -197,11 +197,15 @@ export default function TournamentDetailsPanel({
             <section style={{ display: 'grid', gap: '0.65rem' }}>
               <h3 style={{ margin: 0, fontSize: '1rem' }}>Plakat</h3>
               {tournament.poster_url ? (
-                <img src={tournament.poster_url} alt="Aktuelles Plakat" style={{ maxWidth: '100%', maxHeight: '240px', objectFit: 'contain', borderRadius: '8px', background: 'rgba(0,0,0,0.3)' }} />
+                tournament.poster_url.match(/\.pdf(\?|$)/i) ? (
+                  <iframe src={tournament.poster_url} title="Aktuelles Plakat" style={{ width: '100%', height: '340px', border: 'none', borderRadius: '8px', background: 'rgba(0,0,0,0.3)' }} />
+                ) : (
+                  <img src={tournament.poster_url} alt="Aktuelles Plakat" style={{ maxWidth: '100%', maxHeight: '240px', objectFit: 'contain', borderRadius: '8px', background: 'rgba(0,0,0,0.3)' }} />
+                )
               ) : (
                 <p style={{ margin: 0, opacity: 0.6 }}>Noch kein Plakat hochgeladen.</p>
               )}
-              <input type="file" accept="image/*" onChange={handlePosterFileSelect} />
+              <input type="file" accept="image/*,application/pdf" onChange={handlePosterFileSelect} />
               {posterFile && <p style={{ margin: 0, opacity: 0.7, fontSize: '0.85rem' }}>Ausgewählt: {posterFile.name}</p>}
               <div><button type="button" onClick={handlePosterUploadClick} disabled={!posterFile}>{tournament.poster_url ? 'Plakat ersetzen' : 'Hochladen'}</button></div>
             </section>
