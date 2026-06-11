@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import socket from '../socket.js';
 import { fetchJson } from '../utils/api.js';
 
@@ -7,43 +7,46 @@ export default function useScoreboardData() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    let cancelled = false;
-
+  const fetchScoreboard = useCallback(() => {
     fetchJson('/scoreboard')
       .then((data) => {
-        if (cancelled) return;
         setScoreboard(data);
         setError('');
       })
       .catch((err) => {
         console.error(err);
-        if (cancelled) return;
         setError('Scoreboard konnte nicht geladen werden.');
-        setScoreboard(null);
       })
       .finally(() => {
-        if (!cancelled) {
-          setLoading(false);
-        }
+        setLoading(false);
       });
-
-    return () => {
-      cancelled = true;
-    };
   }, []);
+
+  // Initial fetch
+  useEffect(() => {
+    fetchScoreboard();
+  }, [fetchScoreboard]);
 
   useEffect(() => {
     const handleUpdate = (payload) => {
       setScoreboard(payload);
       setError('');
+      setLoading(false);
+    };
+
+    // Re-fetch full state on reconnect in case updates were missed while disconnected
+    const handleReconnect = () => {
+      fetchScoreboard();
     };
 
     socket.on('scoreboard:update', handleUpdate);
+    socket.on('reconnect', handleReconnect);
+
     return () => {
       socket.off('scoreboard:update', handleUpdate);
+      socket.off('reconnect', handleReconnect);
     };
-  }, []);
+  }, [fetchScoreboard]);
 
   return { scoreboard, error, loading };
 }

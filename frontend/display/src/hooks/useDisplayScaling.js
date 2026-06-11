@@ -5,9 +5,10 @@ export default function useDisplayScaling(dependencies = []) {
   const contentRef = useRef(null);
   const [scale, setScale] = useState(1);
   const scaleRef = useRef(1);
+  const pendingRef = useRef(null);
 
   useEffect(() => {
-    const updateScale = () => {
+    const compute = () => {
       if (!rootRef.current || !contentRef.current) {
         return;
       }
@@ -15,7 +16,8 @@ export default function useDisplayScaling(dependencies = []) {
       const content = contentRef.current;
       const contentWidth = content.offsetWidth;
       const contentHeight = content.offsetHeight;
-      if (!contentWidth || !contentHeight) {
+      // Skip during layout reflow (e.g. beamer connect/disconnect, fullscreen toggle)
+      if (!contentWidth || !contentHeight || !container.clientWidth || !container.clientHeight) {
         return;
       }
       const computed = window.getComputedStyle(container);
@@ -33,23 +35,48 @@ export default function useDisplayScaling(dependencies = []) {
       }
     };
 
-    updateScale();
+    // Debounced wrapper — waits for layout to settle after resize/fullscreen/beamer events
+    const updateScale = () => {
+      if (pendingRef.current !== null) {
+        clearTimeout(pendingRef.current);
+      }
+      pendingRef.current = setTimeout(() => {
+        pendingRef.current = null;
+        compute();
+        // Second pass after another frame in case browser hasn't fully painted
+        requestAnimationFrame(compute);
+      }, 80);
+    };
+
+    // Immediate first compute + deferred fallback
+    compute();
+    requestAnimationFrame(compute);
 
     const resizeObserver =
       typeof ResizeObserver !== 'undefined' ? new ResizeObserver(updateScale) : null;
 
+    if (resizeObserver && rootRef.current) {
+      resizeObserver.observe(rootRef.current);
+    }
     if (resizeObserver && contentRef.current) {
       resizeObserver.observe(contentRef.current);
     }
 
     window.addEventListener('resize', updateScale);
+    document.addEventListener('fullscreenchange', updateScale);
+
     return () => {
+      if (pendingRef.current !== null) {
+        clearTimeout(pendingRef.current);
+        pendingRef.current = null;
+      }
       window.removeEventListener('resize', updateScale);
+      document.removeEventListener('fullscreenchange', updateScale);
       if (resizeObserver) {
         resizeObserver.disconnect();
       }
     };
-  }, dependencies);
+  }, dependencies); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { rootRef, contentRef, scale };
 }
