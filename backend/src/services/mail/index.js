@@ -7,7 +7,10 @@ function getResend() {
 }
 
 const FROM = process.env.MAIL_FROM || 'noreply@info.kunstradbasketball.de';
-const ADMIN_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL;
+const ADMIN_EMAILS = (process.env.ADMIN_NOTIFICATION_EMAIL || '')
+  .split(',')
+  .map((e) => e.trim())
+  .filter(Boolean);
 
 async function send({ to, subject, text, html }) {
   const resend = getResend();
@@ -15,7 +18,8 @@ async function send({ to, subject, text, html }) {
     console.log('[mail] RESEND_API_KEY not set, skipping:', subject);
     return;
   }
-  const { error } = await resend.emails.send({ from: FROM, to, subject, text, html });
+  const recipients = Array.isArray(to) ? to : [to];
+  const { error } = await resend.emails.send({ from: FROM, to: recipients, reply_to: FROM, subject, text, html });
   if (error) console.error('[mail] Send error:', error);
 }
 
@@ -48,10 +52,10 @@ export async function sendRegistrationRejected({ to, tournamentName, teamName, c
 }
 
 export async function sendRegistrationNotification({ tournamentName, teamName, contactName, contactEmail, players }) {
-  if (!ADMIN_EMAIL) return;
+  if (!ADMIN_EMAILS.length) return;
   const playerList = players.map((p, i) => `${i + 1}. ${p.name}${p.jerseyNumber ? ` #${p.jerseyNumber}` : ''}`).join('\n');
   await send({
-    to: ADMIN_EMAIL,
+    to: ADMIN_EMAILS,
     subject: `Neue Anmeldung: ${teamName} – ${tournamentName}`,
     text: `Neue Anmeldung:\n\nTurnier: ${tournamentName}\nTeam: ${teamName}\nKontakt: ${contactName} <${contactEmail}>\nSpieler:\n${playerList}`
   });
