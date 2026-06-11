@@ -99,6 +99,11 @@ export function normalizeTournamentPayload(payload = {}, defaults = {}) {
   const registrationUrl = payload.registration_url !== undefined ? (payload.registration_url ?? null) : (defaults.registration_url ?? null);
   const registrationDeadline = payload.registration_deadline !== undefined ? (payload.registration_deadline ?? null) : (defaults.registration_deadline ?? null);
 
+  const rawLinks = payload.links !== undefined ? payload.links : (defaults.links ?? null);
+  const links = Array.isArray(rawLinks)
+    ? rawLinks.filter((l) => l && typeof l.url === 'string' && l.url.trim()).map((l) => ({ label: String(l.label ?? '').trim(), url: String(l.url).trim() }))
+    : null;
+
   return {
     name,
     status,
@@ -115,7 +120,8 @@ export function normalizeTournamentPayload(payload = {}, defaults = {}) {
     travelInfo,
     contactEmail,
     registrationUrl,
-    registrationDeadline
+    registrationDeadline,
+    links: links && links.length > 0 ? links : null
   };
 }
 

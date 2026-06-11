@@ -64,7 +64,7 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { name, group_count, knockout_rounds, is_public, team_count, classification_mode, status, planned_at, description, location } = req.body ?? {};
+  const { name, group_count, knockout_rounds, is_public, team_count, classification_mode, status, planned_at, description, location, links } = req.body ?? {};
   try {
     const tournament = await createTournament({
       name,
@@ -76,7 +76,8 @@ router.post('/', async (req, res) => {
       status,
       planned_at,
       description,
-      location
+      location,
+      links
     });
     res.status(201).json(tournament);
   } catch (error) {
@@ -91,7 +92,7 @@ router.put('/:id', async (req, res) => {
     return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
   }
 
-  const { name, group_count, knockout_rounds, is_public, team_count, classification_mode, status, planned_at, description, location, schedule_info, travel_info, contact_email, registration_url, registration_deadline } = req.body ?? {};
+  const { name, group_count, knockout_rounds, is_public, team_count, classification_mode, status, planned_at, description, location, schedule_info, travel_info, contact_email, registration_url, registration_deadline, links } = req.body ?? {};
   try {
     const updated = await updateTournament(id, {
       name,
@@ -108,7 +109,8 @@ router.put('/:id', async (req, res) => {
       travel_info,
       contact_email,
       registration_url,
-      registration_deadline
+      registration_deadline,
+      links
     });
     if (!updated) {
       return res.status(404).json({ message: 'Turnier nicht gefunden.' });

@@ -157,6 +157,19 @@ export default function TournamentDetailPage({ tournamentId }) {
             </div>
           )}
 
+          {Array.isArray(tournament.links) && tournament.links.length > 0 && (
+            <div style={cardStyle}>
+              <p style={sectionTitleStyle}>Links</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {tournament.links.map((link, index) => (
+                  <a key={index} href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: '#7cb9ff' }}>
+                    {link.label || link.url}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <button
               type="button"

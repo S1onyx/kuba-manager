@@ -30,7 +30,8 @@ export function mapTournament(row) {
     contact_email: row.contact_email ?? null,
     registration_url: row.registration_url ?? null,
     registration_deadline: row.registration_deadline ?? null,
-    registration_closed: Boolean(row.registration_closed)
+    registration_closed: Boolean(row.registration_closed),
+    links: row.links ? JSON.parse(row.links) : []
   };
 }
 
@@ -70,8 +71,8 @@ export async function insertTournament(payload) {
   const { SQL, db } = await getConnection();
 
   const stmt = db.prepare(`
-    INSERT INTO tournaments (name, group_count, knockout_rounds, is_public, team_count, classification_mode, status, planned_at, description, location, poster_file_id, schedule_info, travel_info, contact_email, registration_url, registration_deadline)
-    VALUES (:name, :group_count, :knockout_rounds, :is_public, :team_count, :classification_mode, :status, :planned_at, :description, :location, :poster_file_id, :schedule_info, :travel_info, :contact_email, :registration_url, :registration_deadline)
+    INSERT INTO tournaments (name, group_count, knockout_rounds, is_public, team_count, classification_mode, status, planned_at, description, location, poster_file_id, schedule_info, travel_info, contact_email, registration_url, registration_deadline, links)
+    VALUES (:name, :group_count, :knockout_rounds, :is_public, :team_count, :classification_mode, :status, :planned_at, :description, :location, :poster_file_id, :schedule_info, :travel_info, :contact_email, :registration_url, :registration_deadline, :links)
   `);
 
   let newId = null;
@@ -92,7 +93,8 @@ export async function insertTournament(payload) {
       ':travel_info': normalized.travelInfo,
       ':contact_email': normalized.contactEmail,
       ':registration_url': normalized.registrationUrl,
-      ':registration_deadline': normalized.registrationDeadline
+      ':registration_deadline': normalized.registrationDeadline,
+      ':links': normalized.links ? JSON.stringify(normalized.links) : null
     });
     stmt.step();
     newId = db.exec('SELECT last_insert_rowid() as id')[0].values[0][0];
@@ -112,7 +114,7 @@ export async function updateTournamentRecord(id, patch = {}, defaults = {}) {
     `UPDATE tournaments
      SET name = ?, group_count = ?, knockout_rounds = ?, is_public = ?, team_count = ?, classification_mode = ?,
          status = ?, planned_at = ?, description = ?, location = ?, poster_file_id = ?,
-         schedule_info = ?, travel_info = ?, contact_email = ?, registration_url = ?, registration_deadline = ?
+         schedule_info = ?, travel_info = ?, contact_email = ?, registration_url = ?, registration_deadline = ?, links = ?
      WHERE id = ?`,
     [
       normalized.name,
@@ -131,6 +133,7 @@ export async function updateTournamentRecord(id, patch = {}, defaults = {}) {
       normalized.contactEmail,
       normalized.registrationUrl,
       normalized.registrationDeadline,
+      normalized.links ? JSON.stringify(normalized.links) : null,
       id
     ]
   );

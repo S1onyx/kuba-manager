@@ -77,6 +77,7 @@ export default function initializeSchema(db) {
   ensureTournamentColumn('registration_url', 'TEXT');
   ensureTournamentColumn('registration_deadline', 'TEXT');
   ensureTournamentColumn('registration_closed', 'INTEGER DEFAULT 0');
+  ensureTournamentColumn('links', 'TEXT');
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS tournament_registrations (

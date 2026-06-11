@@ -129,6 +129,47 @@ export default function TournamentsTab() {
                 />
               </label>
             )}
+            {tournamentForm.status === 'planned' && (
+              <div style={{ gridColumn: '1 / -1', display: 'grid', gap: '0.5rem' }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Links</span>
+                {(tournamentForm.links ?? []).map((link, index) => (
+                  <div key={index} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr auto', gap: '0.4rem', alignItems: 'center' }}>
+                    <input
+                      placeholder="Bezeichnung (z. B. WhatsApp)"
+                      value={link.label}
+                      onChange={(event) => {
+                        const updated = [...tournamentForm.links];
+                        updated[index] = { ...updated[index], label: event.target.value };
+                        handleTournamentFormChange('links', updated);
+                      }}
+                    />
+                    <input
+                      placeholder="URL (https://...)"
+                      value={link.url}
+                      onChange={(event) => {
+                        const updated = [...tournamentForm.links];
+                        updated[index] = { ...updated[index], url: event.target.value };
+                        handleTournamentFormChange('links', updated);
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleTournamentFormChange('links', tournamentForm.links.filter((_, i) => i !== index))}
+                      style={{ padding: '0.3rem 0.6rem', background: 'rgba(255,100,100,0.2)', border: '1px solid rgba(255,100,100,0.4)', borderRadius: '6px', color: '#ff9999', cursor: 'pointer' }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => handleTournamentFormChange('links', [...(tournamentForm.links ?? []), { label: '', url: '' }])}
+                  style={{ alignSelf: 'start', padding: '0.3rem 0.8rem', background: 'rgba(86,160,255,0.15)', border: '1px solid rgba(86,160,255,0.35)', borderRadius: '6px', color: '#7cb9ff', cursor: 'pointer', fontSize: '0.85rem' }}
+                >
+                  + Link hinzufügen
+                </button>
+              </div>
+            )}
             {tournamentForm.status !== 'planned' && (
               <label style={{ display: 'grid', gap: '0.3rem' }}>
                 Gruppen
@@ -276,6 +317,47 @@ export default function TournamentsTab() {
                             rows={3}
                           />
                         </label>
+                      )}
+                      {edit.status === 'planned' && (
+                        <div style={{ display: 'grid', gap: '0.5rem' }}>
+                          <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Links</span>
+                          {(edit.links ?? []).map((link, index) => (
+                            <div key={index} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr auto', gap: '0.4rem', alignItems: 'center' }}>
+                              <input
+                                placeholder="Bezeichnung (z. B. WhatsApp)"
+                                value={link.label}
+                                onChange={(event) => {
+                                  const updated = [...edit.links];
+                                  updated[index] = { ...updated[index], label: event.target.value };
+                                  handleTournamentEditChange(tournament.id, 'links', updated);
+                                }}
+                              />
+                              <input
+                                placeholder="URL (https://...)"
+                                value={link.url}
+                                onChange={(event) => {
+                                  const updated = [...edit.links];
+                                  updated[index] = { ...updated[index], url: event.target.value };
+                                  handleTournamentEditChange(tournament.id, 'links', updated);
+                                }}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleTournamentEditChange(tournament.id, 'links', edit.links.filter((_, i) => i !== index))}
+                                style={{ padding: '0.3rem 0.6rem', background: 'rgba(255,100,100,0.2)', border: '1px solid rgba(255,100,100,0.4)', borderRadius: '6px', color: '#ff9999', cursor: 'pointer' }}
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={() => handleTournamentEditChange(tournament.id, 'links', [...(edit.links ?? []), { label: '', url: '' }])}
+                            style={{ alignSelf: 'start', padding: '0.3rem 0.8rem', background: 'rgba(86,160,255,0.15)', border: '1px solid rgba(86,160,255,0.35)', borderRadius: '6px', color: '#7cb9ff', cursor: 'pointer', fontSize: '0.85rem' }}
+                          >
+                            + Link hinzufügen
+                          </button>
+                        </div>
                       )}
                       {edit.status !== 'planned' && (
                         <div style={{ display: 'grid', gap: '0.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>

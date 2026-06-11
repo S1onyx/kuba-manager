@@ -34,7 +34,8 @@ export default function useTournamentManager({
     travel_info: '',
     contact_email: '',
     registration_url: '',
-    registration_deadline: ''
+    registration_deadline: '',
+    links: []
   });
   const [tournamentEdits, setTournamentEdits] = useState({});
   const [expandedTournamentId, setExpandedTournamentId] = useState(null);
@@ -91,7 +92,8 @@ export default function useTournamentManager({
           travel_info: tournamentForm.travel_info || null,
           contact_email: tournamentForm.contact_email || null,
           registration_url: tournamentForm.registration_url || null,
-          registration_deadline: tournamentForm.registration_deadline || null
+          registration_deadline: tournamentForm.registration_deadline || null,
+          links: tournamentForm.links?.length > 0 ? tournamentForm.links : null
         });
         setTournamentForm({
           name: '',
@@ -108,7 +110,8 @@ export default function useTournamentManager({
           travel_info: '',
           contact_email: '',
           registration_url: '',
-          registration_deadline: ''
+          registration_deadline: '',
+          links: []
         });
         loadTournaments();
         updateMessage('info', 'Turnier erstellt.');
@@ -140,7 +143,8 @@ export default function useTournamentManager({
         travel_info: tournament.travel_info ?? '',
         contact_email: tournament.contact_email ?? '',
         registration_url: tournament.registration_url ?? '',
-        registration_deadline: tournament.registration_deadline ?? ''
+        registration_deadline: tournament.registration_deadline ?? '',
+        links: Array.isArray(tournament.links) ? tournament.links : []
       }
     }));
   }, []);
@@ -184,7 +188,8 @@ export default function useTournamentManager({
           travel_info: draft.travel_info || null,
           contact_email: draft.contact_email || null,
           registration_url: draft.registration_url || null,
-          registration_deadline: draft.registration_deadline || null
+          registration_deadline: draft.registration_deadline || null,
+          links: draft.links?.length > 0 ? draft.links : null
         });
         cancelTournamentEdit(id);
         loadTournaments();
