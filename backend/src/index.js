@@ -10,6 +10,7 @@ import publicRoutes from './routes/public.js';
 import teamRoutes from './routes/teams.js';
 import playerRoutes from './routes/players.js';
 import audioRoutes from './routes/audio.js';
+import inboundRoutes from './routes/inbound.js';
 import { getAudioStorageDirectory } from './services/index.js';
 
 dotenv.config();
@@ -51,6 +52,7 @@ app.use('/api/public', publicRoutes);
 app.use('/api/teams', teamRoutes);
 app.use('/api/players', playerRoutes);
 app.use('/api/audio', audioRoutes);
+app.use('/api/inbound', inboundRoutes);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

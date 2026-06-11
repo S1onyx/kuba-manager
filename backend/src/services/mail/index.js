@@ -7,6 +7,7 @@ function getResend() {
 }
 
 const FROM = process.env.MAIL_FROM || 'noreply@info.kunstradbasketball.de';
+const REPLY_TO = process.env.MAIL_REPLY_TO || FROM;
 const ADMIN_EMAILS = (process.env.ADMIN_NOTIFICATION_EMAIL || '')
   .split(',').map((e) => e.trim()).filter(Boolean);
 
@@ -51,7 +52,7 @@ async function send({ to, subject, text, htmlContent }) {
   const resend = getResend();
   if (!resend) { console.log('[mail] RESEND_API_KEY not set, skipping:', subject); return; }
   const recipients = Array.isArray(to) ? to : [to];
-  const { error } = await resend.emails.send({ from: FROM, to: recipients, reply_to: FROM, subject, text, html: htmlContent });
+  const { error } = await resend.emails.send({ from: FROM, to: recipients, reply_to: REPLY_TO, subject, text, html: htmlContent });
   if (error) console.error('[mail] Send error:', error);
 }
 

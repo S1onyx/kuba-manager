@@ -131,12 +131,13 @@ jobs:
             # Write mail env vars from secrets (idempotent)
             ENV_FILE="${DEPLOY}/.env"
             touch "$ENV_FILE"
-            for KEY in RESEND_API_KEY MAIL_FROM ADMIN_NOTIFICATION_EMAIL; do
+            for KEY in RESEND_API_KEY MAIL_FROM MAIL_REPLY_TO ADMIN_NOTIFICATION_EMAIL; do
               VALUE=""
               case "$KEY" in
                 RESEND_API_KEY)           VALUE="${{ secrets.RESEND_API_KEY }}" ;;
                 MAIL_FROM)                VALUE="${{ secrets.MAIL_FROM }}" ;;
-                ADMIN_NOTIFICATION_EMAIL) VALUE="${{ secrets.ADMIN_NOTIFICATION_EMAIL }}" ;;
+                MAIL_REPLY_TO)            VALUE="${{ vars.MAIL_REPLY_TO }}" ;;
+                ADMIN_NOTIFICATION_EMAIL) VALUE="${{ vars.ADMIN_NOTIFICATION_EMAIL }}" ;;
               esac
               if [ -n "$VALUE" ]; then
                 if grep -q "^${KEY}=" "$ENV_FILE" 2>/dev/null; then
