@@ -37,6 +37,23 @@ export default function TournamentSection() {
 
   return (
     <>
+      {plannedTournaments.length > 0 && (
+        <SectionWrapper title="Kommende Turniere">
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '1rem',
+              justifyContent: 'center'
+            }}
+          >
+            {plannedTournaments.map((tournament) => (
+              <PlannedTournamentCard key={tournament.id} tournament={tournament} />
+            ))}
+          </div>
+        </SectionWrapper>
+      )}
+
       {activeTournaments.length > 0 && (
         <SectionWrapper title="Turniere">
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
@@ -68,22 +85,6 @@ export default function TournamentSection() {
           </div>
         </SectionWrapper>
       )}
-
-      {plannedTournaments.length > 0 && (
-        <SectionWrapper title="Kommende Turniere">
-          <div
-            style={{
-              display: 'grid',
-              gap: '0.75rem',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))'
-            }}
-          >
-            {plannedTournaments.map((tournament) => (
-              <PlannedTournamentCard key={tournament.id} tournament={tournament} />
-            ))}
-          </div>
-        </SectionWrapper>
-      )}
     </>
   );
 }
@@ -104,7 +105,9 @@ function PlannedTournamentCard({ tournament }) {
         background: 'rgba(0,0,0,0.35)',
         borderRadius: '16px',
         overflow: 'hidden',
-        border: '1px solid rgba(255,255,255,0.08)'
+        border: '1px solid rgba(255,255,255,0.08)',
+        width: '300px',
+        maxWidth: '100%'
       }}
     >
       {tournament.poster_url && (

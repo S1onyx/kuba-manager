@@ -156,7 +156,8 @@ export function PublicAppProvider({ children }) {
 
       const active = publicTournaments.filter((t) => t.status === 'active' || !t.status);
       const pool = active.length > 0 ? active : publicTournaments;
-      return pool[pool.length - 1]?.id ?? null;
+      const sorted = [...pool].sort((a, b) => b.id - a.id);
+      return sorted[0]?.id ?? null;
     });
   }, [scoreboard?.tournamentId, currentTournamentMeta, scoreboardPublic, publicTournaments]);
 
