@@ -27,7 +27,13 @@ export default function TournamentRegisterPage({ tournamentId }) {
 
       {loading && <p style={{ opacity: 0.7 }}>Lade...</p>}
 
-      {tournament && !registered && (
+      {tournament?.registration_closed && !registered && (
+        <div style={{ background: 'rgba(255,100,100,0.08)', borderRadius: '16px', padding: '1.5rem', border: '1px solid rgba(255,100,100,0.2)', textAlign: 'center' }}>
+          <p style={{ margin: 0, fontSize: '1.1rem' }}>🔒 Die Anmeldung für dieses Turnier ist geschlossen.</p>
+        </div>
+      )}
+
+      {tournament && !tournament.registration_closed && !registered && (
         <>
           <div>
             <p style={{ margin: '0 0 0.25rem', opacity: 0.55, fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Anmeldung</p>

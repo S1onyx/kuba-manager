@@ -157,6 +157,9 @@ router.post('/tournaments/:id/register', upload.array('audio', 5), async (req, r
     if (!tournament || !tournament.is_public || tournament.status !== 'planned') {
       return res.status(404).json({ message: 'Turnier nicht gefunden oder nicht anmeldbar.' });
     }
+    if (tournament.registration_closed) {
+      return res.status(400).json({ message: 'Die Anmeldung für dieses Turnier ist geschlossen.' });
+    }
 
     const { team_name, contact_name, contact_email, audio_notes } = req.body ?? {};
     let players = [];

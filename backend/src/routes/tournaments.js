@@ -317,6 +317,21 @@ router.put('/:id/teams', async (req, res) => {
   }
 });
 
+router.post('/:id/registration-closed', async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+  const { closed } = req.body ?? {};
+  try {
+    const conn = await import('../db/connection.js');
+    const { SQL, db } = await conn.getConnection();
+    db.run('UPDATE tournaments SET registration_closed = ? WHERE id = ?', [closed ? 1 : 0, id]);
+    conn.persistDatabase(db, SQL);
+    res.json({ ok: true, registration_closed: Boolean(closed) });
+  } catch (error) {
+    res.status(500).json({ message: 'Konnte Anmeldestatus nicht ändern.' });
+  }
+});
+
 router.post('/:id/activate', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {

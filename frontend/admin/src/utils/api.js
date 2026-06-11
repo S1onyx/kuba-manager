@@ -373,6 +373,10 @@ export function activateTournament(id) {
   return request(`/tournaments/${id}/activate`, { method: 'POST' });
 }
 
+export function setRegistrationClosed(id, closed) {
+  return request(`/tournaments/${id}/registration-closed`, { method: 'POST', body: JSON.stringify({ closed }) });
+}
+
 export function fetchRegistrations(tournamentId) {
   return request(`/tournaments/${tournamentId}/registrations`);
 }

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import PanelCard from '../../common/PanelCard.jsx';
 import { useDashboard } from '../../../context/DashboardContext.jsx';
-import { fetchRegistrations, updateRegistrationStatus, activateTournament } from '../../../utils/api.js';
+import { fetchRegistrations, updateRegistrationStatus, activateTournament, setRegistrationClosed } from '../../../utils/api.js';
 
 export default function TournamentDetailsPanel({
   tournament,
@@ -14,6 +14,9 @@ export default function TournamentDetailsPanel({
   const [regLoading, setRegLoading] = useState(false);
   const [regTab, setRegTab] = useState(false);
   const [activating, setActivating] = useState(false);
+  const [statusChanging, setStatusChanging] = useState(null);
+  const [statusError, setStatusError] = useState('');
+  const [closingReg, setClosingReg] = useState(false);
 
   const loadRegistrations = useCallback(() => {
     setRegLoading(true);
@@ -28,8 +31,28 @@ export default function TournamentDetailsPanel({
   }, [tournament.id, tournament.status, loadRegistrations]);
 
   const handleStatusChange = async (regId, status) => {
-    await updateRegistrationStatus(tournament.id, regId, status);
-    loadRegistrations();
+    setStatusChanging(regId);
+    setStatusError('');
+    try {
+      await updateRegistrationStatus(tournament.id, regId, status);
+      await loadRegistrations();
+    } catch (err) {
+      setStatusError(err.message || 'Status konnte nicht geändert werden.');
+    } finally {
+      setStatusChanging(null);
+    }
+  };
+
+  const handleToggleRegistrationClosed = async () => {
+    setClosingReg(true);
+    try {
+      await setRegistrationClosed(tournament.id, !tournament.registration_closed);
+      loadTournaments();
+    } catch (err) {
+      alert(err.message || 'Fehler beim Ändern des Anmeldestatus.');
+    } finally {
+      setClosingReg(false);
+    }
   };
 
   const handleActivate = async () => {
@@ -176,6 +199,17 @@ export default function TournamentDetailsPanel({
 
         {regTab && (
           <div style={{ display: 'grid', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={handleToggleRegistrationClosed}
+                disabled={closingReg}
+                style={{ padding: '0.4rem 1rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: tournament.registration_closed ? 'rgba(64,200,120,0.2)' : 'rgba(255,100,100,0.15)', color: '#fff', fontSize: '0.85rem', cursor: closingReg ? 'not-allowed' : 'pointer', fontWeight: 600 }}
+              >
+                {closingReg ? '...' : tournament.registration_closed ? '🔓 Anmeldung öffnen' : '🔒 Anmeldung schließen'}
+              </button>
+            </div>
+            {statusError && <p style={{ margin: 0, color: '#ffb0b0', fontSize: '0.85rem' }}>{statusError}</p>}
             {registrations.filter((r) => r.status === 'confirmed').length >= 2 && (
               <button
                 type="button"
@@ -194,9 +228,14 @@ export default function TournamentDetailsPanel({
                   <strong>{reg.teamName}</strong>
                   <div style={{ display: 'flex', gap: '0.4rem' }}>
                     {['pending', 'confirmed', 'rejected'].map((s) => (
-                      <button key={s} type="button" onClick={() => handleStatusChange(reg.id, s)}
-                        style={{ padding: '0.2rem 0.6rem', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.15)', background: reg.status === s ? statusColor[s] : 'transparent', color: '#fff', fontSize: '0.75rem', cursor: 'pointer' }}>
-                        {statusLabel[s]}
+                      <button
+                        key={s}
+                        type="button"
+                        disabled={statusChanging === reg.id}
+                        onClick={() => handleStatusChange(reg.id, s)}
+                        style={{ padding: '0.25rem 0.7rem', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.15)', background: reg.status === s ? statusColor[s] : 'transparent', color: '#fff', fontSize: '0.8rem', cursor: statusChanging === reg.id ? 'not-allowed' : 'pointer', opacity: statusChanging === reg.id && reg.status !== s ? 0.5 : 1, fontWeight: reg.status === s ? 600 : 400 }}
+                      >
+                        {statusChanging === reg.id && reg.status === s ? '...' : statusLabel[s]}
                       </button>
                     ))}
                   </div>

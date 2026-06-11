@@ -29,7 +29,8 @@ export function mapTournament(row) {
     travel_info: row.travel_info ?? null,
     contact_email: row.contact_email ?? null,
     registration_url: row.registration_url ?? null,
-    registration_deadline: row.registration_deadline ?? null
+    registration_deadline: row.registration_deadline ?? null,
+    registration_closed: Boolean(row.registration_closed)
   };
 }
 
