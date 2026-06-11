@@ -1,14 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { fetchTournamentDetail } from '../../api.js';
 import { navigateTo } from '../../hooks/useHashRoute.js';
-import RegistrationForm from './RegistrationForm.jsx';
 
 export default function TournamentDetailPage({ tournamentId }) {
   const [tournament, setTournament] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [registered, setRegistered] = useState(false);
-  const formRef = useRef(null);
 
   useEffect(() => {
     setLoading(true);
@@ -87,19 +84,17 @@ export default function TournamentDetailPage({ tournamentId }) {
                 background: 'rgba(255,171,64,0.2)', color: '#ffd180', fontSize: '0.8rem', letterSpacing: '0.08em'
               }}>Geplant</span>
             </div>
-            {!registered && (
-              <button
-                type="button"
-                onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                style={{
-                  padding: '0.65rem 1.5rem', borderRadius: '999px', border: 'none',
-                  background: 'rgba(86,160,255,0.8)', color: '#fff', fontSize: '0.95rem',
-                  fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap'
-                }}
-              >
-                Jetzt anmelden →
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => navigateTo(`/anmelden/${tournament.id}`)}
+              style={{
+                padding: '0.65rem 1.5rem', borderRadius: '999px', border: 'none',
+                background: 'rgba(86,160,255,0.8)', color: '#fff', fontSize: '0.95rem',
+                fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap'
+              }}
+            >
+              Jetzt anmelden →
+            </button>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
@@ -162,17 +157,14 @@ export default function TournamentDetailPage({ tournamentId }) {
             </div>
           )}
 
-          <div ref={formRef} style={{ ...cardStyle, borderColor: 'rgba(86,160,255,0.2)' }}>
-            <h2 style={{ margin: '0 0 1.25rem 0', fontSize: '1.2rem' }}>
-              {registered ? '✓ Anmeldung eingereicht' : 'Team anmelden'}
-            </h2>
-            {registered ? (
-              <p style={{ margin: 0, opacity: 0.8 }}>
-                Deine Anmeldung wurde erfolgreich eingereicht. Du erhältst eine Bestätigungs-E-Mail.
-              </p>
-            ) : (
-              <RegistrationForm tournament={tournament} onSuccess={() => setRegistered(true)} />
-            )}
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <button
+              type="button"
+              onClick={() => navigateTo(`/anmelden/${tournament.id}`)}
+              style={{ padding: '0.85rem 2.5rem', borderRadius: '999px', border: 'none', background: 'rgba(86,160,255,0.8)', color: '#fff', fontSize: '1rem', fontWeight: 700, cursor: 'pointer', letterSpacing: '0.04em' }}
+            >
+              Team anmelden →
+            </button>
           </div>
         </>
       )}

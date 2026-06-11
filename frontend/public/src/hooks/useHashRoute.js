@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 
 function parseHash() {
   const hash = window.location.hash.replace(/^#/, '');
-  const match = hash.match(/^\/turnier\/(\d+)/);
-  if (match) return { page: 'tournament-detail', id: Number(match[1]) };
+  const detailMatch = hash.match(/^\/turnier\/(\d+)$/);
+  if (detailMatch) return { page: 'tournament-detail', id: Number(detailMatch[1]) };
+  const registerMatch = hash.match(/^\/anmelden\/(\d+)$/);
+  if (registerMatch) return { page: 'tournament-register', id: Number(registerMatch[1]) };
   return { page: 'home' };
 }
 

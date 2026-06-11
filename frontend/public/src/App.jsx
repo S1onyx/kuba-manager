@@ -5,6 +5,7 @@ import Reglement from './components/Reglement.jsx';
 import PublicFooter from './components/footer/PublicFooter.jsx';
 import ImpressumPortal from './components/modals/ImpressumPortal.jsx';
 import TournamentDetailPage from './components/tournaments/TournamentDetailPage.jsx';
+import TournamentRegisterPage from './components/tournaments/TournamentRegisterPage.jsx';
 import { PublicAppProvider, usePublicApp } from './context/PublicAppContext.jsx';
 import useHashRoute from './hooks/useHashRoute.js';
 import './styles.css';
@@ -15,6 +16,9 @@ function MainContent() {
 
   if (route.page === 'tournament-detail') {
     return <TournamentDetailPage tournamentId={route.id} />;
+  }
+  if (route.page === 'tournament-register') {
+    return <TournamentRegisterPage tournamentId={route.id} />;
   }
   return isReglementView ? <Reglement /> : <OverviewView />;
 }
