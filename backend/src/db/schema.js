@@ -88,10 +88,17 @@ export default function initializeSchema(db) {
       players_json TEXT NOT NULL DEFAULT '[]',
       audio_notes TEXT,
       status TEXT DEFAULT 'pending',
+      team_id INTEGER,
       created_at TEXT DEFAULT (datetime('now')),
       FOREIGN KEY(tournament_id) REFERENCES tournaments(id) ON DELETE CASCADE
     );
   `);
+
+  const regInfo = db.exec('PRAGMA table_info(tournament_registrations)');
+  const regColumns = (regInfo[0]?.values ?? []).map(([, name]) => name);
+  if (!regColumns.includes('team_id')) {
+    db.exec('ALTER TABLE tournament_registrations ADD COLUMN team_id INTEGER');
+  }
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS registration_audio_files (
