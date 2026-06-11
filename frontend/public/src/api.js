@@ -40,3 +40,19 @@ export function fetchTournamentSummary(id) {
 export function fetchPublicTournaments() {
   return request('/tournaments');
 }
+
+export function fetchTournamentDetail(id) {
+  return request(`/tournaments/${id}/detail`);
+}
+
+export async function submitRegistration(tournamentId, formData) {
+  const response = await fetch(`${API_BASE}/tournaments/${tournamentId}/register`, {
+    method: 'POST',
+    body: formData
+  });
+  const text = await response.text();
+  let json;
+  try { json = JSON.parse(text); } catch { json = { message: text }; }
+  if (!response.ok) throw new Error(json.message || 'Anmeldung fehlgeschlagen');
+  return json;
+}

@@ -29,7 +29,12 @@ export default function useTournamentManager({
     knockout_rounds: '',
     team_count: '',
     classification_mode: 'top4',
-    is_public: false
+    is_public: false,
+    schedule_info: '',
+    travel_info: '',
+    contact_email: '',
+    registration_url: '',
+    registration_deadline: ''
   });
   const [tournamentEdits, setTournamentEdits] = useState({});
   const [expandedTournamentId, setExpandedTournamentId] = useState(null);
@@ -81,7 +86,12 @@ export default function useTournamentManager({
           knockout_rounds: Number(tournamentForm.knockout_rounds || 0),
           team_count: Number(tournamentForm.team_count || 0),
           classification_mode: tournamentForm.classification_mode,
-          is_public: Boolean(tournamentForm.is_public)
+          is_public: Boolean(tournamentForm.is_public),
+          schedule_info: tournamentForm.schedule_info || null,
+          travel_info: tournamentForm.travel_info || null,
+          contact_email: tournamentForm.contact_email || null,
+          registration_url: tournamentForm.registration_url || null,
+          registration_deadline: tournamentForm.registration_deadline || null
         });
         setTournamentForm({
           name: '',
@@ -93,7 +103,12 @@ export default function useTournamentManager({
           knockout_rounds: '',
           team_count: '',
           classification_mode: 'top4',
-          is_public: false
+          is_public: false,
+          schedule_info: '',
+          travel_info: '',
+          contact_email: '',
+          registration_url: '',
+          registration_deadline: ''
         });
         loadTournaments();
         updateMessage('info', 'Turnier erstellt.');
@@ -120,7 +135,12 @@ export default function useTournamentManager({
         knockout_rounds: String(tournament.knockout_rounds ?? 0),
         team_count: String(tournament.team_count ?? 0),
         classification_mode: tournament.classification_mode ?? 'top4',
-        is_public: Boolean(tournament.is_public)
+        is_public: Boolean(tournament.is_public),
+        schedule_info: tournament.schedule_info ?? '',
+        travel_info: tournament.travel_info ?? '',
+        contact_email: tournament.contact_email ?? '',
+        registration_url: tournament.registration_url ?? '',
+        registration_deadline: tournament.registration_deadline ?? ''
       }
     }));
   }, []);
@@ -159,7 +179,12 @@ export default function useTournamentManager({
           knockout_rounds: Number(draft.knockout_rounds || 0),
           team_count: Number(draft.team_count || 0),
           classification_mode: draft.classification_mode,
-          is_public: Boolean(draft.is_public)
+          is_public: Boolean(draft.is_public),
+          schedule_info: draft.schedule_info || null,
+          travel_info: draft.travel_info || null,
+          contact_email: draft.contact_email || null,
+          registration_url: draft.registration_url || null,
+          registration_deadline: draft.registration_deadline || null
         });
         cancelTournamentEdit(id);
         loadTournaments();

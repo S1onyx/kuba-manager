@@ -86,6 +86,49 @@ export default function TournamentsTab() {
                 />
               </label>
             )}
+            {tournamentForm.status === 'planned' && (
+              <label style={{ display: 'grid', gap: '0.3rem', gridColumn: '1 / -1' }}>
+                Ablauf & Zeiten
+                <textarea
+                  value={tournamentForm.schedule_info}
+                  onChange={(event) => handleTournamentFormChange('schedule_info', event.target.value)}
+                  placeholder="z. B. 10:00 Anmeldung, 11:00 Beginn, ..."
+                  rows={3}
+                />
+              </label>
+            )}
+            {tournamentForm.status === 'planned' && (
+              <label style={{ display: 'grid', gap: '0.3rem', gridColumn: '1 / -1' }}>
+                Anreise
+                <textarea
+                  value={tournamentForm.travel_info}
+                  onChange={(event) => handleTournamentFormChange('travel_info', event.target.value)}
+                  placeholder="Adresse, Parkplatz, ÖPNV, ..."
+                  rows={3}
+                />
+              </label>
+            )}
+            {tournamentForm.status === 'planned' && (
+              <label style={{ display: 'grid', gap: '0.3rem' }}>
+                Kontakt-E-Mail
+                <input
+                  type="email"
+                  value={tournamentForm.contact_email}
+                  onChange={(event) => handleTournamentFormChange('contact_email', event.target.value)}
+                  placeholder="info@beispiel.de"
+                />
+              </label>
+            )}
+            {tournamentForm.status === 'planned' && (
+              <label style={{ display: 'grid', gap: '0.3rem' }}>
+                Anmeldefrist
+                <input
+                  type="date"
+                  value={tournamentForm.registration_deadline}
+                  onChange={(event) => handleTournamentFormChange('registration_deadline', event.target.value)}
+                />
+              </label>
+            )}
             {tournamentForm.status !== 'planned' && (
               <label style={{ display: 'grid', gap: '0.3rem' }}>
                 Gruppen

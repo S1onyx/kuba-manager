@@ -93,6 +93,12 @@ export function normalizeTournamentPayload(payload = {}, defaults = {}) {
       ? (payload.poster_file_id === null ? null : Number(payload.poster_file_id) || null)
       : (defaults.poster_file_id ?? null);
 
+  const scheduleInfo = payload.schedule_info !== undefined ? (payload.schedule_info ?? null) : (defaults.schedule_info ?? null);
+  const travelInfo = payload.travel_info !== undefined ? (payload.travel_info ?? null) : (defaults.travel_info ?? null);
+  const contactEmail = payload.contact_email !== undefined ? (payload.contact_email ?? null) : (defaults.contact_email ?? null);
+  const registrationUrl = payload.registration_url !== undefined ? (payload.registration_url ?? null) : (defaults.registration_url ?? null);
+  const registrationDeadline = payload.registration_deadline !== undefined ? (payload.registration_deadline ?? null) : (defaults.registration_deadline ?? null);
+
   return {
     name,
     status,
@@ -104,7 +110,12 @@ export function normalizeTournamentPayload(payload = {}, defaults = {}) {
     plannedAt,
     description,
     location,
-    posterFileId
+    posterFileId,
+    scheduleInfo,
+    travelInfo,
+    contactEmail,
+    registrationUrl,
+    registrationDeadline
   };
 }
 

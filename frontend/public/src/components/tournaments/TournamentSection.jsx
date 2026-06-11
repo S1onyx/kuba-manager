@@ -1,4 +1,5 @@
 import { usePublicApp } from '../../context/PublicAppContext.jsx';
+import { navigateTo } from '../../hooks/useHashRoute.js';
 
 export default function TournamentSection() {
   const {
@@ -107,49 +108,51 @@ function PlannedTournamentCard({ tournament }) {
         overflow: 'hidden',
         border: '1px solid rgba(255,255,255,0.08)',
         width: '300px',
-        maxWidth: '100%'
+        maxWidth: '100%',
+        display: 'flex',
+        flexDirection: 'column'
       }}
     >
-      {tournament.poster_url && (
+      {tournament.poster_url ? (
         <img
           src={tournament.poster_url}
           alt={`Plakat ${tournament.name}`}
-          style={{
-            width: '100%',
-            maxHeight: '260px',
-            objectFit: 'cover',
-            display: 'block'
-          }}
+          style={{ width: '100%', height: '200px', objectFit: 'cover', display: 'block' }}
         />
+      ) : (
+        <div style={{ width: '100%', height: '120px', background: 'rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.3, fontSize: '2rem' }}>
+          🏆
+        </div>
       )}
-      <div style={{ padding: '1.25rem 1.5rem', display: 'grid', gap: '0.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
-          <span style={{ fontWeight: 600, fontSize: '1rem' }}>{tournament.name}</span>
-          <span
-            style={{
-              display: 'inline-block',
-              padding: '0.2rem 0.65rem',
-              borderRadius: '999px',
-              background: 'rgba(255,171,64,0.2)',
-              color: '#ffd180',
-              fontSize: '0.75rem',
-              letterSpacing: '0.08em'
-            }}
-          >
+      <div style={{ padding: '1rem 1.25rem', display: 'grid', gap: '0.4rem', flex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <span style={{ fontWeight: 600, fontSize: '0.95rem' }}>{tournament.name}</span>
+          <span style={{ display: 'inline-block', padding: '0.15rem 0.55rem', borderRadius: '999px', background: 'rgba(255,171,64,0.2)', color: '#ffd180', fontSize: '0.7rem', letterSpacing: '0.08em' }}>
             Geplant
           </span>
         </div>
-        {formattedDate && (
-          <p style={{ opacity: 0.8, fontSize: '0.9rem', margin: 0 }}>{formattedDate}</p>
-        )}
-        {tournament.location && (
-          <p style={{ opacity: 0.65, fontSize: '0.875rem', margin: 0 }}>{tournament.location}</p>
-        )}
-        {tournament.description && (
-          <p style={{ opacity: 0.6, fontSize: '0.85rem', margin: 0, marginTop: '0.25rem' }}>
-            {tournament.description}
-          </p>
-        )}
+        {formattedDate && <p style={{ opacity: 0.75, fontSize: '0.85rem', margin: 0 }}>{formattedDate}</p>}
+        {tournament.location && <p style={{ opacity: 0.55, fontSize: '0.8rem', margin: 0 }}>{tournament.location}</p>}
+      </div>
+      <div style={{ padding: '0 1.25rem 1rem' }}>
+        <button
+          type="button"
+          onClick={() => navigateTo(`/turnier/${tournament.id}`)}
+          style={{
+            width: '100%',
+            padding: '0.55rem',
+            borderRadius: '8px',
+            border: '1px solid rgba(86,160,255,0.4)',
+            background: 'rgba(86,160,255,0.1)',
+            color: '#7cb9ff',
+            fontSize: '0.875rem',
+            fontWeight: 600,
+            cursor: 'pointer',
+            letterSpacing: '0.04em'
+          }}
+        >
+          Details &amp; Anmeldung →
+        </button>
       </div>
     </div>
   );

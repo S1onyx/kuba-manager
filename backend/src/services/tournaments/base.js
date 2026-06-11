@@ -24,7 +24,12 @@ export function mapTournament(row) {
     planned_at: row.planned_at ?? null,
     description: row.description ?? null,
     location: row.location ?? null,
-    poster_file_id: row.poster_file_id ?? null
+    poster_file_id: row.poster_file_id ?? null,
+    schedule_info: row.schedule_info ?? null,
+    travel_info: row.travel_info ?? null,
+    contact_email: row.contact_email ?? null,
+    registration_url: row.registration_url ?? null,
+    registration_deadline: row.registration_deadline ?? null
   };
 }
 
@@ -64,8 +69,8 @@ export async function insertTournament(payload) {
   const { SQL, db } = await getConnection();
 
   const stmt = db.prepare(`
-    INSERT INTO tournaments (name, group_count, knockout_rounds, is_public, team_count, classification_mode, status, planned_at, description, location, poster_file_id)
-    VALUES (:name, :group_count, :knockout_rounds, :is_public, :team_count, :classification_mode, :status, :planned_at, :description, :location, :poster_file_id)
+    INSERT INTO tournaments (name, group_count, knockout_rounds, is_public, team_count, classification_mode, status, planned_at, description, location, poster_file_id, schedule_info, travel_info, contact_email, registration_url, registration_deadline)
+    VALUES (:name, :group_count, :knockout_rounds, :is_public, :team_count, :classification_mode, :status, :planned_at, :description, :location, :poster_file_id, :schedule_info, :travel_info, :contact_email, :registration_url, :registration_deadline)
   `);
 
   let newId = null;
@@ -81,7 +86,12 @@ export async function insertTournament(payload) {
       ':planned_at': normalized.plannedAt,
       ':description': normalized.description,
       ':location': normalized.location,
-      ':poster_file_id': normalized.posterFileId
+      ':poster_file_id': normalized.posterFileId,
+      ':schedule_info': normalized.scheduleInfo,
+      ':travel_info': normalized.travelInfo,
+      ':contact_email': normalized.contactEmail,
+      ':registration_url': normalized.registrationUrl,
+      ':registration_deadline': normalized.registrationDeadline
     });
     stmt.step();
     newId = db.exec('SELECT last_insert_rowid() as id')[0].values[0][0];
@@ -100,7 +110,8 @@ export async function updateTournamentRecord(id, patch = {}, defaults = {}) {
   db.run(
     `UPDATE tournaments
      SET name = ?, group_count = ?, knockout_rounds = ?, is_public = ?, team_count = ?, classification_mode = ?,
-         status = ?, planned_at = ?, description = ?, location = ?, poster_file_id = ?
+         status = ?, planned_at = ?, description = ?, location = ?, poster_file_id = ?,
+         schedule_info = ?, travel_info = ?, contact_email = ?, registration_url = ?, registration_deadline = ?
      WHERE id = ?`,
     [
       normalized.name,
@@ -114,6 +125,11 @@ export async function updateTournamentRecord(id, patch = {}, defaults = {}) {
       normalized.description,
       normalized.location,
       normalized.posterFileId,
+      normalized.scheduleInfo,
+      normalized.travelInfo,
+      normalized.contactEmail,
+      normalized.registrationUrl,
+      normalized.registrationDeadline,
       id
     ]
   );

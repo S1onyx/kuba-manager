@@ -368,3 +368,14 @@ export function uploadTournamentPoster(id, file) {
   formData.append('file', file);
   return request(`/tournaments/${id}/poster`, { method: 'POST', body: formData });
 }
+
+export function fetchRegistrations(tournamentId) {
+  return request(`/tournaments/${tournamentId}/registrations`);
+}
+
+export function updateRegistrationStatus(tournamentId, regId, status) {
+  return request(`/tournaments/${tournamentId}/registrations/${regId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status })
+  });
+}

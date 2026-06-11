@@ -35,6 +35,7 @@ kunstradbasketball.de, www.kunstradbasketball.de {
   }
 }
 
+
 display.kunstradbasketball.de {
   encode gzip zstd
 

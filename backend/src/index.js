@@ -34,6 +34,17 @@ app.use(
   })
 );
 
+import { getRegistrationAudioDir } from './services/registrations/index.js';
+
+app.use(
+  '/media/reg-audio',
+  express.static(getRegistrationAudioDir(), {
+    setHeaders: (res) => {
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+    }
+  })
+);
+
 app.use('/api/scoreboard', scoreboardRoutes);
 app.use('/api/tournaments', tournamentRoutes);
 app.use('/api/public', publicRoutes);

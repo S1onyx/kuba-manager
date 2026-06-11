@@ -71,6 +71,38 @@ export default function initializeSchema(db) {
   ensureTournamentColumn('description', 'TEXT');
   ensureTournamentColumn('location', 'TEXT');
   ensureTournamentColumn('poster_file_id', 'INTEGER');
+  ensureTournamentColumn('schedule_info', 'TEXT');
+  ensureTournamentColumn('travel_info', 'TEXT');
+  ensureTournamentColumn('contact_email', 'TEXT');
+  ensureTournamentColumn('registration_url', 'TEXT');
+  ensureTournamentColumn('registration_deadline', 'TEXT');
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS tournament_registrations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tournament_id INTEGER NOT NULL,
+      team_name TEXT NOT NULL,
+      contact_name TEXT NOT NULL,
+      contact_email TEXT NOT NULL,
+      players_json TEXT NOT NULL DEFAULT '[]',
+      audio_notes TEXT,
+      status TEXT DEFAULT 'pending',
+      created_at TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY(tournament_id) REFERENCES tournaments(id) ON DELETE CASCADE
+    );
+  `);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS registration_audio_files (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      registration_id INTEGER NOT NULL,
+      file_name TEXT NOT NULL,
+      original_name TEXT NOT NULL,
+      label TEXT,
+      created_at TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY(registration_id) REFERENCES tournament_registrations(id) ON DELETE CASCADE
+    );
+  `);
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS tournament_teams (

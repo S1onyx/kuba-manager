@@ -1,4 +1,5 @@
 import express from 'express';
+import multer from 'multer';
 import { getScoreboardState } from '../scoreboard/index.js';
 import {
   computeGroupStandings,
@@ -9,6 +10,17 @@ import {
   groupScheduleByPhase,
   listPublicTournaments
 } from '../services/index.js';
+import { getAudioFileById } from '../services/audio/index.js';
+import { createRegistration, attachAudioFile } from '../services/registrations/index.js';
+import { sendRegistrationConfirmation, sendRegistrationNotification } from '../services/mail/index.js';
+
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
+
+async function withPosterUrl(tournament) {
+  if (!tournament || !tournament.poster_file_id) return tournament;
+  const file = await getAudioFileById(tournament.poster_file_id);
+  return { ...tournament, poster_url: file ? `/media/audio/${encodeURIComponent(file.file_name)}` : null };
+}
 
 const router = express.Router();
 
@@ -116,6 +128,70 @@ router.get('/tournaments', async (_req, res) => {
   } catch (error) {
     console.error('Turnierliste konnte nicht geladen werden:', error);
     res.json([]);
+  }
+});
+
+router.get('/tournaments/:id/detail', async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+  }
+  try {
+    const tournament = await getTournament(id);
+    if (!tournament || !tournament.is_public) {
+      return res.status(404).json({ message: 'Turnier nicht gefunden.' });
+    }
+    res.json(await withPosterUrl(tournament));
+  } catch (error) {
+    res.status(500).json({ message: 'Turnier konnte nicht geladen werden.' });
+  }
+});
+
+router.post('/tournaments/:id/register', upload.array('audio', 5), async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+  }
+  try {
+    const tournament = await getTournament(id);
+    if (!tournament || !tournament.is_public || tournament.status !== 'planned') {
+      return res.status(404).json({ message: 'Turnier nicht gefunden oder nicht anmeldbar.' });
+    }
+
+    const { team_name, contact_name, contact_email, audio_notes } = req.body ?? {};
+    let players = [];
+    try { players = JSON.parse(req.body.players || '[]'); } catch {}
+
+    if (!team_name?.trim() || !contact_name?.trim() || !contact_email?.trim()) {
+      return res.status(400).json({ message: 'Teamname, Kontaktname und E-Mail sind Pflichtfelder.' });
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact_email)) {
+      return res.status(400).json({ message: 'Ungültige E-Mail-Adresse.' });
+    }
+
+    const regId = await createRegistration({
+      tournamentId: id,
+      teamName: team_name.trim(),
+      contactName: contact_name.trim(),
+      contactEmail: contact_email.trim(),
+      players,
+      audioNotes: audio_notes ?? null
+    });
+
+    for (const file of req.files ?? []) {
+      if (file.mimetype.startsWith('audio/') || file.originalname.match(/\.(mp3|ogg|wav|m4a)$/i)) {
+        await attachAudioFile(regId, { buffer: file.buffer, originalName: file.originalname, label: file.originalname });
+      }
+    }
+
+    // Fire-and-forget emails
+    sendRegistrationConfirmation({ to: contact_email.trim(), tournamentName: tournament.name, teamName: team_name.trim(), contactName: contact_name.trim(), players }).catch(console.error);
+    sendRegistrationNotification({ tournamentName: tournament.name, teamName: team_name.trim(), contactName: contact_name.trim(), contactEmail: contact_email.trim(), players }).catch(console.error);
+
+    res.status(201).json({ id: regId, message: 'Anmeldung erfolgreich eingereicht.' });
+  } catch (error) {
+    console.error('Anmeldung fehlgeschlagen:', error);
+    res.status(500).json({ message: 'Anmeldung konnte nicht gespeichert werden.' });
   }
 });
 

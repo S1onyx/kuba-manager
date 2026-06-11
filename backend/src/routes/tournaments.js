@@ -1,5 +1,6 @@
 import express from 'express';
 import multer from 'multer';
+import { listRegistrations, updateRegistrationStatus } from '../services/registrations/index.js';
 import {
   createTournament,
   deleteTournament,
@@ -89,7 +90,7 @@ router.put('/:id', async (req, res) => {
     return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
   }
 
-  const { name, group_count, knockout_rounds, is_public, team_count, classification_mode, status, planned_at, description, location } = req.body ?? {};
+  const { name, group_count, knockout_rounds, is_public, team_count, classification_mode, status, planned_at, description, location, schedule_info, travel_info, contact_email, registration_url, registration_deadline } = req.body ?? {};
   try {
     const updated = await updateTournament(id, {
       name,
@@ -101,7 +102,12 @@ router.put('/:id', async (req, res) => {
       status,
       planned_at,
       description,
-      location
+      location,
+      schedule_info,
+      travel_info,
+      contact_email,
+      registration_url,
+      registration_deadline
     });
     if (!updated) {
       return res.status(404).json({ message: 'Turnier nicht gefunden.' });
@@ -307,6 +313,38 @@ router.put('/:id/teams', async (req, res) => {
       message: 'Teamzuweisungen konnten nicht gespeichert werden.',
       detail: error.message
     });
+  }
+});
+
+router.get('/:id/registrations', async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+  }
+  try {
+    const registrations = await listRegistrations(id);
+    res.json(registrations);
+  } catch (error) {
+    console.error('Anmeldungen konnten nicht geladen werden:', error);
+    res.status(500).json({ message: 'Anmeldungen konnten nicht geladen werden.' });
+  }
+});
+
+router.patch('/:id/registrations/:regId', async (req, res) => {
+  const regId = Number(req.params.regId);
+  const { status } = req.body ?? {};
+  if (!Number.isInteger(regId) || regId <= 0) {
+    return res.status(400).json({ message: 'Ungültige Anmeldungs-ID.' });
+  }
+  const allowed = ['pending', 'confirmed', 'rejected'];
+  if (!allowed.includes(status)) {
+    return res.status(400).json({ message: 'Ungültiger Status.' });
+  }
+  try {
+    await updateRegistrationStatus(regId, status);
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ message: 'Status konnte nicht aktualisiert werden.' });
   }
 });
 
