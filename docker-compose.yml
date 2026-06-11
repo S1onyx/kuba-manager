@@ -5,6 +5,9 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - RESEND_API_KEY=${RESEND_API_KEY:-}
+      - MAIL_FROM=${MAIL_FROM:-noreply@info.kunstradbasketball.de}
+      - ADMIN_NOTIFICATION_EMAIL=${ADMIN_NOTIFICATION_EMAIL:-}
     volumes:
       - backend-data:/app/data
     networks:
