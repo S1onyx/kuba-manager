@@ -3,7 +3,7 @@ import { promises as fsPromises } from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { databasePaths, getConnection, persistDatabase } from '../../db/connection.js';
-import { getAudioStorageDirectory, createAudioFileRecord } from '../audio/index.js';
+import { getAudioStorageDirectory } from '../audio/index.js';
 
 const REG_AUDIO_DIR = path.join(databasePaths.dataDir, 'registration-audio');
 fs.mkdirSync(REG_AUDIO_DIR, { recursive: true });
@@ -143,10 +143,20 @@ export async function confirmRegistration(regId) {
 
   const { SQL, db } = await getConnection();
 
-  // Upsert team
+  // 1. Upsert team
   const teamId = upsertTeam(db, SQL, reg.teamName);
 
-  // Add to tournament_teams if not already there
+  // 2. Insert players (delete old ones from this team first to avoid dupes)
+  db.run('DELETE FROM team_players WHERE team_id = ?', [teamId]);
+  for (const player of reg.players) {
+    if (!player.name?.trim()) continue;
+    db.run(
+      'INSERT INTO team_players (team_id, name, jersey_number, position) VALUES (?, ?, ?, ?)',
+      [teamId, player.name.trim(), player.jerseyNumber ? Number(player.jerseyNumber) : null, null]
+    );
+  }
+
+  // 3. Add to tournament_teams if not already there
   const existing = db.exec(
     'SELECT id FROM tournament_teams WHERE tournament_id = ? AND team_id = ?',
     [reg.tournamentId, teamId]
@@ -159,7 +169,7 @@ export async function confirmRegistration(regId) {
     );
   }
 
-  // Update registration
+  // 4. Update registration
   db.run(
     'UPDATE tournament_registrations SET status = ?, team_id = ? WHERE id = ?',
     ['confirmed', teamId, regId]
@@ -167,40 +177,46 @@ export async function confirmRegistration(regId) {
 
   persistDatabase(db, SQL);
 
-  // Copy Korbhymne to audio storage and register as audio file for this team
-  try {
-    const audioStmt = db.prepare(
-      'SELECT file_name, original_name FROM registration_audio_files WHERE registration_id = ? LIMIT 1'
-    );
-    let audioRow = null;
-    try {
-      audioStmt.bind([regId]);
-      if (audioStmt.step()) audioRow = audioStmt.getAsObject();
-    } finally {
-      audioStmt.free();
-    }
-
-    if (audioRow) {
-      const srcPath = path.join(REG_AUDIO_DIR, audioRow.file_name);
-      const ext = path.extname(audioRow.file_name);
-      const destName = `${crypto.randomBytes(8).toString('hex')}${ext}`;
-      const destPath = path.join(getAudioStorageDirectory(), destName);
-      await fsPromises.copyFile(srcPath, destPath);
-      const stat = await fsPromises.stat(destPath);
-      await createAudioFileRecord({
-        label: `Korbhymne – ${reg.teamName}`,
-        originalName: audioRow.original_name,
-        fileName: destName,
-        mimeType: 'audio/mpeg',
-        sizeBytes: stat.size,
-        usage: 'library'
-      });
-    }
-  } catch (audioErr) {
-    console.error('[registrations] Korbhymne konnte nicht kopiert werden:', audioErr);
-  }
+  // 5. Copy Korbhymne into audio library (fire-and-forget)
+  _copyKorbhymneAsync(db, regId, reg.teamName).catch((err) =>
+    console.error('[registrations] Korbhymne copy failed:', err)
+  );
 
   return { ...reg, status: 'confirmed', teamId };
+}
+
+async function _copyKorbhymneAsync(db, regId, teamName) {
+  // Re-read audio file from DB using fresh connection to avoid stale state
+  const { db: freshDb } = await getConnection();
+  const stmt = freshDb.prepare(
+    'SELECT file_name, original_name FROM registration_audio_files WHERE registration_id = ? LIMIT 1'
+  );
+  let audioRow = null;
+  try {
+    stmt.bind([regId]);
+    if (stmt.step()) audioRow = stmt.getAsObject();
+  } finally {
+    stmt.free();
+  }
+  if (!audioRow) return;
+
+  const srcPath = path.join(REG_AUDIO_DIR, audioRow.file_name);
+  if (!fs.existsSync(srcPath)) return;
+
+  const ext = path.extname(audioRow.file_name) || '.mp3';
+  const destName = `${crypto.randomBytes(8).toString('hex')}${ext}`;
+  const destPath = path.join(getAudioStorageDirectory(), destName);
+  await fsPromises.copyFile(srcPath, destPath);
+  const stat = await fsPromises.stat(destPath);
+
+  const { SQL: SQL2, db: db2 } = await getConnection();
+  db2.run(
+    `INSERT INTO audio_files (label, original_name, file_name, mime_type, size_bytes, usage, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+    [`Korbhymne – ${teamName}`, audioRow.original_name, destName, 'audio/mpeg', stat.size, 'library']
+  );
+  persistDatabase(db2, SQL2);
+  console.log(`[registrations] Korbhymne für "${teamName}" in Audio-Bibliothek eingetragen: ${destName}`);
 }
 
 export async function rejectRegistration(regId) {

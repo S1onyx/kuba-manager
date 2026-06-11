@@ -12,7 +12,7 @@ export default function TournamentDetailsPanel({
   const [posterFile, setPosterFile] = useState(null);
   const [registrations, setRegistrations] = useState([]);
   const [regLoading, setRegLoading] = useState(false);
-  const [regTab, setRegTab] = useState(false);
+  const [activeTab, setActiveTab] = useState('info');
   const [activating, setActivating] = useState(false);
   const [statusChanging, setStatusChanging] = useState(null);
   const [statusError, setStatusError] = useState('');
@@ -144,22 +144,26 @@ export default function TournamentDetailsPanel({
     );
   }
 
-  if (tournament.status === 'planned') {
+  if (tournament.status === 'planned' || tournament.status === 'active') {
     const statusLabel = { pending: 'Ausstehend', confirmed: 'Bestätigt', rejected: 'Abgelehnt' };
     const statusColor = { pending: 'rgba(255,171,64,0.2)', confirmed: 'rgba(64,200,120,0.2)', rejected: 'rgba(255,100,100,0.2)' };
 
     return (
       <PanelCard title={`Turnierdetails – ${tournament.name}`} description="Geplantes Turnier">
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-          <button type="button" onClick={() => setRegTab(false)} style={{ padding: '0.4rem 1rem', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.2)', background: !regTab ? 'rgba(86,160,255,0.2)' : 'transparent', color: '#fff', cursor: 'pointer' }}>
-            Info &amp; Plakat
-          </button>
-          <button type="button" onClick={() => setRegTab(true)} style={{ padding: '0.4rem 1rem', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.2)', background: regTab ? 'rgba(86,160,255,0.2)' : 'transparent', color: '#fff', cursor: 'pointer' }}>
-            Anmeldungen {registrations.length > 0 ? `(${registrations.length})` : ''}
-          </button>
+          {[
+            { id: 'info', label: 'Info & Plakat' },
+            { id: 'registrations', label: `Anmeldungen${registrations.length > 0 ? ` (${registrations.length})` : ''}` },
+            ...(tournament.status === 'active' ? [{ id: 'structure', label: 'Turnierstruktur' }] : [])
+          ].map((tab) => (
+            <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)}
+              style={{ padding: '0.4rem 1rem', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.2)', background: activeTab === tab.id ? 'rgba(86,160,255,0.2)' : 'transparent', color: '#fff', cursor: 'pointer' }}>
+              {tab.label}
+            </button>
+          ))}
         </div>
 
-        {!regTab && (
+        {activeTab === 'info' && (
           <div style={{ display: 'grid', gap: '1rem' }}>
             <section style={{ display: 'grid', gap: '0.65rem' }}>
               <h3 style={{ margin: 0, fontSize: '1rem' }}>Plakat</h3>
@@ -197,7 +201,7 @@ export default function TournamentDetailsPanel({
           </div>
         )}
 
-        {regTab && (
+        {activeTab === 'registrations' && (
           <div style={{ display: 'grid', gap: '0.75rem' }}>
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               <button
@@ -255,107 +259,93 @@ export default function TournamentDetailsPanel({
             ))}
           </div>
         )}
+
+        {activeTab === 'structure' && tournament.status === 'active' && (
+          <StructureContent
+            groups={groups}
+            slotAssignments={slotAssignments}
+            slotInitialAssignments={slotInitialAssignments}
+            structureSaving={structureSaving}
+            hasTournamentChanges={hasTournamentChanges}
+            handleSlotNameChange={handleSlotNameChange}
+            handleSlotTeamSelect={handleSlotTeamSelect}
+            handleSlotReset={handleSlotReset}
+            handleResetAllSlots={handleResetAllSlots}
+            handleTournamentAssignmentsSave={handleTournamentAssignmentsSave}
+            handleTournamentStructureRefresh={handleTournamentStructureRefresh}
+            teams={teams}
+            teamNameById={teamNameById}
+            qualifierSummary={qualifierSummary}
+          />
+        )}
       </PanelCard>
     );
   }
 
+  // Fallback for any other status (completed etc.)
   return (
-    <PanelCard
-      title={`Turnierstruktur – ${tournament.name}`}
-      description={qualifierSummary}
-      action={
-        <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
-          <button type="button" onClick={handleTournamentStructureRefresh}>
-            Neu laden
-          </button>
-          <button
-            type="button"
-            onClick={handleTournamentAssignmentsSave}
-            disabled={!hasTournamentChanges || structureSaving}
-          >
-            {structureSaving ? 'Speichere...' : 'Änderungen sichern'}
-          </button>
-          <button type="button" onClick={handleResetAllSlots}>
-            Zurücksetzen
-          </button>
-        </div>
-      }
-    >
+    <PanelCard title={`Turnierdetails – ${tournament.name}`} description={qualifierSummary}>
+      <StructureContent
+        groups={groups}
+        slotAssignments={slotAssignments}
+        slotInitialAssignments={slotInitialAssignments}
+        structureSaving={structureSaving}
+        hasTournamentChanges={hasTournamentChanges}
+        handleSlotNameChange={handleSlotNameChange}
+        handleSlotTeamSelect={handleSlotTeamSelect}
+        handleSlotReset={handleSlotReset}
+        handleResetAllSlots={handleResetAllSlots}
+        handleTournamentAssignmentsSave={handleTournamentAssignmentsSave}
+        handleTournamentStructureRefresh={handleTournamentStructureRefresh}
+        teams={teams}
+        teamNameById={teamNameById}
+        qualifierSummary={qualifierSummary}
+      />
+    </PanelCard>
+  );
+}
+
+function StructureContent({ groups, slotAssignments, slotInitialAssignments, structureSaving, hasTournamentChanges, handleSlotNameChange, handleSlotTeamSelect, handleSlotReset, handleResetAllSlots, handleTournamentAssignmentsSave, handleTournamentStructureRefresh, teams, teamNameById }) {
+  return (
+    <div style={{ display: 'grid', gap: '1rem' }}>
+      <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
+        <button type="button" onClick={handleTournamentStructureRefresh}>Neu laden</button>
+        <button type="button" onClick={handleTournamentAssignmentsSave} disabled={!hasTournamentChanges || structureSaving}>
+          {structureSaving ? 'Speichere...' : 'Änderungen sichern'}
+        </button>
+        <button type="button" onClick={handleResetAllSlots}>Zurücksetzen</button>
+      </div>
       {groups.length === 0 ? (
         <p style={{ margin: 0 }}>Noch keine Gruppen/Slots definiert.</p>
       ) : (
         <div style={{ display: 'grid', gap: '1.25rem' }}>
           {groups.map((group) => (
-            <section
-              key={group.label ?? group.id}
-              style={{
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                background: 'rgba(8,20,35,0.45)',
-                padding: '1rem 1.2rem',
-                display: 'grid',
-                gap: '0.8rem'
-              }}
-            >
+            <section key={group.label ?? group.id} style={{ borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(8,20,35,0.45)', padding: '1rem 1.2rem', display: 'grid', gap: '0.8rem' }}>
               <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <strong>{group.label || `Gruppe ${group.id ?? ''}`}</strong>
-                <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>
-                  {group.slots?.length ?? 0} Slots
-                </span>
+                <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>{group.slots?.length ?? 0} Slots</span>
               </header>
-
               <div style={{ display: 'grid', gap: '0.75rem' }}>
                 {group.slots.map((slot) => {
                   const key = String(slot.slotNumber);
-                  const assignment = slotAssignments[key] ?? {
-                    name: `Team ${slot.slotNumber}`,
-                    placeholder: `Team ${slot.slotNumber}`,
-                    teamId: ''
-                  };
+                  const assignment = slotAssignments[key] ?? { name: `Team ${slot.slotNumber}`, placeholder: `Team ${slot.slotNumber}`, teamId: '' };
                   const initial = slotInitialAssignments[key] ?? assignment;
-                  const hasChanges =
-                    (assignment.name ?? '').trim() !== (initial.name ?? '').trim() ||
-                    (assignment.teamId ?? '') !== (initial.teamId ?? '');
-
+                  const hasChanges = (assignment.name ?? '').trim() !== (initial.name ?? '').trim() || (assignment.teamId ?? '') !== (initial.teamId ?? '');
                   return (
-                    <div
-                      key={key}
-                      style={{
-                        display: 'grid',
-                        gap: '0.65rem',
-                        padding: '0.75rem',
-                        borderRadius: 'var(--radius-sm)',
-                        border: hasChanges ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.08)',
-                        background: 'rgba(12, 28, 48, 0.6)'
-                      }}
-                    >
+                    <div key={key} style={{ display: 'grid', gap: '0.65rem', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: hasChanges ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.08)', background: 'rgba(12,28,48,0.6)' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span style={{ fontWeight: 600 }}>Slot {slot.slotNumber}</span>
-                        <button type="button" onClick={() => handleSlotReset(slot.slotNumber)}>
-                          Zurücksetzen
-                        </button>
+                        <button type="button" onClick={() => handleSlotReset(slot.slotNumber)}>Zurücksetzen</button>
                       </div>
                       <label style={{ display: 'grid', gap: '0.3rem' }}>
                         Platzhalter / Name
-                        <input
-                          value={assignment.name}
-                          onChange={(event) => handleSlotNameChange(slot.slotNumber, event.target.value)}
-                          placeholder={assignment.placeholder}
-                        />
+                        <input value={assignment.name} onChange={(e) => handleSlotNameChange(slot.slotNumber, e.target.value)} placeholder={assignment.placeholder} />
                       </label>
                       <label style={{ display: 'grid', gap: '0.3rem' }}>
                         Team zuweisen
-                        <select
-                          value={assignment.teamId ?? ''}
-                          onChange={(event) => handleSlotTeamSelect(slot.slotNumber, event.target.value)}
-                        >
+                        <select value={assignment.teamId ?? ''} onChange={(e) => handleSlotTeamSelect(slot.slotNumber, e.target.value)}>
                           <option value="">Kein fixes Team</option>
-                          {teams.map((team) => (
-                            <option key={team.id} value={team.id}>
-                              {team.name}
-                              {teamNameById.get(String(team.id)) ? '' : ''}
-                            </option>
-                          ))}
+                          {teams.map((team) => <option key={team.id} value={team.id}>{team.name}</option>)}
                         </select>
                       </label>
                     </div>
@@ -366,6 +356,6 @@ export default function TournamentDetailsPanel({
           ))}
         </div>
       )}
-    </PanelCard>
+    </div>
   );
 }
