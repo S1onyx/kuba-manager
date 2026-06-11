@@ -127,6 +127,26 @@ jobs:
             DEPLOY=${{ secrets.DEPLOY_PATH }}
             docker run --rm -v "${DEPLOY}:/repo" alpine sh -c "rm -rf /repo/plausible-ce"
             git reset --hard origin/main
+
+            # Write mail env vars from secrets (idempotent)
+            ENV_FILE="${DEPLOY}/.env"
+            touch "$ENV_FILE"
+            for KEY in RESEND_API_KEY MAIL_FROM ADMIN_NOTIFICATION_EMAIL; do
+              VALUE=""
+              case "$KEY" in
+                RESEND_API_KEY)           VALUE="${{ secrets.RESEND_API_KEY }}" ;;
+                MAIL_FROM)                VALUE="${{ secrets.MAIL_FROM }}" ;;
+                ADMIN_NOTIFICATION_EMAIL) VALUE="${{ secrets.ADMIN_NOTIFICATION_EMAIL }}" ;;
+              esac
+              if [ -n "$VALUE" ]; then
+                if grep -q "^${KEY}=" "$ENV_FILE" 2>/dev/null; then
+                  sed -i "s|^${KEY}=.*|${KEY}=${VALUE}|" "$ENV_FILE"
+                else
+                  echo "${KEY}=${VALUE}" >> "$ENV_FILE"
+                fi
+              fi
+            done
+
             docker image prune -f || true
             docker compose pull
             docker compose up -d --remove-orphans
