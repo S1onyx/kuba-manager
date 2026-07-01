@@ -32,9 +32,12 @@ export default function TimerControlCard() {
       setExtraDirty
     },
     scoreboardMeta: { formattedRemaining, statusLabel },
+    audio: { timerCueSettings, timerCueBusy, handleTimerCueSave },
     ui,
     history
   } = useDashboard();
+
+  const autoStart = Boolean(timerCueSettings?.halftimeAutoStart);
 
   return (
     <PanelCard
@@ -67,7 +70,7 @@ export default function TimerControlCard() {
             </span>
             {scoreboard.isHalftimeBreak ? (
               <span style={{ fontSize: '0.85rem', opacity: 0.75 }}>
-                Halbzeitpause läuft · Rest: {formatTime(scoreboard.halftimePauseRemaining ?? 0)} (Auto-Start)
+                Halbzeitpause läuft · Rest: {formatTime(scoreboard.halftimePauseRemaining ?? 0)} ({autoStart ? 'Auto-Start' : 'manueller Start'})
               </span>
             ) : null}
             {(scoreboard.extraSeconds ?? 0) > 0 || (scoreboard.extraElapsedSeconds ?? 0) > 0 ? (
@@ -77,13 +80,24 @@ export default function TimerControlCard() {
             ) : null}
           </div>
 
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginLeft: 'auto' }}>
-            <button type="button" onClick={handleStart} disabled={scoreboard.isRunning}>
-              Start
-            </button>
-            <button type="button" onClick={handlePause} disabled={!scoreboard.isRunning}>
-              Pause
-            </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginLeft: 'auto', alignItems: 'flex-end' }}>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <button type="button" onClick={handleStart} disabled={scoreboard.isRunning}>
+                Start
+              </button>
+              <button type="button" onClick={handlePause} disabled={!scoreboard.isRunning}>
+                Pause
+              </button>
+            </div>
+            <label style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', fontSize: '0.85rem', opacity: 0.9 }}>
+              <input
+                type="checkbox"
+                checked={autoStart}
+                disabled={timerCueBusy}
+                onChange={(e) => handleTimerCueSave({ halftimeAutoStart: e.target.checked })}
+              />
+              2. Halbzeit automatisch starten
+            </label>
           </div>
         </div>
 

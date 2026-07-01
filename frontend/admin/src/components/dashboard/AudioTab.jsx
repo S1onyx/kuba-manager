@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import PanelCard from '../common/PanelCard.jsx';
 import { useDashboard } from '../../context/DashboardContext.jsx';
 
@@ -14,6 +15,8 @@ export default function AudioTab() {
       audioTriggerLabels,
       audioLibraryUploadLabel,
       setAudioLibraryUploadLabel,
+      timerCueSettings,
+      timerCueBusy,
       handleAudioTriggerLabelChange,
       handleAudioTriggerToggle,
       handleAudioTriggerUpload,
@@ -23,9 +26,15 @@ export default function AudioTab() {
       handleAudioLibraryUpload,
       handleAudioLibraryDelete,
       handleAudioLibraryPlay,
+      handleTimerCueSave,
       describeAudioFile
     }
   } = useDashboard();
+
+  const [warningInput, setWarningInput] = useState('');
+  const [countdownInput, setCountdownInput] = useState('');
+  const warningVal = warningInput !== '' ? warningInput : String(timerCueSettings?.warningSeconds ?? 15);
+  const countdownVal = countdownInput !== '' ? countdownInput : String(timerCueSettings?.countdownFrom ?? 5);
 
   return (
     <div style={{ display: 'grid', gap: '1.75rem' }} className="audio-tab">
@@ -141,6 +150,58 @@ export default function AudioTab() {
             })}
           </div>
         )}
+      </PanelCard>
+
+      <PanelCard
+        title="Timer-Signale"
+        description="Konfiguriere wann Vorsignal, Countdown-Piepser und Schlusssignal ausgelöst werden. Sounds werden oben unter 'Spielereignis-Sounds' zugewiesen."
+      >
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleTimerCueSave({
+              warningSeconds: Number(warningVal),
+              countdownFrom: Number(countdownVal)
+            });
+            setWarningInput('');
+            setCountdownInput('');
+          }}
+          style={{ display: 'grid', gap: '1rem' }}
+        >
+          <label style={{ display: 'grid', gap: '0.35rem', fontSize: '0.9rem' }}>
+            Vorsignal ab Sekunde (0 = deaktiviert)
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <input
+                type="number"
+                min="0"
+                max="600"
+                value={warningVal}
+                onChange={(e) => setWarningInput(e.target.value)}
+                style={{ width: '5rem' }}
+                disabled={timerCueBusy}
+              />
+              <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>Sekunden vor Spielende</span>
+            </div>
+          </label>
+          <label style={{ display: 'grid', gap: '0.35rem', fontSize: '0.9rem' }}>
+            Countdown-Piepser ab Sekunde (0 = deaktiviert)
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <input
+                type="number"
+                min="0"
+                max="60"
+                value={countdownVal}
+                onChange={(e) => setCountdownInput(e.target.value)}
+                style={{ width: '5rem' }}
+                disabled={timerCueBusy}
+              />
+              <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>Sekunden vor Schluss (jede Sekunde ein Piep)</span>
+            </div>
+          </label>
+          <button type="submit" disabled={timerCueBusy} style={{ alignSelf: 'start' }}>
+            {timerCueBusy ? 'Speichert...' : 'Speichern'}
+          </button>
+        </form>
       </PanelCard>
 
       <PanelCard

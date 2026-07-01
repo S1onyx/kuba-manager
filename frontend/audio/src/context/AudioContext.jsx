@@ -20,6 +20,7 @@ export function AudioProvider({ children }) {
     playbackError,
     setPlaybackError,
     enqueuePlayback,
+    stopPlayback,
     initializeAudioChain
   } = useAudioPlayback(volumeSettings);
 
@@ -55,14 +56,20 @@ export function AudioProvider({ children }) {
       }
     };
 
+    const handleAudioStop = () => {
+      stopPlayback();
+    };
+
     socket.on('audio:play', handleAudioPlay);
     socket.on('audio:ready', handleAudioReady);
+    socket.on('audio:stop', handleAudioStop);
 
     return () => {
       socket.off('audio:play', handleAudioPlay);
       socket.off('audio:ready', handleAudioReady);
+      socket.off('audio:stop', handleAudioStop);
     };
-  }, [addEvent, addSystemEvent, enqueuePlayback]);
+  }, [addEvent, addSystemEvent, enqueuePlayback, stopPlayback]);
 
   useEffect(() => {
     if (!audioReady) {

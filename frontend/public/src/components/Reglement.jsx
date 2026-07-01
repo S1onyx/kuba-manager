@@ -101,7 +101,7 @@ const sections = [
             type: 'list',
             items: [
               'Ein Team besteht aus maximal fünf Spielern.',
-              'Pro Team stehen maximal vier Spieler gleichzeitig auf dem Feld.',
+              'Pro Team stehen maximal vier Spieler gleichzeitig auf dem Feld. Zu viele Spieler auf dem Feld werden mit 2 Minuten Zeitstrafe geahndet.',
               'Spielerwechsel erfolgen fliegend und ausschließlich über die eigene Coaching Zone.'
             ]
           }
@@ -126,6 +126,7 @@ const sections = [
             type: 'list',
             items: [
               'Jedes Team verfügt über eine eigene Coaching Zone, in der sich Auswechselspieler aufhalten.',
+              'Nach einem erfolgreichen Korbwurf beginnt das kassierende Team mit Einwurf von der eigenen Grundlinie.',
               {
                 text: 'Die Punktewertung entspricht dem Basketball:',
                 subItems: ['1 Punkt – Freiwurf', '2 Punkte – Feldwurf', '3 Punkte – Wurf hinter der Drei-Punkte-Linie']
@@ -145,7 +146,7 @@ const sections = [
           {
             type: 'list',
             items: [
-              'Spieldauer: 10 oder 12 Minuten.',
+              'Spieldauer: 2×5 Minuten mit 1 Minute Halbzeitpause; die Uhr läuft ohne Unterbrechung.',
               'Vor Spielbeginn entscheidet ein Zufallsprinzip (z. B. Münzwurf), welches Team den Ballbesitz erhält.',
               'Das Anspiel erfolgt in der eigenen Hälfte; beide Teams starten in ihrer Hälfte und das Spiel beginnt mit einem Pfiff des Schiedsrichters.',
               'Die Spielleitung überwacht die Zeit und signalisiert das Ende mit einem Pfiff.'
@@ -160,7 +161,8 @@ const sections = [
             type: 'list',
             items: [
               'Mit Ball in der Hand sind maximal drei Pedalumdrehungen erlaubt.',
-              'Spätestens nach drei Pedalumdrehungen muss geprellt oder abgespielt werden.',
+              'Spätestens nach drei Pedalumdrehungen muss geprellt oder abgespielt werden. Doppeldribbling – Ball aufnehmen und erneut prellen – ist verboten.',
+              'Bei mehr als drei Pedalumdrehungen ohne Abspiel oder Prellen erfolgt Ballwechsel an das gegnerische Team.',
               'Kann ein Team den Ball nicht aufnehmen, ohne die Steuerrohrsteiger-Position zu verlassen, erhält das gegnerische Team Ballbesitz; der Schiedsrichter hebt den Ball an, damit das gegnerische Team ihn übernehmen kann.',
               'Verlässt der Ball das Spielfeld, erhält ebenfalls das gegnerische Team an dieser Stelle den Ball, den der Schiedsrichter freigibt.'
             ]
@@ -176,7 +178,7 @@ const sections = [
               'Die Vorrunde wird in einer oder mehreren Gruppen ausgetragen.',
               'Punktevergabe: Sieg 3 Punkte, Unentschieden 1 Punkt, Niederlage 0 Punkte.',
               'In der Endrunde wird im K.-o.-Modus gespielt. Bei Unentschieden nach regulärer Spielzeit folgt eine Verlängerung über die halbe Spielzeit.',
-              'Bleibt es danach unentschieden, erfolgt ein fünfmaliger Freiwurf shootout beider Teams hinter der Drei-Punkte-Linie. Falls weiterhin kein Sieger feststeht, wird der Ablauf wiederholt, bis ein Team gewinnt.'
+              'Bleibt es danach unentschieden, erfolgt ein Freiwurf-Shootout: Beide Teams werfen abwechselnd fünfmal hinter der Drei-Punkte-Linie – jeder Spieler muss mindestens einmal werfen. Falls weiterhin kein Sieger feststeht, wird der Ablauf wiederholt, bis ein Team gewinnt.'
             ]
           }
         ]
@@ -202,7 +204,8 @@ const sections = [
           {
             type: 'list',
             items: [
-              'Umfasst unter anderem Runterschubsen, regelwidriges Blocken bei hoher Geschwindigkeit oder absichtliches Anfahren.',
+              'Umfasst unter anderem Runterschubsen, regelwidriges Blocken bei hoher Geschwindigkeit, absichtliches Anfahren oder Weg-Abschneiden (Querstellen vor einem fahrenden Spieler ohne Bremsabstand).',
+              'Unvermeidlicher Körperkontakt ohne Einfluss auf den Spielverlauf gilt nicht als Foul.',
               'Bei Zusammenstößen entscheidet der Schiedsrichter über die Schuldfrage; bei Unklarheit erhalten beide Spieler eine Zeitstrafe.',
               {
                 text: 'Zeitstrafen-Katalog:',
@@ -242,7 +245,21 @@ const sections = [
         ]
       },
       {
-        heading: '3.5 Zeitspiel',
+        heading: '3.5 Freiwurf',
+        body: [
+          {
+            type: 'list',
+            items: [
+              'Freiwürfe werden hinter der Drei-Punkte-Linie ausgeführt.',
+              'Der werfende Spieler hat drei Pedalumdrehungen Zeit, um den Freiwurf auszuführen.',
+              'Gegnerische Spieler müssen während des Freiwurfs außerhalb der Drei-Punkte-Zone bleiben.',
+              'Trifft der Freiwurf, gibt das gegnerische Team von der Grundlinie ein.'
+            ]
+          }
+        ]
+      },
+      {
+        heading: '3.6 Zeitspiel',
         body: [
           {
             type: 'paragraph',

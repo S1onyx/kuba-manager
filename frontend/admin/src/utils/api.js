@@ -236,6 +236,17 @@ export function playAudioLibraryFile(id) {
   });
 }
 
+export function fetchTimerCueSettings() {
+  return request('/audio/timer-cues');
+}
+
+export function saveTimerCueSettings(payload) {
+  return request('/audio/timer-cues', {
+    method: 'PUT',
+    body: JSON.stringify(payload)
+  });
+}
+
 export function updateMatchContext(payload) {
   return request('/scoreboard/context', {
     method: 'POST',

@@ -209,10 +209,13 @@ export default function initializeSchema(db) {
   const defaultTriggers = [
     ['game_start', 'Spielstart', 'Wird beim Starten des Spiels abgespielt.'],
     ['game_pause', 'Spielpause', 'Wird beim Pausieren des Spiels abgespielt.'],
-    ['game_end', 'Spielende', 'Wird beim Beenden/Speichern des Spiels abgespielt.'],
+    ['game_end', 'Schlusssignal', 'Wird beim Ablauf der Spielzeit abgespielt.'],
     ['score_team_a', 'Korb Team A', 'Wird bei einem Korb für Team A abgespielt.'],
     ['score_team_b', 'Korb Team B', 'Wird bei einem Korb für Team B abgespielt.'],
-    ['foul', 'Foul', 'Wird bei einem Foul abgespielt.']
+    ['foul', 'Foul', 'Wird bei einem Foul abgespielt.'],
+    ['penalty_expired', 'Strafe abgelaufen', 'Wird abgespielt, wenn eine Zeitstrafe abgelaufen ist.'],
+    ['timer_warning', 'Vorsignal', 'Dezentes Signal kurz vor Spielende bzw. Halbzeit (konfigurierbar).'],
+    ['timer_countdown_beep', 'Countdown-Piepser', 'Sekundlicher Piepser in der Schlussphase bzw. vor Wiederanpfiff (konfigurierbar).']
   ];
 
   defaultTriggers.forEach(([key, label, description]) => {
@@ -220,6 +223,28 @@ export default function initializeSchema(db) {
       INSERT INTO audio_triggers (key, label, description, is_active)
       SELECT '${key}', '${label}', '${description.replace(/'/g, "''")}', 1
       WHERE NOT EXISTS (SELECT 1 FROM audio_triggers WHERE key = '${key}');
+    `);
+  });
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS app_settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL,
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
+  `);
+
+  const defaultSettings = [
+    ['timer_warning_seconds', '15'],
+    ['timer_countdown_from', '5'],
+    ['halftime_auto_start', '0']
+  ];
+
+  defaultSettings.forEach(([key, value]) => {
+    db.exec(`
+      INSERT INTO app_settings (key, value)
+      SELECT '${key}', '${value}'
+      WHERE NOT EXISTS (SELECT 1 FROM app_settings WHERE key = '${key}');
     `);
   });
 }

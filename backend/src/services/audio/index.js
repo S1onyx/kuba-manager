@@ -404,6 +404,61 @@ export async function updateTriggerSettings(key, { isActive, fileId }) {
   return getAudioTrigger(trigger.key);
 }
 
+const timerCueCache = { warningSeconds: 15, countdownFrom: 5, halftimeAutoStart: false };
+let timerCueCacheLoaded = false;
+
+async function loadTimerCueCache() {
+  const { db } = await getConnection();
+  for (const [key, prop] of [['timer_warning_seconds', 'warningSeconds'], ['timer_countdown_from', 'countdownFrom']]) {
+    const stmt = db.prepare('SELECT value FROM app_settings WHERE key = ?');
+    stmt.bind([key]);
+    const row = stmt.step() ? stmt.getAsObject() : null;
+    stmt.free();
+    if (row) timerCueCache[prop] = Math.max(0, Number(row.value) || 0);
+  }
+  const autoStmt = db.prepare('SELECT value FROM app_settings WHERE key = ?');
+  autoStmt.bind(['halftime_auto_start']);
+  const autoRow = autoStmt.step() ? autoStmt.getAsObject() : null;
+  autoStmt.free();
+  if (autoRow) timerCueCache.halftimeAutoStart = autoRow.value === '1';
+  timerCueCacheLoaded = true;
+}
+
+export async function initTimerCueSettings() {
+  await loadTimerCueCache();
+}
+
+export function getTimerCueSettingsSync() {
+  return { ...timerCueCache };
+}
+
+export async function getTimerCueSettings() {
+  if (!timerCueCacheLoaded) await loadTimerCueCache();
+  return { ...timerCueCache };
+}
+
+export async function updateTimerCueSettings({ warningSeconds, countdownFrom, halftimeAutoStart }) {
+  if (!timerCueCacheLoaded) await loadTimerCueCache();
+  const { SQL, db } = await getConnection();
+  if (warningSeconds !== undefined) {
+    const v = Math.max(0, Math.trunc(Number(warningSeconds) || 0));
+    db.run("INSERT OR REPLACE INTO app_settings (key, value, updated_at) VALUES (?, ?, datetime('now'))", ['timer_warning_seconds', String(v)]);
+    timerCueCache.warningSeconds = v;
+  }
+  if (countdownFrom !== undefined) {
+    const v = Math.max(0, Math.trunc(Number(countdownFrom) || 0));
+    db.run("INSERT OR REPLACE INTO app_settings (key, value, updated_at) VALUES (?, ?, datetime('now'))", ['timer_countdown_from', String(v)]);
+    timerCueCache.countdownFrom = v;
+  }
+  if (halftimeAutoStart !== undefined) {
+    const v = halftimeAutoStart ? '1' : '0';
+    db.run("INSERT OR REPLACE INTO app_settings (key, value, updated_at) VALUES (?, ?, datetime('now'))", ['halftime_auto_start', v]);
+    timerCueCache.halftimeAutoStart = halftimeAutoStart ? true : false;
+  }
+  persistDatabase(db, SQL);
+  return { ...timerCueCache };
+}
+
 export async function upsertTriggerFileFromUpload(key, uploadMeta) {
   const trigger = await getAudioTrigger(key);
   if (!trigger) {

@@ -75,6 +75,15 @@ export default function useAudioPlayback(volumeSettings = DEFAULT_VOLUME_SETTING
     }
   }, []);
 
+  const stopPlayback = useCallback(() => {
+    pendingQueueRef.current = [];
+    const audioEl = audioElementRef.current;
+    if (audioEl) {
+      audioEl.pause();
+      audioEl.currentTime = 0;
+    }
+  }, []);
+
   const enqueuePlayback = useCallback(
     (payload) => {
       const category = resolveCategoryFromPayload(payload);
@@ -134,6 +143,7 @@ export default function useAudioPlayback(volumeSettings = DEFAULT_VOLUME_SETTING
     playbackError,
     setPlaybackError,
     enqueuePlayback,
+    stopPlayback,
     initializeAudioChain
   };
 }

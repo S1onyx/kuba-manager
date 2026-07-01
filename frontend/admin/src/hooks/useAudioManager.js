@@ -4,6 +4,8 @@ import {
   deleteAudioLibraryFile,
   fetchAudioLibrary,
   fetchAudioTriggers,
+  fetchTimerCueSettings,
+  saveTimerCueSettings,
   playAudioLibraryFile,
   playAudioTriggerPreview,
   updateAudioTrigger,
@@ -21,6 +23,8 @@ export default function useAudioManager({ updateMessage }) {
   const [audioManualBusy, setAudioManualBusy] = useState({});
   const [audioTriggerLabels, setAudioTriggerLabels] = useState({});
   const [audioLibraryUploadLabel, setAudioLibraryUploadLabel] = useState('');
+  const [timerCueSettings, setTimerCueSettings] = useState({ warningSeconds: 15, countdownFrom: 5, halftimeAutoStart: false });
+  const [timerCueBusy, setTimerCueBusy] = useState(false);
 
   const loadAudioData = useCallback(
     async (showLoader = false) => {
@@ -29,12 +33,14 @@ export default function useAudioManager({ updateMessage }) {
       }
       setAudioError('');
       try {
-        const [triggersResponse, libraryResponse] = await Promise.all([
+        const [triggersResponse, libraryResponse, cueSettings] = await Promise.all([
           fetchAudioTriggers(),
-          fetchAudioLibrary()
+          fetchAudioLibrary(),
+          fetchTimerCueSettings()
         ]);
         setAudioTriggers(triggersResponse?.triggers ?? []);
         setAudioLibrary(libraryResponse?.files ?? []);
+        if (cueSettings) setTimerCueSettings(cueSettings);
       } catch (err) {
         console.error('Audiodaten konnten nicht geladen werden.', err);
         setAudioError('Audiodaten konnten nicht geladen werden.');
@@ -234,6 +240,23 @@ export default function useAudioManager({ updateMessage }) {
     [updateMessage]
   );
 
+  const handleTimerCueSave = useCallback(
+    async (updates) => {
+      setTimerCueBusy(true);
+      try {
+        const updated = await saveTimerCueSettings(updates);
+        if (updated) setTimerCueSettings(updated);
+        updateMessage('info', 'Timer-Einstellungen gespeichert.');
+      } catch (err) {
+        console.error('Timer-Cue-Einstellungen konnten nicht gespeichert werden.', err);
+        updateMessage('error', 'Timer-Einstellungen konnten nicht gespeichert werden.');
+      } finally {
+        setTimerCueBusy(false);
+      }
+    },
+    [updateMessage]
+  );
+
   const describeAudioFile = useCallback((file) => {
     if (!file) {
       return '';
@@ -258,6 +281,8 @@ export default function useAudioManager({ updateMessage }) {
     audioTriggerLabels,
     audioLibraryUploadLabel,
     setAudioLibraryUploadLabel,
+    timerCueSettings,
+    timerCueBusy,
     loadAudioData,
     handleAudioTriggerLabelChange,
     handleAudioTriggerToggle,
@@ -268,6 +293,7 @@ export default function useAudioManager({ updateMessage }) {
     handleAudioLibraryUpload,
     handleAudioLibraryDelete,
     handleAudioLibraryPlay,
+    handleTimerCueSave,
     describeAudioFile
   };
 }

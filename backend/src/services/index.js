@@ -59,5 +59,8 @@ export {
   storePosterUpload,
   getAudioStorageDirectory,
   getActiveTriggerWithFile,
-  ensureScoreTriggerForTeam
+  ensureScoreTriggerForTeam,
+  initTimerCueSettings,
+  getTimerCueSettings,
+  updateTimerCueSettings
 } from './audio/index.js';

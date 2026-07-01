@@ -11,7 +11,7 @@ import teamRoutes from './routes/teams.js';
 import playerRoutes from './routes/players.js';
 import audioRoutes from './routes/audio.js';
 import inboundRoutes from './routes/inbound.js';
-import { getAudioStorageDirectory } from './services/index.js';
+import { getAudioStorageDirectory, initTimerCueSettings } from './services/index.js';
 
 dotenv.config();
 
@@ -53,6 +53,8 @@ app.use('/api/teams', teamRoutes);
 app.use('/api/players', playerRoutes);
 app.use('/api/audio', audioRoutes);
 app.use('/api/inbound', inboundRoutes);
+
+initTimerCueSettings().catch((err) => console.error('Timer-Cue-Einstellungen konnten nicht geladen werden:', err));
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

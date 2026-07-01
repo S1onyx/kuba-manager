@@ -9,7 +9,9 @@ import {
   upsertTriggerFileFromUpload,
   storeLibraryUpload,
   getAudioFileById,
-  assignFileToTrigger
+  assignFileToTrigger,
+  getTimerCueSettings,
+  updateTimerCueSettings
 } from '../services/index.js';
 import { playAudioFileById } from '../audio/dispatcher.js';
 
@@ -210,6 +212,31 @@ router.post('/triggers/:key/assign', async (req, res) => {
   } catch (error) {
     console.error('Audiodatei konnte nicht zugewiesen werden:', error);
     res.status(400).json({ message: error.message || 'Audiodatei konnte nicht zugewiesen werden.' });
+  }
+});
+
+router.get('/timer-cues', async (_req, res) => {
+  try {
+    const settings = await getTimerCueSettings();
+    res.json(settings);
+  } catch (error) {
+    console.error('Timer-Cue-Einstellungen konnten nicht geladen werden:', error);
+    res.status(500).json({ message: 'Timer-Cue-Einstellungen konnten nicht geladen werden.' });
+  }
+});
+
+router.put('/timer-cues', async (req, res) => {
+  const { warningSeconds, countdownFrom, halftimeAutoStart } = req.body ?? {};
+  try {
+    const updated = await updateTimerCueSettings({
+      warningSeconds: warningSeconds === undefined ? undefined : Number(warningSeconds),
+      countdownFrom: countdownFrom === undefined ? undefined : Number(countdownFrom),
+      halftimeAutoStart: halftimeAutoStart === undefined ? undefined : Boolean(halftimeAutoStart)
+    });
+    res.json(updated);
+  } catch (error) {
+    console.error('Timer-Cue-Einstellungen konnten nicht gespeichert werden:', error);
+    res.status(400).json({ message: error.message || 'Timer-Cue-Einstellungen konnten nicht gespeichert werden.' });
   }
 });
 

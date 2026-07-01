@@ -35,8 +35,6 @@ export default function ScoreboardPage({
   const extraExpected =
     scoreboard && (scoreboard.extraSeconds ?? 0) !== 0 ? formatTime(scoreboard.extraSeconds ?? 0) : null;
   const extraElapsed = extraElapsedSeconds > 0 ? formatTime(extraElapsedSeconds) : null;
-  const halftimeFormatted =
-    scoreboard?.halftimeSeconds ? formatTime(scoreboard.halftimeSeconds) : null;
   const isHalftimeBreak = Boolean(scoreboard?.isHalftimeBreak);
   const halftimeBreakRemaining = isHalftimeBreak
     ? formatTime(halftimePauseRemaining)
@@ -63,75 +61,87 @@ export default function ScoreboardPage({
   }
 
   const containerStyle = {
+    position: 'relative',
     width: '100%',
-    maxWidth: '1600px',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: isCompact ? 'stretch' : 'center',
-    padding: isMobile
-      ? '1.5rem clamp(0.75rem, 4vw, 1.5rem)'
-      : isCompact
-        ? '2rem clamp(1rem, 4vw, 2.25rem)'
-        : '2.5rem 3rem',
-    gap: isMobile ? '1.5rem' : '2.2rem',
+    alignItems: 'center',
+    padding: isMobile ? '1.5rem 1rem' : isCompact ? '2rem 1.5rem' : '2.5rem 2rem',
+    gap: isMobile ? '1.5rem' : '2.25rem',
     boxSizing: 'border-box',
     color: '#ffffff'
   };
 
-  const titleFontSize = isMobile ? '2.8rem' : isCompact ? '3.8rem' : '4.5rem';
-  const tournamentFontSize = isMobile ? '1.8rem' : isCompact ? '2.1rem' : '2.4rem';
-  const stageFontSize = isMobile ? '1.2rem' : isCompact ? '1.4rem' : '1.6rem';
-  const matchcodeFontSize = isMobile ? '0.9rem' : '1.1rem';
+  const halfBadgeFontSize = isMobile ? '1.3rem' : isCompact ? '1.6rem' : '1.9rem';
+  const titleFontSize = isMobile ? '2.6rem' : isCompact ? '3.4rem' : '4rem';
+  const tournamentFontSize = isMobile ? '1.1rem' : isCompact ? '1.35rem' : '1.6rem';
+  const matchcodeFontSize = isMobile ? '0.85rem' : '1rem';
+
+  const hasHeader = Boolean(stageDescription || tournamentName || scoreboard?.scheduleCode || error);
 
   return (
     <div style={containerStyle}>
-      <header style={{ textAlign: 'center' }}>
-        <h1
-          style={{
-            fontSize: titleFontSize,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            marginBottom: '1rem'
-          }}
-        >
-          Kunstrad Basketball
-        </h1>
-        {error ? <p style={{ color: '#ff8a80', fontSize: '1.2rem' }}>{error}</p> : null}
-      </header>
+      {/* Half badge: centered pill in normal flow → never covered, never shifts the axis */}
+      <div
+        style={{
+          alignSelf: 'center',
+          padding: isMobile ? '0.3rem 0.9rem' : '0.4rem 1.2rem',
+          borderRadius: '999px',
+          background: 'rgba(0,0,0,0.3)',
+          border: '1px solid rgba(255,255,255,0.18)',
+          fontSize: halfBadgeFontSize,
+          fontWeight: 700,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          lineHeight: 1,
+          whiteSpace: 'nowrap',
+          textShadow: '0 2px 12px rgba(0,0,0,0.7)'
+        }}
+      >
+        {currentHalf}. Half
+      </div>
 
-      {tournamentName || scoreboard?.stageLabel ? (
-        <div style={{ textAlign: 'center' }}>
+      {hasHeader ? (
+        <header style={{ textAlign: 'center', width: '100%' }}>
           {tournamentName ? (
-            <h2
+            <p
               style={{
+                margin: 0,
+                marginBottom: stageDescription ? '0.35rem' : 0,
                 fontSize: tournamentFontSize,
-                letterSpacing: '0.08em',
+                letterSpacing: '0.1em',
                 textTransform: 'uppercase',
-                marginBottom: '0.5rem'
+                opacity: 0.7,
+                fontWeight: 500
               }}
             >
               {tournamentName}
-            </h2>
-          ) : null}
-          {stageDescription ? (
-            <p
-              style={{
-                fontSize: stageFontSize,
-                opacity: 0.85,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.4rem'
-              }}
-            >
-              <span>{stageDescription}</span>
-              {scoreboard?.scheduleCode ? (
-                <span style={{ fontSize: matchcodeFontSize, opacity: 0.7, letterSpacing: '0.12em' }}>
-                  Matchcode {scoreboard.scheduleCode}
-                </span>
-              ) : null}
             </p>
           ) : null}
-        </div>
+          {stageDescription ? (
+            <h1
+              style={{
+                margin: 0,
+                marginBottom: scoreboard?.scheduleCode ? '0.35rem' : 0,
+                fontSize: titleFontSize,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                fontWeight: 700,
+                lineHeight: 1.1
+              }}
+            >
+              {stageDescription}
+            </h1>
+          ) : null}
+          {scoreboard?.scheduleCode ? (
+            <p style={{ margin: 0, fontSize: matchcodeFontSize, opacity: 0.55, letterSpacing: '0.12em' }}>
+              {scoreboard.scheduleCode}
+            </p>
+          ) : null}
+          {error ? (
+            <p style={{ margin: 0, marginTop: '0.5rem', color: '#ff8a80', fontSize: '1.1rem' }}>{error}</p>
+          ) : null}
+        </header>
       ) : null}
 
       <Scoreboard score={score} teamNames={teamNames} />
@@ -141,8 +151,6 @@ export default function ScoreboardPage({
         isRunning={Boolean(scoreboard?.isRunning)}
         extraTime={extraExpected}
         extraElapsed={extraElapsed}
-        halftimeAt={halftimeFormatted}
-        half={currentHalf}
         isHalftimeBreak={isHalftimeBreak}
         halftimeBreakRemaining={halftimeBreakRemaining}
         isExtraTime={isExtraTime}

@@ -28,7 +28,7 @@ export default function useDisplayScaling(dependencies = []) {
       const availableWidth = Math.max(container.clientWidth - paddingX, 50);
       const availableHeight = Math.max(container.clientHeight - paddingY, 50);
       const nextScale = Math.min(availableWidth / contentWidth, availableHeight / contentHeight);
-      const clamped = Math.max(Math.min(nextScale, 1.6), 0.45);
+      const clamped = Math.max(Math.min(nextScale, 2.2), 0.45);
       if (Math.abs(clamped - scaleRef.current) > 0.0005) {
         scaleRef.current = clamped;
         setScale(clamped);

@@ -20,3 +20,14 @@ export function broadcastAudioEvent(payload) {
     }
   });
 }
+
+// Cut off any currently playing sound (e.g. a long countdown beep) at a boundary.
+export function broadcastAudioStop() {
+  audioSockets.forEach((socket) => {
+    try {
+      socket.emit('audio:stop');
+    } catch (error) {
+      console.error('Audio-Stop-Broadcast fehlgeschlagen:', error);
+    }
+  });
+}

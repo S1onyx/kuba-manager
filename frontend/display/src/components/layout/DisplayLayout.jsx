@@ -1,13 +1,12 @@
 const rootWrapperStyle = {
   width: '100vw',
-  minHeight: '100vh',
+  height: '100vh',
   background: 'radial-gradient(circle at top, #1f3b73 0%, #0b1a2b 55%, #050d1a 100%)',
   color: '#ffffff',
-  overflowX: 'hidden',
-  overflowY: 'auto',
+  overflow: 'hidden',
   display: 'flex',
   justifyContent: 'center',
-  alignItems: 'flex-start',
+  alignItems: 'center',
   position: 'relative',
   padding: 'clamp(0.75rem, 3vw, 1.5rem)',
   boxSizing: 'border-box'
@@ -15,21 +14,18 @@ const rootWrapperStyle = {
 
 const scaledLayoutStyle = {
   width: '100%',
-  minHeight: '100%',
+  height: '100%',
   display: 'flex',
   justifyContent: 'center',
-  alignItems: 'flex-start',
+  alignItems: 'center',
   overflow: 'hidden',
   boxSizing: 'border-box'
 };
 
 const scaledContentBase = {
-  transformOrigin: 'top center',
-  width: 'min(1600px, 100vw)',
-  maxWidth: '100%',
-  margin: '0 auto',
-  boxSizing: 'border-box',
-  padding: '0 clamp(0.5rem, 3vw, 1.5rem)'
+  transformOrigin: 'center center',
+  width: 'min(1200px, 100%)',
+  boxSizing: 'border-box'
 };
 
 export default function DisplayLayout({ rootRef, contentRef, scale, children, overlay = null }) {

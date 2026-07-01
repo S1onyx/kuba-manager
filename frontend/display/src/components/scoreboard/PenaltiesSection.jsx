@@ -22,7 +22,11 @@ const penaltyListStyle = {
   padding: 0,
   margin: 0,
   display: 'grid',
-  gap: '0.65rem'
+  gap: '0.65rem',
+  // ponytail: reserve room for ~3 rows so adding penalties doesn't grow the card,
+  // rescale the whole display and shift it. Bump if you routinely run >3 at once.
+  minHeight: '9.5rem',
+  alignContent: 'start'
 };
 
 const penaltyItemStyle = {
@@ -36,8 +40,14 @@ const penaltyItemStyle = {
 };
 
 function PenaltyList({ entries }) {
+  // Always render the same min-height container (empty or not) so adding the
+  // first penalty doesn't change card height → no display rescale.
   if (!entries || entries.length === 0) {
-    return <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '1.1rem' }}>Keine laufenden Strafen</p>;
+    return (
+      <div style={{ ...penaltyListStyle, color: 'rgba(255,255,255,0.65)', fontSize: '1.1rem' }}>
+        Keine laufenden Strafen
+      </div>
+    );
   }
 
   return (
@@ -58,14 +68,13 @@ function PenaltyList({ entries }) {
   );
 }
 
-export default function PenaltiesSection({ penalties, teamNames }) {
+export default function PenaltiesSection({ penalties }) {
   const safePenalties = penalties ?? { a: [], b: [] };
 
   return (
     <section style={penaltiesWrapperStyle}>
       {['a', 'b'].map((teamKey) => {
         const list = safePenalties[teamKey] ?? [];
-        const name = teamKey === 'a' ? teamNames.teamA : teamNames.teamB;
 
         return (
           <article key={teamKey} style={penaltyCardStyle}>
@@ -78,7 +87,7 @@ export default function PenaltiesSection({ penalties, teamNames }) {
                 letterSpacing: '0.08em'
               }}
             >
-              Zeitstrafen {name}
+              Zeitstrafen
             </h3>
             <PenaltyList entries={list} />
           </article>
