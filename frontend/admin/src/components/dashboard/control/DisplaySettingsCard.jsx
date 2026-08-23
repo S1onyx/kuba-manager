@@ -1,8 +1,10 @@
+import { useTranslation } from 'react-i18next';
 import { DISPLAY_VIEW_OPTIONS } from '../../../constants/dashboard.js';
 import PanelCard from '../../common/PanelCard.jsx';
 import { useDashboard } from '../../../context/DashboardContext.jsx';
 
 export default function DisplaySettingsCard() {
+  const { t } = useTranslation();
   const {
     scoreboard: { scoreboard, displayViewPending },
     scoreboardActions: { handleDisplayViewChange }
@@ -12,8 +14,8 @@ export default function DisplaySettingsCard() {
 
   return (
     <PanelCard
-      title="Beameranzeige"
-      description="Wechsle zwischen Live-Spielstand und Turnierbaum auf dem Beamer."
+      title={t('control.display.title')}
+      description={t('control.display.description')}
     >
       <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
         {DISPLAY_VIEW_OPTIONS.map((option) => {
@@ -34,19 +36,19 @@ export default function DisplaySettingsCard() {
                 cursor: isActive ? 'default' : 'pointer'
               }}
             >
-              {option.label}
+              {t(option.labelKey)}
             </button>
           );
         })}
       </div>
       {displayView === 'bracket' && !scoreboard?.tournamentId ? (
         <p style={{ margin: 0, color: 'var(--warning)', fontSize: '0.9rem' }}>
-          Hinweis: Für den Turnierbaum muss im Match-Kontext ein Turnier gesetzt sein.
+          {t('control.display.bracketHint')}
         </p>
       ) : null}
       {displayViewPending ? (
         <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-          Anzeige wird aktualisiert...
+          {t('control.display.updating')}
         </p>
       ) : null}
     </PanelCard>

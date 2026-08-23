@@ -1,14 +1,19 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { fetchTournamentStages, updateMatchContext } from '../utils/api.js';
 import { canonicalizeGroupLabel } from '../utils/formatters.js';
+import { formatApiError } from '../utils/apiError.js';
+import { formatStageLabelI18n } from '../utils/stageLabels.js';
 
 const EMPTY_STAGE_OPTIONS = { group: [], knockout: [], placement: [] };
 
 export default function useMatchContext({ scoreboard, updateMessage, setScoreboard }) {
+  const { t } = useTranslation();
   const [contextForm, setContextForm] = useState({ tournamentId: '', stageType: '', stageLabel: '' });
   const [contextFormDirty, setContextFormDirty] = useState(false);
   const [stageOptions, setStageOptions] = useState(EMPTY_STAGE_OPTIONS);
   const [stageOptionsLoading, setStageOptionsLoading] = useState(false);
+  const [stageI18nMap, setStageI18nMap] = useState(() => new Map());
   const stageLabelMapRef = useRef(new Map());
 
   const resolvedTournamentId = useMemo(() => {
@@ -89,6 +94,7 @@ export default function useMatchContext({ scoreboard, updateMessage, setScoreboa
   useEffect(() => {
     if (!resolvedTournamentId) {
       setStageOptions(EMPTY_STAGE_OPTIONS);
+      setStageI18nMap(new Map());
       setStageOptionsLoading(false);
       return;
     }
@@ -104,10 +110,21 @@ export default function useMatchContext({ scoreboard, updateMessage, setScoreboa
           knockout: Array.isArray(data?.knockout) ? data.knockout : [],
           placement: Array.isArray(data?.placement) ? data.placement : []
         });
+        const i18nMap = new Map();
+        Object.values(data?.i18n ?? {}).forEach((entries) => {
+          (Array.isArray(entries) ? entries : []).forEach((entry) => {
+            const raw = (entry?.stage_label ?? '').toString().trim().toLowerCase();
+            if (raw && entry?.stage_label_i18n) {
+              i18nMap.set(raw, entry.stage_label_i18n);
+            }
+          });
+        });
+        setStageI18nMap(i18nMap);
       })
       .catch(() => {
         if (!active) return;
         setStageOptions(EMPTY_STAGE_OPTIONS);
+        setStageI18nMap(new Map());
       })
       .finally(() => {
         if (!active) return;
@@ -181,43 +198,48 @@ export default function useMatchContext({ scoreboard, updateMessage, setScoreboa
       };
 
       if (payload.stageType && !payload.stageLabel) {
-        updateMessage('error', 'Bitte eine Phasenbezeichnung angeben.');
+        updateMessage('error', t('feedback.stageLabelRequired'));
         return false;
       }
 
       try {
         const updated = await updateMatchContext(payload);
         setScoreboard(updated);
-        updateMessage('info', 'Match-Kontext aktualisiert.');
+        updateMessage('info', t('feedback.contextUpdated'));
         setContextFormDirty(false);
         return true;
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Match-Kontext konnte nicht gesetzt werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.contextUpdateFailed'));
         return false;
       }
     },
-    [contextForm, setScoreboard, updateMessage]
+    [contextForm, setScoreboard, updateMessage, t]
   );
 
   const stageListId = stageSuggestionEntries.length > 0 ? 'stage-options-all' : undefined;
   const stageHintLines = useMemo(() => {
     const labels = {
-      group: 'Gruppen',
-      knockout: 'KO',
-      placement: 'Platzierung'
+      group: t('phases.groupShort'),
+      knockout: t('phases.knockoutShort'),
+      placement: t('phases.placement')
     };
     return Object.entries(stageHintsByPhase)
       .filter(([, entries]) => Array.isArray(entries) && entries.length > 0)
-      .map(([phase, entries]) => `${labels[phase] ?? phase}: ${entries.join(', ')}`);
-  }, [stageHintsByPhase]);
+      .map(([phase, entries]) => {
+        const localized = entries.map((label) =>
+          formatStageLabelI18n(stageI18nMap.get(label.toLowerCase()), t, label)
+        );
+        return `${labels[phase] ?? phase}: ${localized.join(', ')}`;
+      });
+  }, [stageHintsByPhase, stageI18nMap, t]);
 
   const stageLabelPlaceholder = useMemo(() => {
-    if (contextForm.stageType === 'group') return 'z.B. Gruppe A';
-    if (contextForm.stageType === 'knockout') return 'z.B. Viertelfinale';
-    if (contextForm.stageType === 'placement') return 'z.B. Spiel um Platz 3 / 4';
-    return 'z.B. Viertelfinale oder Spiel um Platz 3 / 4';
-  }, [contextForm.stageType]);
+    if (contextForm.stageType === 'group') return t('control.context.placeholderGroup');
+    if (contextForm.stageType === 'knockout') return t('control.context.placeholderKnockout');
+    if (contextForm.stageType === 'placement') return t('control.context.placeholderPlacement');
+    return t('control.context.placeholderDefault');
+  }, [contextForm.stageType, t]);
 
   return {
     contextForm,

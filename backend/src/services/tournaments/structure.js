@@ -16,7 +16,8 @@ import {
   generateClassificationStages,
   calculateQualifierDistribution,
   resolveParticipantDetails,
-  normalizeClassificationMode
+  normalizeClassificationMode,
+  describeStageLabel
 } from './helpers.js';
 
 export async function regenerateTournamentStructure(tournament) {
@@ -529,6 +530,10 @@ function mapScheduleRow(row, teamsMap, teamsByName, matchLabelLookup, resultsByC
     tournament_id: row.tournament_id,
     phase: row.phase,
     stage_label: row.stage_label,
+    stage_label_i18n: describeStageLabel(row.phase, row.stage_label, {
+      round: row.round_number,
+      group: metadata?.group ?? null
+    }),
     round_number: row.round_number,
     match_order: row.match_order,
     stage_order: row.stage_order,
@@ -726,10 +731,21 @@ export async function getTournamentStages(tournamentId) {
     }
   });
 
+  const withI18n = (phase) =>
+    Array.from(stageSet[phase]).map((stageLabel) => ({
+      stage_label: stageLabel,
+      stage_label_i18n: describeStageLabel(phase, stageLabel, {})
+    }));
+
   return {
     group: Array.from(stageSet.group),
     knockout: Array.from(stageSet.knockout),
-    placement: Array.from(stageSet.placement)
+    placement: Array.from(stageSet.placement),
+    i18n: {
+      group: withI18n('group'),
+      knockout: withI18n('knockout'),
+      placement: withI18n('placement')
+    }
   };
 }
 
@@ -828,8 +844,11 @@ export function groupScheduleByPhase(schedule = []) {
       return acc;
     }, null);
 
+    const firstMatch = Array.from(stage.rounds.values())[0]?.[0] ?? null;
     return {
       stage_label: stage.stage_label,
+      stage_label_i18n:
+        firstMatch?.stage_label_i18n ?? describeStageLabel('group', stage.stage_label, {}),
       rounds: roundsWithMeta.map(({ round, matches }) => ({
         round,
         matches
@@ -857,6 +876,7 @@ export function groupScheduleByPhase(schedule = []) {
     grouped[phase] = Array.from(otherStageMaps[phase].entries())
       .map(([stageLabel, matches]) => ({
         stage_label: stageLabel,
+        stage_label_i18n: matches[0]?.stage_label_i18n ?? describeStageLabel(phase, stageLabel, {}),
         matches: sortMatches(matches)
       }))
       .sort(

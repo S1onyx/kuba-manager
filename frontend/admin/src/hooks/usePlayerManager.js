@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   createPlayer,
   deletePlayer,
   fetchPlayers,
   updatePlayer
 } from '../utils/api.js';
+import { formatApiError } from '../utils/apiError.js';
 
 export default function usePlayerManager({ updateMessage, loadPlayersDependencies = [], refreshActiveTeams }) {
+  const { t } = useTranslation();
   const [players, setPlayers] = useState([]);
   const [playersLoading, setPlayersLoading] = useState(true);
   const [playersError, setPlayersError] = useState('');
@@ -22,15 +25,15 @@ export default function usePlayerManager({ updateMessage, loadPlayersDependencie
         setPlayers(data);
         setPlayersError('');
       })
-      .catch(() => {
-        setPlayersError('Spieler konnten nicht geladen werden.');
+      .catch((err) => {
+        setPlayersError(formatApiError(err, t, 'feedback.playersLoadFailed'));
       })
       .finally(() => {
         if (showLoader) {
           setPlayersLoading(false);
         }
       });
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadPlayers(true);
@@ -45,11 +48,11 @@ export default function usePlayerManager({ updateMessage, loadPlayersDependencie
       event?.preventDefault();
 
       if (!playerCreate.teamId) {
-        updateMessage('error', 'Bitte ein Team auswählen.');
+        updateMessage('error', t('feedback.selectTeamRequired'));
         return false;
       }
       if (!playerCreate.name.trim()) {
-        updateMessage('error', 'Bitte einen Spielernamen eingeben.');
+        updateMessage('error', t('feedback.playerNameRequired'));
         return false;
       }
 
@@ -58,7 +61,7 @@ export default function usePlayerManager({ updateMessage, loadPlayersDependencie
       if (jerseyValue) {
         const parsed = Number(jerseyValue);
         if (!Number.isFinite(parsed) || parsed < 0) {
-          updateMessage('error', 'Bitte eine gültige Rückennummer angeben.');
+          updateMessage('error', t('feedback.jerseyInvalid'));
           return false;
         }
         jerseyNumber = parsed;
@@ -74,17 +77,17 @@ export default function usePlayerManager({ updateMessage, loadPlayersDependencie
       try {
         await createPlayer(payload);
         setPlayerCreate((prev) => ({ teamId: prev.teamId, name: '', jerseyNumber: '', position: '' }));
-        updateMessage('info', 'Spieler angelegt.');
+        updateMessage('info', t('feedback.playerCreated'));
         loadPlayers();
         refreshActiveTeams?.();
         return true;
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Spieler konnte nicht angelegt werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.playerCreateFailed'));
         return false;
       }
     },
-    [playerCreate, loadPlayers, updateMessage, refreshActiveTeams]
+    [playerCreate, loadPlayers, updateMessage, refreshActiveTeams, t]
   );
 
   const startPlayerEdit = useCallback((player) => {
@@ -129,7 +132,7 @@ export default function usePlayerManager({ updateMessage, loadPlayersDependencie
       }
 
       if (!edit.name.trim()) {
-        updateMessage('error', 'Bitte einen Spielernamen eingeben.');
+        updateMessage('error', t('feedback.playerNameRequired'));
         return false;
       }
 
@@ -138,7 +141,7 @@ export default function usePlayerManager({ updateMessage, loadPlayersDependencie
       if (jerseyValue) {
         const parsed = Number(jerseyValue);
         if (!Number.isFinite(parsed) || parsed < 0) {
-          updateMessage('error', 'Bitte eine gültige Rückennummer angeben.');
+          updateMessage('error', t('feedback.jerseyInvalid'));
           return false;
         }
         jerseyNumber = parsed;
@@ -153,35 +156,35 @@ export default function usePlayerManager({ updateMessage, loadPlayersDependencie
       };
 
       if (payload.teamId == null) {
-        updateMessage('error', 'Bitte ein Team auswählen.');
+        updateMessage('error', t('feedback.selectTeamRequired'));
         return false;
       }
 
       try {
         await updatePlayer(id, payload);
-        updateMessage('info', 'Spieler aktualisiert.');
+        updateMessage('info', t('feedback.playerUpdated'));
         cancelPlayerEdit(id);
         loadPlayers();
         refreshActiveTeams?.();
         return true;
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Spieler konnte nicht aktualisiert werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.playerUpdateFailed'));
         return false;
       }
     },
-    [playerEdits, players, cancelPlayerEdit, loadPlayers, updateMessage, refreshActiveTeams]
+    [playerEdits, players, cancelPlayerEdit, loadPlayers, updateMessage, refreshActiveTeams, t]
   );
 
   const handlePlayerDelete = useCallback(
     async (id) => {
-      if (!window.confirm('Spieler wirklich löschen?')) {
+      if (!window.confirm(t('players.confirmDelete'))) {
         return false;
       }
 
       try {
         await deletePlayer(id);
-        updateMessage('info', 'Spieler gelöscht.');
+        updateMessage('info', t('feedback.playerDeleted'));
         setPlayerEdits((prev) => {
           const next = { ...prev };
           delete next[id];
@@ -192,11 +195,11 @@ export default function usePlayerManager({ updateMessage, loadPlayersDependencie
         return true;
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Spieler konnte nicht gelöscht werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.playerDeleteFailed'));
         return false;
       }
     },
-    [loadPlayers, updateMessage, refreshActiveTeams]
+    [loadPlayers, updateMessage, refreshActiveTeams, t]
   );
 
   const playersByTeam = useMemo(() => {

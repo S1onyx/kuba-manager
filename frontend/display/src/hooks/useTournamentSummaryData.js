@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import i18n from '../i18n/index.js';
 import { fetchJson } from '../utils/api.js';
 
 export default function useTournamentSummaryData(scoreboard) {
@@ -40,7 +41,7 @@ export default function useTournamentSummaryData(scoreboard) {
         console.error(err);
         if (cancelled) return;
         setSummary(null);
-        setError('Turnierübersicht konnte nicht geladen werden.');
+        setError(i18n.t('errors.loadSummary'));
       })
       .finally(() => {
         if (!cancelled) {

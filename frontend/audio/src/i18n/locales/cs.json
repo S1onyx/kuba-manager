@@ -1,0 +1,71 @@
+{
+  "header": {
+    "title": "Kunstrad Basketball – Audio",
+    "subtitle": "Tato stránka automaticky přehrává všechny nastavené herní zvuky. Nechte prosím reproduktory zapnuté."
+  },
+  "status": {
+    "connected": "Připojeno",
+    "disconnected": "Nepřipojeno",
+    "audioOn": "Zvuk aktivován",
+    "audioOff": "Zvuk deaktivován",
+    "enableAudio": "Aktivovat zvuk",
+    "audioActive": "Zvuk aktivní"
+  },
+  "devices": {
+    "label": "Výstupní zařízení",
+    "systemDefault": "Výchozí nastavení systému",
+    "unnamed": "Zařízení {{id}}"
+  },
+  "volume": {
+    "title": "Hlasitost podle události",
+    "description": "Nastavte vzájemný poměr herních událostí. Hodnoty se ukládají lokálně v prohlížeči.",
+    "categories": {
+      "score": {
+        "label": "Košové hymny",
+        "description": "Všechny zvuky košů (týmové nebo obecné)."
+      },
+      "game": {
+        "label": "Začátek / přestávka / konec hry",
+        "description": "Stavová hlášení jako startovní signál, poločas nebo konečné skóre."
+      },
+      "events": {
+        "label": "Herní události",
+        "description": "Další spouštěče, jako jsou fauly nebo individuální události."
+      },
+      "manual": {
+        "label": "Ruční přehrávání",
+        "description": "Zvuky spuštěné přímo z knihovny."
+      }
+    }
+  },
+  "events": {
+    "title": "Poslední události",
+    "logDescription": "Příchozí zvuky se automaticky přehrávají jeden po druhém.",
+    "empty": "Zatím nebyly přijaty žádné zvukové události.",
+    "manual": "Ručně",
+    "event": "Událost",
+    "audioConnected": "Zvuk připojen",
+    "soundFallback": "Zvuk č. {{id}}",
+    "count_one": "{{count}} událost",
+    "count_few": "{{count}} události",
+    "count_many": "{{count}} události",
+    "count_other": "{{count}} událostí"
+  },
+  "errors": {
+    "playbackFailed": "Zvuk se nepodařilo přehrát. Zkontrolujte prosím reproduktory.",
+    "devicesNotFound": "Výstupní zvuková zařízení se nepodařilo zjistit.",
+    "sinkNotSupported": "Tento prohlížeč nepodporuje výběr výstupního zařízení.",
+    "sinkFailed": "Výstupní zařízení se nepodařilo nastavit."
+  },
+  "languageSwitcher": {
+    "label": "Vybrat jazyk",
+    "aiNotice": "Strojový překlad — může obsahovat chyby"
+  },
+  "languages": {
+    "de": "Deutsch",
+    "en": "English",
+    "fr": "Français",
+    "hu": "Magyar",
+    "cs": "Čeština"
+  }
+}

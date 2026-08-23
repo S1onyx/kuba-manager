@@ -1,9 +1,11 @@
+import { useTranslation } from 'react-i18next';
 import { PENALTY_PRESETS } from '../../../constants/dashboard.js';
 import PanelCard from '../../common/PanelCard.jsx';
 import { useDashboard } from '../../../context/DashboardContext.jsx';
 import { formatTime } from '../../../utils/formatters.js';
 
 export default function PenaltyManagerCard() {
+  const { t } = useTranslation();
   const {
     scoreboard: {
       scoreboard,
@@ -16,8 +18,8 @@ export default function PenaltyManagerCard() {
 
   return (
     <PanelCard
-      title="Zeitstrafen"
-      description="Verwalte Strafen je Team. Optional Spieler zuordnen und Laufzeiten im Blick behalten."
+      title={t('control.penalties.title')}
+      description={t('control.penalties.description')}
     >
       <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
         {['a', 'b'].map((teamKey) => {
@@ -50,12 +52,12 @@ export default function PenaltyManagerCard() {
                 style={{ display: 'grid', gap: '0.65rem' }}
               >
                 <label style={{ display: 'grid', gap: '0.3rem' }}>
-                  Spieler
+                  {t('control.penalties.player')}
                   <select
                     value={form.playerId}
                     onChange={(event) => handlePenaltyFormChange(teamKey, 'playerId', event.target.value)}
                   >
-                    <option value="">Team gesamt</option>
+                    <option value="">{t('control.penalties.wholeTeam')}</option>
                     {(scoreboard.players?.[teamKey] ?? []).map((player) => (
                       <option key={player.id ?? player.playerId ?? player.name} value={player.playerId ?? ''}>
                         {player.displayName ?? player.name}
@@ -65,24 +67,26 @@ export default function PenaltyManagerCard() {
                 </label>
 
                 <label style={{ display: 'grid', gap: '0.3rem' }}>
-                  Name / Grund
+                  {t('control.penalties.nameReason')}
                   <input
                     value={form.name}
                     onChange={(event) => handlePenaltyFormChange(teamKey, 'name', event.target.value)}
-                    placeholder="z.B. Foul Jonas"
+                    placeholder={t('control.penalties.namePlaceholder')}
                   />
                 </label>
 
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                   <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', flex: '1 1 160px' }}>
-                    Dauer
+                    {t('control.penalties.duration')}
                     <select
                       value={form.preset}
                       onChange={(event) => handlePenaltyFormChange(teamKey, 'preset', event.target.value)}
                     >
                       {PENALTY_PRESETS.map((preset) => (
                         <option key={preset.value} value={preset.value}>
-                          {preset.label}
+                          {preset.labelKey
+                            ? t(preset.labelKey)
+                            : t('penaltyPresets.minutes', { count: preset.minutes })}
                         </option>
                       ))}
                     </select>
@@ -92,16 +96,16 @@ export default function PenaltyManagerCard() {
                       style={{ flex: '1 1 auto' }}
                       value={form.custom}
                       onChange={(event) => handlePenaltyFormChange(teamKey, 'custom', event.target.value)}
-                      placeholder="MM:SS oder Sekunden"
+                      placeholder={t('control.penalties.customPlaceholder')}
                     />
                   ) : null}
                 </div>
-                <button type="submit">Zeitstrafe hinzufügen</button>
+                <button type="submit">{t('control.penalties.add')}</button>
               </form>
 
               <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: '0.6rem' }}>
                 {penalties.length === 0 ? (
-                  <li style={{ color: 'var(--text-muted)' }}>Keine aktiven Zeitstrafen</li>
+                  <li style={{ color: 'var(--text-muted)' }}>{t('control.penalties.none')}</li>
                 ) : (
                   penalties.map((penalty) => (
                     <li
@@ -125,7 +129,9 @@ export default function PenaltyManagerCard() {
                           {penalty.name}
                         </span>
                         <span style={{ fontSize: '0.85rem', opacity: 0.75 }}>
-                          {penalty.isExpired ? 'abgelaufen' : `${formatTime(penalty.remainingSeconds)} verbleibend`}
+                          {penalty.isExpired
+                            ? t('control.penalties.expired')
+                            : t('control.penalties.remaining', { time: formatTime(penalty.remainingSeconds) })}
                         </span>
                       </div>
                       <button
@@ -133,7 +139,7 @@ export default function PenaltyManagerCard() {
                         onClick={() => handlePenaltyRemove(penalty.id)}
                         style={{ background: 'rgba(211,47,47,0.85)', color: '#fff' }}
                       >
-                        Entfernen
+                        {t('control.penalties.remove')}
                       </button>
                     </li>
                   ))

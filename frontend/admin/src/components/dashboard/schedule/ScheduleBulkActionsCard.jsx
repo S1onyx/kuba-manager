@@ -1,15 +1,11 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import PanelCard from '../../common/PanelCard.jsx';
 import { useDashboard } from '../../../context/DashboardContext.jsx';
-
-const PHASE_OPTIONS = [
-  { value: 'all', label: 'Alle Phasen' },
-  { value: 'group', label: 'Gruppenphase' },
-  { value: 'knockout', label: 'KO-Phase' },
-  { value: 'placement', label: 'Platzierung' }
-];
+import { SCHEDULE_PHASE_OPTIONS } from '../../../constants/dashboard.js';
 
 export default function ScheduleBulkActionsCard() {
+  const { t } = useTranslation();
   const {
     matchContext: { resolvedTournamentId },
     schedule: {
@@ -46,23 +42,23 @@ export default function ScheduleBulkActionsCard() {
 
   if (!resolvedTournamentId) {
     return (
-      <PanelCard title="Spieltermine planen" description="Wähle zunächst ein Turnier aus, um Termine zu bearbeiten.">
-        <p style={{ margin: 0, color: 'var(--text-muted)' }}>Kein Turnier ausgewählt.</p>
+      <PanelCard title={t('schedule.bulk.title')} description={t('schedule.bulk.descriptionNoTournament')}>
+        <p style={{ margin: 0, color: 'var(--text-muted)' }}>{t('schedule.bulk.noTournament')}</p>
       </PanelCard>
     );
   }
 
   if (scheduleLoading) {
     return (
-      <PanelCard title="Spieltermine planen" description="Lade Spielplan…">
-        <p style={{ margin: 0 }}>Spielplan wird geladen…</p>
+      <PanelCard title={t('schedule.bulk.title')} description={t('schedule.bulk.descriptionLoading')}>
+        <p style={{ margin: 0 }}>{t('schedule.bulk.loading')}</p>
       </PanelCard>
     );
   }
 
   if (scheduleError) {
     return (
-      <PanelCard title="Spieltermine planen" description="Lade Spielplan…">
+      <PanelCard title={t('schedule.bulk.title')} description={t('schedule.bulk.descriptionLoading')}>
         <p style={{ margin: 0, color: 'var(--warning)' }}>{scheduleError}</p>
       </PanelCard>
     );
@@ -70,16 +66,16 @@ export default function ScheduleBulkActionsCard() {
 
   if (!scheduleChronological || scheduleChronological.length === 0) {
     return (
-      <PanelCard title="Spieltermine planen" description="Spielplan">
-        <p style={{ margin: 0 }}>Noch keine Partien im Spielplan vorhanden.</p>
+      <PanelCard title={t('schedule.bulk.title')} description={t('schedule.bulk.descriptionList')}>
+        <p style={{ margin: 0 }}>{t('schedule.bulk.noMatches')}</p>
       </PanelCard>
     );
   }
 
   return (
     <PanelCard
-      title="Spieltermine planen"
-      description="Bulk-Aktionen zum Setzen von Datum, Uhrzeit und Speichern des Spielplans."
+      title={t('schedule.bulk.title')}
+      description={t('schedule.bulk.description')}
     >
       <div style={{ display: 'grid', gap: '1.25rem' }}>
         <div
@@ -94,15 +90,15 @@ export default function ScheduleBulkActionsCard() {
             background: 'rgba(12, 28, 48, 0.55)'
           }}
         >
-          <span>Gesamtspiele: {stats.total}</span>
-          <span>Geplant: {stats.scheduled}</span>
-          <span>Offen: {stats.unscheduled}</span>
+          <span>{t('schedule.bulk.total', { count: stats.total })}</span>
+          <span>{t('schedule.bulk.scheduled', { count: stats.scheduled })}</span>
+          <span>{t('schedule.bulk.open', { count: stats.unscheduled })}</span>
         </div>
 
         <section style={{ display: 'grid', gap: '0.75rem' }}>
           <header>
-            <h3 style={{ margin: 0, fontSize: '1rem', letterSpacing: '0.04em' }}>Datum für alle Spiele</h3>
-            <p style={{ margin: 0, opacity: 0.75 }}>Setzt lediglich das Datum – Uhrzeiten bleiben erhalten.</p>
+            <h3 style={{ margin: 0, fontSize: '1rem', letterSpacing: '0.04em' }}>{t('schedule.bulk.applyDateTitle')}</h3>
+            <p style={{ margin: 0, opacity: 0.75 }}>{t('schedule.bulk.applyDateDescription')}</p>
           </header>
           <form
             onSubmit={(event) => {
@@ -112,28 +108,28 @@ export default function ScheduleBulkActionsCard() {
             style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}
           >
             <label style={{ display: 'grid', gap: '0.3rem' }}>
-              Datum
+              {t('schedule.bulk.date')}
               <input type="date" value={bulkDate} onChange={(event) => setBulkDate(event.target.value)} required />
             </label>
             <label style={{ display: 'grid', gap: '0.3rem' }}>
-              Phase
+              {t('schedule.bulk.phase')}
               <select value={bulkDatePhase} onChange={(event) => setBulkDatePhase(event.target.value)}>
-                {PHASE_OPTIONS.map((option) => (
+                {SCHEDULE_PHASE_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
-                    {option.label}
+                    {t(option.labelKey)}
                   </option>
                 ))}
               </select>
             </label>
-            <button type="submit">Datum anwenden</button>
+            <button type="submit">{t('schedule.bulk.applyDate')}</button>
           </form>
         </section>
 
         <section style={{ display: 'grid', gap: '0.75rem' }}>
           <header>
-            <h3 style={{ margin: 0, fontSize: '1rem', letterSpacing: '0.04em' }}>Auto-Planer</h3>
+            <h3 style={{ margin: 0, fontSize: '1rem', letterSpacing: '0.04em' }}>{t('schedule.bulk.autoPlanTitle')}</h3>
             <p style={{ margin: 0, opacity: 0.75 }}>
-              Vergibt Startzeiten automatisch – perfekt für feste Intervalle (z. B. alle 12 Minuten).
+              {t('schedule.bulk.autoPlanDescription')}
             </p>
           </header>
           <form
@@ -153,7 +149,7 @@ export default function ScheduleBulkActionsCard() {
           >
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
               <label style={{ display: 'grid', gap: '0.3rem' }}>
-                Startzeitpunkt
+                {t('schedule.bulk.start')}
                 <input
                   type="datetime-local"
                   value={autoStart}
@@ -162,7 +158,7 @@ export default function ScheduleBulkActionsCard() {
                 />
               </label>
               <label style={{ display: 'grid', gap: '0.3rem' }}>
-                Intervall (Minuten)
+                {t('schedule.bulk.interval')}
                 <input
                   type="number"
                   min="1"
@@ -172,17 +168,17 @@ export default function ScheduleBulkActionsCard() {
                 />
               </label>
               <label style={{ display: 'grid', gap: '0.3rem' }}>
-                Pause nach X Spielen
+                {t('schedule.bulk.breakAfter')}
                 <input
                   type="number"
                   min="1"
-                  placeholder="optional"
+                  placeholder={t('schedule.bulk.breakAfterPlaceholder')}
                   value={autoBreakAfter}
                   onChange={(event) => setAutoBreakAfter(event.target.value)}
                 />
               </label>
               <label style={{ display: 'grid', gap: '0.3rem' }}>
-                Pausenlänge (Minuten)
+                {t('schedule.bulk.breakDuration')}
                 <input
                   type="number"
                   min="1"
@@ -198,7 +194,7 @@ export default function ScheduleBulkActionsCard() {
                   checked={autoSkipCompleted}
                   onChange={(event) => setAutoSkipCompleted(event.target.checked)}
                 />
-                Abgeschlossene Spiele überspringen
+                {t('schedule.bulk.skipCompleted')}
               </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <input
@@ -206,39 +202,39 @@ export default function ScheduleBulkActionsCard() {
                   checked={autoOnlyEmpty}
                   onChange={(event) => setAutoOnlyEmpty(event.target.checked)}
                 />
-                Nur freie Slots füllen
+                {t('schedule.bulk.onlyEmpty')}
               </label>
               <label style={{ display: 'grid', gap: '0.3rem' }}>
-                Phase
+                {t('schedule.bulk.phase')}
                 <select value={autoPhase} onChange={(event) => setAutoPhase(event.target.value)}>
-                  {PHASE_OPTIONS.map((option) => (
+                  {SCHEDULE_PHASE_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
-                      {option.label}
+                      {t(option.labelKey)}
                     </option>
                   ))}
                 </select>
               </label>
             </div>
             <div>
-              <button type="submit">Auto-Plan anwenden</button>
+              <button type="submit">{t('schedule.bulk.applyAutoPlan')}</button>
             </div>
           </form>
         </section>
 
         <section style={{ display: 'grid', gap: '0.75rem' }}>
           <header>
-            <h3 style={{ margin: 0, fontSize: '1rem', letterSpacing: '0.04em' }}>Änderungen speichern</h3>
+            <h3 style={{ margin: 0, fontSize: '1rem', letterSpacing: '0.04em' }}>{t('schedule.bulk.saveTitle')}</h3>
             <p style={{ margin: 0, opacity: 0.75 }}>
-              Speichert alle geänderten Termine auf einmal in der Datenbank.
+              {t('schedule.bulk.saveDescription')}
             </p>
           </header>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
             <label style={{ display: 'grid', gap: '0.3rem' }}>
-              Phase
+              {t('schedule.bulk.phase')}
               <select value={bulkSavePhase} onChange={(event) => setBulkSavePhase(event.target.value)}>
-                {PHASE_OPTIONS.map((option) => (
+                {SCHEDULE_PHASE_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
-                    {option.label}
+                    {t(option.labelKey)}
                   </option>
                 ))}
               </select>
@@ -248,7 +244,7 @@ export default function ScheduleBulkActionsCard() {
               onClick={() => handleScheduleBulkPersist({ phase: bulkSavePhase })}
               disabled={bulkSaving}
             >
-              {bulkSaving ? 'Speichere...' : 'Alle Änderungen speichern'}
+              {bulkSaving ? t('common.saving') : t('schedule.bulk.saveAll')}
             </button>
           </div>
         </section>

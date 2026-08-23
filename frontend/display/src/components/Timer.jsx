@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import useMediaQuery from '../hooks/useMediaQuery.js';
 
 // Shared axis grid: left number | center glyph | right number.
@@ -29,6 +30,7 @@ export default function Timer({
   isHalftimeBreak,
   halftimeBreakRemaining
 }) {
+  const { t } = useTranslation();
   const isCompact = useMediaQuery('(max-width: 1100px)');
   const isStacked = useMediaQuery('(max-width: 720px)');
 
@@ -87,7 +89,7 @@ export default function Timer({
                     opacity: 0.65
                   }}
                 >
-                  Nachspielzeit
+                  {t('scoreboard.extraTime')}
                 </span>
               </span>
             ) : null}
@@ -106,7 +108,7 @@ export default function Timer({
               opacity: 0.7
             }}
           >
-            Halbzeit
+            {t('scoreboard.halftimeBreak')}
           </span>
           {(() => {
             const [hm, hs] = splitColon(halftimeBreakRemaining);

@@ -181,13 +181,13 @@ export function PublicAppProvider({ children }) {
   );
 
   const liveTabVisible = useMemo(
-    () => availableSummaryTabs.some((tab) => tab.id === 'live'),
+    () => availableSummaryTabs.includes('live'),
     [availableSummaryTabs]
   );
 
   useEffect(() => {
-    if (!availableSummaryTabs.some((tab) => tab.id === activeSummaryTab)) {
-      setActiveSummaryTab(availableSummaryTabs[0]?.id ?? 'results');
+    if (!availableSummaryTabs.includes(activeSummaryTab)) {
+      setActiveSummaryTab(availableSummaryTabs[0] ?? 'results');
     }
   }, [availableSummaryTabs, activeSummaryTab]);
 
@@ -219,7 +219,7 @@ export function PublicAppProvider({ children }) {
 
   const handleSummaryTabSelect = useCallback(
     (tabId) => {
-      const targetTab = tabId || availableSummaryTabs[0]?.id || 'live';
+      const targetTab = tabId || availableSummaryTabs[0] || 'live';
       if (targetTab === 'live') {
         liveTabAutoRef.current = {
           lastApplied: scoreboard?.tournamentId ?? selectedTournamentId ?? null,

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const wrapperStyle = {
   background: 'rgba(0,0,0,0.38)',
@@ -51,8 +52,9 @@ const responsiveStyles = `
 `;
 
 export default function GroupStandingsCard({ group }) {
+  const { t } = useTranslation();
   const standings = group?.standings ?? [];
-  const label = group?.label ?? 'Gruppe';
+  const label = group?.label ?? t('groupStandings.group');
   const recordedGamesCount = group?.recordedGamesCount ?? 0;
   const scrollRef = useRef(null);
   const [isScrollable, setScrollable] = useState(false);
@@ -81,11 +83,11 @@ export default function GroupStandingsCard({ group }) {
           style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}
         >
           <h3 style={{ fontSize: '1.1rem', letterSpacing: '0.05em' }}>{label}</h3>
-          <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>Spiele: {recordedGamesCount}</span>
+          <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>{t('groupStandings.gamesCount', { count: recordedGamesCount })}</span>
         </header>
 
       {standings.length === 0 ? (
-        <p style={{ fontSize: '0.95rem', opacity: 0.75 }}>Noch keine Ergebnisse in dieser Gruppe.</p>
+        <p style={{ fontSize: '0.95rem', opacity: 0.75 }}>{t('groupStandings.noResults')}</p>
       ) : (
         <div
           ref={scrollRef}
@@ -95,15 +97,15 @@ export default function GroupStandingsCard({ group }) {
             <thead>
               <tr>
                 <th style={headerCellStyle}>#</th>
-                <th style={{ ...headerCellStyle, textAlign: 'left' }}>Team</th>
-                <th style={headerCellStyle}>Sp</th>
-                <th style={headerCellStyle}>S</th>
-                <th style={headerCellStyle}>U</th>
-                <th style={headerCellStyle}>N</th>
-                <th style={headerCellStyle}>Tore</th>
-                <th style={headerCellStyle}>Diff</th>
-                <th style={headerCellStyle}>Strafen</th>
-                <th style={headerCellStyle}>Pkt</th>
+                <th style={{ ...headerCellStyle, textAlign: 'left' }}>{t('groupStandings.colTeam')}</th>
+                <th style={headerCellStyle}>{t('groupStandings.colPlayed')}</th>
+                <th style={headerCellStyle}>{t('groupStandings.colWon')}</th>
+                <th style={headerCellStyle}>{t('groupStandings.colDrawn')}</th>
+                <th style={headerCellStyle}>{t('groupStandings.colLost')}</th>
+                <th style={headerCellStyle}>{t('groupStandings.colGoals')}</th>
+                <th style={headerCellStyle}>{t('groupStandings.colDiff')}</th>
+                <th style={headerCellStyle}>{t('groupStandings.colPenalties')}</th>
+                <th style={headerCellStyle}>{t('groupStandings.colPoints')}</th>
               </tr>
             </thead>
             <tbody>
@@ -141,7 +143,7 @@ export default function GroupStandingsCard({ group }) {
           }}
         >
           <span style={{ fontSize: '1rem' }}>↔</span>
-          <span>Zum Scrollen wischen</span>
+          <span>{t('groupStandings.scrollHint')}</span>
         </div>
       ) : null}
       </section>

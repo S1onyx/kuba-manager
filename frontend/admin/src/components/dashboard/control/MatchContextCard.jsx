@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import PanelCard from '../../common/PanelCard.jsx';
 import { useDashboard } from '../../../context/DashboardContext.jsx';
 
 export default function MatchContextCard() {
+  const { t } = useTranslation();
   const {
     matchContext: {
       contextForm,
@@ -19,8 +21,8 @@ export default function MatchContextCard() {
 
   return (
     <PanelCard
-      title="Match-Kontext"
-      description="Bestimme Turnier, Phase und Label für den aktuellen Livemodus."
+      title={t('control.context.title')}
+      description={t('control.context.description')}
     >
       <form
         onSubmit={(event) => {
@@ -30,13 +32,13 @@ export default function MatchContextCard() {
         style={{ display: 'grid', gap: '1rem' }}
       >
         <label style={{ display: 'grid', gap: '0.35rem' }}>
-          Turnier
+          {t('control.context.tournament')}
           <select
             value={contextForm.tournamentId}
             onChange={(event) => handleContextFormChange('tournamentId', event.target.value)}
             disabled={tournamentsLoading}
           >
-            <option value="">Kein Turnier</option>
+            <option value="">{t('control.context.noTournament')}</option>
             {tournaments.map((tournament) => (
               <option key={tournament.id} value={tournament.id}>
                 {tournament.name}
@@ -46,25 +48,25 @@ export default function MatchContextCard() {
         </label>
 
         <label style={{ display: 'grid', gap: '0.35rem' }}>
-          Phase
+          {t('control.context.stage')}
           <select
             value={contextForm.stageType}
             onChange={(event) => handleContextFormChange('stageType', event.target.value)}
           >
-            <option value="">Keine Phase</option>
-            <option value="group">Gruppenphase</option>
-            <option value="knockout">KO-Runde</option>
-            <option value="placement">Platzierung</option>
+            <option value="">{t('control.context.noStage')}</option>
+            <option value="group">{t('control.context.stageGroup')}</option>
+            <option value="knockout">{t('control.context.stageKnockout')}</option>
+            <option value="placement">{t('control.context.stagePlacement')}</option>
           </select>
         </label>
 
         {contextForm.stageType ? (
           <label style={{ display: 'grid', gap: '0.35rem' }}>
             {contextForm.stageType === 'group'
-              ? 'Gruppenbezeichnung'
+              ? t('control.context.groupLabel')
               : contextForm.stageType === 'knockout'
-                ? 'Rundenbezeichnung'
-                : 'Platzierungsbezeichnung'}
+                ? t('control.context.roundLabel')
+                : t('control.context.placementLabel')}
             <input
               value={contextForm.stageLabel}
               onChange={(event) => handleContextFormChange('stageLabel', event.target.value)}
@@ -79,20 +81,20 @@ export default function MatchContextCard() {
               </datalist>
             ) : null}
             {stageOptionsLoading ? (
-              <span style={{ fontSize: '0.8rem', opacity: 0.65 }}>Lade verfügbare Phasen ...</span>
+              <span style={{ fontSize: '0.8rem', opacity: 0.65 }}>{t('control.context.loadingStages')}</span>
             ) : stageHintLines.length > 0 ? (
               <div style={{ display: 'grid', gap: '0.2rem', fontSize: '0.8rem', opacity: 0.68 }}>
-                <span>Vorschläge: {stageHintLines.join(' · ')}</span>
-                <span>Tipp: Bekannte Labels setzen automatisch die passende Phase.</span>
+                <span>{t('control.context.suggestions', { hints: stageHintLines.join(' · ') })}</span>
+                <span>{t('control.context.suggestionsTip')}</span>
               </div>
             ) : (
-              <span style={{ fontSize: '0.8rem', opacity: 0.65 }}>Noch keine Vorschläge verfügbar.</span>
+              <span style={{ fontSize: '0.8rem', opacity: 0.65 }}>{t('control.context.noSuggestions')}</span>
             )}
           </label>
         ) : null}
 
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <button type="submit">Match-Kontext speichern</button>
+          <button type="submit">{t('control.context.submit')}</button>
         </div>
       </form>
       {tournamentsError ? (

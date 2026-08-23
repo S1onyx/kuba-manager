@@ -1,4 +1,4 @@
-export function describeAudioFile(file) {
+export function describeAudioFile(file, fallback = '') {
   if (!file) {
     return '';
   }
@@ -8,15 +8,15 @@ export function describeAudioFile(file) {
   if (file.original_name) {
     return file.original_name;
   }
-  return `Sound #${file.id ?? ''}`;
+  return fallback;
 }
 
-export function formatEventTime(timestamp) {
+export function formatEventTime(timestamp, locale = 'de-DE') {
   if (!timestamp) {
     return '';
   }
   try {
-    return new Date(timestamp).toLocaleTimeString('de-DE', {
+    return new Date(timestamp).toLocaleTimeString(locale, {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit'

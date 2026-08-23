@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import BracketGroupTables from './BracketGroupTables.jsx';
 import BracketStageMatches from './BracketStageMatches.jsx';
 
@@ -27,6 +28,7 @@ const subtitleStyle = {
 };
 
 export default function BracketView({ tournamentName, structure }) {
+  const { t } = useTranslation();
   const knockoutStages = structure?.schedule?.knockout ?? [];
   const placementStages = structure?.schedule?.placement ?? [];
 
@@ -35,13 +37,13 @@ export default function BracketView({ tournamentName, structure }) {
       {tournamentName ? (
         <header style={headerStyle}>
           <h2 style={titleStyle}>{tournamentName}</h2>
-          <p style={subtitleStyle}>Gruppentabellen und KO-Spiele im Überblick</p>
+          <p style={subtitleStyle}>{t('bracket.subtitle')}</p>
         </header>
       ) : null}
 
       <BracketGroupTables groups={structure?.groups ?? []} />
-      <BracketStageMatches title="KO-Runde" stages={knockoutStages} />
-      <BracketStageMatches title="Platzierungsspiele" stages={placementStages} />
+      <BracketStageMatches title={t('bracket.knockoutTitle')} stages={knockoutStages} />
+      <BracketStageMatches title={t('bracket.placementTitle')} stages={placementStages} />
     </div>
   );
 }

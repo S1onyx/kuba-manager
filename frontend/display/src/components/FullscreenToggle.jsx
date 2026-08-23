@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const buttonBaseStyle = {
   zIndex: 1000,
@@ -21,6 +22,7 @@ const buttonBaseStyle = {
 };
 
 export default function FullscreenToggle({ auto = false, fixed = true, style = {}, onChange }) {
+  const { t } = useTranslation();
   const [isFullscreen, setIsFullscreen] = useState(() =>
     typeof document !== 'undefined' ? Boolean(document.fullscreenElement) : false
   );
@@ -82,7 +84,7 @@ export default function FullscreenToggle({ auto = false, fixed = true, style = {
 
   return (
     <button type="button" onClick={handleToggle} style={buttonStyle}>
-      {isFullscreen ? 'Vollbild verlassen' : 'Vollbild'}
+      {isFullscreen ? t('controls.fullscreenExit') : t('controls.fullscreenEnter')}
     </button>
   );
 }

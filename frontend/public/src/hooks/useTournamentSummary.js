@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { fetchTournamentSummary } from '../api.js';
+import i18n from '../i18n/index.js';
 import { REFRESH_INTERVAL_MS } from '../constants.js';
 
 export function useTournamentSummary(selectedTournamentId) {
@@ -38,7 +39,7 @@ export function useTournamentSummary(selectedTournamentId) {
         initializedRef.current = true;
       } catch (err) {
         console.error(err);
-        setError('Turnierübersicht konnte nicht geladen werden.');
+        setError(i18n.t('error.loadSummary'));
         setSummary(null);
       } finally {
         setLoading(false);

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { fetchPublicTournaments } from '../api.js';
+import i18n from '../i18n/index.js';
 import { REFRESH_INTERVAL_MS } from '../constants.js';
 
 export function usePublicTournaments() {
@@ -27,7 +28,7 @@ export function usePublicTournaments() {
       initializedRef.current = true;
     } catch (err) {
       console.error(err);
-      setError('Öffentliche Turniere konnten nicht geladen werden.');
+      setError(i18n.t('error.loadTournaments'));
     } finally {
       initializedRef.current = true;
       setLoading(false);

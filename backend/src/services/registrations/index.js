@@ -4,6 +4,7 @@ import path from 'node:path';
 import crypto from 'crypto';
 import { databasePaths, getConnection, persistDatabase } from '../../db/connection.js';
 import { getAudioStorageDirectory } from '../audio/index.js';
+import { normalizeLanguage } from '../mail/index.js';
 
 const REG_AUDIO_DIR = path.join(databasePaths.dataDir, 'registration-audio');
 fs.mkdirSync(REG_AUDIO_DIR, { recursive: true });
@@ -18,15 +19,16 @@ export function getRegistrationAudioDir() {
   return REG_AUDIO_DIR;
 }
 
-export async function createRegistration({ tournamentId, teamName, contactName, contactEmail, players, audioNotes }) {
+export async function createRegistration({ tournamentId, teamName, contactName, contactEmail, players, audioNotes, language }) {
   const { SQL, db } = await getConnection();
+  const normalizedLanguage = normalizeLanguage(language);
   const stmt = db.prepare(`
-    INSERT INTO tournament_registrations (tournament_id, team_name, contact_name, contact_email, players_json, audio_notes)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO tournament_registrations (tournament_id, team_name, contact_name, contact_email, players_json, audio_notes, language)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
   `);
   let id = null;
   try {
-    stmt.bind([tournamentId, teamName, contactName, contactEmail, JSON.stringify(players ?? []), audioNotes ?? null]);
+    stmt.bind([tournamentId, teamName, contactName, contactEmail, JSON.stringify(players ?? []), audioNotes ?? null, normalizedLanguage]);
     stmt.step();
     id = db.exec('SELECT last_insert_rowid() as id')[0].values[0][0];
   } finally {
@@ -79,6 +81,7 @@ export async function listRegistrations(tournamentId) {
         audioNotes: row.audio_notes,
         status: row.status,
         teamId: row.team_id ?? null,
+        language: normalizeLanguage(row.language),
         createdAt: row.created_at,
         audioFiles: row.audio_files
           ? row.audio_files.split(';;').map((s) => {
@@ -111,6 +114,7 @@ export async function getRegistration(id) {
       audioNotes: row.audio_notes,
       status: row.status,
       teamId: row.team_id ?? null,
+      language: normalizeLanguage(row.language),
       createdAt: row.created_at
     };
   } finally {

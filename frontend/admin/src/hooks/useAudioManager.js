@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   assignAudioTriggerFile,
   deleteAudioLibraryFile,
@@ -12,8 +13,10 @@ import {
   uploadAudioLibraryFile,
   uploadAudioTriggerFile
 } from '../utils/api.js';
+import { formatApiError } from '../utils/apiError.js';
 
 export default function useAudioManager({ updateMessage }) {
+  const { t } = useTranslation();
   const [audioTriggers, setAudioTriggers] = useState([]);
   const [audioLibrary, setAudioLibrary] = useState([]);
   const [audioLoading, setAudioLoading] = useState(false);
@@ -43,14 +46,14 @@ export default function useAudioManager({ updateMessage }) {
         if (cueSettings) setTimerCueSettings(cueSettings);
       } catch (err) {
         console.error('Audiodaten konnten nicht geladen werden.', err);
-        setAudioError('Audiodaten konnten nicht geladen werden.');
+        setAudioError(formatApiError(err, t, 'feedback.audioLoadFailed'));
       } finally {
         if (showLoader) {
           setAudioLoading(false);
         }
       }
     },
-    []
+    [t]
   );
 
   useEffect(() => {
@@ -70,10 +73,10 @@ export default function useAudioManager({ updateMessage }) {
       try {
         await updateAudioTrigger(key, { isActive: nextState });
         await loadAudioData();
-        updateMessage('info', nextState ? 'Sound aktiviert.' : 'Sound deaktiviert.');
+        updateMessage('info', nextState ? t('feedback.soundEnabled') : t('feedback.soundDisabled'));
       } catch (err) {
         console.error('Audio-Trigger konnte nicht aktualisiert werden.', err);
-        updateMessage('error', 'Audio-Trigger konnte nicht aktualisiert werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.triggerUpdateFailed'));
       } finally {
         setAudioTriggerBusy((prev) => {
           const next = { ...prev };
@@ -82,7 +85,7 @@ export default function useAudioManager({ updateMessage }) {
         });
       }
     },
-    [loadAudioData, updateMessage]
+    [loadAudioData, updateMessage, t]
   );
 
   const handleAudioTriggerUpload = useCallback(
@@ -96,10 +99,10 @@ export default function useAudioManager({ updateMessage }) {
         await uploadAudioTriggerFile(key, file, label || undefined);
         setAudioTriggerLabels((prev) => ({ ...prev, [key]: '' }));
         await loadAudioData();
-        updateMessage('info', 'Audiodatei gespeichert.');
+        updateMessage('info', t('feedback.audioSaved'));
       } catch (err) {
         console.error('Audiodatei konnte nicht gespeichert werden.', err);
-        updateMessage('error', 'Audiodatei konnte nicht gespeichert werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.audioSaveFailed'));
       } finally {
         setAudioUploadBusy((prev) => {
           const next = { ...prev };
@@ -108,7 +111,7 @@ export default function useAudioManager({ updateMessage }) {
         });
       }
     },
-    [audioTriggerLabels, loadAudioData, updateMessage]
+    [audioTriggerLabels, loadAudioData, updateMessage, t]
   );
 
   const handleAudioTriggerAssign = useCallback(
@@ -121,10 +124,10 @@ export default function useAudioManager({ updateMessage }) {
       try {
         await assignAudioTriggerFile(key, Number.isFinite(numeric) ? numeric : null);
         await loadAudioData();
-        updateMessage('info', 'Audiodatei verknüpft.');
+        updateMessage('info', t('feedback.audioAssigned'));
       } catch (err) {
         console.error('Audiodatei konnte nicht verknüpft werden.', err);
-        updateMessage('error', 'Audiodatei konnte nicht verknüpft werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.audioAssignFailed'));
       } finally {
         setAudioTriggerBusy((prev) => {
           const next = { ...prev };
@@ -133,7 +136,7 @@ export default function useAudioManager({ updateMessage }) {
         });
       }
     },
-    [loadAudioData, updateMessage]
+    [loadAudioData, updateMessage, t]
   );
 
   const handleAudioTriggerClear = useCallback(
@@ -142,10 +145,10 @@ export default function useAudioManager({ updateMessage }) {
       try {
         await assignAudioTriggerFile(key, null);
         await loadAudioData();
-        updateMessage('info', 'Soundzuordnung entfernt.');
+        updateMessage('info', t('feedback.assignmentRemoved'));
       } catch (err) {
         console.error('Soundzuordnung konnte nicht entfernt werden.', err);
-        updateMessage('error', 'Soundzuordnung konnte nicht entfernt werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.assignmentRemoveFailed'));
       } finally {
         setAudioTriggerBusy((prev) => {
           const next = { ...prev };
@@ -154,7 +157,7 @@ export default function useAudioManager({ updateMessage }) {
         });
       }
     },
-    [loadAudioData, updateMessage]
+    [loadAudioData, updateMessage, t]
   );
 
   const handleAudioTriggerPreview = useCallback(
@@ -162,10 +165,10 @@ export default function useAudioManager({ updateMessage }) {
       setAudioTriggerBusy((prev) => ({ ...prev, [key]: true }));
       try {
         await playAudioTriggerPreview(key);
-        updateMessage('info', 'Sound ausgelöst.');
+        updateMessage('info', t('feedback.soundPlayed'));
       } catch (err) {
         console.error('Sound konnte nicht abgespielt werden.', err);
-        updateMessage('error', 'Sound konnte nicht abgespielt werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.soundPlayFailed'));
       } finally {
         setAudioTriggerBusy((prev) => {
           const next = { ...prev };
@@ -174,7 +177,7 @@ export default function useAudioManager({ updateMessage }) {
         });
       }
     },
-    [updateMessage]
+    [updateMessage, t]
   );
 
   const handleAudioLibraryUpload = useCallback(
@@ -188,15 +191,15 @@ export default function useAudioManager({ updateMessage }) {
         await uploadAudioLibraryFile(file, label || undefined);
         setAudioLibraryUploadLabel('');
         await loadAudioData();
-        updateMessage('info', 'Audiodatei hinzugefügt.');
+        updateMessage('info', t('feedback.audioUploaded'));
       } catch (err) {
         console.error('Audiodatei konnte nicht hochgeladen werden.', err);
-        updateMessage('error', 'Audiodatei konnte nicht hochgeladen werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.audioUploadFailed'));
       } finally {
         setAudioLoading(false);
       }
     },
-    [audioLibraryUploadLabel, loadAudioData, updateMessage]
+    [audioLibraryUploadLabel, loadAudioData, updateMessage, t]
   );
 
   const handleAudioLibraryDelete = useCallback(
@@ -205,10 +208,10 @@ export default function useAudioManager({ updateMessage }) {
       try {
         await deleteAudioLibraryFile(fileId);
         await loadAudioData();
-        updateMessage('info', 'Audiodatei gelöscht.');
+        updateMessage('info', t('feedback.audioDeleted'));
       } catch (err) {
         console.error('Audiodatei konnte nicht gelöscht werden.', err);
-        updateMessage('error', 'Audiodatei konnte nicht gelöscht werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.audioDeleteFailed'));
       } finally {
         setAudioManualBusy((prev) => {
           const next = { ...prev };
@@ -217,7 +220,7 @@ export default function useAudioManager({ updateMessage }) {
         });
       }
     },
-    [loadAudioData, updateMessage]
+    [loadAudioData, updateMessage, t]
   );
 
   const handleAudioLibraryPlay = useCallback(
@@ -225,10 +228,10 @@ export default function useAudioManager({ updateMessage }) {
       setAudioManualBusy((prev) => ({ ...prev, [fileId]: true }));
       try {
         await playAudioLibraryFile(fileId);
-        updateMessage('info', 'Sound ausgelöst.');
+        updateMessage('info', t('feedback.soundPlayed'));
       } catch (err) {
         console.error('Sound konnte nicht ausgelöst werden.', err);
-        updateMessage('error', 'Sound konnte nicht ausgelöst werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.soundTriggerFailed'));
       } finally {
         setAudioManualBusy((prev) => {
           const next = { ...prev };
@@ -237,7 +240,7 @@ export default function useAudioManager({ updateMessage }) {
         });
       }
     },
-    [updateMessage]
+    [updateMessage, t]
   );
 
   const handleTimerCueSave = useCallback(
@@ -246,15 +249,15 @@ export default function useAudioManager({ updateMessage }) {
       try {
         const updated = await saveTimerCueSettings(updates);
         if (updated) setTimerCueSettings(updated);
-        updateMessage('info', 'Timer-Einstellungen gespeichert.');
+        updateMessage('info', t('feedback.timerCuesSaved'));
       } catch (err) {
         console.error('Timer-Cue-Einstellungen konnten nicht gespeichert werden.', err);
-        updateMessage('error', 'Timer-Einstellungen konnten nicht gespeichert werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.timerCuesSaveFailed'));
       } finally {
         setTimerCueBusy(false);
       }
     },
-    [updateMessage]
+    [updateMessage, t]
   );
 
   const describeAudioFile = useCallback((file) => {
@@ -267,8 +270,8 @@ export default function useAudioManager({ updateMessage }) {
     if (file.original_name) {
       return file.original_name;
     }
-    return `Sound #${file.id}`;
-  }, []);
+    return t('audio.soundFallback', { id: file.id });
+  }, [t]);
 
   return {
     audioTriggers,

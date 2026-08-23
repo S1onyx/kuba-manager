@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import PanelCard from '../common/PanelCard.jsx';
 import { useDashboard } from '../../context/DashboardContext.jsx';
 
 export default function PlayersTab() {
+  const { t } = useTranslation();
   const {
     teams: { teams },
     players: {
@@ -24,19 +26,19 @@ export default function PlayersTab() {
   return (
     <div style={{ display: 'grid', gap: '1.75rem' }}>
       <PanelCard
-        title="Spieler anlegen"
-        description="Lege Spieler für die Statistik an und ordne sie Teams zu. Danach lassen sich Punkte Aktionen Spielern zuweisen."
+        title={t('players.createTitle')}
+        description={t('players.createDescription')}
       >
         <form onSubmit={handlePlayerCreateSubmit} style={{ display: 'grid', gap: '1rem' }}>
           <div style={{ display: 'grid', gap: '0.85rem', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
             <label style={{ display: 'grid', gap: '0.3rem' }}>
-              Team
+              {t('players.team')}
               <select
                 value={playerCreate.teamId}
                 onChange={(event) => handlePlayerCreateChange('teamId', event.target.value)}
                 required
               >
-                <option value="">Team wählen</option>
+                <option value="">{t('players.selectTeam')}</option>
                 {teams.map((team) => (
                   <option key={team.id} value={team.id}>
                     {team.name}
@@ -45,43 +47,43 @@ export default function PlayersTab() {
               </select>
             </label>
             <label style={{ display: 'grid', gap: '0.3rem' }}>
-              Spielername
+              {t('players.playerName')}
               <input
                 value={playerCreate.name}
                 onChange={(event) => handlePlayerCreateChange('name', event.target.value)}
-                placeholder="Name"
+                placeholder={t('players.namePlaceholder')}
                 required
               />
             </label>
             <label style={{ display: 'grid', gap: '0.3rem' }}>
-              Rückennummer
+              {t('players.jerseyNumber')}
               <input
                 value={playerCreate.jerseyNumber}
                 onChange={(event) => handlePlayerCreateChange('jerseyNumber', event.target.value)}
-                placeholder="z.B. 12"
+                placeholder={t('players.jerseyPlaceholder')}
               />
             </label>
             <label style={{ display: 'grid', gap: '0.3rem' }}>
-              Position (optional)
+              {t('players.positionOptional')}
               <input
                 value={playerCreate.position}
                 onChange={(event) => handlePlayerCreateChange('position', event.target.value)}
-                placeholder="z.B. Center"
+                placeholder={t('players.positionPlaceholder')}
               />
             </label>
           </div>
           <div>
-            <button type="submit">Spieler anlegen</button>
+            <button type="submit">{t('players.create')}</button>
           </div>
         </form>
       </PanelCard>
 
       <PanelCard
-        title="Spielerübersicht"
-        description="Bearbeite oder lösche Spieler. Ziehe unzugeordnete Spieler Teams zu, um sie im Scoreboard nutzen zu können."
+        title={t('players.listTitle')}
+        description={t('players.listDescription')}
       >
         {playersLoading ? (
-          <p style={{ margin: 0 }}>Spieler werden geladen...</p>
+          <p style={{ margin: 0 }}>{t('players.loading')}</p>
         ) : playersError ? (
           <p style={{ margin: 0, color: 'var(--warning)' }}>{playersError}</p>
         ) : (
@@ -102,10 +104,10 @@ export default function PlayersTab() {
                 >
                   <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <strong>{team.name}</strong>
-                    <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>{teamPlayers.length} Spieler</span>
+                    <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>{t('players.count', { count: teamPlayers.length })}</span>
                   </header>
                   {teamPlayers.length === 0 ? (
-                    <p style={{ margin: 0, color: 'var(--text-muted)' }}>Noch keine Spieler erfasst.</p>
+                    <p style={{ margin: 0, color: 'var(--text-muted)' }}>{t('players.empty')}</p>
                   ) : (
                     <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '0.75rem' }}>
                       {teamPlayers.map((player) => {
@@ -133,24 +135,24 @@ export default function PlayersTab() {
                                   <input
                                     value={edit.name}
                                     onChange={(event) => handlePlayerEditChange(player.id, 'name', event.target.value)}
-                                    placeholder="Name"
+                                    placeholder={t('players.namePlaceholder')}
                                     required
                                   />
                                   <input
                                     value={edit.jerseyNumber}
                                     onChange={(event) => handlePlayerEditChange(player.id, 'jerseyNumber', event.target.value)}
-                                    placeholder="Nr."
+                                    placeholder={t('players.jerseyShort')}
                                   />
                                   <input
                                     value={edit.position}
                                     onChange={(event) => handlePlayerEditChange(player.id, 'position', event.target.value)}
-                                    placeholder="Position"
+                                    placeholder={t('players.position')}
                                   />
                                   <select
                                     value={edit.teamId}
                                     onChange={(event) => handlePlayerEditChange(player.id, 'teamId', event.target.value)}
                                   >
-                                    <option value="">Team wählen</option>
+                                    <option value="">{t('players.selectTeam')}</option>
                                     {teams.map((otherTeam) => (
                                       <option key={otherTeam.id} value={otherTeam.id}>
                                         {otherTeam.name}
@@ -159,9 +161,9 @@ export default function PlayersTab() {
                                   </select>
                                 </div>
                                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                  <button type="submit">Speichern</button>
+                                  <button type="submit">{t('common.save')}</button>
                                   <button type="button" onClick={() => cancelPlayerEdit(player.id)}>
-                                    Abbrechen
+                                    {t('common.cancel')}
                                   </button>
                                 </div>
                               </form>
@@ -178,14 +180,14 @@ export default function PlayersTab() {
                                 </div>
                                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                                   <button type="button" onClick={() => startPlayerEdit(player)}>
-                                    Bearbeiten
+                                    {t('common.edit')}
                                   </button>
                                   <button
                                     type="button"
                                     onClick={() => handlePlayerDelete(player.id)}
                                     style={{ background: 'rgba(211,47,47,0.85)', color: '#fff' }}
                                   >
-                                    Löschen
+                                    {t('common.delete')}
                                   </button>
                                 </div>
                               </div>
@@ -210,7 +212,7 @@ export default function PlayersTab() {
                   gap: '0.6rem'
                 }}
               >
-                <strong>Unzugeordnete Spieler</strong>
+                <strong>{t('players.unassigned')}</strong>
                 <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '0.35rem' }}>
                   {unassignedPlayers.map((player) => (
                     <li key={player.id} style={{ opacity: 0.8 }}>

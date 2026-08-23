@@ -30,14 +30,14 @@ router.get('/triggers', async (_req, res) => {
     res.json({ triggers });
   } catch (error) {
     console.error('Audio-Trigger konnten nicht geladen werden:', error);
-    res.status(500).json({ message: 'Audio-Trigger konnten nicht geladen werden.' });
+    res.status(500).json({ code: 'AUDIO_TRIGGERS_LOAD_FAILED', message: 'Audio-Trigger konnten nicht geladen werden.' });
   }
 });
 
 router.put('/triggers/:key', async (req, res) => {
   const key = String(req.params.key ?? '').trim();
   if (!key) {
-    return res.status(400).json({ message: 'Ungültiger Trigger-Key.' });
+    return res.status(400).json({ code: 'INVALID_TRIGGER_KEY', message: 'Ungültiger Trigger-Key.' });
   }
 
   const { isActive, fileId } = req.body ?? {};
@@ -57,25 +57,25 @@ router.put('/triggers/:key', async (req, res) => {
     });
 
     if (!updated) {
-      return res.status(404).json({ message: 'Trigger wurde nicht gefunden.' });
+      return res.status(404).json({ code: 'TRIGGER_NOT_FOUND', message: 'Trigger wurde nicht gefunden.' });
     }
 
     res.json(updated);
   } catch (error) {
     console.error('Audio-Trigger konnte nicht aktualisiert werden:', error);
-    res.status(400).json({ message: error.message || 'Audio-Trigger konnte nicht aktualisiert werden.' });
+    res.status(400).json({ code: 'TRIGGER_UPDATE_FAILED', message: error.message || 'Audio-Trigger konnte nicht aktualisiert werden.' });
   }
 });
 
 router.post('/triggers/:key/upload', upload.single('file'), async (req, res) => {
   const key = String(req.params.key ?? '').trim();
   if (!key) {
-    return res.status(400).json({ message: 'Ungültiger Trigger-Key.' });
+    return res.status(400).json({ code: 'INVALID_TRIGGER_KEY', message: 'Ungültiger Trigger-Key.' });
   }
 
   const file = req.file;
   if (!file) {
-    return res.status(400).json({ message: 'Bitte eine MP3-Datei hochladen.' });
+    return res.status(400).json({ code: 'AUDIO_FILE_REQUIRED', message: 'Bitte eine MP3-Datei hochladen.' });
   }
 
   try {
@@ -89,23 +89,23 @@ router.post('/triggers/:key/upload', upload.single('file'), async (req, res) => 
     res.json(updated);
   } catch (error) {
     console.error('Trigger-Audiodatei konnte nicht gespeichert werden:', error);
-    res.status(400).json({ message: error.message || 'Die Audiodatei konnte nicht gespeichert werden.' });
+    res.status(400).json({ code: 'AUDIO_FILE_SAVE_FAILED', message: error.message || 'Die Audiodatei konnte nicht gespeichert werden.' });
   }
 });
 
 router.post('/triggers/:key/play', async (req, res) => {
   const key = String(req.params.key ?? '').trim();
   if (!key) {
-    return res.status(400).json({ message: 'Ungültiger Trigger-Key.' });
+    return res.status(400).json({ code: 'INVALID_TRIGGER_KEY', message: 'Ungültiger Trigger-Key.' });
   }
 
   try {
     const trigger = await getAudioTrigger(key);
     if (!trigger) {
-      return res.status(404).json({ message: 'Trigger wurde nicht gefunden.' });
+      return res.status(404).json({ code: 'TRIGGER_NOT_FOUND', message: 'Trigger wurde nicht gefunden.' });
     }
     if (!trigger.file) {
-      return res.status(400).json({ message: 'Diesem Trigger ist keine Audiodatei zugewiesen.' });
+      return res.status(400).json({ code: 'TRIGGER_NO_AUDIO_FILE', message: 'Diesem Trigger ist keine Audiodatei zugewiesen.' });
     }
 
     const payload = await playAudioFileById(
@@ -116,7 +116,7 @@ router.post('/triggers/:key/play', async (req, res) => {
     res.json(payload);
   } catch (error) {
     console.error('Trigger konnte nicht abgespielt werden:', error);
-    res.status(500).json({ message: 'Trigger konnte nicht abgespielt werden.' });
+    res.status(500).json({ code: 'TRIGGER_PLAY_FAILED', message: 'Trigger konnte nicht abgespielt werden.' });
   }
 });
 
@@ -126,14 +126,14 @@ router.get('/library', async (_req, res) => {
     res.json({ files });
   } catch (error) {
     console.error('Audio-Bibliothek konnte nicht geladen werden:', error);
-    res.status(500).json({ message: 'Audio-Bibliothek konnte nicht geladen werden.' });
+    res.status(500).json({ code: 'AUDIO_LIBRARY_LOAD_FAILED', message: 'Audio-Bibliothek konnte nicht geladen werden.' });
   }
 });
 
 router.post('/library/upload', upload.single('file'), async (req, res) => {
   const file = req.file;
   if (!file) {
-    return res.status(400).json({ message: 'Bitte eine MP3-Datei hochladen.' });
+    return res.status(400).json({ code: 'AUDIO_FILE_REQUIRED', message: 'Bitte eine MP3-Datei hochladen.' });
   }
 
   try {
@@ -146,25 +146,25 @@ router.post('/library/upload', upload.single('file'), async (req, res) => {
     res.status(201).json(record);
   } catch (error) {
     console.error('Audiodatei konnte nicht hochgeladen werden:', error);
-    res.status(400).json({ message: error.message || 'Audiodatei konnte nicht hochgeladen werden.' });
+    res.status(400).json({ code: 'AUDIO_UPLOAD_FAILED', message: error.message || 'Audiodatei konnte nicht hochgeladen werden.' });
   }
 });
 
 router.delete('/library/:id', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Audio-ID.' });
+    return res.status(400).json({ code: 'INVALID_AUDIO_ID', message: 'Ungültige Audio-ID.' });
   }
 
   try {
     const removed = await deleteAudioFile(id);
     if (!removed) {
-      return res.status(404).json({ message: 'Audiodatei nicht gefunden.' });
+      return res.status(404).json({ code: 'AUDIO_FILE_NOT_FOUND', message: 'Audiodatei nicht gefunden.' });
     }
     res.status(204).end();
   } catch (error) {
     console.error('Audiodatei konnte nicht gelöscht werden:', error);
-    res.status(500).json({ message: 'Audiodatei konnte nicht gelöscht werden.' });
+    res.status(500).json({ code: 'AUDIO_DELETE_FAILED', message: 'Audiodatei konnte nicht gelöscht werden.' });
   }
 });
 
@@ -172,7 +172,7 @@ router.post('/manual/play', async (req, res) => {
   const { fileId } = req.body ?? {};
   const numericId = Number(fileId);
   if (!Number.isInteger(numericId) || numericId <= 0) {
-    return res.status(400).json({ message: 'Ungültige Audio-ID.' });
+    return res.status(400).json({ code: 'INVALID_AUDIO_ID', message: 'Ungültige Audio-ID.' });
   }
 
   try {
@@ -180,7 +180,7 @@ router.post('/manual/play', async (req, res) => {
     res.json(payload);
   } catch (error) {
     console.error('Audiodatei konnte nicht abgespielt werden:', error);
-    res.status(400).json({ message: error.message || 'Audiodatei konnte nicht abgespielt werden.' });
+    res.status(400).json({ code: 'AUDIO_PLAY_FAILED', message: error.message || 'Audiodatei konnte nicht abgespielt werden.' });
   }
 });
 
@@ -188,30 +188,30 @@ router.post('/triggers/:key/assign', async (req, res) => {
   const key = String(req.params.key ?? '').trim();
   const { fileId } = req.body ?? {};
   if (!key) {
-    return res.status(400).json({ message: 'Ungültiger Trigger-Key.' });
+    return res.status(400).json({ code: 'INVALID_TRIGGER_KEY', message: 'Ungültiger Trigger-Key.' });
   }
 
   try {
     const numericId = fileId === null || fileId === undefined ? null : Number(fileId);
     if (numericId !== null && (!Number.isInteger(numericId) || numericId <= 0)) {
-      return res.status(400).json({ message: 'Ungültige Audio-ID.' });
+      return res.status(400).json({ code: 'INVALID_AUDIO_ID', message: 'Ungültige Audio-ID.' });
     }
 
     if (numericId !== null) {
       const exists = await getAudioFileById(numericId);
       if (!exists) {
-        return res.status(404).json({ message: 'Audiodatei nicht gefunden.' });
+        return res.status(404).json({ code: 'AUDIO_FILE_NOT_FOUND', message: 'Audiodatei nicht gefunden.' });
       }
     }
 
     const updated = await assignFileToTrigger(key, numericId);
     if (!updated) {
-      return res.status(404).json({ message: 'Trigger wurde nicht gefunden.' });
+      return res.status(404).json({ code: 'TRIGGER_NOT_FOUND', message: 'Trigger wurde nicht gefunden.' });
     }
     res.json(updated);
   } catch (error) {
     console.error('Audiodatei konnte nicht zugewiesen werden:', error);
-    res.status(400).json({ message: error.message || 'Audiodatei konnte nicht zugewiesen werden.' });
+    res.status(400).json({ code: 'AUDIO_ASSIGN_FAILED', message: error.message || 'Audiodatei konnte nicht zugewiesen werden.' });
   }
 });
 
@@ -221,7 +221,7 @@ router.get('/timer-cues', async (_req, res) => {
     res.json(settings);
   } catch (error) {
     console.error('Timer-Cue-Einstellungen konnten nicht geladen werden:', error);
-    res.status(500).json({ message: 'Timer-Cue-Einstellungen konnten nicht geladen werden.' });
+    res.status(500).json({ code: 'TIMER_CUE_SETTINGS_LOAD_FAILED', message: 'Timer-Cue-Einstellungen konnten nicht geladen werden.' });
   }
 });
 
@@ -236,7 +236,7 @@ router.put('/timer-cues', async (req, res) => {
     res.json(updated);
   } catch (error) {
     console.error('Timer-Cue-Einstellungen konnten nicht gespeichert werden:', error);
-    res.status(400).json({ message: error.message || 'Timer-Cue-Einstellungen konnten nicht gespeichert werden.' });
+    res.status(400).json({ code: 'TIMER_CUE_SETTINGS_SAVE_FAILED', message: error.message || 'Timer-Cue-Einstellungen konnten nicht gespeichert werden.' });
   }
 });
 

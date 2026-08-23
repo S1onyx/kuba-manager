@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 const gridStyle = {
   display: 'grid',
   gap: '1rem',
@@ -50,6 +52,7 @@ const responsiveStyles = `
 `;
 
 export default function TeamStatsGrid({ stats = [], highlightCount = 6 }) {
+  const { t } = useTranslation();
   if (!stats || stats.length === 0) {
     return null;
   }
@@ -59,10 +62,8 @@ export default function TeamStatsGrid({ stats = [], highlightCount = 6 }) {
   return (
     <section>
       <header style={{ marginBottom: '1rem' }}>
-        <h3 className="team-grid__title" style={{ fontSize: '1.2rem', letterSpacing: '0.05em' }}>Top-Teams</h3>
-        <p style={{ fontSize: '0.95rem', opacity: 0.75 }}>
-          Ranking basierend auf Punkten, Tordifferenz und erzielten Körben.
-        </p>
+        <h3 className="team-grid__title" style={{ fontSize: '1.2rem', letterSpacing: '0.05em' }}>{t('teamStats.title')}</h3>
+        <p style={{ fontSize: '0.95rem', opacity: 0.75 }}>{t('teamStats.description')}</p>
       </header>
       <div className="team-grid" style={gridStyle}>
         {topTeams.map((team, index) => (
@@ -72,28 +73,28 @@ export default function TeamStatsGrid({ stats = [], highlightCount = 6 }) {
               <strong style={{ fontSize: '1.15rem', letterSpacing: '0.05em' }}>{team.team}</strong>
             </div>
             <div className="team-grid__score" style={{ ...scoreStyle, fontWeight: 600 }}>
-              <span>Punkte</span>
+              <span>{t('teamStats.points')}</span>
               <span>{team.points}</span>
             </div>
             <div className="team-grid__score" style={scoreStyle}>
-              <span>Bilanz</span>
+              <span>{t('teamStats.record')}</span>
               <span>
                 {team.wins}-{team.draws}-{team.losses}
               </span>
             </div>
             <div className="team-grid__score" style={scoreStyle}>
-              <span>Tore</span>
+              <span>{t('teamStats.goals')}</span>
               <span>
                 {team.goalsFor}:{team.goalsAgainst} ({team.goalDiff >= 0 ? '+' : ''}
                 {team.goalDiff})
               </span>
             </div>
             <div className="team-grid__score" style={scoreStyle}>
-              <span>Spiele</span>
+              <span>{t('teamStats.games')}</span>
               <span>{team.played}</span>
             </div>
             <div className="team-grid__score" style={scoreStyle}>
-              <span>Strafen</span>
+              <span>{t('teamStats.penalties')}</span>
               <span>{team.penalties}</span>
             </div>
           </article>

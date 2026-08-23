@@ -16,7 +16,7 @@ router.get('/', async (_req, res) => {
     res.json(teams);
   } catch (error) {
     console.error('Teams konnten nicht geladen werden:', error);
-    res.status(500).json({ message: 'Teams konnten nicht geladen werden.' });
+    res.status(500).json({ code: 'TEAMS_LOAD_FAILED', message: 'Teams konnten nicht geladen werden.' });
   }
 });
 
@@ -28,9 +28,9 @@ router.post('/', async (req, res) => {
   } catch (error) {
     console.error('Team konnte nicht erstellt werden:', error);
     if (String(error?.message || '').includes('unique') || String(error?.message || '').includes('Unique')) {
-      res.status(409).json({ message: 'Teamname bereits vergeben.' });
+      res.status(409).json({ code: 'TEAM_NAME_TAKEN', message: 'Teamname bereits vergeben.' });
     } else {
-      res.status(400).json({ message: 'Team konnte nicht erstellt werden.', detail: error.message });
+      res.status(400).json({ code: 'TEAM_CREATE_FAILED', message: 'Team konnte nicht erstellt werden.', detail: error.message });
     }
   }
 });
@@ -38,13 +38,13 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Team-ID.' });
+    return res.status(400).json({ code: 'INVALID_TEAM_ID', message: 'Ungültige Team-ID.' });
   }
 
   try {
     const updated = await updateTeam(id, req.body ?? {});
     if (!updated) {
-      return res.status(404).json({ message: 'Team nicht gefunden.' });
+      return res.status(404).json({ code: 'TEAM_NOT_FOUND', message: 'Team nicht gefunden.' });
     }
 
     const scoreboard = getScoreboardState();
@@ -65,9 +65,9 @@ router.put('/:id', async (req, res) => {
   } catch (error) {
     console.error('Team konnte nicht aktualisiert werden:', error);
     if (String(error?.message || '').includes('unique') || String(error?.message || '').includes('Unique')) {
-      res.status(409).json({ message: 'Teamname bereits vergeben.' });
+      res.status(409).json({ code: 'TEAM_NAME_TAKEN', message: 'Teamname bereits vergeben.' });
     } else {
-      res.status(400).json({ message: 'Team konnte nicht aktualisiert werden.', detail: error.message });
+      res.status(400).json({ code: 'TEAM_UPDATE_FAILED', message: 'Team konnte nicht aktualisiert werden.', detail: error.message });
     }
   }
 });
@@ -75,18 +75,18 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Team-ID.' });
+    return res.status(400).json({ code: 'INVALID_TEAM_ID', message: 'Ungültige Team-ID.' });
   }
 
   try {
     const existing = await getTeam(id);
     if (!existing) {
-      return res.status(404).json({ message: 'Team nicht gefunden.' });
+      return res.status(404).json({ code: 'TEAM_NOT_FOUND', message: 'Team nicht gefunden.' });
     }
 
     const deleted = await deleteTeam(id);
     if (!deleted) {
-      return res.status(500).json({ message: 'Team konnte nicht gelöscht werden.' });
+      return res.status(500).json({ code: 'TEAM_DELETE_FAILED', message: 'Team konnte nicht gelöscht werden.' });
     }
 
     const scoreboard = getScoreboardState();
@@ -106,7 +106,7 @@ router.delete('/:id', async (req, res) => {
     res.status(204).end();
   } catch (error) {
     console.error('Team konnte nicht gelöscht werden:', error);
-    res.status(500).json({ message: 'Team konnte nicht gelöscht werden.' });
+    res.status(500).json({ code: 'TEAM_DELETE_FAILED', message: 'Team konnte nicht gelöscht werden.' });
   }
 });
 

@@ -1,5 +1,8 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDateLocale } from '../i18n/index.js';
 import BracketStageList from './BracketStageList.jsx';
+import { formatStageLabelI18n } from '../utils/stageLabels.js';
 
 const containerStyle = {
   background: 'rgba(0,0,0,0.28)',
@@ -207,14 +210,14 @@ const responsiveStyles = `
 `;
 
 const scheduleViewModes = [
-  { id: 'timeline', label: 'Zeitstrahl' },
-  { id: 'phases', label: 'Phasen' }
+  { id: 'timeline', labelKey: 'schedule.viewTimeline' },
+  { id: 'phases', labelKey: 'schedule.viewPhases' }
 ];
 
-const phaseDisplayLabels = {
-  group: 'Gruppenphase',
-  knockout: 'KO-Runde',
-  placement: 'Platzierungsspiele'
+const phaseLabelKeys = {
+  group: 'schedule.phaseGroup',
+  knockout: 'schedule.phaseKnockout',
+  placement: 'schedule.phasePlacement'
 };
 
 const phaseSortOrder = {
@@ -223,25 +226,26 @@ const phaseSortOrder = {
   placement: 3
 };
 
-const dateTimeFormatter = new Intl.DateTimeFormat('de-DE', {
-  weekday: 'short',
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit'
-});
-
-function formatMatchDateTime(value) {
-  if (!value) {
-    return null;
-  }
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-  const formatted = dateTimeFormatter.format(date).split(', ').join(' · ');
-  return `${formatted} Uhr`;
+function createMatchDateTimeFormatter(dateLocale, t) {
+  const dateTimeFormatter = new Intl.DateTimeFormat(dateLocale, {
+    weekday: 'short',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+  return (value) => {
+    if (!value) {
+      return null;
+    }
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return null;
+    }
+    const formatted = dateTimeFormatter.format(date).split(', ').join(' · ');
+    return t('schedule.timeValue', { time: formatted });
+  };
 }
 
 function toScheduledTimestamp(value) {
@@ -253,7 +257,7 @@ function toScheduledTimestamp(value) {
   return Number.isNaN(timestamp) ? null : timestamp;
 }
 
-function renderGroupSchedule(groupStages, formatDateTime) {
+function renderGroupSchedule(groupStages, formatDateTime, t) {
   if (!groupStages || groupStages.length === 0) {
     return null;
   }
@@ -261,10 +265,8 @@ function renderGroupSchedule(groupStages, formatDateTime) {
   return (
     <section style={{ display: 'grid', gap: '1.25rem' }}>
       <header>
-        <h3 style={{ fontSize: '1.2rem', letterSpacing: '0.05em' }}>Gruppen-Spielplan</h3>
-        <p style={{ fontSize: '0.95rem', opacity: 0.75 }}>
-          Jede Gruppe spielt eine vollständige Runde – alle Teams treffen einmal aufeinander.
-        </p>
+        <h3 style={{ fontSize: '1.2rem', letterSpacing: '0.05em' }}>{t('schedule.groupTitle')}</h3>
+        <p style={{ fontSize: '0.95rem', opacity: 0.75 }}>{t('schedule.groupDescription')}</p>
       </header>
       <div style={{ display: 'grid', gap: '1.1rem' }}>
         {groupStages.map((group) => (
@@ -273,7 +275,7 @@ function renderGroupSchedule(groupStages, formatDateTime) {
             <div style={{ display: 'grid', gap: '0.8rem' }}>
               {group.rounds.map((round) => (
                 <div key={`${group.stage_label}-round-${round.round}`} style={{ display: 'grid', gap: '0.55rem' }}>
-                  <span style={roundHeaderStyle}>Runde {round.round}</span>
+                  <span style={roundHeaderStyle}>{t('schedule.round', { round: round.round })}</span>
                   <div style={{ display: 'grid', gap: '0.35rem' }}>
                     {round.matches.map((match) => {
                       const scheduledLabel = formatDateTime ? formatDateTime(match.scheduled_at) : null;
@@ -318,7 +320,7 @@ function renderGroupSchedule(groupStages, formatDateTime) {
   );
 }
 
-function buildTimelineEntries(schedule) {
+function buildTimelineEntries(schedule, t, dateLocale) {
   if (!schedule) {
     return [];
   }
@@ -347,6 +349,7 @@ function buildTimelineEntries(schedule) {
       timestamp: toScheduledTimestamp(scheduledRaw),
       phase: meta.phase ?? match.phase ?? null,
       stageLabel: meta.stageLabel ?? match.stage_label ?? '',
+      stageLabelI18n: meta.stageLabelI18n ?? match.stage_label_i18n ?? null,
       roundLabel: meta.roundLabel ?? null,
       metadata: match.metadata ?? {},
       matchOrder: match.match_order ?? meta.matchOrder ?? 0
@@ -360,7 +363,8 @@ function buildTimelineEntries(schedule) {
         pushMatch(match, {
           phase: 'group',
           stageLabel: stage.stage_label,
-          roundLabel: round.round ? `Runde ${round.round}` : null,
+          stageLabelI18n: stage.stage_label_i18n,
+          roundLabel: round.round ? t('schedule.round', { round: round.round }) : null,
           matchOrder: index
         });
       });
@@ -373,6 +377,7 @@ function buildTimelineEntries(schedule) {
         pushMatch(match, {
           phase,
           stageLabel: stage.stage_label,
+          stageLabelI18n: stage.stage_label_i18n,
           matchOrder: index
         });
       });
@@ -395,18 +400,18 @@ function buildTimelineEntries(schedule) {
         return (phaseSortOrder[a.phase] ?? 10) - (phaseSortOrder[b.phase] ?? 10);
       }
       if (a.stageLabel !== b.stageLabel) {
-        return a.stageLabel.localeCompare(b.stageLabel, 'de', { sensitivity: 'base' });
+        return a.stageLabel.localeCompare(b.stageLabel, dateLocale, { sensitivity: 'base' });
       }
       return a.matchOrder - b.matchOrder;
     })
     .map((entry, index) => ({
       ...entry,
       key: entry.key ?? `match-${index}`,
-      phaseLabel: phaseDisplayLabels[entry.phase] ?? entry.phase ?? 'Partie'
+      phaseLabel: phaseLabelKeys[entry.phase] ? t(phaseLabelKeys[entry.phase]) : entry.phase ?? t('schedule.phaseDefault')
     }));
 }
 
-function renderTimelineRow(entry, nextKey, nowTs, formatDateTime, activeKey) {
+function renderTimelineRow(entry, nextKey, nowTs, formatDateTime, activeKey, t) {
   const scheduledLabel = entry.timestamp !== null ? formatDateTime(entry.scheduledRaw) : null;
   const isPast = entry.timestamp !== null && entry.timestamp < nowTs;
   const isActive = Boolean(activeKey && entry.key === activeKey);
@@ -431,7 +436,7 @@ function renderTimelineRow(entry, nextKey, nowTs, formatDateTime, activeKey) {
     metaParts.push(entry.phaseLabel);
   }
   if (entry.stageLabel) {
-    metaParts.push(entry.stageLabel);
+    metaParts.push(formatStageLabelI18n(t, entry.stageLabelI18n, entry.stageLabel));
   }
   if (entry.roundLabel) {
     metaParts.push(entry.roundLabel);
@@ -444,7 +449,7 @@ function renderTimelineRow(entry, nextKey, nowTs, formatDateTime, activeKey) {
           <span>{scheduledLabel}</span>
         ) : (
           <>
-            <span>Termin offen</span>
+            <span>{t('schedule.openDate')}</span>
             {entry.phaseLabel ? <small style={{ opacity: 0.7 }}>{entry.phaseLabel}</small> : null}
           </>
         )}
@@ -461,18 +466,18 @@ function renderTimelineRow(entry, nextKey, nowTs, formatDateTime, activeKey) {
           }}
         >
           <span style={{ textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {entry.home || 'Noch offen'}
+            {entry.home || t('schedule.openTeam')}
           </span>
           <span className="schedule-timeline__score">{scoreLabel}</span>
           <span style={{ textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {entry.away || 'Noch offen'}
+            {entry.away || t('schedule.openTeam')}
           </span>
         </div>
         {entry.metadata?.description ? (
           <span className="schedule-timeline__note">{entry.metadata.description}</span>
         ) : null}
         {isActive ? (
-          <span className="schedule-timeline__now-hint">Wir befinden uns hier.</span>
+          <span className="schedule-timeline__now-hint">{t('schedule.nowHint')}</span>
         ) : null}
         {metaParts.length ? <span className="schedule-timeline__meta">{metaParts.join(' · ')}</span> : null}
       </div>
@@ -480,7 +485,7 @@ function renderTimelineRow(entry, nextKey, nowTs, formatDateTime, activeKey) {
   );
 }
 
-function TimelineSchedule({ entries, formatDateTime, activeScheduleCode }) {
+function TimelineSchedule({ entries, formatDateTime, activeScheduleCode, t }) {
   const nowTs = Date.now();
   const hasTimeInfo = entries.some((entry) => entry.timestamp !== null);
   const nextEntry = entries.find((entry) => entry.timestamp !== null && entry.timestamp >= nowTs);
@@ -497,7 +502,7 @@ function TimelineSchedule({ entries, formatDateTime, activeScheduleCode }) {
 
   if (activeKey) {
     entries.forEach((entry) => {
-      rows.push(renderTimelineRow(entry, nextKey, nowTs, formatDateTime, activeKey));
+      rows.push(renderTimelineRow(entry, nextKey, nowTs, formatDateTime, activeKey, t));
     });
   } else {
     let nowInserted = !hasTimeInfo;
@@ -508,17 +513,15 @@ function TimelineSchedule({ entries, formatDateTime, activeScheduleCode }) {
         className="schedule-timeline__row schedule-timeline__item schedule-timeline__item--now"
       >
         <div className="schedule-timeline__time">
-          <strong>Jetzt</strong>
+          <strong>{t('schedule.now')}</strong>
           <span style={{ fontSize: '0.85rem', opacity: 0.8 }}>{formatDateTime(new Date())}</span>
         </div>
         <div className="schedule-timeline__marker">
           <span className="schedule-timeline__dot" />
         </div>
         <div className="schedule-timeline__details">
-          <span className="schedule-timeline__now-hint">Wir befinden uns hier.</span>
-          <span className="schedule-timeline__meta">
-            Darunter findest du sofort die nächste angesetzte Partie – darüber liegen die bereits gespielten Spiele.
-          </span>
+          <span className="schedule-timeline__now-hint">{t('schedule.nowHint')}</span>
+          <span className="schedule-timeline__meta">{t('schedule.nowDescription')}</span>
         </div>
       </div>
     );
@@ -528,7 +531,7 @@ function TimelineSchedule({ entries, formatDateTime, activeScheduleCode }) {
         rows.push(renderNowRow(entry.key));
         nowInserted = true;
       }
-      rows.push(renderTimelineRow(entry, nextKey, nowTs, formatDateTime, null));
+      rows.push(renderTimelineRow(entry, nextKey, nowTs, formatDateTime, null, t));
     });
 
     if (!nowInserted && hasTimeInfo) {
@@ -539,15 +542,11 @@ function TimelineSchedule({ entries, formatDateTime, activeScheduleCode }) {
   return (
     <section className="schedule-timeline">
       <header>
-        <h3 style={{ fontSize: '1.2rem', letterSpacing: '0.05em' }}>Zeitlicher Ablauf</h3>
-        <p style={{ fontSize: '0.95rem', opacity: 0.75 }}>
-          Alle Partien sortiert nach Uhrzeit. Der Marker zeigt dir, wo wir uns gerade im Turniertag befinden.
-        </p>
+        <h3 style={{ fontSize: '1.2rem', letterSpacing: '0.05em' }}>{t('schedule.timelineTitle')}</h3>
+        <p style={{ fontSize: '0.95rem', opacity: 0.75 }}>{t('schedule.timelineDescription')}</p>
       </header>
       {entries.length === 0 ? (
-        <p style={{ opacity: 0.75, fontSize: '0.95rem' }}>
-          Noch keine Partien geplant. Sobald Termine gesetzt sind, erscheint hier der zeitliche Ablauf.
-        </p>
+        <p style={{ opacity: 0.75, fontSize: '0.95rem' }}>{t('schedule.timelineEmpty')}</p>
       ) : (
         <div className="schedule-timeline__list">{rows}</div>
       )}
@@ -556,8 +555,17 @@ function TimelineSchedule({ entries, formatDateTime, activeScheduleCode }) {
 }
 
 export default function SchedulePreview({ schedule, activeScheduleCode = null }) {
+  const { t } = useTranslation();
+  const dateLocale = useDateLocale();
   const [viewMode, setViewMode] = useState(scheduleViewModes[0]?.id ?? 'timeline');
-  const timelineEntries = useMemo(() => (schedule ? buildTimelineEntries(schedule) : []), [schedule]);
+  const formatMatchDateTime = useMemo(
+    () => createMatchDateTimeFormatter(dateLocale, t),
+    [dateLocale, t]
+  );
+  const timelineEntries = useMemo(
+    () => (schedule ? buildTimelineEntries(schedule, t, dateLocale) : []),
+    [schedule, t, dateLocale]
+  );
 
   if (!schedule) {
     return null;
@@ -572,14 +580,11 @@ export default function SchedulePreview({ schedule, activeScheduleCode = null })
     <section className="schedule-preview" style={containerStyle}>
       <header style={{ display: 'grid', gap: '0.65rem' }}>
         <div>
-          <h2 style={{ fontSize: '1.4rem', letterSpacing: '0.05em' }}>Spielplan</h2>
-          <p style={{ opacity: 0.75, fontSize: '0.95rem' }}>
-            Wähle zwischen der bekannten Phasenansicht und einem chronologischen Zeitstrahl – so siehst du sofort, was als
-            Nächstes ansteht.
-          </p>
+          <h2 style={{ fontSize: '1.4rem', letterSpacing: '0.05em' }}>{t('schedule.title')}</h2>
+          <p style={{ opacity: 0.75, fontSize: '0.95rem' }}>{t('schedule.intro')}</p>
         </div>
         {!showEmptyNotice ? (
-          <div className="schedule-preview__view-toggle" role="group" aria-label="Darstellung wechseln">
+          <div className="schedule-preview__view-toggle" role="group" aria-label={t('schedule.viewToggleLabel')}>
             {scheduleViewModes.map((mode) => {
               const isActive = viewMode === mode.id;
               const isTimelineMode = mode.id === 'timeline';
@@ -594,7 +599,7 @@ export default function SchedulePreview({ schedule, activeScheduleCode = null })
                   disabled={disabled}
                   onClick={() => setViewMode(mode.id)}
                 >
-                  {mode.label}
+                  {t(mode.labelKey)}
                 </button>
               );
             })}
@@ -603,10 +608,7 @@ export default function SchedulePreview({ schedule, activeScheduleCode = null })
       </header>
 
       {showEmptyNotice ? (
-        <p style={{ opacity: 0.75, fontSize: '0.95rem' }}>
-          Der vorläufige Spielplan wurde noch nicht veröffentlicht. Sobald Paarungen feststehen, erscheinen sie
-          automatisch an dieser Stelle.
-        </p>
+        <p style={{ opacity: 0.75, fontSize: '0.95rem' }}>{t('schedule.empty')}</p>
       ) : (
         <>
           {viewMode === 'timeline' ? (
@@ -614,16 +616,17 @@ export default function SchedulePreview({ schedule, activeScheduleCode = null })
               entries={timelineEntries}
               formatDateTime={formatMatchDateTime}
               activeScheduleCode={activeScheduleCode}
+              t={t}
             />
           ) : (
             <>
-              {renderGroupSchedule(schedule.group, formatMatchDateTime)}
+              {renderGroupSchedule(schedule.group, formatMatchDateTime, t)}
 
               {hasKnockout ? (
                 <BracketStageList
                   stages={schedule.knockout}
-                  title="KO-Phase"
-                  description="Duell-Baum der Finalrunden – Sieger steigen jeweils eine Ebene auf."
+                  title={t('schedule.knockoutTitle')}
+                  description={t('schedule.knockoutDescription')}
                   formatDateTime={formatMatchDateTime}
                 />
               ) : null}
@@ -631,8 +634,8 @@ export default function SchedulePreview({ schedule, activeScheduleCode = null })
               {hasPlacement ? (
                 <BracketStageList
                   stages={schedule.placement}
-                  title="Platzierungsspiele"
-                  description="Spiele um die weiteren Platzierungen – alle Teams absolvieren gleich viele Partien."
+                  title={t('schedule.placementTitle')}
+                  description={t('schedule.placementDescription')}
                   formatDateTime={formatMatchDateTime}
                 />
               ) : null}

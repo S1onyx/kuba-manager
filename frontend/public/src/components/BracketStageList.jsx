@@ -1,3 +1,6 @@
+import { useTranslation } from 'react-i18next';
+import { formatStageLabelI18n } from '../utils/stageLabels.js';
+
 const sectionStyle = {
   background: 'rgba(0,0,0,0.32)',
   borderRadius: '20px',
@@ -98,6 +101,7 @@ function renderMatch(match, index, formatDateTime) {
 }
 
 export default function BracketStageList({ stages = [], title, description, formatDateTime }) {
+  const { t } = useTranslation();
   if (!stages || stages.length === 0) {
     return null;
   }
@@ -114,7 +118,7 @@ export default function BracketStageList({ stages = [], title, description, form
       <div style={{ display: 'grid', gap: '1.15rem' }}>
         {stages.map((stage) => (
           <div key={stage.stage_label} style={stageWrapperStyle}>
-            <strong style={stageLabelStyle}>{stage.stage_label}</strong>
+            <strong style={stageLabelStyle}>{formatStageLabelI18n(t, stage.stage_label_i18n, stage.stage_label)}</strong>
             {stage.matches.map((match, index) => renderMatch(match, index, formatDateTime))}
           </div>
         ))}

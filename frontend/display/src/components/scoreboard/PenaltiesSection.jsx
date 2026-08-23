@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { formatTime } from '../../utils/formatting.js';
 
 const penaltiesWrapperStyle = {
@@ -40,12 +41,14 @@ const penaltyItemStyle = {
 };
 
 function PenaltyList({ entries }) {
+  const { t } = useTranslation();
+
   // Always render the same min-height container (empty or not) so adding the
   // first penalty doesn't change card height → no display rescale.
   if (!entries || entries.length === 0) {
     return (
       <div style={{ ...penaltyListStyle, color: 'rgba(255,255,255,0.65)', fontSize: '1.1rem' }}>
-        Keine laufenden Strafen
+        {t('penalties.empty')}
       </div>
     );
   }
@@ -61,7 +64,7 @@ function PenaltyList({ entries }) {
           }}
         >
           <span>{penalty.name}</span>
-          <span>{penalty.isExpired ? 'abgelaufen' : formatTime(penalty.remainingSeconds)}</span>
+          <span>{penalty.isExpired ? t('penalties.expired') : formatTime(penalty.remainingSeconds)}</span>
         </li>
       ))}
     </ul>
@@ -69,6 +72,7 @@ function PenaltyList({ entries }) {
 }
 
 export default function PenaltiesSection({ penalties }) {
+  const { t } = useTranslation();
   const safePenalties = penalties ?? { a: [], b: [] };
 
   return (
@@ -87,7 +91,7 @@ export default function PenaltiesSection({ penalties }) {
                 letterSpacing: '0.08em'
               }}
             >
-              Zeitstrafen
+              {t('penalties.title')}
             </h3>
             <PenaltyList entries={list} />
           </article>

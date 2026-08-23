@@ -21,7 +21,22 @@ async function request(path, options = {}) {
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(text || 'Request failed');
+    let code = null;
+    let detail = null;
+    let message = text;
+    try {
+      const parsed = JSON.parse(text);
+      code = parsed?.code ?? null;
+      detail = parsed?.detail ?? null;
+      message = parsed?.message ?? text;
+    } catch {
+      // Antwort ist kein JSON – Rohtext als Nachricht behalten
+    }
+    const error = new Error(message || 'Request failed');
+    error.code = code;
+    error.detail = detail;
+    error.status = response.status;
+    throw error;
   }
 
   if (response.status === 204) {

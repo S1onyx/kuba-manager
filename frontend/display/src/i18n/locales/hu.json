@@ -1,0 +1,117 @@
+{
+  "app": {
+    "mirrorStandard": "1. kijelző (normál)",
+    "mirrorInverted": "2. kijelző (invertált)"
+  },
+  "controls": {
+    "fullscreenEnter": "Teljes képernyő",
+    "fullscreenExit": "Kilépés a teljes képernyőből",
+    "showLive": "Élő mód megjelenítése",
+    "showBracket": "Torna-ág megjelenítése",
+    "updating": "Frissítés…"
+  },
+  "scoreboard": {
+    "halfBadge": "{{half}}. félidő",
+    "teamA": "A csapat",
+    "teamB": "B csapat",
+    "extraTime": "Rájátszás",
+    "halftimeBreak": "Félidő"
+  },
+  "penalties": {
+    "title": "Időbüntetések",
+    "empty": "Nincs folyamatban lévő büntetés",
+    "expired": "lejárt"
+  },
+  "standings": {
+    "currentTitle": "Aktuális csoporttabella",
+    "loading": "Tabella betöltése...",
+    "noResults": "Még nincsenek eredmények.",
+    "colRank": "#",
+    "colTeam": "Csapat",
+    "colPlayed": "Mérk.",
+    "colWon": "GY",
+    "colDrawn": "D",
+    "colLost": "V",
+    "colGoals": "Kosarak",
+    "colDiff": "Kül.",
+    "colPenalties": "Bünt.",
+    "colPoints": "Pont",
+    "colStatus": "Státusz"
+  },
+  "stage": {
+    "groupLabel": "{{label}}. csoport",
+    "groupPhase": "Csoportkör · {{label}}",
+    "knockoutPhase": "Kieséses kör · {{label}}",
+    "placementPhase": "Helyosztó · {{label}}",
+    "knockoutFinal": "Döntő",
+    "knockoutRoundGeneric_one": "Kieséses kör ({{count}} csapat)",
+    "knockoutRoundGeneric_other": "Kieséses kör ({{count}} csapat)",
+    "round": {
+      "p4": "Elődöntő",
+      "p8": "Negyeddöntő",
+      "p16": "Nyolcaddöntő",
+      "p32": "Legjobb 32",
+      "p64": "Legjobb 64",
+      "p128": "Legjobb 128"
+    },
+    "placementMatch": "Mérkőzés a(z) {{from}}. helyért",
+    "placementRound": "Helyosztó kör {{from}}–{{to}}"
+  },
+  "bracket": {
+    "title": "Torna-ág és csoportáttekintés",
+    "subtitle": "Csoporttabellák és kieséses mérkőzések egy pillantással",
+    "noTournament": "Nincs kiválasztott torna. Kérjük, állítson be egy tornát az eredményjelzőhöz az admin felületen.",
+    "loading": "Tornastruktúra betöltése…",
+    "noStructure": "Még nem érhető el tornastruktúra. Kérjük, kezelje a mérkőzésprogramot és a csoportokat az admin felületen.",
+    "groupStage": "Csoportkör",
+    "noGroupData": "Még nincsenek csoportadatok.",
+    "matchesCompleted": "Lejátszott mérkőzések: {{recorded}}/{{total}}",
+    "noResults": "Nincsenek rögzített eredmények.",
+    "knockoutTitle": "Kieséses kör",
+    "placementTitle": "Helyosztó mérkőzések",
+    "stageFallback": "Szakasz",
+    "round": "{{round}}. kör",
+    "matchcode": "Mérkőzéskód: {{code}}",
+    "timeValue": "{{time}}",
+    "status": {
+      "qualified": "továbbjutott",
+      "inPosition": "jó úton",
+      "contender": "üldöző"
+    }
+  },
+  "summary": {
+    "loading": "Végső áttekintés betöltése…",
+    "empty": "Még nem állnak rendelkezésre végső adatok. Kérjük, zárja le a tornát az admin felületen.",
+    "defaultTournamentName": "Torna",
+    "title": "A torna vége",
+    "description": "Végső tabella, helyezések és kiemelkedő játékosteljesítmények egy pillantással.",
+    "champion": "Bajnok",
+    "championDecidedBy": "Döntés: {{method}}",
+    "championFinalWin": "Győzelem a döntőben",
+    "score": "Eredmény: {{score}}",
+    "runnerUp": "Második helyezett:",
+    "placementsTitle": "Végső helyezések",
+    "colPlacement": "Helyezés",
+    "colTeam": "Csapat",
+    "colDecision": "Döntés",
+    "colOpponent": "Ellenfél",
+    "colResult": "Eredmény",
+    "overallStandings": "Összesített mérleg",
+    "topScorer": "Legjobb pontszerző",
+    "threePointSpecialist": "Hárompontos-specialista",
+    "penaltyKing": "A büntetőpad királya",
+    "points_one": "{{count}} pont",
+    "points_other": "{{count}} pont",
+    "threes_one": "{{count}} hárompontos",
+    "threes_other": "{{count}} hárompontos",
+    "penaltySeconds_one": "{{count}} mp büntetés",
+    "penaltySeconds_other": "{{count}} mp büntetés",
+    "teamFallback": "Csapat"
+  },
+  "errors": {
+    "loadScoreboard": "Az eredményjelző nem tölthető be.",
+    "loadStandings": "A tabella nem tölthető be.",
+    "loadStructure": "A tornastruktúra nem tölthető be.",
+    "loadSummary": "A torna áttekintése nem tölthető be."
+  }
+}

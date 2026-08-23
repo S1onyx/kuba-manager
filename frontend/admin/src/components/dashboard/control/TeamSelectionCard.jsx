@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import PanelCard from '../../common/PanelCard.jsx';
 import { useDashboard } from '../../../context/DashboardContext.jsx';
 
 export default function TeamSelectionCard() {
+  const { t } = useTranslation();
   const {
     scoreboard: {
       teamForm,
@@ -15,8 +17,8 @@ export default function TeamSelectionCard() {
 
   return (
     <PanelCard
-      title="Teams auswählen"
-      description="Wähle bestehende Teams oder verwalte freie Teamnamen für das Scoreboard."
+      title={t('control.teamSelection.title')}
+      description={t('control.teamSelection.description')}
     >
       <form
         onSubmit={(event) => {
@@ -27,21 +29,22 @@ export default function TeamSelectionCard() {
       >
         <div style={{ display: 'grid', gap: '1.25rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))' }}>
           {[
-            { idField: 'teamAId', nameField: 'teamAName', label: 'Team A' },
-            { idField: 'teamBId', nameField: 'teamBName', label: 'Team B' }
-          ].map(({ idField, nameField, label }) => {
+            { idField: 'teamAId', nameField: 'teamAName', teamKey: 'teamA' },
+            { idField: 'teamBId', nameField: 'teamBName', teamKey: 'teamB' }
+          ].map(({ idField, nameField, teamKey }) => {
+            const teamLabel = t(`common.${teamKey}`);
             const currentId = teamForm[idField];
             const hasCurrentSelection = Boolean(currentId) && teams.some((team) => String(team.id) === currentId);
             return (
               <article key={idField} style={{ display: 'grid', gap: '0.65rem' }}>
                 <label style={{ display: 'grid', gap: '0.3rem' }}>
-                  {label} auswählen
+                  {t('control.teamSelection.selectLabel', { team: teamLabel })}
                   <select
                     value={teamForm[idField]}
                     onChange={(event) => handleTeamSelectChange(idField, event.target.value, teams)}
                     disabled={teamsLoading}
                   >
-                    <option value="">Freier Name</option>
+                    <option value="">{t('control.teamSelection.freeName')}</option>
                     {teams.map((team) => (
                       <option key={team.id} value={team.id}>
                         {team.name}
@@ -49,18 +52,20 @@ export default function TeamSelectionCard() {
                     ))}
                     {!hasCurrentSelection && currentId ? (
                       <option value={currentId}>
-                        {teamForm[nameField] ? `${teamForm[nameField]} (nicht mehr verfügbar)` : 'Ehemaliges Team'}
+                        {teamForm[nameField]
+                          ? t('control.teamSelection.notAvailable', { name: teamForm[nameField] })
+                          : t('control.teamSelection.formerTeam')}
                       </option>
                     ) : null}
                   </select>
                 </label>
 
                 <label style={{ display: 'grid', gap: '0.3rem' }}>
-                  {label} Name
+                  {t('control.teamSelection.nameLabel', { team: teamLabel })}
                   <input
                     value={teamForm[nameField]}
                     onChange={(event) => handleTeamInputChange(nameField, event.target.value)}
-                    placeholder={`${label} Name`}
+                    placeholder={t('control.teamSelection.nameLabel', { team: teamLabel })}
                   />
                 </label>
               </article>
@@ -70,12 +75,12 @@ export default function TeamSelectionCard() {
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', alignItems: 'center' }}>
           {teamDirty ? (
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Änderungen noch nicht übernommen.</span>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{t('control.teamSelection.dirtyHint')}</span>
           ) : null}
-          <button type="submit">Teams übernehmen</button>
+          <button type="submit">{t('control.teamSelection.submit')}</button>
         </div>
       </form>
-      {teamsLoading ? <p style={{ margin: 0 }}>Teams werden geladen...</p> : null}
+      {teamsLoading ? <p style={{ margin: 0 }}>{t('control.teamSelection.loading')}</p> : null}
       {teamsError ? <p style={{ margin: 0, color: 'var(--warning)' }}>{teamsError}</p> : null}
     </PanelCard>
   );

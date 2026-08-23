@@ -1,8 +1,10 @@
+import { useTranslation } from 'react-i18next';
 import { POINT_OPTIONS } from '../../../constants/dashboard.js';
 import PanelCard from '../../common/PanelCard.jsx';
 import { useDashboard } from '../../../context/DashboardContext.jsx';
 
 export default function ScoreControlCard() {
+  const { t } = useTranslation();
   const {
     scoreboard: {
       scoreboard,
@@ -18,8 +20,8 @@ export default function ScoreControlCard() {
 
   return (
     <PanelCard
-      title="Punktestand"
-      description="Schnelle +/- Aktionen oder manuelle Korrektur des Spielstandes."
+      title={t('control.score.title')}
+      description={t('control.score.description')}
     >
       <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center', textAlign: 'center' }}>
         {['a', 'b'].map((teamKey) => {
@@ -42,7 +44,7 @@ export default function ScoreControlCard() {
             >
               <header style={{ display: 'grid', gap: '0.2rem' }}>
                 <span style={{ fontSize: '0.78rem', letterSpacing: '0.12em', opacity: 0.65 }}>
-                  {teamKey === 'a' ? 'Team A' : 'Team B'}
+                  {teamKey === 'a' ? t('common.teamA') : t('common.teamB')}
                 </span>
                 <strong style={{ fontSize: '1.1rem' }}>
                   {teamName}: {score}
@@ -50,14 +52,14 @@ export default function ScoreControlCard() {
               </header>
 
               <label style={{ display: 'grid', gap: '0.3rem' }}>
-                Wer hat getroffen?
+                {t('control.score.scorerLabel')}
                 <select
                   value={selectedScorer[teamKey]}
                   onChange={(event) =>
                     setSelectedScorer((prev) => ({ ...prev, [teamKey]: event.target.value }))
                   }
                 >
-                  <option value="">Team gesamt</option>
+                  <option value="">{t('control.score.wholeTeam')}</option>
                   {(scoreboard.players?.[teamKey] ?? []).map((player) => (
                     <option
                       key={player.id ?? player.playerId ?? player.name}
@@ -106,7 +108,7 @@ export default function ScoreControlCard() {
                   onChange={(event) => handleManualScoreChange(teamKey, event.target.value)}
                   style={{ width: '5rem' }}
                 />
-                <button type="submit">Setzen</button>
+                <button type="submit">{t('control.score.set')}</button>
               </form>
             </div>
           );
@@ -114,7 +116,7 @@ export default function ScoreControlCard() {
       </div>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <button type="button" onClick={handleResetScores}>
-          Punktestand zurücksetzen
+          {t('control.score.reset')}
         </button>
       </div>
     </PanelCard>

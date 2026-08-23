@@ -1,3 +1,6 @@
+import { useTranslation } from 'react-i18next';
+import { formatGroupLabel } from '../../utils/formatting.js';
+
 const containerStyle = {
   width: '100%',
   display: 'grid',
@@ -56,21 +59,23 @@ const statusColors = {
   contender: '#80d8ff'
 };
 
-function formatStatus(status) {
-  if (status === 'qualified') return 'qualifiziert';
-  if (status === 'in_position') return 'auf Kurs';
-  if (status === 'contender') return 'verfolgt';
+function formatStatus(t, status) {
+  if (status === 'qualified') return t('bracket.status.qualified');
+  if (status === 'in_position') return t('bracket.status.inPosition');
+  if (status === 'contender') return t('bracket.status.contender');
   return '—';
 }
 
 export default function BracketGroupTables({ groups }) {
+  const { t } = useTranslation();
+
   if (!Array.isArray(groups) || groups.length === 0) {
     return (
       <section style={containerStyle}>
         <h2 style={{ margin: 0, fontSize: 'clamp(1.3rem, 2.6vw, 1.8rem)', letterSpacing: '0.06em' }}>
-          Gruppenphase
+          {t('bracket.groupStage')}
         </h2>
-        <p style={{ margin: 0, opacity: 0.8 }}>Noch keine Gruppendaten vorhanden.</p>
+        <p style={{ margin: 0, opacity: 0.8 }}>{t('bracket.noGroupData')}</p>
       </section>
     );
   }
@@ -78,7 +83,7 @@ export default function BracketGroupTables({ groups }) {
   return (
     <section style={containerStyle}>
       <h2 style={{ margin: 0, fontSize: 'clamp(1.3rem, 2.6vw, 1.8rem)', letterSpacing: '0.06em' }}>
-        Gruppenphase
+        {t('bracket.groupStage')}
       </h2>
       <div style={gridStyle}>
         {groups.map((group) => {
@@ -89,29 +94,31 @@ export default function BracketGroupTables({ groups }) {
           return (
             <article key={group.label || group.canonicalLabel || group.id} style={cardStyle}>
               <div>
-                <h3 style={headerStyle}>{group.label || `Gruppe ${group.canonicalLabel ?? ''}`}</h3>
+                <h3 style={headerStyle}>
+                  {formatGroupLabel(group.label ?? group.canonicalLabel, t)}
+                </h3>
                 <p style={metaStyle}>
-                  Spiele abgeschlossen: {recorded}/{total > 0 ? total : '—'}
+                  {t('bracket.matchesCompleted', { recorded, total: total > 0 ? total : '—' })}
                 </p>
               </div>
               {entries.length === 0 ? (
-                <p style={{ margin: 0, opacity: 0.75 }}>Keine Ergebnisse gespeichert.</p>
+                <p style={{ margin: 0, opacity: 0.75 }}>{t('bracket.noResults')}</p>
               ) : (
                 <div style={tableWrapperStyle}>
                   <table style={tableStyle}>
                     <thead>
                       <tr>
-                        <th style={cellStyle}>#</th>
-                        <th style={{ ...cellStyle, textAlign: 'left' }}>Team</th>
-                        <th style={cellStyle}>Spiele</th>
-                        <th style={cellStyle}>S</th>
-                        <th style={cellStyle}>U</th>
-                        <th style={cellStyle}>N</th>
-                        <th style={cellStyle}>Tore</th>
-                        <th style={cellStyle}>Diff</th>
-                        <th style={cellStyle}>Strafen</th>
-                        <th style={cellStyle}>Punkte</th>
-                        <th style={cellStyle}>Status</th>
+                        <th style={cellStyle}>{t('standings.colRank')}</th>
+                        <th style={{ ...cellStyle, textAlign: 'left' }}>{t('standings.colTeam')}</th>
+                        <th style={cellStyle}>{t('standings.colPlayed')}</th>
+                        <th style={cellStyle}>{t('standings.colWon')}</th>
+                        <th style={cellStyle}>{t('standings.colDrawn')}</th>
+                        <th style={cellStyle}>{t('standings.colLost')}</th>
+                        <th style={cellStyle}>{t('standings.colGoals')}</th>
+                        <th style={cellStyle}>{t('standings.colDiff')}</th>
+                        <th style={cellStyle}>{t('standings.colPenalties')}</th>
+                        <th style={cellStyle}>{t('standings.colPoints')}</th>
+                        <th style={cellStyle}>{t('standings.colStatus')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -129,7 +136,7 @@ export default function BracketGroupTables({ groups }) {
                             <td style={cellStyle}>{entry.goalDiff}</td>
                             <td style={cellStyle}>{entry.penalties}</td>
                             <td style={cellStyle}>{entry.points}</td>
-                            <td style={{ ...cellStyle, color: statusColor }}>{formatStatus(entry.status)}</td>
+                            <td style={{ ...cellStyle, color: statusColor }}>{formatStatus(t, entry.status)}</td>
                           </tr>
                         );
                       })}

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import socket from '../socket.js';
+import i18n from '../i18n/index.js';
 import { fetchJson } from '../utils/api.js';
 
 export default function useScoreboardData() {
@@ -15,7 +16,7 @@ export default function useScoreboardData() {
       })
       .catch((err) => {
         console.error(err);
-        setError('Scoreboard konnte nicht geladen werden.');
+        setError(i18n.t('errors.loadScoreboard'));
       })
       .finally(() => {
         setLoading(false);

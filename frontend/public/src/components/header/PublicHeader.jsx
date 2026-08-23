@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { usePublicApp } from '../../context/PublicAppContext.jsx';
 import useHashRoute from '../../hooks/useHashRoute.js';
 
 export default function PublicHeader() {
+  const { t } = useTranslation();
   const {
     navigation: { goHome, goReglement },
     isReglementView
@@ -13,7 +15,7 @@ export default function PublicHeader() {
     <header className="public-header">
       <h1 className="public-header__title">Kunstrad Basketball</h1>
       <p className="public-header__subtitle">
-        Live-Spielstand, Tabellen und Statistiken zum aktuell ausgewählten Turnier.
+        {t('header.subtitle')}
       </p>
       {!onSubPage ? (
         <nav className="public-header__nav">
@@ -22,14 +24,14 @@ export default function PublicHeader() {
             onClick={goHome}
             className={`pill-btn${!isReglementView ? ' pill-btn--active' : ''}`}
           >
-            Spielplan
+            {t('header.navSchedule')}
           </button>
           <button
             type="button"
             onClick={goReglement}
             className={`pill-btn${isReglementView ? ' pill-btn--active' : ''}`}
           >
-            Reglement
+            {t('header.navReglement')}
           </button>
         </nav>
       ) : null}

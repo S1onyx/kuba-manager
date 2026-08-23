@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   createTournament,
   deleteTournament,
@@ -8,6 +9,7 @@ import {
   setTournamentCompletionStatus,
   uploadTournamentPoster
 } from '../utils/api.js';
+import { formatApiError } from '../utils/apiError.js';
 
 export default function useTournamentManager({
   scoreboard,
@@ -16,6 +18,7 @@ export default function useTournamentManager({
   setContextForm,
   setContextFormDirty
 }) {
+  const { t } = useTranslation();
   const [tournaments, setTournaments] = useState([]);
   const [tournamentsLoading, setTournamentsLoading] = useState(true);
   const [tournamentsError, setTournamentsError] = useState('');
@@ -50,15 +53,15 @@ export default function useTournamentManager({
         setTournaments(data);
         setTournamentsError('');
       })
-      .catch(() => {
-        setTournamentsError('Turniere konnten nicht geladen werden.');
+      .catch((err) => {
+        setTournamentsError(formatApiError(err, t, 'feedback.tournamentsLoadFailed'));
       })
       .finally(() => {
         if (showLoader) {
           setTournamentsLoading(false);
         }
       });
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadTournaments(true);
@@ -72,7 +75,7 @@ export default function useTournamentManager({
     async (event) => {
       event?.preventDefault();
       if (!tournamentForm.name.trim()) {
-        updateMessage('error', 'Turniername darf nicht leer sein.');
+        updateMessage('error', t('feedback.tournamentNameRequired'));
         return false;
       }
 
@@ -114,15 +117,15 @@ export default function useTournamentManager({
           links: []
         });
         loadTournaments();
-        updateMessage('info', 'Turnier erstellt.');
+        updateMessage('info', t('feedback.tournamentCreated'));
         return true;
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Turnier konnte nicht erstellt werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.tournamentCreateFailed'));
         return false;
       }
     },
-    [tournamentForm, loadTournaments, updateMessage]
+    [tournamentForm, loadTournaments, updateMessage, t]
   );
 
   const startTournamentEdit = useCallback((tournament) => {
@@ -168,7 +171,7 @@ export default function useTournamentManager({
     async (id) => {
       const draft = tournamentEdits[id];
       if (!draft || !draft.name.trim()) {
-        updateMessage('error', 'Turniername darf nicht leer sein.');
+        updateMessage('error', t('feedback.tournamentNameRequired'));
         return false;
       }
 
@@ -193,20 +196,20 @@ export default function useTournamentManager({
         });
         cancelTournamentEdit(id);
         loadTournaments();
-        updateMessage('info', 'Turnier aktualisiert.');
+        updateMessage('info', t('feedback.tournamentUpdated'));
         return true;
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Turnier konnte nicht aktualisiert werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.tournamentUpdateFailed'));
         return false;
       }
     },
-    [tournamentEdits, cancelTournamentEdit, loadTournaments, updateMessage]
+    [tournamentEdits, cancelTournamentEdit, loadTournaments, updateMessage, t]
   );
 
   const handleTournamentDelete = useCallback(
     async (id) => {
-      if (!window.confirm('Turnier wirklich löschen?')) {
+      if (!window.confirm(t('tournaments.confirmDelete'))) {
         return false;
       }
 
@@ -224,15 +227,15 @@ export default function useTournamentManager({
           setContextFormDirty(false);
         }
         loadTournaments();
-        updateMessage('info', 'Turnier gelöscht.');
+        updateMessage('info', t('feedback.tournamentDeleted'));
         return true;
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Turnier konnte nicht gelöscht werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.tournamentDeleteFailed'));
         return false;
       }
     },
-    [cancelTournamentEdit, scoreboard?.tournamentId, setScoreboard, setContextForm, setContextFormDirty, loadTournaments, updateMessage]
+    [cancelTournamentEdit, scoreboard?.tournamentId, setScoreboard, setContextForm, setContextFormDirty, loadTournaments, updateMessage, t]
   );
 
   const handleTournamentDetailsToggle = useCallback((id) => {
@@ -246,11 +249,11 @@ export default function useTournamentManager({
       try {
         await setTournamentCompletionStatus(id, completed);
         loadTournaments();
-        updateMessage('info', completed ? 'Turnier abgeschlossen.' : 'Turnier wieder geöffnet.');
+        updateMessage('info', completed ? t('feedback.tournamentCompleted') : t('feedback.tournamentReopened'));
         return true;
       } catch (error) {
         console.error(error);
-        updateMessage('error', 'Turnierstatus konnte nicht aktualisiert werden.');
+        updateMessage('error', formatApiError(error, t, 'feedback.tournamentStatusFailed'));
         return false;
       } finally {
         setTournamentCompletionSaving((prev) => {
@@ -260,7 +263,7 @@ export default function useTournamentManager({
         });
       }
     },
-    [loadTournaments, updateMessage]
+    [loadTournaments, updateMessage, t]
   );
 
   const handlePosterUpload = useCallback(
@@ -268,13 +271,13 @@ export default function useTournamentManager({
       try {
         await uploadTournamentPoster(tournamentId, file);
         loadTournaments();
-        updateMessage('info', 'Plakat hochgeladen.');
+        updateMessage('info', t('feedback.posterUploaded'));
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Plakat konnte nicht hochgeladen werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.posterUploadFailed'));
       }
     },
-    [loadTournaments, updateMessage]
+    [loadTournaments, updateMessage, t]
   );
 
   return {

@@ -1,4 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import PanelCard from '../common/PanelCard.jsx';
+import { useFormatStageLabel } from '../../utils/stageLabels.js';
 
 export default function ScoreboardSummary({
   scoreboard,
@@ -7,25 +9,34 @@ export default function ScoreboardSummary({
   onToggleDisplayView,
   displayViewPending = false
 }) {
+  const { t } = useTranslation();
+  const formatStageLabel = useFormatStageLabel();
+
   if (!scoreboard) {
     return null;
   }
 
+  const stageSuffix = scoreboard.stageType && scoreboard.stageLabel
+    ? scoreboard.stageType === 'group'
+      ? formatStageLabel(
+          scoreboard.stageLabelI18n ?? { type: 'group', group: scoreboard.stageLabel },
+          scoreboard.stageLabel
+        )
+      : formatStageLabel(scoreboard.stageLabelI18n, scoreboard.stageLabel)
+    : '';
+
   const tournamentBadge = scoreboard.tournamentName
-    ? `${scoreboard.tournamentName}${
-        scoreboard.stageType && scoreboard.stageLabel
-          ? scoreboard.stageType === 'group'
-            ? ` · Gruppe ${scoreboard.stageLabel}`
-            : ` · ${scoreboard.stageLabel}`
-          : ''
-      }`
-    : 'Kein Turnier hinterlegt';
+    ? `${scoreboard.tournamentName}${stageSuffix ? ` · ${stageSuffix}` : ''}`
+    : t('summary.noTournament');
+
+  const displayViewLabel =
+    scoreboard.displayView === 'bracket' ? t('displayViews.bracket') : t('displayViews.scoreboard');
 
   return (
     <PanelCard
       tone="accent"
-      title="Live-Spielstand"
-      description="Aktuelle Teams, Score und Uhr im Überblick."
+      title={t('summary.title')}
+      description={t('summary.description')}
     >
       <div
         style={{
@@ -38,7 +49,7 @@ export default function ScoreboardSummary({
       >
         <div style={{ display: 'grid', gap: '0.3rem' }}>
           <span style={{ fontSize: '0.82rem', letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.72 }}>
-            Teams
+            {t('summary.teams')}
           </span>
           <div style={{ fontSize: 'clamp(1.15rem, 4.5vw, 1.6rem)', fontWeight: 700, letterSpacing: '0.01em' }}>
             {scoreboard.teamAName} <span style={{ opacity: 0.7 }}>vs</span> {scoreboard.teamBName}
@@ -79,13 +90,17 @@ export default function ScoreboardSummary({
       >
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
           <span>{tournamentBadge}</span>
-          {scoreboard.scheduleCode ? <span>Matchcode: {scoreboard.scheduleCode}</span> : null}
+          {scoreboard.scheduleCode ? <span>{t('summary.matchCode', { code: scoreboard.scheduleCode })}</span> : null}
           <span>
-            Anzeige: {scoreboard.displayView === 'bracket' ? 'Turnierbaum' : 'Live-Spielstand'}
+            {t('summary.display', { view: displayViewLabel })}
           </span>
           {scoreboard.tournamentId ? (
             <span style={{ fontWeight: 600 }}>
-              Turnierstatus: {scoreboard.tournamentCompleted ? 'abgeschlossen' : 'läuft'}
+              {t('summary.tournamentStatus', {
+                status: scoreboard.tournamentCompleted
+                  ? t('summary.statusCompleted')
+                  : t('summary.statusRunning')
+              })}
             </span>
           ) : null}
         </div>
@@ -106,10 +121,10 @@ export default function ScoreboardSummary({
             }}
           >
             {displayViewPending
-              ? 'Wechsle...'
+              ? t('summary.switching')
               : scoreboard.displayView === 'bracket'
-                ? 'Live anzeigen'
-                : 'Turnierbaum anzeigen'}
+                ? t('summary.showLive')
+                : t('summary.showBracket')}
           </button>
         </div>
       </div>

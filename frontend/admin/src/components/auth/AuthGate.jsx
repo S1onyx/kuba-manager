@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ADMIN_AUTH, ADMIN_SESSION_KEY } from '../../config.js';
 
 const toToken = (username, password) => {
@@ -10,6 +11,7 @@ const toToken = (username, password) => {
 };
 
 export default function AuthGate({ children }) {
+  const { t } = useTranslation();
   const [authorized, setAuthorized] = useState(false);
   const [checking, setChecking] = useState(true);
   const [error, setError] = useState('');
@@ -42,7 +44,7 @@ export default function AuthGate({ children }) {
       }
       setAuthorized(true);
     } else {
-      setError('Nutzername oder Passwort ist ungültig.');
+      setError(t('auth.invalidCredentials'));
     }
   };
 
@@ -57,29 +59,29 @@ export default function AuthGate({ children }) {
   return (
     <div className="auth-gate">
       <div className="auth-card">
-        <h1 className="auth-card__title">Admin Login</h1>
+        <h1 className="auth-card__title">{t('auth.title')}</h1>
         <p className="auth-card__subtitle">
-          Bitte Zugangsdaten eingeben, um das Steuerpanel zu öffnen.
+          {t('auth.subtitle')}
         </p>
         {error ? <p className="auth-card__error">{error}</p> : null}
         <form onSubmit={handleSubmit} autoComplete="off">
           <label className="auth-card__field">
-            <span>Nutzername</span>
+            <span>{t('auth.username')}</span>
             <input
               name="username"
               type="text"
-              placeholder="z. B. admin"
+              placeholder={t('auth.usernamePlaceholder')}
               autoComplete="off"
               required
             />
           </label>
           <label className="auth-card__field">
-            <span>Passwort</span>
+            <span>{t('auth.password')}</span>
             <div className="auth-card__password">
               <input
                 name="password"
                 type={showPassword ? 'text' : 'password'}
-                placeholder="Passwort"
+                placeholder={t('auth.password')}
                 autoComplete="off"
                 required
               />
@@ -87,14 +89,14 @@ export default function AuthGate({ children }) {
                 type="button"
                 className="auth-card__toggle"
                 onClick={() => setShowPassword((prev) => !prev)}
-                aria-label={showPassword ? 'Passwort verbergen' : 'Passwort anzeigen'}
+                aria-label={showPassword ? t('auth.hidePasswordAria') : t('auth.showPasswordAria')}
               >
-                {showPassword ? 'Verbergen' : 'Anzeigen'}
+                {showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
               </button>
             </div>
           </label>
           <div className="auth-card__actions">
-            <button type="submit">Anmelden</button>
+            <button type="submit">{t('auth.submit')}</button>
           </div>
         </form>
       </div>

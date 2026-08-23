@@ -53,6 +53,12 @@ export async function submitRegistration(tournamentId, formData) {
   const text = await response.text();
   let json;
   try { json = JSON.parse(text); } catch { json = { message: text }; }
-  if (!response.ok) throw new Error(json.message || 'Anmeldung fehlgeschlagen');
+  if (!response.ok) {
+    const error = new Error(json.message || 'Anmeldung fehlgeschlagen');
+    if (json.code) {
+      error.code = json.code;
+    }
+    throw error;
+  }
   return json;
 }

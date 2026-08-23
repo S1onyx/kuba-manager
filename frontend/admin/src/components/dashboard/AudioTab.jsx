@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import PanelCard from '../common/PanelCard.jsx';
 import { useDashboard } from '../../context/DashboardContext.jsx';
 
 export default function AudioTab() {
+  const { t } = useTranslation();
   const {
     audio: {
       audioTriggers,
@@ -39,19 +41,19 @@ export default function AudioTab() {
   return (
     <div style={{ display: 'grid', gap: '1.75rem' }} className="audio-tab">
       <PanelCard
-        title="Audio-Steuerung"
-        description="Wähle Sounds für Spielereignisse oder löse Audios manuell aus – ideal für Moderation und Hallen-Atmosphäre."
+        title={t('audio.controlTitle')}
+        description={t('audio.controlDescription')}
       >
         {audioError ? <p style={{ margin: 0, color: 'var(--warning)' }}>{audioError}</p> : null}
-        {audioLoading ? <p style={{ margin: 0 }}>Audiodaten werden geladen...</p> : null}
+        {audioLoading ? <p style={{ margin: 0 }}>{t('audio.loading')}</p> : null}
       </PanelCard>
 
       <PanelCard
-        title="Spielereignis-Sounds"
-        description="Ordne jedem Ereignis passende Sounds zu, teste sie oder schalte Trigger schnell ab."
+        title={t('audio.triggersTitle')}
+        description={t('audio.triggersDescription')}
       >
         {audioTriggers.length === 0 ? (
-          <p style={{ margin: 0, opacity: 0.7 }}>Noch keine Audio-Trigger konfiguriert.</p>
+          <p style={{ margin: 0, opacity: 0.7 }}>{t('audio.noTriggers')}</p>
         ) : (
           <div className="audio-trigger-list">
             {audioTriggers.map((trigger) => {
@@ -74,14 +76,14 @@ export default function AudioTab() {
                       disabled={busy}
                       className={`audio-trigger-card__toggle${trigger.is_active ? ' audio-trigger-card__toggle--active' : ''}`}
                     >
-                      {trigger.is_active ? 'Aktiv' : 'Stumm'}
+                      {trigger.is_active ? t('audio.active') : t('audio.muted')}
                     </button>
                   </div>
 
                   {currentFile ? (
                     <div className="audio-trigger-card__current">
                       <span>
-                        Aktueller Sound: <strong>{describeAudioFile(currentFile)}</strong>
+                        {t('audio.currentSound')} <strong>{describeAudioFile(currentFile)}</strong>
                       </span>
                       <div className="audio-trigger-card__currentButtons">
                         <button
@@ -89,33 +91,33 @@ export default function AudioTab() {
                           onClick={() => handleAudioTriggerPreview(trigger.key)}
                           disabled={busy}
                         >
-                          Abspielen
+                          {t('audio.play')}
                         </button>
                         <button
                           type="button"
                           onClick={() => handleAudioTriggerClear(trigger.key)}
                           disabled={busy}
                         >
-                          Zuordnung entfernen
+                          {t('audio.clearAssignment')}
                         </button>
                       </div>
                     </div>
                   ) : (
-                    <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.7 }}>Keine Audiodatei zugewiesen.</p>
+                    <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.7 }}>{t('audio.noFile')}</p>
                   )}
 
                   <div className="audio-trigger-card__inputs">
                     <label className="audio-trigger-card__field">
-                      Label (optional)
+                      {t('audio.labelOptional')}
                       <input
                         value={audioTriggerLabels[trigger.key] ?? ''}
                         onChange={(event) => handleAudioTriggerLabelChange(trigger.key, event.target.value)}
-                        placeholder="z. B. Fanfare"
+                        placeholder={t('audio.labelPlaceholder')}
                         disabled={audioUploadBusy[trigger.key]}
                       />
                     </label>
                     <label className="audio-trigger-card__upload">
-                      Neue Datei hochladen
+                      {t('audio.uploadNew')}
                       <input
                         type="file"
                         accept="audio/*"
@@ -130,13 +132,13 @@ export default function AudioTab() {
                       />
                     </label>
                     <label className="audio-trigger-card__field">
-                      Aus Bibliothek wählen
+                      {t('audio.chooseFromLibrary')}
                       <select
                         value={currentFile?.id ?? ''}
                         onChange={(event) => handleAudioTriggerAssign(trigger.key, event.target.value)}
                         disabled={busy}
                       >
-                        <option value="">Keine Auswahl</option>
+                        <option value="">{t('audio.noSelection')}</option>
                         {audioLibrary.map((file) => (
                           <option key={file.id} value={file.id}>
                             {describeAudioFile(file)}
@@ -153,8 +155,8 @@ export default function AudioTab() {
       </PanelCard>
 
       <PanelCard
-        title="Timer-Signale"
-        description="Konfiguriere wann Vorsignal, Countdown-Piepser und Schlusssignal ausgelöst werden. Sounds werden oben unter 'Spielereignis-Sounds' zugewiesen."
+        title={t('audio.timerTitle')}
+        description={t('audio.timerDescription')}
       >
         <form
           onSubmit={(event) => {
@@ -169,7 +171,7 @@ export default function AudioTab() {
           style={{ display: 'grid', gap: '1rem' }}
         >
           <label style={{ display: 'grid', gap: '0.35rem', fontSize: '0.9rem' }}>
-            Vorsignal ab Sekunde (0 = deaktiviert)
+            {t('audio.warningLabel')}
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
               <input
                 type="number"
@@ -180,11 +182,11 @@ export default function AudioTab() {
                 style={{ width: '5rem' }}
                 disabled={timerCueBusy}
               />
-              <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>Sekunden vor Spielende</span>
+              <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>{t('audio.warningHint')}</span>
             </div>
           </label>
           <label style={{ display: 'grid', gap: '0.35rem', fontSize: '0.9rem' }}>
-            Countdown-Piepser ab Sekunde (0 = deaktiviert)
+            {t('audio.countdownLabel')}
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
               <input
                 type="number"
@@ -195,18 +197,18 @@ export default function AudioTab() {
                 style={{ width: '5rem' }}
                 disabled={timerCueBusy}
               />
-              <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>Sekunden vor Schluss (jede Sekunde ein Piep)</span>
+              <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>{t('audio.countdownHint')}</span>
             </div>
           </label>
           <button type="submit" disabled={timerCueBusy} style={{ alignSelf: 'start' }}>
-            {timerCueBusy ? 'Speichert...' : 'Speichern'}
+            {timerCueBusy ? t('common.saving') : t('common.save')}
           </button>
         </form>
       </PanelCard>
 
       <PanelCard
-        title="Audio-Bibliothek"
-        description="Verwalte alle verfügbaren Audiodateien und starte Sounds manuell."
+        title={t('audio.libraryTitle')}
+        description={t('audio.libraryDescription')}
       >
         <form
           onSubmit={(event) => {
@@ -215,15 +217,15 @@ export default function AudioTab() {
           className="audio-library-form"
         >
           <label className="audio-library-form__field">
-            Label (optional)
+            {t('audio.labelOptional')}
             <input
               value={audioLibraryUploadLabel}
               onChange={(event) => setAudioLibraryUploadLabel(event.target.value)}
-              placeholder="z. B. Intro Musik"
+              placeholder={t('audio.libraryLabelPlaceholder')}
             />
           </label>
           <label className="audio-library-form__upload">
-            Datei hochladen
+            {t('audio.uploadFile')}
             <input
               type="file"
               accept="audio/*"
@@ -239,7 +241,7 @@ export default function AudioTab() {
         </form>
 
         {audioLibrary.length === 0 ? (
-          <p style={{ margin: 0, opacity: 0.7 }}>Noch keine Audiodateien vorhanden.</p>
+          <p style={{ margin: 0, opacity: 0.7 }}>{t('audio.noFiles')}</p>
         ) : (
           <div style={{ display: 'grid', gap: '0.75rem' }}>
             {audioLibrary.map((file) => {
@@ -256,7 +258,7 @@ export default function AudioTab() {
                       onClick={() => handleAudioLibraryPlay(file.id)}
                       disabled={busy}
                     >
-                      Abspielen
+                      {t('audio.play')}
                     </button>
                     <button
                       type="button"
@@ -264,7 +266,7 @@ export default function AudioTab() {
                       disabled={busy}
                       style={{ background: 'rgba(211,47,47,0.85)', color: '#fff' }}
                     >
-                      Löschen
+                      {t('common.delete')}
                     </button>
                   </div>
                 </article>

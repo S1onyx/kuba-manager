@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 const cellStyle = {
   border: '1px solid rgba(255,255,255,0.3)',
   padding: '0.5rem 0.75rem',
@@ -5,8 +7,10 @@ const cellStyle = {
 };
 
 export default function GroupStandings({ standings }) {
+  const { t } = useTranslation();
+
   if (!standings || standings.length === 0) {
-    return <p style={{ textAlign: 'left' }}>Noch keine Ergebnisse vorhanden.</p>;
+    return <p style={{ textAlign: 'left' }}>{t('standings.noResults')}</p>;
   }
 
   return (
@@ -20,16 +24,16 @@ export default function GroupStandings({ standings }) {
       >
         <thead>
           <tr>
-            <th style={cellStyle}>#</th>
-            <th style={{ ...cellStyle, textAlign: 'left' }}>Team</th>
-            <th style={cellStyle}>Spiele</th>
-            <th style={cellStyle}>S</th>
-            <th style={cellStyle}>U</th>
-            <th style={cellStyle}>N</th>
-            <th style={cellStyle}>Tore</th>
-            <th style={cellStyle}>Diff</th>
-            <th style={cellStyle}>Strafen</th>
-            <th style={cellStyle}>Punkte</th>
+            <th style={cellStyle}>{t('standings.colRank')}</th>
+            <th style={{ ...cellStyle, textAlign: 'left' }}>{t('standings.colTeam')}</th>
+            <th style={cellStyle}>{t('standings.colPlayed')}</th>
+            <th style={cellStyle}>{t('standings.colWon')}</th>
+            <th style={cellStyle}>{t('standings.colDrawn')}</th>
+            <th style={cellStyle}>{t('standings.colLost')}</th>
+            <th style={cellStyle}>{t('standings.colGoals')}</th>
+            <th style={cellStyle}>{t('standings.colDiff')}</th>
+            <th style={cellStyle}>{t('standings.colPenalties')}</th>
+            <th style={cellStyle}>{t('standings.colPoints')}</th>
           </tr>
         </thead>
         <tbody>

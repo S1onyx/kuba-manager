@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { fetchTournamentDetail } from '../../api.js';
 import { navigateTo } from '../../hooks/useHashRoute.js';
 import RegistrationForm from './RegistrationForm.jsx';
@@ -19,6 +20,7 @@ const responsiveStyles = `
 `;
 
 export default function TournamentRegisterPage({ tournamentId }) {
+  const { t } = useTranslation();
   const [tournament, setTournament] = useState(null);
   const [loading, setLoading] = useState(true);
   const [registered, setRegistered] = useState(false);
@@ -38,21 +40,21 @@ export default function TournamentRegisterPage({ tournamentId }) {
         onClick={() => navigateTo(`/turnier/${tournamentId}`)}
         style={{ alignSelf: 'start', background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.75)', borderRadius: '999px', padding: '0.4rem 1rem', cursor: 'pointer', fontSize: '0.875rem', minHeight: '44px', display: 'inline-flex', alignItems: 'center' }}
       >
-        ← Zurück zum Turnier
+        {t('registration.backToTournament')}
       </button>
 
-      {loading && <p style={{ opacity: 0.7 }}>Lade...</p>}
+      {loading && <p style={{ opacity: 0.7 }}>{t('registration.loading')}</p>}
 
       {tournament?.registration_closed && !registered && (
         <div className="tournament-register__panel" style={{ background: 'rgba(255,100,100,0.08)', borderRadius: '16px', padding: '1.5rem', border: '1px solid rgba(255,100,100,0.2)', textAlign: 'center' }}>
-          <p style={{ margin: 0, fontSize: '1.1rem' }}>Die Anmeldung für dieses Turnier ist geschlossen.</p>
+          <p style={{ margin: 0, fontSize: '1.1rem' }}>{t('registration.closed')}</p>
         </div>
       )}
 
       {tournament && !tournament.registration_closed && !registered && (
         <>
           <div>
-            <p style={{ margin: '0 0 0.25rem', opacity: 0.55, fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Anmeldung</p>
+            <p style={{ margin: '0 0 0.25rem', opacity: 0.55, fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t('registration.title')}</p>
             <h1 style={{ margin: 0, fontSize: 'clamp(1.3rem, 4vw, 1.8rem)' }}>{tournament.name}</h1>
           </div>
           <div className="tournament-register__panel" style={{ background: 'rgba(0,0,0,0.35)', borderRadius: '16px', padding: '1.5rem 1.75rem', border: '1px solid rgba(86,160,255,0.15)' }}>
@@ -63,14 +65,14 @@ export default function TournamentRegisterPage({ tournamentId }) {
 
       {registered && (
         <div className="tournament-register__panel" style={{ background: 'rgba(64,200,120,0.08)', borderRadius: '16px', padding: '2rem', border: '1px solid rgba(64,200,120,0.2)', textAlign: 'center', display: 'grid', gap: '1rem' }}>
-          <h2 style={{ margin: 0 }}>Anmeldung eingereicht!</h2>
-          <p style={{ margin: 0, opacity: 0.75 }}>Du erhältst eine Bestätigungs-E-Mail. Wir melden uns sobald deine Anmeldung geprüft wurde.</p>
+          <h2 style={{ margin: 0 }}>{t('registration.successTitle')}</h2>
+          <p style={{ margin: 0, opacity: 0.75 }}>{t('registration.successText')}</p>
           <button
             type="button"
             onClick={() => navigateTo(`/turnier/${tournamentId}`)}
             style={{ justifySelf: 'center', padding: '0.6rem 1.5rem', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.2)', background: 'transparent', color: '#fff', cursor: 'pointer', minHeight: '44px', display: 'inline-flex', alignItems: 'center' }}
           >
-            Zurück zur Turnierseite
+            {t('registration.backToTournamentPage')}
           </button>
         </div>
       )}

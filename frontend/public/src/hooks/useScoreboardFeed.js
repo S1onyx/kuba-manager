@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import socket from '../socket.js';
 import { fetchCurrentStatus } from '../api.js';
+import i18n from '../i18n/index.js';
 import { REFRESH_INTERVAL_MS } from '../constants.js';
 
 export function useScoreboardFeed({ onScoreboardEvent } = {}) {
@@ -21,7 +22,7 @@ export function useScoreboardFeed({ onScoreboardEvent } = {}) {
       setError('');
     } catch (err) {
       console.error(err);
-      setError('Aktueller Spielstand konnte nicht geladen werden.');
+      setError(i18n.t('error.loadScoreboard'));
       setCurrentTournamentMeta(null);
     }
   }, []);

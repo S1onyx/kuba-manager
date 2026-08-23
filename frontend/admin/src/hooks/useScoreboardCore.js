@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import socket from '../socket.js';
 import {
   addPenalty,
@@ -21,8 +22,10 @@ import {
 } from '../utils/api.js';
 import { createPenaltyForms } from '../utils/forms.js';
 import { formatTime, parseTimerInput } from '../utils/formatters.js';
+import { formatApiError } from '../utils/apiError.js';
 
 export default function useScoreboardCore({ updateMessage }) {
+  const { t } = useTranslation();
   const [scoreboard, setScoreboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [teamForm, setTeamForm] = useState({ teamAName: '', teamBName: '', teamAId: '', teamBId: '' });
@@ -77,14 +80,14 @@ export default function useScoreboardCore({ updateMessage }) {
       })
       .catch(() => {
         if (!active) return;
-        updateMessage('error', 'Scoreboard konnte nicht geladen werden.');
+        updateMessage('error', t('feedback.scoreboardLoadFailed'));
         setLoading(false);
       });
 
     return () => {
       active = false;
     };
-  }, [initializeStateFromScoreboard, updateMessage]);
+  }, [initializeStateFromScoreboard, updateMessage, t]);
 
   useEffect(() => {
     const handleUpdate = (payload) => {
@@ -202,7 +205,7 @@ export default function useScoreboardCore({ updateMessage }) {
       if (teamForm.teamAId) {
         const numeric = Number(teamForm.teamAId);
         if (!Number.isInteger(numeric) || numeric <= 0) {
-          updateMessage('error', 'Ungültige Auswahl für Team A.');
+          updateMessage('error', t('feedback.invalidSelectionTeamA'));
           return false;
         }
         payload.teamAId = numeric;
@@ -213,7 +216,7 @@ export default function useScoreboardCore({ updateMessage }) {
       if (teamForm.teamBId) {
         const numeric = Number(teamForm.teamBId);
         if (!Number.isInteger(numeric) || numeric <= 0) {
-          updateMessage('error', 'Ungültige Auswahl für Team B.');
+          updateMessage('error', t('feedback.invalidSelectionTeamB'));
           return false;
         }
         payload.teamBId = numeric;
@@ -222,22 +225,22 @@ export default function useScoreboardCore({ updateMessage }) {
       }
 
       if (Object.keys(payload).length === 0) {
-        updateMessage('error', 'Bitte mindestens ein Team setzen oder benennen.');
+        updateMessage('error', t('feedback.teamRequired'));
         return false;
       }
 
       try {
         await updateTeams(payload);
         setTeamDirty(false);
-        updateMessage('info', 'Teamnamen aktualisiert.');
+        updateMessage('info', t('feedback.teamNamesUpdated'));
         return true;
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Teamnamen konnten nicht gespeichert werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.teamNamesUpdateFailed'));
         return false;
       }
     },
-    [teamForm, updateMessage]
+    [teamForm, updateMessage, t]
   );
 
   const handleScore = useCallback(
@@ -262,14 +265,17 @@ export default function useScoreboardCore({ updateMessage }) {
         const playerName = selected
           ? roster.find((player) => String(player.playerId) === String(selected))?.name ?? null
           : null;
-        const baseMessage = `${points > 0 ? '+' : ''}${points} Punkte für Team ${team.toUpperCase()}`;
-        updateMessage('info', playerName ? `${baseMessage} (${playerName}).` : `${baseMessage}.`);
+        const signedPoints = `${points > 0 ? '+' : ''}${points}`;
+        const teamName = team.toUpperCase();
+        updateMessage('info', playerName
+          ? t('feedback.pointsScoredBy', { points: signedPoints, team: teamName, player: playerName })
+          : t('feedback.pointsScored', { points: signedPoints, team: teamName }));
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Punkte konnten nicht aktualisiert werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.pointsUpdateFailed'));
       }
     },
-    [scoreboard?.players, selectedScorer, updateMessage]
+    [scoreboard?.players, selectedScorer, updateMessage, t]
   );
 
   const handleManualScoreChange = useCallback((team, value) => {
@@ -283,34 +289,34 @@ export default function useScoreboardCore({ updateMessage }) {
       const numeric = Number(rawValue);
 
       if (!Number.isFinite(numeric) || numeric < 0) {
-        updateMessage('error', 'Bitte einen gültigen Wert (>= 0) eingeben.');
+        updateMessage('error', t('feedback.invalidScoreValue'));
         return false;
       }
 
       try {
         await setScoreAbsolute(team, Math.trunc(numeric));
         setManualDirty((prev) => ({ ...prev, [team]: false }));
-        updateMessage('info', `Punktestand für Team ${team.toUpperCase()} gesetzt.`);
+        updateMessage('info', t('feedback.scoreSet', { team: team.toUpperCase() }));
         return true;
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Punktestand konnte nicht gesetzt werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.scoreSetFailed'));
         return false;
       }
     },
-    [manualScores, updateMessage]
+    [manualScores, updateMessage, t]
   );
 
   const handleResetScores = useCallback(async () => {
     try {
       await resetScoreboard();
       setManualDirty({ a: false, b: false });
-      updateMessage('info', 'Punktestand zurückgesetzt.');
+      updateMessage('info', t('feedback.scoresReset'));
     } catch (err) {
       console.error(err);
-      updateMessage('error', 'Punktestand konnte nicht zurückgesetzt werden.');
+      updateMessage('error', formatApiError(err, t, 'feedback.scoresResetFailed'));
     }
-  }, [updateMessage]);
+  }, [updateMessage, t]);
 
   const handlePenaltyFormChange = useCallback((teamKey, field, value) => {
     setPenaltyForms((prev) => ({
@@ -336,7 +342,7 @@ export default function useScoreboardCore({ updateMessage }) {
       const seconds = resolvePenaltyDuration(form);
 
       if (seconds === null || seconds <= 0) {
-        updateMessage('error', 'Bitte eine gültige Zeit für die Zeitstrafe angeben.');
+        updateMessage('error', t('feedback.invalidPenaltyTime'));
         return false;
       }
 
@@ -348,94 +354,94 @@ export default function useScoreboardCore({ updateMessage }) {
           ...prev,
           [teamKey]: { name: '', preset: '60', custom: '', playerId: '' }
         }));
-        updateMessage('info', `Zeitstrafe für Team ${teamKey.toUpperCase()} hinzugefügt.`);
+        updateMessage('info', t('feedback.penaltyAdded', { team: teamKey.toUpperCase() }));
         return true;
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Zeitstrafe konnte nicht hinzugefügt werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.penaltyAddFailed'));
         return false;
       }
     },
-    [penaltyForms, resolvePenaltyDuration, updateMessage]
+    [penaltyForms, resolvePenaltyDuration, updateMessage, t]
   );
 
   const handlePenaltyRemove = useCallback(
     async (id) => {
       try {
         await removePenalty(id);
-        updateMessage('info', 'Zeitstrafe entfernt.');
+        updateMessage('info', t('feedback.penaltyRemoved'));
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Zeitstrafe konnte nicht entfernt werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.penaltyRemoveFailed'));
       }
     },
-    [updateMessage]
+    [updateMessage, t]
   );
 
   const handleHalftimeSubmit = useCallback(
     async (value) => {
       const seconds = parseTimerInput(value);
       if (seconds === null || seconds < 0) {
-        updateMessage('error', 'Bitte eine gültige Halbzeitzeit eingeben (z.B. 10:00 oder 600).');
+        updateMessage('error', t('feedback.invalidHalftime'));
         return false;
       }
 
       try {
         await setHalftime(seconds);
         setHalftimeDirty(false);
-        updateMessage('info', 'Halbzeit aktualisiert.');
+        updateMessage('info', t('feedback.halftimeUpdated'));
         return true;
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Halbzeit konnte nicht gespeichert werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.halftimeUpdateFailed'));
         return false;
       }
     },
-    [updateMessage]
+    [updateMessage, t]
   );
 
   const handleHalftimePauseSubmit = useCallback(
     async (value) => {
       const seconds = parseTimerInput(value);
       if (seconds === null || seconds < 0) {
-        updateMessage('error', 'Bitte eine gültige Halbzeitpausen-Dauer eingeben (z.B. 05:00 oder 300).');
+        updateMessage('error', t('feedback.invalidHalftimePause'));
         return false;
       }
 
       try {
         await setHalftimePause(seconds);
         setHalftimePauseDirty(false);
-        updateMessage('info', 'Halbzeitpause aktualisiert.');
+        updateMessage('info', t('feedback.halftimePauseUpdated'));
         return true;
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Halbzeitpause konnte nicht gespeichert werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.halftimePauseUpdateFailed'));
         return false;
       }
     },
-    [updateMessage]
+    [updateMessage, t]
   );
 
   const handleExtraTimeSubmit = useCallback(
     async (value) => {
       const seconds = parseTimerInput(value);
       if (seconds === null || seconds < 0) {
-        updateMessage('error', 'Bitte eine gültige Nachspielzeit eingeben (z.B. 02:00 oder 120).');
+        updateMessage('error', t('feedback.invalidExtraTime'));
         return false;
       }
 
       try {
         await setExtraTime(seconds);
         setExtraDirty(false);
-        updateMessage('info', 'Nachspielzeit aktualisiert.');
+        updateMessage('info', t('feedback.extraTimeUpdated'));
         return true;
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Nachspielzeit konnte nicht gespeichert werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.extraTimeUpdateFailed'));
         return false;
       }
     },
-    [updateMessage]
+    [updateMessage, t]
   );
 
   const handleExtraTimeAdjust = useCallback(
@@ -459,22 +465,22 @@ export default function useScoreboardCore({ updateMessage }) {
         await setExtraTime(nextValue);
         setExtraDirty(false);
         setExtraTimeInput(formatTime(nextValue));
-        updateMessage('info', `Nachspielzeit auf ${formatTime(nextValue)} gesetzt.`);
+        updateMessage('info', t('feedback.extraTimeSet', { time: formatTime(nextValue) }));
         return true;
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Nachspielzeit konnte nicht gespeichert werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.extraTimeUpdateFailed'));
         return false;
       }
     },
-    [scoreboard, updateMessage, setExtraDirty, setExtraTimeInput]
+    [scoreboard, updateMessage, setExtraDirty, setExtraTimeInput, t]
   );
 
   const handleTimerSubmit = useCallback(
     async (value) => {
       const seconds = parseTimerInput(value);
       if (seconds === null) {
-        updateMessage('error', 'Bitte eine gültige Zeit eingeben (z.B. 10:00 oder 600).');
+        updateMessage('error', t('feedback.invalidTime'));
         return false;
       }
 
@@ -482,17 +488,17 @@ export default function useScoreboardCore({ updateMessage }) {
         setSubmittingTimer(true);
         await setScoreboardTimer(seconds);
         setTimerInput('');
-        updateMessage('info', 'Spielzeit aktualisiert.');
+        updateMessage('info', t('feedback.timerUpdated'));
         return true;
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Spielzeit konnte nicht gespeichert werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.timerUpdateFailed'));
         return false;
       } finally {
         setSubmittingTimer(false);
       }
     },
-    [updateMessage]
+    [updateMessage, t]
   );
 
   const handleStart = useCallback(async () => {
@@ -500,18 +506,18 @@ export default function useScoreboardCore({ updateMessage }) {
       await startScoreboardTimer();
     } catch (err) {
       console.error(err);
-      updateMessage('error', 'Spielzeit konnte nicht gestartet werden.');
+      updateMessage('error', formatApiError(err, t, 'feedback.timerStartFailed'));
     }
-  }, [updateMessage]);
+  }, [updateMessage, t]);
 
   const handlePause = useCallback(async () => {
     try {
       await pauseScoreboardTimer();
     } catch (err) {
       console.error(err);
-      updateMessage('error', 'Spielzeit konnte nicht pausiert werden.');
+      updateMessage('error', formatApiError(err, t, 'feedback.timerPauseFailed'));
     }
-  }, [updateMessage]);
+  }, [updateMessage, t]);
 
   const handleFinishGame = useCallback(async () => {
     try {
@@ -520,38 +526,38 @@ export default function useScoreboardCore({ updateMessage }) {
         setScoreboard(nextState);
       }
       setManualDirty({ a: false, b: false });
-      updateMessage('info', 'Spiel beendet. Bitte bei Bedarf den Spielstand speichern.');
+      updateMessage('info', t('feedback.gameFinished'));
       return true;
     } catch (err) {
       console.error(err);
-      updateMessage('error', 'Spiel konnte nicht beendet werden.');
+      updateMessage('error', formatApiError(err, t, 'feedback.gameFinishFailed'));
       return false;
     }
-  }, [updateMessage]);
+  }, [updateMessage, t]);
 
   const handleSaveGame = useCallback(
     async ({ onSaved } = {}) => {
       if (scoreboard?.isRunning) {
-        updateMessage('error', 'Spiel läuft noch. Bitte zuerst beenden.');
+        updateMessage('error', t('feedback.gameStillRunning'));
         return false;
       }
 
-      if (!window.confirm('Aktuellen Spielstand speichern?')) {
+      if (!window.confirm(t('feedback.confirmSaveGame'))) {
         return false;
       }
 
       try {
         await saveCurrentGame();
-        updateMessage('info', 'Spiel gespeichert.');
+        updateMessage('info', t('feedback.gameSaved'));
         onSaved?.();
         return true;
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Spiel konnte nicht gespeichert werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.gameSaveFailed'));
         return false;
       }
     },
-    [scoreboard?.isRunning, updateMessage]
+    [scoreboard?.isRunning, updateMessage, t]
   );
 
   const handleNewGame = useCallback(
@@ -563,16 +569,16 @@ export default function useScoreboardCore({ updateMessage }) {
         setManualDirty({ a: false, b: false });
         setPenaltyForms(createPenaltyForms());
         setTimerInput('');
-        updateMessage('info', 'Neues Spiel vorbereitet.');
+        updateMessage('info', t('feedback.newGamePrepared'));
         onReset?.();
         return true;
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Neues Spiel konnte nicht gestartet werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.newGameFailed'));
         return false;
       }
     },
-    [initializeStateFromScoreboard, updateMessage]
+    [initializeStateFromScoreboard, updateMessage, t]
   );
 
   const handleDisplayViewChange = useCallback(
@@ -585,19 +591,17 @@ export default function useScoreboardCore({ updateMessage }) {
       setDisplayViewPending(true);
       try {
         await setDisplayView(normalized);
-        const successMessage =
-          normalized === 'scoreboard'
-            ? 'Beamer zeigt jetzt den Live-Spielstand.'
-            : 'Beamer zeigt jetzt den Turnierbaum.';
-        updateMessage('info', successMessage);
+        updateMessage('info', normalized === 'scoreboard'
+          ? t('feedback.displayNowScoreboard')
+          : t('feedback.displayNowBracket'));
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Anzeige-Modus konnte nicht aktualisiert werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.displayUpdateFailed'));
       } finally {
         setDisplayViewPending(false);
       }
     },
-    [scoreboard?.displayView, updateMessage]
+    [scoreboard?.displayView, updateMessage, t]
   );
 
 
@@ -636,15 +640,15 @@ export default function useScoreboardCore({ updateMessage }) {
   );
 
   const statusLabel = useMemo(() => {
-    if (scoreboard?.isHalftimeBreak) return 'Halbzeitpause';
-    if (scoreboard?.isExtraTime) return scoreboard?.isRunning ? 'Nachspielzeit' : 'Nachspielzeit (Pause)';
-    return scoreboard?.isRunning ? 'läuft' : 'pausiert';
-  }, [scoreboard?.isHalftimeBreak, scoreboard?.isExtraTime, scoreboard?.isRunning]);
+    if (scoreboard?.isHalftimeBreak) return t('status.halftimeBreak');
+    if (scoreboard?.isExtraTime) return scoreboard?.isRunning ? t('status.extraTime') : t('status.extraTimePaused');
+    return scoreboard?.isRunning ? t('status.running') : t('status.paused');
+  }, [scoreboard?.isHalftimeBreak, scoreboard?.isExtraTime, scoreboard?.isRunning, t]);
 
   const liveStateLabel = useMemo(() => {
-    if (scoreboard?.isHalftimeBreak) return 'Halbzeitpause';
-    return scoreboard?.isRunning ? 'läuft' : 'pausiert';
-  }, [scoreboard?.isHalftimeBreak, scoreboard?.isRunning]);
+    if (scoreboard?.isHalftimeBreak) return t('status.halftimeBreak');
+    return scoreboard?.isRunning ? t('status.running') : t('status.paused');
+  }, [scoreboard?.isHalftimeBreak, scoreboard?.isRunning, t]);
 
   return {
     scoreboard,

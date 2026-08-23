@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const overlayStyle = {
   position: 'fixed',
@@ -91,12 +92,9 @@ const defaultImpressum = {
     datenschutzUrl: '' // z.B. '/datenschutz'
   },
   disclaimer: {
-    content:
-      'Verantwortlich im Sinne des § 18 Abs. 2 MStV: Simon Riedinger, Am Tiefenbach 20, 74360 Ilsfeld',
-    liabilityLinks:
-      'Trotz sorgfältiger inhaltlicher Kontrolle übernehme ich keine Haftung für die Inhalte externer Links. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich.',
-    liabilityContent:
-      'Als Diensteanbieter bin ich gemäß § 7 Abs. 1 TMG für eigene Inhalte auf diesen Seiten verantwortlich. Nach §§ 8 bis 10 TMG bin ich jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.'
+    content: '',
+    liabilityLinks: '',
+    liabilityContent: ''
   },
   meta: {
     lastUpdated: '2025-10-21'
@@ -127,6 +125,7 @@ function Field({ label, value, render }) {
 }
 
 export default function Impressum({ data = defaultImpressum, onClose }) {
+  const { t } = useTranslation();
   const dialogRef = useRef(null);
 
   useEffect(() => {
@@ -173,15 +172,15 @@ export default function Impressum({ data = defaultImpressum, onClose }) {
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
           <div>
             <h2 id="impressum-title" className="impressum-dialog__title" style={{ margin: 0, fontSize: '1.8rem', letterSpacing: '0.08em' }}>
-              Impressum
+              {t('impressum.title')}
             </h2>
             <p id="impressum-desc" style={{ margin: '0.4rem 0 0', opacity: 0.75 }}>
-              Angaben gemäß § 5 TMG und § 18 Abs. 2 MStV.
+              {t('impressum.subtitle')}
             </p>
           </div>
           <button
             type="button"
-            aria-label="Impressum schließen"
+            aria-label={t('impressum.closeAria')}
             onClick={onClose}
             style={{
               background: 'transparent',
@@ -197,12 +196,12 @@ export default function Impressum({ data = defaultImpressum, onClose }) {
               flexShrink: 0
             }}
           >
-            Schließen
+            {t('impressum.close')}
           </button>
         </header>
 
         <section style={sectionStyle}>
-          <h3 style={{ margin: 0, fontSize: '1.2rem', letterSpacing: '0.04em' }}>Anbieter</h3>
+          <h3 style={{ margin: 0, fontSize: '1.2rem', letterSpacing: '0.04em' }}>{t('impressum.provider')}</h3>
           <p style={{ margin: 0, lineHeight: 1.5 }}>
             {companyLine && (<>{companyLine}<br /></>)}
             {operator.street}<br />
@@ -210,18 +209,18 @@ export default function Impressum({ data = defaultImpressum, onClose }) {
             {operator.country}
           </p>
           {Array.isArray(operator.representatives) && operator.representatives.length > 0 ? (
-            <Field label="Verantwortlich" value={operator.representatives.join(', ')} />
+            <Field label={t('impressum.responsible')} value={operator.representatives.join(', ')} />
           ) : null}
-          <Field label="E-Mail" value={operator.email} />
-          <Field label="Telefon" value={operator.phone} />
-          <Field label="Registergericht" value={operator.registerCourt} />
-          <Field label="Registernummer" value={operator.registerNumber} />
+          <Field label={t('impressum.email')} value={operator.email} />
+          <Field label={t('impressum.phone')} value={operator.phone} />
+          <Field label={t('impressum.registerCourt')} value={operator.registerCourt} />
+          <Field label={t('impressum.registerNumber')} value={operator.registerNumber} />
           <Field
-            label="Datenschutz"
+            label={t('impressum.privacy')}
             render={() =>
               links.datenschutzUrl ? (
                 <a href={links.datenschutzUrl} style={{ color: '#cfe2ff', textDecoration: 'underline' }}>
-                  Datenschutzerklärung
+                  {t('impressum.privacyPolicy')}
                 </a>
               ) : null
             }
@@ -230,30 +229,30 @@ export default function Impressum({ data = defaultImpressum, onClose }) {
 
         {vat.required ? (
           <section style={sectionStyle}>
-            <h3 style={{ margin: 0, fontSize: '1.2rem', letterSpacing: '0.04em' }}>Umsatzsteuer-ID</h3>
-            <Field label="USt-IdNr." value={vat.identificationNumber} />
+            <h3 style={{ margin: 0, fontSize: '1.2rem', letterSpacing: '0.04em' }}>{t('impressum.vatId')}</h3>
+            <Field label={t('impressum.vatNumber')} value={vat.identificationNumber} />
           </section>
         ) : null}
 
         {supervision.authority ? (
           <section style={sectionStyle}>
-            <h3 style={{ margin: 0, fontSize: '1.2rem', letterSpacing: '0.04em' }}>Aufsichtsbehörde</h3>
+            <h3 style={{ margin: 0, fontSize: '1.2rem', letterSpacing: '0.04em' }}>{t('impressum.supervisoryAuthority')}</h3>
             <p style={{ margin: 0 }}>{supervision.authority}</p>
           </section>
         ) : null}
 
         <section style={sectionStyle}>
-          <h3 style={{ margin: 0, fontSize: '1.2rem', letterSpacing: '0.04em' }}>Hinweise & Haftung</h3>
-          <p style={{ margin: 0, lineHeight: 1.5 }}>{disclaimer.content}</p>
-          <p style={{ margin: 0, lineHeight: 1.5 }}>{disclaimer.liabilityContent}</p>
-          <p style={{ margin: 0, lineHeight: 1.5 }}>{disclaimer.liabilityLinks}</p>
+          <h3 style={{ margin: 0, fontSize: '1.2rem', letterSpacing: '0.04em' }}>{t('impressum.disclaimerHeading')}</h3>
+          <p style={{ margin: 0, lineHeight: 1.5 }}>{disclaimer.content || t('impressum.legalResponsibility')}</p>
+          <p style={{ margin: 0, lineHeight: 1.5 }}>{disclaimer.liabilityContent || t('impressum.liabilityContent')}</p>
+          <p style={{ margin: 0, lineHeight: 1.5 }}>{disclaimer.liabilityLinks || t('impressum.liabilityLinks')}</p>
         </section>
 
         {(meta.lastUpdated || links.datenschutzUrl) && (
           <section style={sectionStyle}>
             {meta.lastUpdated && (
               <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.65 }}>
-                Stand: {meta.lastUpdated}
+                {t('impressum.lastUpdated', { date: meta.lastUpdated })}
               </p>
             )}
           </section>

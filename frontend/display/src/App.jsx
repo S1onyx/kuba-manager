@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import DisplayLayout from './components/layout/DisplayLayout.jsx';
 import FullscreenToggle from './components/FullscreenToggle.jsx';
 import DisplayViewToggle from './components/DisplayViewToggle.jsx';
@@ -12,7 +13,18 @@ import useStandingsData from './hooks/useStandingsData.js';
 import useStructureData from './hooks/useStructureData.js';
 import useTournamentSummaryData from './hooks/useTournamentSummaryData.js';
 
+function DocumentLanguageSync() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    document.documentElement.lang = i18n.language;
+  }, [i18n, i18n.language]);
+
+  return null;
+}
+
 export default function App() {
+  const { t } = useTranslation();
   useBodyScrollLock();
   const isNarrowScreen = useMediaQuery('(max-width: 900px)');
 
@@ -162,7 +174,7 @@ export default function App() {
           backdropFilter: 'blur(6px)'
         }}
       >
-        {mirrorMode ? 'Display 2 (invertiert)' : 'Display 1 (Standard)'}
+        {mirrorMode ? t('app.mirrorInverted') : t('app.mirrorStandard')}
       </button>
       <FullscreenToggle
         auto={autoFullscreen}
@@ -173,8 +185,11 @@ export default function App() {
   );
 
   return (
-    <DisplayLayout rootRef={rootRef} contentRef={contentRef} scale={scale} overlay={overlayControls}>
-      {activeContent}
-    </DisplayLayout>
+    <>
+      <DocumentLanguageSync />
+      <DisplayLayout rootRef={rootRef} contentRef={contentRef} scale={scale} overlay={overlayControls}>
+        {activeContent}
+      </DisplayLayout>
+    </>
   );
 }

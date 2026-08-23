@@ -1,5 +1,7 @@
+import { useTranslation } from 'react-i18next';
 import { usePublicApp } from '../../context/PublicAppContext.jsx';
 import { formatGroupLabel } from '../../utils/formatters.js';
+import { formatStageLabelI18n } from '../../utils/stageLabels.js';
 import CurrentMatchCard from '../CurrentMatchCard.jsx';
 import GroupStandingsCard from '../GroupStandingsCard.jsx';
 import RecentResults from '../RecentResults.jsx';
@@ -10,6 +12,7 @@ import PlayerStatsTable from '../PlayerStatsTable.jsx';
 import TournamentFinalOverview from '../TournamentFinalOverview.jsx';
 
 export default function SummaryContent() {
+  const { t } = useTranslation();
   const {
     summary: {
       activeTab,
@@ -30,10 +33,10 @@ export default function SummaryContent() {
         <CurrentMatchCard scoreboard={currentCardData} />
         {showCurrentGroup ? (
           <section style={{ display: 'grid', gap: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.2rem', letterSpacing: '0.05em' }}>Aktuelle Gruppentabelle</h3>
+            <h3 style={{ fontSize: '1.2rem', letterSpacing: '0.05em' }}>{t('summary.currentGroup')}</h3>
             <GroupStandingsCard
               group={{
-                label: formatGroupLabel(scoreboard?.stageLabel),
+                label: formatGroupLabel(scoreboard?.stageLabel, t),
                 standings: currentGroupStandings,
                 recordedGamesCount
               }}
@@ -64,12 +67,12 @@ export default function SummaryContent() {
   if (activeTab === 'groups') {
     const groups = Array.isArray(tournamentSummary.groupStandings) ? tournamentSummary.groupStandings : [];
     if (groups.length === 0) {
-      return <p style={{ opacity: 0.75 }}>Noch keine Gruppenergebnisse verfügbar.</p>;
+      return <p style={{ opacity: 0.75 }}>{t('summary.noGroupResults')}</p>;
     }
 
     return (
       <section style={{ display: 'grid', gap: '1.25rem' }}>
-        <h2 style={{ fontSize: 'clamp(1.2rem, 4vw, 1.4rem)', letterSpacing: '0.05em' }}>Gruppenübersicht</h2>
+        <h2 style={{ fontSize: 'clamp(1.2rem, 4vw, 1.4rem)', letterSpacing: '0.05em' }}>{t('summary.groupsTitle')}</h2>
         <div
           style={{
             display: 'grid',
@@ -78,7 +81,10 @@ export default function SummaryContent() {
           }}
         >
           {groups.map((group) => (
-            <GroupStandingsCard key={group.canonicalLabel} group={group} />
+            <GroupStandingsCard
+              key={group.canonicalLabel}
+              group={{ ...group, label: formatStageLabelI18n(t, group.labelI18n, group.label) }}
+            />
           ))}
         </div>
       </section>

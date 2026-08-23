@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BACKEND_URL } from '../config.js';
 import { DEFAULT_VOLUME_SETTINGS } from '../constants/volume.js';
 
@@ -27,6 +28,7 @@ function resolveCategoryFromPayload(payload) {
 }
 
 export default function useAudioPlayback(volumeSettings = DEFAULT_VOLUME_SETTINGS) {
+  const { t } = useTranslation();
   const audioElementRef = useRef(null);
   const audioContextRef = useRef(null);
   const pendingQueueRef = useRef([]);
@@ -71,9 +73,9 @@ export default function useAudioPlayback(volumeSettings = DEFAULT_VOLUME_SETTING
       setPlaybackError('');
     } catch (error) {
       console.error('Sound konnte nicht abgespielt werden:', error);
-      setPlaybackError('Sound konnte nicht abgespielt werden. Bitte Lautsprecher prüfen.');
+      setPlaybackError(t('errors.playbackFailed'));
     }
-  }, []);
+  }, [t]);
 
   const stopPlayback = useCallback(() => {
     pendingQueueRef.current = [];

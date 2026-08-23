@@ -1,24 +1,10 @@
+// Sichtbare Labels/Beschreibungen liegen in src/i18n/locales/*.json
+// unter volume.categories.<key>.
 export const VOLUME_CATEGORIES = [
-  {
-    key: 'score',
-    label: 'Korbhymnen',
-    description: 'Alle Treffersounds (Team-spezifisch oder allgemein).'
-  },
-  {
-    key: 'game',
-    label: 'Spielstart / Pause / Ende',
-    description: 'Statusmeldungen wie Startsignal, Halbzeit- oder Endstand.'
-  },
-  {
-    key: 'events',
-    label: 'Spielereignisse',
-    description: 'Weitere Trigger wie Fouls oder individuelle Events.'
-  },
-  {
-    key: 'manual',
-    label: 'Manuelle Wiedergabe',
-    description: 'Sounds, die direkt aus der Bibliothek gestartet werden.'
-  }
+  { key: 'score' },
+  { key: 'game' },
+  { key: 'events' },
+  { key: 'manual' }
 ];
 
 export const DEFAULT_VOLUME_SETTINGS = VOLUME_CATEGORIES.reduce(

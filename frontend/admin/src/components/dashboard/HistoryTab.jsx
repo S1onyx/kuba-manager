@@ -1,8 +1,12 @@
+import { useTranslation } from 'react-i18next';
 import PanelCard from '../common/PanelCard.jsx';
 import { useDashboard } from '../../context/DashboardContext.jsx';
 import { formatTime } from '../../utils/formatters.js';
+import { useFormatStageLabel } from '../../utils/stageLabels.js';
 
 export default function HistoryTab() {
+  const { t } = useTranslation();
+  const formatStageLabel = useFormatStageLabel();
   const {
     history: {
       history,
@@ -22,20 +26,20 @@ export default function HistoryTab() {
 
   return (
     <PanelCard
-      title="Historie"
-      description="Archivierte Spiele bearbeiten oder löschen. Ideal für Ergebnis-Validierung und Turnierstatistiken."
+      title={t('history.title')}
+      description={t('history.description')}
       action={
         <button type="button" onClick={loadHistory}>
-          Aktualisieren
+          {t('history.refresh')}
         </button>
       }
     >
       {historyLoading ? (
-        <p style={{ margin: 0 }}>Gespeicherte Spiele werden geladen...</p>
+        <p style={{ margin: 0 }}>{t('history.loading')}</p>
       ) : historyError ? (
         <p style={{ margin: 0, color: 'var(--warning)' }}>{historyError}</p>
       ) : history.length === 0 ? (
-        <p style={{ margin: 0 }}>Noch keine Spiele gespeichert.</p>
+        <p style={{ margin: 0 }}>{t('history.empty')}</p>
       ) : (
         <div style={{ display: 'grid', gap: '1.2rem' }}>
           {history.map((game) => {
@@ -43,6 +47,11 @@ export default function HistoryTab() {
             const plannedExtra = game.extra_seconds > 0 ? `+${formatTime(game.extra_seconds)}` : '—';
             const playedExtra = game.extra_elapsed_seconds > 0 ? formatTime(game.extra_elapsed_seconds) : '—';
             const isEditing = editingGameId === game.id;
+            const stageSuffix = game.stage_label
+              ? game.stage_type === 'group'
+                ? formatStageLabel(game.stage_label_i18n ?? { type: 'group', group: game.stage_label }, game.stage_label)
+                : formatStageLabel(game.stage_label_i18n, game.stage_label)
+              : '';
 
             return (
               <article
@@ -76,15 +85,15 @@ export default function HistoryTab() {
                   >
                     <div style={{ display: 'grid', gap: '0.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
                       <label style={{ display: 'grid', gap: '0.3rem' }}>
-                        Team A
+                        {t('common.teamA')}
                         <input value={editForm.team_a} onChange={(event) => handleHistoryEditChange('team_a', event.target.value)} />
                       </label>
                       <label style={{ display: 'grid', gap: '0.3rem' }}>
-                        Team B
+                        {t('common.teamB')}
                         <input value={editForm.team_b} onChange={(event) => handleHistoryEditChange('team_b', event.target.value)} />
                       </label>
                       <label style={{ display: 'grid', gap: '0.3rem' }}>
-                        Score Team A
+                        {t('history.scoreA')}
                         <input
                           type="number"
                           min="0"
@@ -93,7 +102,7 @@ export default function HistoryTab() {
                         />
                       </label>
                       <label style={{ display: 'grid', gap: '0.3rem' }}>
-                        Score Team B
+                        {t('history.scoreB')}
                         <input
                           type="number"
                           min="0"
@@ -105,23 +114,23 @@ export default function HistoryTab() {
 
                     <div style={{ display: 'grid', gap: '0.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
                       <label style={{ display: 'grid', gap: '0.3rem' }}>
-                        Nachspielzeit (geplant)
+                        {t('history.extraPlanned')}
                         <input
                           value={editForm.extra_seconds}
                           onChange={(event) => handleHistoryEditChange('extra_seconds', event.target.value)}
-                          placeholder="MM:SS oder Sekunden"
+                          placeholder={t('history.mmssPlaceholder')}
                         />
                       </label>
                       <label style={{ display: 'grid', gap: '0.3rem' }}>
-                        Nachspielzeit (gelaufen)
+                        {t('history.extraElapsed')}
                         <input
                           value={editForm.extra_elapsed_seconds}
                           onChange={(event) => handleHistoryEditChange('extra_elapsed_seconds', event.target.value)}
-                          placeholder="MM:SS oder Sekunden"
+                          placeholder={t('history.mmssPlaceholder')}
                         />
                       </label>
                       <label style={{ display: 'grid', gap: '0.3rem' }}>
-                        Strafen Team A (Anzahl)
+                        {t('history.penaltiesA')}
                         <input
                           type="number"
                           min="0"
@@ -130,7 +139,7 @@ export default function HistoryTab() {
                         />
                       </label>
                       <label style={{ display: 'grid', gap: '0.3rem' }}>
-                        Strafen Team B (Anzahl)
+                        {t('history.penaltiesB')}
                         <input
                           type="number"
                           min="0"
@@ -141,9 +150,9 @@ export default function HistoryTab() {
                     </div>
 
                     <div style={{ display: 'flex', gap: '0.75rem' }}>
-                      <button type="submit">Speichern</button>
+                      <button type="submit">{t('common.save')}</button>
                       <button type="button" onClick={cancelHistoryEdit}>
-                        Abbrechen
+                        {t('common.cancel')}
                       </button>
                     </div>
                   </form>
@@ -153,32 +162,37 @@ export default function HistoryTab() {
                       {game.team_a} {game.score_a} : {game.score_b} {game.team_b}
                     </p>
                     <p style={{ margin: 0, fontSize: '0.88rem', opacity: 0.75 }}>
-                      Turnier: {game.tournament_name ?? '—'}
-                      {game.stage_type === 'group' && game.stage_label
-                        ? ` · Gruppe ${game.stage_label}`
-                        : game.stage_type === 'knockout' && game.stage_label
-                          ? ` · ${game.stage_label}`
-                          : ''}
+                      {t('history.tournament', { name: game.tournament_name ?? '—' })}
+                      {stageSuffix ? ` · ${stageSuffix}` : ''}
                     </p>
                     <p style={{ margin: 0, fontSize: '0.88rem', opacity: 0.75 }}>
-                      Spielzeit: {formatTime(game.duration_seconds)} · Halbzeit bei {formatTime(game.halftime_seconds)} · Pause {formatTime(game.halftime_pause_seconds)}
+                      {t('history.gameTime', {
+                        duration: formatTime(game.duration_seconds),
+                        halftime: formatTime(game.halftime_seconds),
+                        pause: formatTime(game.halftime_pause_seconds)
+                      })}
                     </p>
                     <p style={{ margin: 0, fontSize: '0.88rem', opacity: 0.75 }}>
-                      Nachspielzeit geplant: {plannedExtra} · gelaufen: {playedExtra}
+                      {t('history.extraTimeLine', { planned: plannedExtra, elapsed: playedExtra })}
                     </p>
                     <p style={{ margin: 0, fontSize: '0.88rem', opacity: 0.75 }}>
-                      Strafen – {game.team_a}: {penalties.a?.length ?? 0} · {game.team_b}: {penalties.b?.length ?? 0}
+                      {t('history.penaltiesLine', {
+                        teamA: game.team_a,
+                        countA: penalties.a?.length ?? 0,
+                        teamB: game.team_b,
+                        countB: penalties.b?.length ?? 0
+                      })}
                     </p>
                     <div style={{ display: 'flex', gap: '0.65rem', marginTop: '0.4rem', flexWrap: 'wrap' }}>
                       <button type="button" onClick={() => startHistoryEdit(game)}>
-                        Bearbeiten
+                        {t('common.edit')}
                       </button>
                       <button
                         type="button"
                         onClick={() => handleHistoryDelete(game.id)}
                         style={{ background: 'rgba(211,47,47,0.85)', color: '#fff' }}
                       >
-                        Löschen
+                        {t('common.delete')}
                       </button>
                     </div>
                   </div>

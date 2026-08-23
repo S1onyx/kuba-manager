@@ -1,9 +1,11 @@
+import { useTranslation } from 'react-i18next';
 import { usePublicApp } from '../../context/PublicAppContext.jsx';
 import NoticeBox from '../common/NoticeBox.jsx';
 import TournamentSection from '../tournaments/TournamentSection.jsx';
 import SummarySection from '../summary/SummarySection.jsx';
 
 export default function OverviewView() {
+  const { t } = useTranslation();
   const {
     scoreboardState: { error: currentError, currentTournamentMeta },
     summary: { showPrivateNotice },
@@ -16,8 +18,9 @@ export default function OverviewView() {
 
       {showPrivateNotice ? (
         <NoticeBox tone="warning">
-          Das Turnier „{currentTournamentMeta?.name || 'Aktuelles Turnier'}“ ist privat und erscheint nicht im öffentlichen
-          Dashboard.
+          {t('overview.privateNotice', {
+            name: currentTournamentMeta?.name || t('overview.currentTournament')
+          })}
         </NoticeBox>
       ) : null}
 

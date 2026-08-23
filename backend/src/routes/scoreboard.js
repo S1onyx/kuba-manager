@@ -61,11 +61,11 @@ router.post('/teams', async (req, res) => {
     if (teamAId !== undefined && teamAId !== null && teamAId !== '') {
       const numeric = Number(teamAId);
       if (!Number.isInteger(numeric) || numeric <= 0) {
-        return res.status(400).json({ message: 'Ungültige Team-ID für Team A.' });
+        return res.status(400).json({ code: 'INVALID_TEAM_A_ID', message: 'Ungültige Team-ID für Team A.' });
       }
       const team = await getTeam(numeric);
       if (!team) {
-        return res.status(404).json({ message: 'Team A wurde nicht gefunden.' });
+        return res.status(404).json({ code: 'TEAM_A_NOT_FOUND', message: 'Team A wurde nicht gefunden.' });
       }
       payload.teamAId = team.id;
       payload.teamAName = team.name;
@@ -84,11 +84,11 @@ router.post('/teams', async (req, res) => {
     if (teamBId !== undefined && teamBId !== null && teamBId !== '') {
       const numeric = Number(teamBId);
       if (!Number.isInteger(numeric) || numeric <= 0) {
-        return res.status(400).json({ message: 'Ungültige Team-ID für Team B.' });
+        return res.status(400).json({ code: 'INVALID_TEAM_B_ID', message: 'Ungültige Team-ID für Team B.' });
       }
       const team = await getTeam(numeric);
       if (!team) {
-        return res.status(404).json({ message: 'Team B wurde nicht gefunden.' });
+        return res.status(404).json({ code: 'TEAM_B_NOT_FOUND', message: 'Team B wurde nicht gefunden.' });
       }
       payload.teamBId = team.id;
       payload.teamBName = team.name;
@@ -105,14 +105,14 @@ router.post('/teams', async (req, res) => {
     }
 
     if (!provided) {
-      return res.status(400).json({ message: 'Bitte mindestens ein Team setzen.' });
+      return res.status(400).json({ code: 'TEAM_REQUIRED', message: 'Bitte mindestens ein Team setzen.' });
     }
 
     const nextState = setTeams(payload);
     res.json(nextState);
   } catch (error) {
     console.error('Teamnamen konnten nicht gesetzt werden:', error);
-    res.status(500).json({ message: 'Teamnamen konnten nicht gesetzt werden.' });
+    res.status(500).json({ code: 'TEAM_NAMES_UPDATE_FAILED', message: 'Teamnamen konnten nicht gesetzt werden.' });
   }
 });
 
@@ -127,26 +127,26 @@ router.post('/score', (req, res) => {
   } = req.body ?? {};
 
   if (!team || !['a', 'b', 'A', 'B'].includes(team)) {
-    return res.status(400).json({ message: 'Ungültiges Team. Erlaubt sind \"A\" oder \"B\".' });
+    return res.status(400).json({ code: 'INVALID_TEAM_SIDE', message: 'Ungültiges Team. Erlaubt sind \"A\" oder \"B\".' });
   }
 
   const numericPoints = Number(points);
   if (!Number.isFinite(numericPoints) || ![1, 2, 3].includes(Math.abs(Math.trunc(numericPoints)))) {
-    return res.status(400).json({ message: 'Punkte müssen 1, 2 oder 3 sein.' });
+    return res.status(400).json({ code: 'INVALID_POINTS', message: 'Punkte müssen 1, 2 oder 3 sein.' });
   }
 
   let resolvedPlayerId = null;
   if (playerId !== undefined && playerId !== null && playerId !== '') {
     const parsedPlayerId = Number(playerId);
     if (!Number.isInteger(parsedPlayerId) || parsedPlayerId <= 0) {
-      return res.status(400).json({ message: 'Ungültige Spieler-ID.' });
+      return res.status(400).json({ code: 'INVALID_PLAYER_ID', message: 'Ungültige Spieler-ID.' });
     }
     const state = getScoreboardState();
     const teamKey = String(team).toLowerCase() === 'b' ? 'b' : 'a';
     const roster = teamKey === 'b' ? state.players?.b ?? [] : state.players?.a ?? [];
     const exists = roster.some((player) => player.playerId === parsedPlayerId);
     if (!exists) {
-      return res.status(400).json({ message: 'Spieler gehört nicht zum ausgewählten Team.' });
+      return res.status(400).json({ code: 'PLAYER_NOT_IN_TEAM', message: 'Spieler gehört nicht zum ausgewählten Team.' });
     }
     resolvedPlayerId = parsedPlayerId;
   }
@@ -170,11 +170,11 @@ router.post('/score/set', (req, res) => {
   const { team, score } = req.body ?? {};
 
   if (!team || !['a', 'b', 'A', 'B'].includes(team)) {
-    return res.status(400).json({ message: 'Ungültiges Team. Erlaubt sind \"A\" oder \"B\".' });
+    return res.status(400).json({ code: 'INVALID_TEAM_SIDE', message: 'Ungültiges Team. Erlaubt sind \"A\" oder \"B\".' });
   }
 
   if (!Number.isFinite(Number(score)) || Number(score) < 0) {
-    return res.status(400).json({ message: 'score muss eine nicht-negative Zahl sein.' });
+    return res.status(400).json({ code: 'INVALID_SCORE', message: 'score muss eine nicht-negative Zahl sein.' });
   }
 
   const nextState = setScoreAbsolute(team, Number(score));
@@ -200,7 +200,7 @@ router.post('/timer', (req, res) => {
   const { seconds } = req.body ?? {};
 
   if (!Number.isFinite(Number(seconds))) {
-    return res.status(400).json({ message: 'seconds muss eine Zahl sein.' });
+    return res.status(400).json({ code: 'SECONDS_MUST_BE_NUMBER', message: 'seconds muss eine Zahl sein.' });
   }
 
   const nextState = setRemainingSeconds(Number(seconds));
@@ -217,12 +217,12 @@ router.post('/context', async (req, res) => {
     if (tournamentId !== null && tournamentId !== undefined && tournamentId !== '') {
       const parsedId = Number(tournamentId);
       if (!Number.isInteger(parsedId) || parsedId <= 0) {
-        return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+        return res.status(400).json({ code: 'INVALID_TOURNAMENT_ID', message: 'Ungültige Turnier-ID.' });
       }
 
       const tournament = await getTournament(parsedId);
       if (!tournament) {
-        return res.status(404).json({ message: 'Turnier nicht gefunden.' });
+        return res.status(404).json({ code: 'TOURNAMENT_NOT_FOUND', message: 'Turnier nicht gefunden.' });
       }
 
       resolvedTournamentId = tournament.id;
@@ -233,12 +233,12 @@ router.post('/context', async (req, res) => {
     if (stageType) {
       const normalizedStageType = String(stageType);
       if (!['group', 'knockout', 'placement'].includes(normalizedStageType)) {
-        return res.status(400).json({ message: 'Ungültiger Phasentyp.' });
+        return res.status(400).json({ code: 'INVALID_STAGE_TYPE', message: 'Ungültiger Phasentyp.' });
       }
 
       const label = String(stageLabel ?? '').trim();
       if (!label) {
-        return res.status(400).json({ message: 'Phasenbezeichnung darf nicht leer sein.' });
+        return res.status(400).json({ code: 'STAGE_LABEL_REQUIRED', message: 'Phasenbezeichnung darf nicht leer sein.' });
       }
 
       const normalizedLabel = normalizedStageType === 'group'
@@ -246,7 +246,7 @@ router.post('/context', async (req, res) => {
         : label;
 
       if (normalizedStageType === 'group' && !normalizedLabel) {
-        return res.status(400).json({ message: 'Ungültige Gruppenbezeichnung.' });
+        return res.status(400).json({ code: 'INVALID_GROUP_LABEL', message: 'Ungültige Gruppenbezeichnung.' });
       }
 
       setMatchContext({
@@ -269,7 +269,7 @@ router.post('/context', async (req, res) => {
     res.json(getScoreboardState());
   } catch (error) {
     console.error('Match-Kontext konnte nicht gesetzt werden:', error);
-    res.status(500).json({ message: 'Match-Kontext konnte nicht gesetzt werden.' });
+    res.status(500).json({ code: 'MATCH_CONTEXT_SET_FAILED', message: 'Match-Kontext konnte nicht gesetzt werden.' });
   }
 });
 
@@ -280,10 +280,10 @@ router.post('/display', (req, res) => {
     res.json(nextState);
   } catch (error) {
     if (error?.code === 'INVALID_DISPLAY_VIEW') {
-      return res.status(400).json({ message: error.message });
+      return res.status(400).json({ code: 'INVALID_DISPLAY_VIEW', message: error.message });
     }
     console.error('Anzeige-Modus konnte nicht gesetzt werden:', error);
-    res.status(500).json({ message: 'Anzeige-Modus konnte nicht gesetzt werden.' });
+    res.status(500).json({ code: 'DISPLAY_MODE_SET_FAILED', message: 'Anzeige-Modus konnte nicht gesetzt werden.' });
   }
 });
 
@@ -291,7 +291,7 @@ router.post('/tournament/completion', async (req, res) => {
   const { completed } = req.body ?? {};
   const snapshot = getScoreboardState();
   if (!snapshot.tournamentId) {
-    return res.status(400).json({ message: 'Kein Turnier im Scoreboard gesetzt.' });
+    return res.status(400).json({ code: 'NO_TOURNAMENT_IN_SCOREBOARD', message: 'Kein Turnier im Scoreboard gesetzt.' });
   }
   try {
     const desired = completed === undefined ? true : Boolean(completed);
@@ -300,7 +300,7 @@ router.post('/tournament/completion', async (req, res) => {
     res.json(nextState);
   } catch (error) {
     console.error('Turnierstatus konnte nicht gesetzt werden:', error);
-    res.status(500).json({ message: 'Turnierstatus konnte nicht gesetzt werden.' });
+    res.status(500).json({ code: 'TOURNAMENT_STATUS_SET_FAILED', message: 'Turnierstatus konnte nicht gesetzt werden.' });
   }
 });
 
@@ -309,25 +309,25 @@ router.post('/schedule/select', async (req, res) => {
 
   const numericId = Number(tournamentId);
   if (!Number.isInteger(numericId) || numericId <= 0) {
-    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+    return res.status(400).json({ code: 'INVALID_TOURNAMENT_ID', message: 'Ungültige Turnier-ID.' });
   }
 
   const code = String(scheduleCode ?? '').trim();
   if (!code) {
-    return res.status(400).json({ message: 'Ungültiger Spielcode.' });
+    return res.status(400).json({ code: 'INVALID_MATCH_CODE', message: 'Ungültiger Spielcode.' });
   }
 
   try {
     const tournament = await getTournament(numericId);
     if (!tournament) {
-      return res.status(404).json({ message: 'Turnier nicht gefunden.' });
+      return res.status(404).json({ code: 'TOURNAMENT_NOT_FOUND', message: 'Turnier nicht gefunden.' });
     }
 
     const scheduleEntries = await getTournamentSchedule(tournament.id);
     const match = scheduleEntries.find((entry) => entry.code === code);
 
     if (!match) {
-      return res.status(404).json({ message: 'Spiel konnte im Spielplan nicht gefunden werden.' });
+      return res.status(404).json({ code: 'SCHEDULE_MATCH_NOT_FOUND', message: 'Spiel konnte im Spielplan nicht gefunden werden.' });
     }
 
     const homePlayers = match.home?.teamId ? await listPlayersByTeam(match.home.teamId) : [];
@@ -360,7 +360,7 @@ router.post('/schedule/select', async (req, res) => {
     });
   } catch (error) {
     console.error('Spielplan-Match konnte nicht ausgewählt werden:', error);
-    res.status(500).json({ message: 'Spielplan-Match konnte nicht ausgewählt werden.' });
+    res.status(500).json({ code: 'SCHEDULE_MATCH_SELECT_FAILED', message: 'Spielplan-Match konnte nicht ausgewählt werden.' });
   }
 });
 
@@ -387,7 +387,7 @@ router.get('/standings', async (_req, res) => {
     });
   } catch (error) {
     console.error('Tabelle konnte nicht berechnet werden:', error);
-    res.status(500).json({ message: 'Tabelle konnte nicht berechnet werden.' });
+    res.status(500).json({ code: 'STANDINGS_CALCULATION_FAILED', message: 'Tabelle konnte nicht berechnet werden.' });
   }
 });
 
@@ -404,7 +404,7 @@ router.get('/structure', async (_req, res) => {
 
     const structure = await getTournamentStructureDetails(snapshot.tournamentId);
     if (!structure) {
-      return res.status(404).json({ message: 'Turnierstruktur nicht gefunden.' });
+      return res.status(404).json({ code: 'TOURNAMENT_STRUCTURE_NOT_FOUND', message: 'Turnierstruktur nicht gefunden.' });
     }
 
     res.json({
@@ -414,7 +414,7 @@ router.get('/structure', async (_req, res) => {
     });
   } catch (error) {
     console.error('Turnierstruktur konnte nicht geladen werden:', error);
-    res.status(500).json({ message: 'Turnierstruktur konnte nicht geladen werden.' });
+    res.status(500).json({ code: 'TOURNAMENT_STRUCTURE_LOAD_FAILED', message: 'Turnierstruktur konnte nicht geladen werden.' });
   }
 });
 
@@ -434,7 +434,7 @@ router.post('/finish', (_req, res) => {
     res.json(snapshot);
   } catch (error) {
     console.error('Spiel konnte nicht beendet werden:', error);
-    res.status(500).json({ message: 'Spiel konnte nicht beendet werden.' });
+    res.status(500).json({ code: 'GAME_FINISH_FAILED', message: 'Spiel konnte nicht beendet werden.' });
   }
 });
 
@@ -446,7 +446,7 @@ router.post('/save', async (_req, res) => {
     res.json(savedGame);
   } catch (error) {
     console.error('Spiel konnte nicht gespeichert werden:', error);
-    res.status(500).json({ message: 'Spiel konnte nicht gespeichert werden.' });
+    res.status(500).json({ code: 'GAME_SAVE_FAILED', message: 'Spiel konnte nicht gespeichert werden.' });
   }
 });
 
@@ -456,7 +456,7 @@ router.post('/game/new', (_req, res) => {
     res.json(freshState);
   } catch (error) {
     console.error('Neues Spiel konnte nicht vorbereitet werden:', error);
-    res.status(500).json({ message: 'Neues Spiel konnte nicht vorbereitet werden.' });
+    res.status(500).json({ code: 'GAME_PREPARE_FAILED', message: 'Neues Spiel konnte nicht vorbereitet werden.' });
   }
 });
 
@@ -466,32 +466,32 @@ router.get('/history', async (_req, res) => {
     res.json(games);
   } catch (error) {
     console.error('Historie konnte nicht geladen werden:', error);
-    res.status(500).json({ message: 'Historie konnte nicht geladen werden.' });
+    res.status(500).json({ code: 'GAME_HISTORY_LOAD_FAILED', message: 'Historie konnte nicht geladen werden.' });
   }
 });
 
 router.get('/history/:id', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Spiel-ID.' });
+    return res.status(400).json({ code: 'INVALID_GAME_ID', message: 'Ungültige Spiel-ID.' });
   }
 
   try {
     const game = await getGame(id);
     if (!game) {
-      return res.status(404).json({ message: 'Spiel nicht gefunden.' });
+      return res.status(404).json({ code: 'GAME_NOT_FOUND', message: 'Spiel nicht gefunden.' });
     }
     res.json(game);
   } catch (error) {
     console.error('Spiel konnte nicht geladen werden:', error);
-    res.status(500).json({ message: 'Spiel konnte nicht geladen werden.' });
+    res.status(500).json({ code: 'GAME_LOAD_FAILED', message: 'Spiel konnte nicht geladen werden.' });
   }
 });
 
 router.put('/history/:id', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Spiel-ID.' });
+    return res.status(400).json({ code: 'INVALID_GAME_ID', message: 'Ungültige Spiel-ID.' });
   }
 
   const {
@@ -509,7 +509,7 @@ router.put('/history/:id', async (req, res) => {
   if (team_a !== undefined) {
     const trimmed = String(team_a).trim();
     if (!trimmed) {
-      return res.status(400).json({ message: 'team_a darf nicht leer sein.' });
+      return res.status(400).json({ code: 'TEAM_A_NAME_REQUIRED', message: 'team_a darf nicht leer sein.' });
     }
     patch.team_a = trimmed;
   }
@@ -517,7 +517,7 @@ router.put('/history/:id', async (req, res) => {
   if (team_b !== undefined) {
     const trimmed = String(team_b).trim();
     if (!trimmed) {
-      return res.status(400).json({ message: 'team_b darf nicht leer sein.' });
+      return res.status(400).json({ code: 'TEAM_B_NAME_REQUIRED', message: 'team_b darf nicht leer sein.' });
     }
     patch.team_b = trimmed;
   }
@@ -525,7 +525,7 @@ router.put('/history/:id', async (req, res) => {
   if (score_a !== undefined) {
     const numeric = Number(score_a);
     if (!Number.isFinite(numeric) || numeric < 0) {
-      return res.status(400).json({ message: 'score_a muss >= 0 sein.' });
+      return res.status(400).json({ code: 'INVALID_SCORE_A', message: 'score_a muss >= 0 sein.' });
     }
     patch.score_a = Math.trunc(numeric);
   }
@@ -533,7 +533,7 @@ router.put('/history/:id', async (req, res) => {
   if (score_b !== undefined) {
     const numeric = Number(score_b);
     if (!Number.isFinite(numeric) || numeric < 0) {
-      return res.status(400).json({ message: 'score_b muss >= 0 sein.' });
+      return res.status(400).json({ code: 'INVALID_SCORE_B', message: 'score_b muss >= 0 sein.' });
     }
     patch.score_b = Math.trunc(numeric);
   }
@@ -541,7 +541,7 @@ router.put('/history/:id', async (req, res) => {
   if (extra_seconds !== undefined) {
     const numeric = Number(extra_seconds);
     if (!Number.isFinite(numeric) || numeric < 0) {
-      return res.status(400).json({ message: 'extra_seconds muss >= 0 sein.' });
+      return res.status(400).json({ code: 'INVALID_EXTRA_SECONDS', message: 'extra_seconds muss >= 0 sein.' });
     }
     patch.extra_seconds = Math.trunc(numeric);
   }
@@ -549,14 +549,14 @@ router.put('/history/:id', async (req, res) => {
   if (extra_elapsed_seconds !== undefined) {
     const numeric = Number(extra_elapsed_seconds);
     if (!Number.isFinite(numeric) || numeric < 0) {
-      return res.status(400).json({ message: 'extra_elapsed_seconds muss >= 0 sein.' });
+      return res.status(400).json({ code: 'INVALID_EXTRA_ELAPSED_SECONDS', message: 'extra_elapsed_seconds muss >= 0 sein.' });
     }
     patch.extra_elapsed_seconds = Math.trunc(numeric);
   }
 
   if (penalties !== undefined) {
     if (typeof penalties !== 'object' || penalties === null) {
-      return res.status(400).json({ message: 'penalties muss ein Objekt sein.' });
+      return res.status(400).json({ code: 'INVALID_PENALTIES', message: 'penalties muss ein Objekt sein.' });
     }
     patch.penalties = penalties;
   }
@@ -564,32 +564,32 @@ router.put('/history/:id', async (req, res) => {
   try {
     const updatedGame = await updateGame(id, patch);
     if (!updatedGame) {
-      return res.status(404).json({ message: 'Spiel nicht gefunden.' });
+      return res.status(404).json({ code: 'GAME_NOT_FOUND', message: 'Spiel nicht gefunden.' });
     }
     bumpScheduleVersion();
     res.json(updatedGame);
   } catch (error) {
     console.error('Spiel konnte nicht aktualisiert werden:', error);
-    res.status(500).json({ message: 'Spiel konnte nicht aktualisiert werden.' });
+    res.status(500).json({ code: 'GAME_UPDATE_FAILED', message: 'Spiel konnte nicht aktualisiert werden.' });
   }
 });
 
 router.delete('/history/:id', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Spiel-ID.' });
+    return res.status(400).json({ code: 'INVALID_GAME_ID', message: 'Ungültige Spiel-ID.' });
   }
 
   try {
     const deleted = await deleteGame(id);
     if (!deleted) {
-      return res.status(404).json({ message: 'Spiel nicht gefunden.' });
+      return res.status(404).json({ code: 'GAME_NOT_FOUND', message: 'Spiel nicht gefunden.' });
     }
     bumpScheduleVersion();
     res.status(204).end();
   } catch (error) {
     console.error('Spiel konnte nicht gelöscht werden:', error);
-    res.status(500).json({ message: 'Spiel konnte nicht gelöscht werden.' });
+    res.status(500).json({ code: 'GAME_DELETE_FAILED', message: 'Spiel konnte nicht gelöscht werden.' });
   }
 });
 
@@ -597,25 +597,25 @@ router.post('/penalties', (req, res) => {
   const { team, name, seconds, playerId, description } = req.body ?? {};
 
   if (!team || !['a', 'b', 'A', 'B'].includes(team)) {
-    return res.status(400).json({ message: 'Ungültiges Team. Erlaubt sind \"A\" oder \"B\".' });
+    return res.status(400).json({ code: 'INVALID_TEAM_SIDE', message: 'Ungültiges Team. Erlaubt sind \"A\" oder \"B\".' });
   }
 
   if (!Number.isFinite(Number(seconds)) || Number(seconds) <= 0) {
-    return res.status(400).json({ message: 'seconds muss größer als 0 sein.' });
+    return res.status(400).json({ code: 'SECONDS_MUST_BE_POSITIVE', message: 'seconds muss größer als 0 sein.' });
   }
 
   let resolvedPlayerId = null;
   if (playerId !== undefined && playerId !== null && playerId !== '') {
     const parsedPlayerId = Number(playerId);
     if (!Number.isInteger(parsedPlayerId) || parsedPlayerId <= 0) {
-      return res.status(400).json({ message: 'Ungültige Spieler-ID.' });
+      return res.status(400).json({ code: 'INVALID_PLAYER_ID', message: 'Ungültige Spieler-ID.' });
     }
     const state = getScoreboardState();
     const teamKey = String(team).toLowerCase() === 'b' ? 'b' : 'a';
     const roster = teamKey === 'b' ? state.players?.b ?? [] : state.players?.a ?? [];
     const exists = roster.some((player) => player.playerId === parsedPlayerId);
     if (!exists) {
-      return res.status(400).json({ message: 'Spieler gehört nicht zum ausgewählten Team.' });
+      return res.status(400).json({ code: 'PLAYER_NOT_IN_TEAM', message: 'Spieler gehört nicht zum ausgewählten Team.' });
     }
     resolvedPlayerId = parsedPlayerId;
   }
@@ -638,7 +638,7 @@ router.post('/halftime', (req, res) => {
   const { seconds } = req.body ?? {};
 
   if (!Number.isFinite(Number(seconds)) || Number(seconds) < 0) {
-    return res.status(400).json({ message: 'seconds muss >= 0 sein.' });
+    return res.status(400).json({ code: 'SECONDS_MUST_BE_NON_NEGATIVE', message: 'seconds muss >= 0 sein.' });
   }
 
   const nextState = setHalftimeSeconds(Number(seconds));
@@ -649,7 +649,7 @@ router.post('/extra-time', (req, res) => {
   const { seconds } = req.body ?? {};
 
   if (!Number.isFinite(Number(seconds)) || Number(seconds) < 0) {
-    return res.status(400).json({ message: 'seconds muss >= 0 sein.' });
+    return res.status(400).json({ code: 'SECONDS_MUST_BE_NON_NEGATIVE', message: 'seconds muss >= 0 sein.' });
   }
 
   const nextState = setExtraSeconds(Number(seconds));
@@ -660,7 +660,7 @@ router.post('/halftime/pause', (req, res) => {
   const { seconds } = req.body ?? {};
 
   if (!Number.isFinite(Number(seconds)) || Number(seconds) < 0) {
-    return res.status(400).json({ message: 'seconds muss >= 0 sein.' });
+    return res.status(400).json({ code: 'SECONDS_MUST_BE_NON_NEGATIVE', message: 'seconds muss >= 0 sein.' });
   }
 
   const nextState = setHalftimePauseSeconds(Number(seconds));

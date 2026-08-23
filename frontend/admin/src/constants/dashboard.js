@@ -1,27 +1,34 @@
 export const POINT_OPTIONS = [1, 2, 3];
 
 export const DISPLAY_VIEW_OPTIONS = [
-  { id: 'scoreboard', label: 'Live-Spielstand' },
-  { id: 'bracket', label: 'Turnierbaum' }
+  { id: 'scoreboard', labelKey: 'displayViews.scoreboard' },
+  { id: 'bracket', labelKey: 'displayViews.bracket' }
 ];
 
 export const PENALTY_PRESETS = [
-  { value: '60', label: '1 Minute' },
-  { value: '120', label: '2 Minuten' },
-  { value: 'custom', label: 'Individuell' }
+  { value: '60', minutes: 1 },
+  { value: '120', minutes: 2 },
+  { value: 'custom', labelKey: 'penaltyPresets.custom' }
 ];
 
 export const CONTROL_TABS = [
-  { id: 'control', label: 'Live-Steuerung' },
-  { id: 'schedule', label: 'Spieltermine' },
-  { id: 'audio', label: 'Audio' },
-  { id: 'history', label: 'Historie' },
-  { id: 'players', label: 'Spieler' },
-  { id: 'teams', label: 'Teams' },
-  { id: 'tournaments', label: 'Turniere' }
+  { id: 'control', labelKey: 'tabs.control' },
+  { id: 'schedule', labelKey: 'tabs.schedule' },
+  { id: 'audio', labelKey: 'tabs.audio' },
+  { id: 'history', labelKey: 'tabs.history' },
+  { id: 'players', labelKey: 'tabs.players' },
+  { id: 'teams', labelKey: 'tabs.teams' },
+  { id: 'tournaments', labelKey: 'tabs.tournaments' }
 ];
 
 export const TOURNAMENT_CLASSIFICATION_OPTIONS = [
-  { value: 'top4', label: 'nur Plätze 1–4' },
-  { value: 'all', label: 'alle Plätze (vollständig)' }
+  { value: 'top4', labelKey: 'classification.top4' },
+  { value: 'all', labelKey: 'classification.all' }
+];
+
+export const SCHEDULE_PHASE_OPTIONS = [
+  { value: 'all', labelKey: 'phases.all' },
+  { value: 'group', labelKey: 'phases.group' },
+  { value: 'knockout', labelKey: 'phases.knockout' },
+  { value: 'placement', labelKey: 'phases.placement' }
 ];

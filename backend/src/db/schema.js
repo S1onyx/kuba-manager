@@ -100,6 +100,9 @@ export default function initializeSchema(db) {
   if (!regColumns.includes('team_id')) {
     db.exec('ALTER TABLE tournament_registrations ADD COLUMN team_id INTEGER');
   }
+  if (!regColumns.includes('language')) {
+    db.exec("ALTER TABLE tournament_registrations ADD COLUMN language TEXT NOT NULL DEFAULT 'de'");
+  }
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS registration_audio_files (

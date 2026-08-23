@@ -1,0 +1,117 @@
+{
+  "app": {
+    "mirrorStandard": "Écran 1 (standard)",
+    "mirrorInverted": "Écran 2 (inversé)"
+  },
+  "controls": {
+    "fullscreenEnter": "Plein écran",
+    "fullscreenExit": "Quitter le plein écran",
+    "showLive": "Afficher le mode live",
+    "showBracket": "Afficher l'arbre du tournoi",
+    "updating": "Mise à jour…"
+  },
+  "scoreboard": {
+    "halfBadge": "Mi-temps {{half}}",
+    "teamA": "Équipe A",
+    "teamB": "Équipe B",
+    "extraTime": "Temps additionnel",
+    "halftimeBreak": "Mi-temps"
+  },
+  "penalties": {
+    "title": "Pénalités temporelles",
+    "empty": "Aucune pénalité en cours",
+    "expired": "expirée"
+  },
+  "standings": {
+    "currentTitle": "Classement actuel du groupe",
+    "loading": "Chargement du classement...",
+    "noResults": "Aucun résultat disponible pour le moment.",
+    "colRank": "#",
+    "colTeam": "Équipe",
+    "colPlayed": "Matchs",
+    "colWon": "V",
+    "colDrawn": "N",
+    "colLost": "D",
+    "colGoals": "Paniers",
+    "colDiff": "Diff",
+    "colPenalties": "Pénalités",
+    "colPoints": "Points",
+    "colStatus": "Statut"
+  },
+  "stage": {
+    "groupLabel": "Groupe {{label}}",
+    "groupPhase": "Phase de groupes · {{label}}",
+    "knockoutPhase": "Phase éliminatoire · {{label}}",
+    "placementPhase": "Classement · {{label}}",
+    "knockoutFinal": "Finale",
+    "knockoutRoundGeneric_one": "Tour éliminatoire ({{count}} équipe)",
+    "knockoutRoundGeneric_other": "Tour éliminatoire ({{count}} équipes)",
+    "round": {
+      "p4": "Demi-finales",
+      "p8": "Quarts de finale",
+      "p16": "Huitièmes de finale",
+      "p32": "Seizièmes de finale",
+      "p64": "Trente-deuxièmes de finale",
+      "p128": "Soixante-quatrièmes de finale"
+    },
+    "placementMatch": "Match pour la place {{from}}",
+    "placementRound": "Tour de classement {{from}}–{{to}}"
+  },
+  "bracket": {
+    "title": "Arbre du tournoi et aperçu des groupes",
+    "subtitle": "Classements des groupes et matchs éliminatoires en un coup d'œil",
+    "noTournament": "Aucun tournoi sélectionné. Veuillez définir un tournoi pour le tableau d'affichage dans le panneau d'administration.",
+    "loading": "Chargement de la structure du tournoi…",
+    "noStructure": "Aucune structure de tournoi disponible pour le moment. Veuillez gérer le calendrier et les groupes dans le panneau d'administration.",
+    "groupStage": "Phase de groupes",
+    "noGroupData": "Aucune donnée de groupe disponible pour le moment.",
+    "matchesCompleted": "Matchs terminés : {{recorded}}/{{total}}",
+    "noResults": "Aucun résultat enregistré.",
+    "knockoutTitle": "Phase éliminatoire",
+    "placementTitle": "Matchs de classement",
+    "stageFallback": "Phase",
+    "round": "Tour {{round}}",
+    "matchcode": "Code du match {{code}}",
+    "timeValue": "{{time}}",
+    "status": {
+      "qualified": "qualifié",
+      "inPosition": "en bonne voie",
+      "contender": "poursuivant"
+    }
+  },
+  "summary": {
+    "loading": "Chargement du bilan final…",
+    "empty": "Aucune donnée finale disponible pour le moment. Veuillez clôturer le tournoi dans le panneau d'administration.",
+    "defaultTournamentName": "Tournoi",
+    "title": "Fin du tournoi",
+    "description": "Classement final, places finales et performances exceptionnelles des joueurs en un coup d'œil.",
+    "champion": "Champion",
+    "championDecidedBy": "Décidé en {{method}}",
+    "championFinalWin": "Victoire en finale",
+    "score": "Résultat {{score}}",
+    "runnerUp": "Finaliste :",
+    "placementsTitle": "Classement final",
+    "colPlacement": "Place",
+    "colTeam": "Équipe",
+    "colDecision": "Décision",
+    "colOpponent": "Adversaire",
+    "colResult": "Résultat",
+    "overallStandings": "Bilan général",
+    "topScorer": "Meilleur marqueur",
+    "threePointSpecialist": "Spécialiste des trois points",
+    "penaltyKing": "Roi des pénalités",
+    "points_one": "{{count}} point",
+    "points_other": "{{count}} points",
+    "threes_one": "{{count}} panier à trois points",
+    "threes_other": "{{count}} paniers à trois points",
+    "penaltySeconds_one": "{{count}} seconde de pénalité",
+    "penaltySeconds_other": "{{count}} secondes de pénalité",
+    "teamFallback": "Équipe"
+  },
+  "errors": {
+    "loadScoreboard": "Le tableau d'affichage n'a pas pu être chargé.",
+    "loadStandings": "Le classement n'a pas pu être chargé.",
+    "loadStructure": "La structure du tournoi n'a pas pu être chargée.",
+    "loadSummary": "L'aperçu du tournoi n'a pas pu être chargé."
+  }
+}

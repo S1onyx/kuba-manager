@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createTeam, deleteTeam, fetchTeams, updateTeam } from '../utils/api.js';
+import { formatApiError } from '../utils/apiError.js';
 
 export default function useTeamManager({ updateMessage }) {
+  const { t } = useTranslation();
   const [teams, setTeams] = useState([]);
   const [teamsLoading, setTeamsLoading] = useState(true);
   const [teamsError, setTeamsError] = useState('');
@@ -17,15 +20,15 @@ export default function useTeamManager({ updateMessage }) {
         setTeams(data);
         setTeamsError('');
       })
-      .catch(() => {
-        setTeamsError('Teams konnten nicht geladen werden.');
+      .catch((err) => {
+        setTeamsError(formatApiError(err, t, 'feedback.teamsLoadFailed'));
       })
       .finally(() => {
         if (showLoader) {
           setTeamsLoading(false);
         }
       });
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadTeams(true);
@@ -36,7 +39,7 @@ export default function useTeamManager({ updateMessage }) {
       event?.preventDefault();
       const trimmed = teamCreateName.trim();
       if (!trimmed) {
-        updateMessage('error', 'Teamname darf nicht leer sein.');
+        updateMessage('error', t('feedback.teamNameRequired'));
         return false;
       }
 
@@ -44,15 +47,15 @@ export default function useTeamManager({ updateMessage }) {
         await createTeam({ name: trimmed });
         setTeamCreateName('');
         loadTeams();
-        updateMessage('info', 'Team angelegt.');
+        updateMessage('info', t('feedback.teamCreated'));
         return true;
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Team konnte nicht angelegt werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.teamCreateFailed'));
         return false;
       }
     },
-    [teamCreateName, loadTeams, updateMessage]
+    [teamCreateName, loadTeams, updateMessage, t]
   );
 
   const startTeamEdit = useCallback((team) => {
@@ -81,7 +84,7 @@ export default function useTeamManager({ updateMessage }) {
     async (id) => {
       const draft = teamEdits[id];
       if (!draft || !draft.name.trim()) {
-        updateMessage('error', 'Teamname darf nicht leer sein.');
+        updateMessage('error', t('feedback.teamNameRequired'));
         return false;
       }
 
@@ -89,20 +92,20 @@ export default function useTeamManager({ updateMessage }) {
         await updateTeam(id, { name: draft.name });
         cancelTeamEdit(id);
         loadTeams();
-        updateMessage('info', 'Team aktualisiert.');
+        updateMessage('info', t('feedback.teamUpdated'));
         return true;
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Team konnte nicht aktualisiert werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.teamUpdateFailed'));
         return false;
       }
     },
-    [teamEdits, cancelTeamEdit, loadTeams, updateMessage]
+    [teamEdits, cancelTeamEdit, loadTeams, updateMessage, t]
   );
 
   const handleTeamDelete = useCallback(
     async (id) => {
-      if (!window.confirm('Team wirklich löschen?')) {
+      if (!window.confirm(t('teams.confirmDelete'))) {
         return false;
       }
 
@@ -110,15 +113,15 @@ export default function useTeamManager({ updateMessage }) {
         await deleteTeam(id);
         cancelTeamEdit(id);
         loadTeams();
-        updateMessage('info', 'Team gelöscht.');
+        updateMessage('info', t('feedback.teamDeleted'));
         return true;
       } catch (err) {
         console.error(err);
-        updateMessage('error', 'Team konnte nicht gelöscht werden.');
+        updateMessage('error', formatApiError(err, t, 'feedback.teamDeleteFailed'));
         return false;
       }
     },
-    [cancelTeamEdit, loadTeams, updateMessage]
+    [cancelTeamEdit, loadTeams, updateMessage, t]
   );
 
   return {

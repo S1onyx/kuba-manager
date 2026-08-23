@@ -1,0 +1,117 @@
+{
+  "app": {
+    "mirrorStandard": "Display 1 (standard)",
+    "mirrorInverted": "Display 2 (inverted)"
+  },
+  "controls": {
+    "fullscreenEnter": "Fullscreen",
+    "fullscreenExit": "Exit fullscreen",
+    "showLive": "Show live mode",
+    "showBracket": "Show tournament bracket",
+    "updating": "Updating…"
+  },
+  "scoreboard": {
+    "halfBadge": "Half {{half}}",
+    "teamA": "Team A",
+    "teamB": "Team B",
+    "extraTime": "Stoppage time",
+    "halftimeBreak": "Half-time"
+  },
+  "penalties": {
+    "title": "Time penalties",
+    "empty": "No active penalties",
+    "expired": "expired"
+  },
+  "standings": {
+    "currentTitle": "Current group standings",
+    "loading": "Loading standings...",
+    "noResults": "No results yet.",
+    "colRank": "#",
+    "colTeam": "Team",
+    "colPlayed": "Played",
+    "colWon": "W",
+    "colDrawn": "D",
+    "colLost": "L",
+    "colGoals": "Goals",
+    "colDiff": "Diff",
+    "colPenalties": "Penalties",
+    "colPoints": "Points",
+    "colStatus": "Status"
+  },
+  "stage": {
+    "groupLabel": "Group {{label}}",
+    "groupPhase": "Group stage · {{label}}",
+    "knockoutPhase": "Knockout round · {{label}}",
+    "placementPhase": "Placement · {{label}}",
+    "knockoutFinal": "Final",
+    "knockoutRoundGeneric_one": "Knockout round ({{count}} team)",
+    "knockoutRoundGeneric_other": "Knockout round ({{count}} teams)",
+    "round": {
+      "p4": "Semi-finals",
+      "p8": "Quarter-finals",
+      "p16": "Round of 16",
+      "p32": "Round of 32",
+      "p64": "Round of 64",
+      "p128": "Round of 128"
+    },
+    "placementMatch": "Match for place {{from}}",
+    "placementRound": "Placement round {{from}}–{{to}}"
+  },
+  "bracket": {
+    "title": "Tournament bracket & group overview",
+    "subtitle": "Group standings and knockout games at a glance",
+    "noTournament": "No tournament selected. Please set a tournament for the scoreboard in the admin panel.",
+    "loading": "Loading tournament structure…",
+    "noStructure": "No tournament structure available yet. Please maintain the schedule and groups in the admin panel.",
+    "groupStage": "Group stage",
+    "noGroupData": "No group data available yet.",
+    "matchesCompleted": "Matches completed: {{recorded}}/{{total}}",
+    "noResults": "No results recorded.",
+    "knockoutTitle": "Knockout round",
+    "placementTitle": "Placement matches",
+    "stageFallback": "Stage",
+    "round": "Round {{round}}",
+    "matchcode": "Match code {{code}}",
+    "timeValue": "{{time}}",
+    "status": {
+      "qualified": "qualified",
+      "inPosition": "on course",
+      "contender": "chasing"
+    }
+  },
+  "summary": {
+    "loading": "Loading final overview…",
+    "empty": "No final data available yet. Please complete the tournament in the admin panel.",
+    "defaultTournamentName": "Tournament",
+    "title": "End of tournament",
+    "description": "Final standings, final placements and outstanding player performances at a glance.",
+    "champion": "Champion",
+    "championDecidedBy": "Decided in the {{method}}",
+    "championFinalWin": "Final win",
+    "score": "Result {{score}}",
+    "runnerUp": "Runner-up:",
+    "placementsTitle": "Final placements",
+    "colPlacement": "Rank",
+    "colTeam": "Team",
+    "colDecision": "Decision",
+    "colOpponent": "Opponent",
+    "colResult": "Result",
+    "overallStandings": "Overall record",
+    "topScorer": "Top scorer",
+    "threePointSpecialist": "Three-point specialist",
+    "penaltyKing": "Penalty bench king",
+    "points_one": "{{count}} point",
+    "points_other": "{{count}} points",
+    "threes_one": "{{count}} three-pointer",
+    "threes_other": "{{count}} three-pointers",
+    "penaltySeconds_one": "{{count}} second of penalties",
+    "penaltySeconds_other": "{{count}} seconds of penalties",
+    "teamFallback": "Team"
+  },
+  "errors": {
+    "loadScoreboard": "The scoreboard could not be loaded.",
+    "loadStandings": "The standings could not be loaded.",
+    "loadStructure": "The tournament structure could not be loaded.",
+    "loadSummary": "The tournament overview could not be loaded."
+  }
+}

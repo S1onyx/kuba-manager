@@ -1,13 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import PanelCard from '../../common/PanelCard.jsx';
 import { useDashboard } from '../../../context/DashboardContext.jsx';
 import { fetchRegistrations, updateRegistrationStatus, activateTournament, setRegistrationClosed } from '../../../utils/api.js';
+import { formatApiError } from '../../../utils/apiError.js';
+import { useDateLocale } from '../../../i18n/index.js';
 
 export default function TournamentDetailsPanel({
   tournament,
   structureState,
   teams
 }) {
+  const { t } = useTranslation();
+  const dateLocale = useDateLocale();
   const { tournaments: { handlePosterUpload, loadTournaments } } = useDashboard();
   const [posterFile, setPosterFile] = useState(null);
   const [registrations, setRegistrations] = useState([]);
@@ -41,7 +46,7 @@ export default function TournamentDetailsPanel({
       await updateRegistrationStatus(tournament.id, regId, status);
       await loadRegistrations();
     } catch (err) {
-      setStatusError(err.message || 'Status konnte nicht geändert werden.');
+      setStatusError(formatApiError(err, t, 'tournaments.details.statusChangeFailed'));
     } finally {
       setStatusChanging(null);
     }
@@ -53,7 +58,7 @@ export default function TournamentDetailsPanel({
       await setRegistrationClosed(tournament.id, !tournament.registration_closed);
       loadTournaments();
     } catch (err) {
-      alert(err.message || 'Fehler beim Ändern des Anmeldestatus.');
+      alert(formatApiError(err, t, 'tournaments.details.registrationToggleFailed'));
     } finally {
       setClosingReg(false);
     }
@@ -92,7 +97,7 @@ export default function TournamentDetailsPanel({
       setShowActivateForm(false);
       loadTournaments();
     } catch (err) {
-      alert(err.message || 'Aktivierung fehlgeschlagen.');
+      alert(formatApiError(err, t, 'tournaments.details.activationFailed'));
     } finally {
       setActivating(false);
     }
@@ -134,24 +139,24 @@ export default function TournamentDetailsPanel({
   }, [activeStructure]);
 
   const qualifierSummary = activeStructure?.knockout?.entrants
-    ? `${activeStructure.knockout.entrants} mögliche KO-Teilnehmer`
-    : 'Keine KO-Runde konfiguriert';
+    ? t('tournaments.details.qualifierPossible', { count: activeStructure.knockout.entrants })
+    : t('tournaments.details.noKnockout');
 
   if (structureLoading) {
     return (
-      <PanelCard title="Turnierdetails" description={`Struktur wird geladen für ${tournament.name}...`}>
-        <p style={{ margin: 0 }}>Bitte warten...</p>
+      <PanelCard title={t('tournaments.details.title')} description={t('tournaments.details.loadingDescription', { name: tournament.name })}>
+        <p style={{ margin: 0 }}>{t('tournaments.details.pleaseWait')}</p>
       </PanelCard>
     );
   }
 
   if (structureError) {
     return (
-      <PanelCard title="Turnierdetails" description={`Aktuelle Struktur von ${tournament.name}`}>
+      <PanelCard title={t('tournaments.details.title')} description={t('tournaments.details.structureDescription', { name: tournament.name })}>
         <p style={{ margin: 0, color: 'var(--warning)' }}>{structureError}</p>
         <div>
           <button type="button" onClick={handleTournamentStructureRefresh}>
-            Erneut versuchen
+            {t('tournaments.details.retry')}
           </button>
         </div>
       </PanelCard>
@@ -160,13 +165,13 @@ export default function TournamentDetailsPanel({
 
   if (!activeStructure) {
     return (
-      <PanelCard title="Turnierdetails" description={`Aktuelle Struktur von ${tournament.name}`}>
+      <PanelCard title={t('tournaments.details.title')} description={t('tournaments.details.structureDescription', { name: tournament.name })}>
         <p style={{ margin: 0 }}>
-          Noch keine Struktur verfügbar. Bitte aktualisiere das Turnier oder lade die Struktur neu.
+          {t('tournaments.details.noStructure')}
         </p>
         <div>
           <button type="button" onClick={handleTournamentStructureRefresh}>
-            Struktur laden
+            {t('tournaments.details.loadStructure')}
           </button>
         </div>
       </PanelCard>
@@ -174,16 +179,20 @@ export default function TournamentDetailsPanel({
   }
 
   if (tournament.status === 'planned' || tournament.status === 'active') {
-    const statusLabel = { pending: 'Ausstehend', confirmed: 'Bestätigt', rejected: 'Abgelehnt' };
+    const statusLabel = {
+      pending: t('tournaments.details.regStatusPending'),
+      confirmed: t('tournaments.details.regStatusConfirmed'),
+      rejected: t('tournaments.details.regStatusRejected')
+    };
     const statusColor = { pending: 'rgba(255,171,64,0.2)', confirmed: 'rgba(64,200,120,0.2)', rejected: 'rgba(255,100,100,0.2)' };
 
     return (
-      <PanelCard title={`Turnierdetails – ${tournament.name}`} description="Geplantes Turnier">
+      <PanelCard title={t('tournaments.details.titleWithName', { name: tournament.name })} description={t('tournaments.details.plannedDescription')}>
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
           {[
-            { id: 'info', label: 'Info & Plakat' },
-            { id: 'registrations', label: `Anmeldungen${registrations.length > 0 ? ` (${registrations.length})` : ''}` },
-            ...(tournament.status === 'active' ? [{ id: 'structure', label: 'Turnierstruktur' }] : [])
+            { id: 'info', label: t('tournaments.details.tabInfo') },
+            { id: 'registrations', label: `${t('tournaments.details.tabRegistrations')}${registrations.length > 0 ? ` (${registrations.length})` : ''}` },
+            ...(tournament.status === 'active' ? [{ id: 'structure', label: t('tournaments.details.tabStructure') }] : [])
           ].map((tab) => (
             <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)}
               style={{ padding: '0.4rem 1rem', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.2)', background: activeTab === tab.id ? 'rgba(86,160,255,0.2)' : 'transparent', color: '#fff', cursor: 'pointer' }}>
@@ -195,7 +204,7 @@ export default function TournamentDetailsPanel({
         {activeTab === 'info' && (
           <div style={{ display: 'grid', gap: '1rem' }}>
             <section style={{ display: 'grid', gap: '0.65rem' }}>
-              <h3 style={{ margin: 0, fontSize: '1rem' }}>Plakat</h3>
+              <h3 style={{ margin: 0, fontSize: '1rem' }}>{t('tournaments.details.poster')}</h3>
               {tournament.poster_url ? (
                 tournament.poster_mime_type === 'application/pdf' ? (
                   <object
@@ -204,23 +213,23 @@ export default function TournamentDetailsPanel({
                     style={{ width: '100%', aspectRatio: '1 / 1.414', borderRadius: '8px', background: 'rgba(0,0,0,0.3)', display: 'block' }}
                   >
                     <a href={tournament.poster_url} target="_blank" rel="noopener noreferrer" style={{ display: 'block', padding: '1rem', textAlign: 'center', color: '#7cb9ff' }}>
-                      PDF öffnen
+                      {t('tournaments.details.openPdf')}
                     </a>
                   </object>
                 ) : (
-                  <img src={tournament.poster_url} alt="Aktuelles Plakat" style={{ maxWidth: '100%', maxHeight: '240px', objectFit: 'contain', borderRadius: '8px', background: 'rgba(0,0,0,0.3)' }} />
+                  <img src={tournament.poster_url} alt={t('tournaments.details.posterAlt')} style={{ maxWidth: '100%', maxHeight: '240px', objectFit: 'contain', borderRadius: '8px', background: 'rgba(0,0,0,0.3)' }} />
                 )
               ) : (
-                <p style={{ margin: 0, opacity: 0.6 }}>Noch kein Plakat hochgeladen.</p>
+                <p style={{ margin: 0, opacity: 0.6 }}>{t('tournaments.details.noPoster')}</p>
               )}
               <input type="file" accept="image/*,application/pdf" onChange={handlePosterFileSelect} />
-              {posterFile && <p style={{ margin: 0, opacity: 0.7, fontSize: '0.85rem' }}>Ausgewählt: {posterFile.name}</p>}
-              <div><button type="button" onClick={handlePosterUploadClick} disabled={!posterFile}>{tournament.poster_url ? 'Plakat ersetzen' : 'Hochladen'}</button></div>
+              {posterFile && <p style={{ margin: 0, opacity: 0.7, fontSize: '0.85rem' }}>{t('tournaments.details.posterSelected', { name: posterFile.name })}</p>}
+              <div><button type="button" onClick={handlePosterUploadClick} disabled={!posterFile}>{tournament.poster_url ? t('tournaments.details.replacePoster') : t('tournaments.details.upload')}</button></div>
             </section>
 
             {[
-              ['Ablauf & Zeiten', 'schedule_info'],
-              ['Anreise', 'travel_info'],
+              [t('tournaments.scheduleInfo'), 'schedule_info'],
+              [t('tournaments.travelInfo'), 'travel_info'],
             ].map(([label, field]) => tournament[field] && (
               <section key={field}>
                 <h3 style={{ margin: '0 0 0.4rem', fontSize: '0.85rem', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</h3>
@@ -229,14 +238,14 @@ export default function TournamentDetailsPanel({
             ))}
             {tournament.contact_email && (
               <section>
-                <h3 style={{ margin: '0 0 0.4rem', fontSize: '0.85rem', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Kontakt</h3>
+                <h3 style={{ margin: '0 0 0.4rem', fontSize: '0.85rem', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t('tournaments.details.contact')}</h3>
                 <a href={`mailto:${tournament.contact_email}`} style={{ color: '#7cb9ff' }}>{tournament.contact_email}</a>
               </section>
             )}
             {tournament.registration_deadline && (
               <section>
-                <h3 style={{ margin: '0 0 0.4rem', fontSize: '0.85rem', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Anmeldefrist</h3>
-                <p style={{ margin: 0, opacity: 0.85 }}>{new Date(tournament.registration_deadline).toLocaleDateString('de-DE')}</p>
+                <h3 style={{ margin: '0 0 0.4rem', fontSize: '0.85rem', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t('tournaments.details.deadline')}</h3>
+                <p style={{ margin: 0, opacity: 0.85 }}>{new Date(tournament.registration_deadline).toLocaleDateString(dateLocale)}</p>
               </section>
             )}
           </div>
@@ -251,7 +260,7 @@ export default function TournamentDetailsPanel({
                 disabled={closingReg}
                 style={{ padding: '0.4rem 1rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: tournament.registration_closed ? 'rgba(64,200,120,0.2)' : 'rgba(255,100,100,0.15)', color: '#fff', fontSize: '0.85rem', cursor: closingReg ? 'not-allowed' : 'pointer', fontWeight: 600 }}
               >
-                {closingReg ? '...' : tournament.registration_closed ? '🔓 Anmeldung öffnen' : '🔒 Anmeldung schließen'}
+                {closingReg ? '...' : tournament.registration_closed ? t('tournaments.details.openRegistration') : t('tournaments.details.closeRegistration')}
               </button>
             </div>
             {statusError && <p style={{ margin: 0, color: '#ffb0b0', fontSize: '0.85rem' }}>{statusError}</p>}
@@ -261,36 +270,36 @@ export default function TournamentDetailsPanel({
                 onClick={openActivateForm}
                 style={{ padding: '0.55rem 1.25rem', borderRadius: '8px', border: 'none', background: 'rgba(64,200,120,0.25)', color: '#7dffb3', fontWeight: 600, cursor: 'pointer', justifySelf: 'start' }}
               >
-                🚀 Turnier aktivieren
+                {t('tournaments.details.activate')}
               </button>
             )}
 
             {showActivateForm && (
               <div style={{ background: 'rgba(0,0,0,0.3)', borderRadius: '12px', padding: '1.25rem', display: 'grid', gap: '1rem', border: '1px solid rgba(64,200,120,0.2)' }}>
-                <h3 style={{ margin: 0, fontSize: '1rem' }}>Turnier-Konfiguration</h3>
+                <h3 style={{ margin: 0, fontSize: '1rem' }}>{t('tournaments.details.activateConfig')}</h3>
                 <div className="admin-grid-2col">
                   <label style={{ display: 'grid', gap: '0.3rem', fontSize: '0.875rem' }}>
-                    Gruppen
+                    {t('tournaments.groups')}
                     <input type="number" min="1" value={activateGroupCount} onChange={(e) => setActivateGroupCount(e.target.value)}
                       style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff' }} />
                   </label>
                   <label style={{ display: 'grid', gap: '0.3rem', fontSize: '0.875rem' }}>
-                    KO-Runden
+                    {t('tournaments.knockoutRounds')}
                     <input type="number" min="0" value={activateKoRounds} onChange={(e) => setActivateKoRounds(e.target.value)}
                       style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff' }} />
                   </label>
                 </div>
 
                 <div style={{ display: 'grid', gap: '0.5rem' }}>
-                  <p style={{ margin: 0, fontSize: '0.875rem', opacity: 0.7 }}>Teams ({activateTeams.length})</p>
-                  {activateTeams.map((t, idx) => (
+                  <p style={{ margin: 0, fontSize: '0.875rem', opacity: 0.7 }}>{t('tournaments.details.teamsCount', { count: activateTeams.length })}</p>
+                  {activateTeams.map((team, idx) => (
                     <div key={idx} style={{ display: 'grid', gridTemplateColumns: 'auto 1fr auto', gap: '0.5rem', alignItems: 'center' }}>
                       <span style={{ fontSize: '0.8rem', opacity: 0.5, minWidth: '20px' }}>{idx + 1}.</span>
                       <input
-                        value={t.name}
+                        value={team.name}
                         onChange={(e) => updateActivateTeam(idx, 'name', e.target.value)}
-                        placeholder="Teamname"
-                        style={{ padding: '0.45rem 0.6rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: t.team_id ? 'rgba(64,200,120,0.08)' : 'rgba(255,255,255,0.06)', color: '#fff', fontSize: '0.875rem' }}
+                        placeholder={t('tournaments.details.teamNamePlaceholder')}
+                        style={{ padding: '0.45rem 0.6rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: team.team_id ? 'rgba(64,200,120,0.08)' : 'rgba(255,255,255,0.06)', color: '#fff', fontSize: '0.875rem' }}
                       />
                       <button type="button" onClick={() => removeActivateTeamSlot(idx)}
                         style={{ padding: '0.3rem 0.5rem', borderRadius: '6px', border: '1px solid rgba(255,100,100,0.3)', background: 'transparent', color: 'rgba(255,100,100,0.8)', cursor: 'pointer', fontSize: '0.8rem' }}>
@@ -300,24 +309,24 @@ export default function TournamentDetailsPanel({
                   ))}
                   <button type="button" onClick={addActivateTeamSlot}
                     style={{ padding: '0.4rem', borderRadius: '6px', border: '1px dashed rgba(255,255,255,0.2)', background: 'transparent', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', fontSize: '0.85rem' }}>
-                    + Team hinzufügen
+                    {t('tournaments.details.addTeam')}
                   </button>
                 </div>
 
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                   <button type="button" onClick={handleActivate} disabled={activating}
                     style={{ padding: '0.55rem 1.25rem', borderRadius: '8px', border: 'none', background: activating ? 'rgba(64,200,120,0.15)' : 'rgba(64,200,120,0.4)', color: '#7dffb3', fontWeight: 600, cursor: activating ? 'not-allowed' : 'pointer' }}>
-                    {activating ? 'Wird aktiviert...' : '🚀 Jetzt aktivieren'}
+                    {activating ? t('tournaments.details.activating') : t('tournaments.details.activateNow')}
                   </button>
                   <button type="button" onClick={() => setShowActivateForm(false)}
                     style={{ padding: '0.55rem 1rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'transparent', color: '#fff', cursor: 'pointer' }}>
-                    Abbrechen
+                    {t('common.cancel')}
                   </button>
                 </div>
               </div>
             )}
-            {regLoading && <p style={{ margin: 0, opacity: 0.6 }}>Lade Anmeldungen...</p>}
-            {!regLoading && registrations.length === 0 && <p style={{ margin: 0, opacity: 0.6 }}>Noch keine Anmeldungen.</p>}
+            {regLoading && <p style={{ margin: 0, opacity: 0.6 }}>{t('tournaments.details.loadingRegistrations')}</p>}
+            {!regLoading && registrations.length === 0 && <p style={{ margin: 0, opacity: 0.6 }}>{t('tournaments.details.noRegistrations')}</p>}
             {registrations.map((reg) => (
               <div key={reg.id} style={{ background: 'rgba(0,0,0,0.25)', borderRadius: '10px', padding: '1rem', display: 'grid', gap: '0.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -342,11 +351,11 @@ export default function TournamentDetailsPanel({
                 </p>
                 {reg.audioFiles?.length > 0 && (
                   <p style={{ margin: 0, opacity: 0.6, fontSize: '0.8rem' }}>
-                    Audio: {reg.audioFiles.map((f) => f.originalName).join(', ')}
+                    {t('tournaments.details.audioFiles', { files: reg.audioFiles.map((f) => f.originalName).join(', ') })}
                   </p>
                 )}
                 {reg.audioNotes && <p style={{ margin: 0, opacity: 0.6, fontSize: '0.8rem', fontStyle: 'italic' }}>{reg.audioNotes}</p>}
-                <p style={{ margin: 0, opacity: 0.4, fontSize: '0.75rem' }}>{new Date(reg.createdAt).toLocaleString('de-DE')}</p>
+                <p style={{ margin: 0, opacity: 0.4, fontSize: '0.75rem' }}>{new Date(reg.createdAt).toLocaleString(dateLocale)}</p>
               </div>
             ))}
           </div>
@@ -376,7 +385,7 @@ export default function TournamentDetailsPanel({
 
   // Fallback for any other status (completed etc.)
   return (
-    <PanelCard title={`Turnierdetails – ${tournament.name}`} description={qualifierSummary}>
+    <PanelCard title={t('tournaments.details.titleWithName', { name: tournament.name })} description={qualifierSummary}>
       <StructureContent
         groups={groups}
         slotAssignments={slotAssignments}
@@ -398,45 +407,50 @@ export default function TournamentDetailsPanel({
 }
 
 function StructureContent({ groups, slotAssignments, slotInitialAssignments, structureSaving, hasTournamentChanges, handleSlotNameChange, handleSlotTeamSelect, handleSlotReset, handleResetAllSlots, handleTournamentAssignmentsSave, handleTournamentStructureRefresh, teams, teamNameById }) {
+  const { t } = useTranslation();
   return (
     <div style={{ display: 'grid', gap: '1rem' }}>
       <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
-        <button type="button" onClick={handleTournamentStructureRefresh}>Neu laden</button>
+        <button type="button" onClick={handleTournamentStructureRefresh}>{t('tournaments.details.reload')}</button>
         <button type="button" onClick={handleTournamentAssignmentsSave} disabled={!hasTournamentChanges || structureSaving}>
-          {structureSaving ? 'Speichere...' : 'Änderungen sichern'}
+          {structureSaving ? t('tournaments.details.saving') : t('tournaments.details.saveChanges')}
         </button>
-        <button type="button" onClick={handleResetAllSlots}>Zurücksetzen</button>
+        <button type="button" onClick={handleResetAllSlots}>{t('tournaments.details.reset')}</button>
       </div>
       {groups.length === 0 ? (
-        <p style={{ margin: 0 }}>Noch keine Gruppen/Slots definiert.</p>
+        <p style={{ margin: 0 }}>{t('tournaments.details.noGroups')}</p>
       ) : (
         <div style={{ display: 'grid', gap: '1.25rem' }}>
           {groups.map((group) => (
             <section key={group.label ?? group.id} style={{ borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(8,20,35,0.45)', padding: '1rem 1.2rem', display: 'grid', gap: '0.8rem' }}>
               <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <strong>{group.label || `Gruppe ${group.id ?? ''}`}</strong>
-                <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>{group.slots?.length ?? 0} Slots</span>
+                <strong>{group.label || t('tournaments.details.groupFallback', { id: group.id ?? '' })}</strong>
+                <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>{t('tournaments.details.slots', { count: group.slots?.length ?? 0 })}</span>
               </header>
               <div style={{ display: 'grid', gap: '0.75rem' }}>
                 {group.slots.map((slot) => {
                   const key = String(slot.slotNumber);
-                  const assignment = slotAssignments[key] ?? { name: `Team ${slot.slotNumber}`, placeholder: `Team ${slot.slotNumber}`, teamId: '' };
+                  const assignment = slotAssignments[key] ?? {
+                    name: t('tournaments.details.teamFallback', { number: slot.slotNumber }),
+                    placeholder: t('tournaments.details.teamFallback', { number: slot.slotNumber }),
+                    teamId: ''
+                  };
                   const initial = slotInitialAssignments[key] ?? assignment;
                   const hasChanges = (assignment.name ?? '').trim() !== (initial.name ?? '').trim() || (assignment.teamId ?? '') !== (initial.teamId ?? '');
                   return (
                     <div key={key} style={{ display: 'grid', gap: '0.65rem', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: hasChanges ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.08)', background: 'rgba(12,28,48,0.6)' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontWeight: 600 }}>Slot {slot.slotNumber}</span>
-                        <button type="button" onClick={() => handleSlotReset(slot.slotNumber)}>Zurücksetzen</button>
+                        <span style={{ fontWeight: 600 }}>{t('tournaments.details.slot', { number: slot.slotNumber })}</span>
+                        <button type="button" onClick={() => handleSlotReset(slot.slotNumber)}>{t('tournaments.details.reset')}</button>
                       </div>
                       <label style={{ display: 'grid', gap: '0.3rem' }}>
-                        Platzhalter / Name
+                        {t('tournaments.details.placeholderName')}
                         <input value={assignment.name} onChange={(e) => handleSlotNameChange(slot.slotNumber, e.target.value)} placeholder={assignment.placeholder} />
                       </label>
                       <label style={{ display: 'grid', gap: '0.3rem' }}>
-                        Team zuweisen
+                        {t('tournaments.details.assignTeam')}
                         <select value={assignment.teamId ?? ''} onChange={(e) => handleSlotTeamSelect(slot.slotNumber, e.target.value)}>
-                          <option value="">Kein fixes Team</option>
+                          <option value="">{t('tournaments.details.noFixedTeam')}</option>
                           {teams.map((team) => <option key={team.id} value={team.id}>{team.name}</option>)}
                         </select>
                       </label>

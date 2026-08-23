@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   fetchTournamentSchedule,
   selectScheduleMatch,
@@ -10,6 +11,9 @@ import {
   normalizeLocalDateTimeToISO
 } from '../utils/formatters.js';
 import { createPenaltyForms } from '../utils/forms.js';
+import { formatApiError } from '../utils/apiError.js';
+import { formatStageLabelI18n } from '../utils/stageLabels.js';
+import { useDateLocale } from '../i18n/index.js';
 
 const PHASES = new Set(['group', 'knockout', 'placement']);
 
@@ -35,6 +39,8 @@ export default function useScheduleManager({
   updateMessage,
   refreshScheduleDependencies = []
 }) {
+  const { t } = useTranslation();
+  const dateLocale = useDateLocale();
   const [scheduleData, setScheduleData] = useState(null);
   const [scheduleLoading, setScheduleLoading] = useState(false);
   const [scheduleError, setScheduleError] = useState('');
@@ -63,14 +69,14 @@ export default function useScheduleManager({
     } catch (err) {
       console.error(err);
       setScheduleData(null);
-      setScheduleError('Spielplan konnte nicht geladen werden.');
+      setScheduleError(formatApiError(err, t, 'feedback.scheduleLoadFailed'));
       return false;
     } finally {
       if (showLoader) {
         setScheduleLoading(false);
       }
     }
-  }, [resolvedTournamentId]);
+  }, [resolvedTournamentId, t]);
 
   useEffect(() => {
     refreshSchedule(true);
@@ -118,20 +124,24 @@ export default function useScheduleManager({
       const roundNumber = entry.round_number ?? entry.metadata?.round ?? null;
       const hasResult = Boolean(entry.result?.hasResult);
       const scoreText = hasResult ? `${entry.result.scoreA ?? 0}:${entry.result.scoreB ?? 0}` : null;
-      const stageLabel = entry.stage_label || (phase === 'group' ? 'Gruppe' : 'Phase');
+      const stageLabel = formatStageLabelI18n(
+        entry.stage_label_i18n,
+        t,
+        entry.stage_label || (phase === 'group' ? t('phases.groupFallback') : t('phases.fallback'))
+      );
       const descriptor =
         phase === 'group'
-          ? `${stageLabel}${roundNumber ? ` · Runde ${roundNumber}` : ''}`
+          ? `${stageLabel}${roundNumber ? ` · ${t('phases.round', { round: roundNumber })}` : ''}`
           : stageLabel;
 
       const scheduledTimestamp = entry.scheduled_at ? Date.parse(entry.scheduled_at) : null;
-      const scheduledLabel = Number.isFinite(scheduledTimestamp) ? formatDateTime(entry.scheduled_at) : null;
+      const scheduledLabel = Number.isFinite(scheduledTimestamp) ? formatDateTime(entry.scheduled_at, dateLocale) : null;
       const detailParts = [];
       if (scheduledLabel) {
-        detailParts.push(`Start ${scheduledLabel}`);
+        detailParts.push(t('schedule.optionStart', { time: scheduledLabel }));
       }
       if (scoreText) {
-        detailParts.push(`Ergebnis ${scoreText}`);
+        detailParts.push(t('schedule.optionResult', { score: scoreText }));
       }
       const detailSuffix = detailParts.length > 0 ? ` · ${detailParts.join(' · ')}` : '';
       const label = `${descriptor} – ${entry.home_label} vs ${entry.away_label}${detailSuffix}`;
@@ -175,7 +185,7 @@ export default function useScheduleManager({
     });
 
     return { options, matchMap };
-  }, [scheduleData]);
+  }, [scheduleData, t, dateLocale]);
 
   const scheduleChronological = useMemo(() => {
     if (!scheduleData?.raw || !Array.isArray(scheduleData.raw)) {
@@ -235,7 +245,7 @@ export default function useScheduleManager({
     async (entryId, overrideValue = undefined, options = {}) => {
       const { silent = false, skipRefresh = false } = options;
       if (!resolvedTournamentId) {
-        updateMessage('error', 'Bitte zuerst ein Turnier im Match-Kontext auswählen.');
+        updateMessage('error', t('feedback.tournamentRequired'));
         return false;
       }
 
@@ -248,7 +258,7 @@ export default function useScheduleManager({
       if (trimmed) {
         normalized = normalizeLocalDateTimeToISO(trimmed);
         if (!normalized) {
-          updateMessage('error', 'Bitte ein gültiges Datum/Uhrzeit auswählen.');
+          updateMessage('error', t('feedback.invalidDateTime'));
           return false;
         }
       }
@@ -267,7 +277,7 @@ export default function useScheduleManager({
           [key]: trimmed
         }));
         if (!silent) {
-          updateMessage('info', normalized ? 'Spieltermin gespeichert.' : 'Spieltermin entfernt.');
+          updateMessage('info', normalized ? t('feedback.scheduleEntrySaved') : t('feedback.scheduleEntryRemoved'));
         }
         if (!skipRefresh) {
           await refreshSchedule();
@@ -275,20 +285,12 @@ export default function useScheduleManager({
         return true;
       } catch (err) {
         console.error(err);
-        let detail = '';
-        if (typeof err?.message === 'string') {
-          try {
-            const parsed = JSON.parse(err.message);
-            detail = parsed?.detail ?? parsed?.message ?? '';
-          } catch {
-            detail = err.message;
-          }
-        }
         if (!silent) {
+          const detail = typeof err?.detail === 'string' ? err.detail : '';
           if (detail.includes('Ungültiger Zeitpunkt')) {
-            updateMessage('error', 'Bitte ein gültiges Datum/Uhrzeit auswählen.');
+            updateMessage('error', t('feedback.invalidDateTime'));
           } else {
-            updateMessage('error', 'Spieltermin konnte nicht gespeichert werden.');
+            updateMessage('error', formatApiError(err, t, 'feedback.scheduleEntrySaveFailed'));
           }
         }
         return false;
@@ -300,7 +302,7 @@ export default function useScheduleManager({
         });
       }
     },
-    [resolvedTournamentId, scheduleDrafts, refreshSchedule, updateMessage]
+    [resolvedTournamentId, scheduleDrafts, refreshSchedule, updateMessage, t]
   );
 
   const handleScheduleDraftClear = useCallback(
@@ -319,7 +321,7 @@ export default function useScheduleManager({
     ({ date, phase = 'all' }) => {
       const normalizedDate = typeof date === 'string' ? date.trim() : '';
       if (!/^\d{4}-\d{2}-\d{2}$/.test(normalizedDate)) {
-        updateMessage('error', 'Bitte ein gültiges Datum wählen (JJJJ-MM-TT).');
+        updateMessage('error', t('feedback.invalidDate'));
         return false;
       }
       const normalizedPhase = normalizePhaseFilter(phase);
@@ -327,7 +329,7 @@ export default function useScheduleManager({
         (entry) => normalizedPhase === 'all' || entry.phase === normalizedPhase
       );
       if (targets.length === 0) {
-        updateMessage('error', 'Keine Spiele für den ausgewählten Bereich gefunden.');
+        updateMessage('error', t('feedback.noGamesInScope'));
         return false;
       }
       setScheduleDrafts((prev) => {
@@ -344,10 +346,10 @@ export default function useScheduleManager({
         });
         return next;
       });
-      updateMessage('info', `Datum für ${targets.length} Spiele aktualisiert.`);
+      updateMessage('info', t('feedback.dateApplied', { count: targets.length }));
       return true;
     },
-    [scheduleData?.raw, updateMessage]
+    [scheduleData?.raw, updateMessage, t]
   );
 
   const handleScheduleAutoPlan = useCallback(
@@ -362,17 +364,17 @@ export default function useScheduleManager({
     }) => {
       const normalizedStart = typeof start === 'string' ? start.trim() : '';
       if (!normalizedStart) {
-        updateMessage('error', 'Bitte einen Startzeitpunkt auswählen.');
+        updateMessage('error', t('feedback.startRequired'));
         return false;
       }
       const startDate = new Date(normalizedStart);
       if (Number.isNaN(startDate.getTime())) {
-        updateMessage('error', 'Startzeitpunkt ist ungültig.');
+        updateMessage('error', t('feedback.startInvalid'));
         return false;
       }
       const interval = Number(intervalMinutes);
       if (!Number.isFinite(interval) || interval <= 0) {
-        updateMessage('error', 'Intervall muss größer als 0 sein.');
+        updateMessage('error', t('feedback.intervalInvalid'));
         return false;
       }
 
@@ -392,7 +394,7 @@ export default function useScheduleManager({
       });
 
       if (entries.length === 0) {
-        updateMessage('error', 'Keine passenden Spiele für die automatische Planung gefunden.');
+        updateMessage('error', t('feedback.noGamesForAutoPlan'));
         return false;
       }
 
@@ -424,16 +426,16 @@ export default function useScheduleManager({
         return next;
       });
 
-      updateMessage('info', `${assignments.length} Spiele automatisch geplant.`);
+      updateMessage('info', t('feedback.autoPlanned', { count: assignments.length }));
       return true;
     },
-    [scheduleChronological, getDraftValue, updateMessage]
+    [scheduleChronological, getDraftValue, updateMessage, t]
   );
 
   const handleScheduleBulkPersist = useCallback(
     async ({ phase = 'all' } = {}) => {
       if (!resolvedTournamentId) {
-        updateMessage('error', 'Bitte zuerst ein Turnier im Match-Kontext auswählen.');
+        updateMessage('error', t('feedback.tournamentRequired'));
         return false;
       }
       const normalizedPhase = normalizePhaseFilter(phase);
@@ -441,7 +443,7 @@ export default function useScheduleManager({
         (entry) => normalizedPhase === 'all' || entry.phase === normalizedPhase
       );
       if (targets.length === 0) {
-        updateMessage('error', 'Keine Spiele für den ausgewählten Bereich gefunden.');
+        updateMessage('error', t('feedback.noGamesInScope'));
         return false;
       }
 
@@ -452,7 +454,7 @@ export default function useScheduleManager({
       });
 
       if (pending.length === 0) {
-        updateMessage('info', 'Keine Änderungen zum Speichern vorhanden.');
+        updateMessage('info', t('feedback.noChangesToSave'));
         return true;
       }
 
@@ -474,14 +476,14 @@ export default function useScheduleManager({
       await refreshSchedule();
 
       if (failure === 0) {
-        updateMessage('info', `${success} Spieltermine gespeichert.`);
+        updateMessage('info', t('feedback.scheduleSaved', { count: success }));
         return true;
       }
 
       if (success > 0) {
-        updateMessage('warning', `${success} gespeichert, ${failure} fehlgeschlagen.`);
+        updateMessage('warning', t('feedback.schedulePartiallySaved', { success, failure }));
       } else {
-        updateMessage('error', 'Speichern der Spieltermine fehlgeschlagen.');
+        updateMessage('error', t('feedback.schedulePersistFailed'));
       }
 
       return false;
@@ -492,7 +494,8 @@ export default function useScheduleManager({
       getDraftValue,
       handleScheduleDraftSubmit,
       refreshSchedule,
-      updateMessage
+      updateMessage,
+      t
     ]
   );
 
@@ -500,24 +503,22 @@ export default function useScheduleManager({
     async (code) => {
       const selectedCode = String(code ?? '').trim();
       if (!selectedCode) {
-        updateMessage('error', 'Bitte ein Match aus dem Spielplan auswählen.');
+        updateMessage('error', t('feedback.selectMatchRequired'));
         return false;
       }
       if (!resolvedTournamentId) {
-        updateMessage('error', 'Bitte zuerst ein Turnier im Match-Kontext auswählen.');
+        updateMessage('error', t('feedback.tournamentRequired'));
         return false;
       }
 
       const match = scheduleOptionData.matchMap.get(selectedCode);
       if (!match) {
-        updateMessage('error', 'Das ausgewählte Match konnte im Spielplan nicht gefunden werden.');
+        updateMessage('error', t('feedback.scheduleMatchNotFound'));
         return false;
       }
 
       if (match.result?.hasResult) {
-        const confirmReuse = window.confirm(
-          'Für dieses Match wurde bereits ein Ergebnis gespeichert. Soll es trotzdem übernommen werden?'
-        );
+        const confirmReuse = window.confirm(t('feedback.confirmReuseResult'));
         if (!confirmReuse) {
           return false;
         }
@@ -529,7 +530,7 @@ export default function useScheduleManager({
         const response = await selectScheduleMatch(resolvedTournamentId, selectedCode);
         const nextState = response?.scoreboard ?? null;
         if (!nextState) {
-          updateMessage('error', 'Aktualisierter Scoreboard-Status nicht verfügbar.');
+          updateMessage('error', t('feedback.scoreboardStateUnavailable'));
           return false;
         }
 
@@ -544,11 +545,11 @@ export default function useScheduleManager({
         });
         setContextFormDirty(false);
         setSchedulePickerCode(nextState.scheduleCode ?? selectedCode);
-        updateMessage('info', 'Match aus Spielplan übernommen.');
+        updateMessage('info', t('feedback.scheduleMatchApplied'));
         return true;
       } catch (error) {
         console.error(error);
-        updateMessage('error', 'Spielplan-Match konnte nicht übernommen werden.');
+        updateMessage('error', formatApiError(error, t, 'feedback.scheduleMatchApplyFailed'));
         return false;
       } finally {
         setScheduleSelection('');
@@ -563,7 +564,8 @@ export default function useScheduleManager({
       setManualDirty,
       setContextForm,
       setContextFormDirty,
-      updateMessage
+      updateMessage,
+      t
     ]
   );
 
@@ -572,12 +574,17 @@ export default function useScheduleManager({
       return '';
     }
 
+    const stageName = formatStageLabelI18n(
+      entry.stage_label_i18n,
+      t,
+      entry.stage_label || t('phases.fallback')
+    );
     const roundPart = entry.phase === 'group' && entry.round_number
-      ? ` · Runde ${entry.round_number}`
+      ? ` · ${t('phases.round', { round: entry.round_number })}`
       : '';
 
-    return `${entry.stage_label || 'Phase'}${roundPart} – ${entry.home_label} vs ${entry.away_label}`;
-  }, []);
+    return `${stageName}${roundPart} – ${entry.home_label} vs ${entry.away_label}`;
+  }, [t]);
 
   const selectedScheduleMatch = scheduleOptionData.matchMap.get(schedulePickerCode ?? '');
   const activeScheduleMatch = scoreboard?.scheduleCode

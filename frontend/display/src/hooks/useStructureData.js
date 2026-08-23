@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import i18n from '../i18n/index.js';
 import { fetchJson } from '../utils/api.js';
 
 export default function useStructureData(scoreboard, displayView) {
@@ -43,7 +44,7 @@ export default function useStructureData(scoreboard, displayView) {
         console.error(err);
         if (cancelled) return;
         setStructure(null);
-        setError('Turnierstruktur konnte nicht geladen werden.');
+        setError(i18n.t('errors.loadStructure'));
       })
       .finally(() => {
         if (!cancelled) {

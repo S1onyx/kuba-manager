@@ -1,0 +1,69 @@
+{
+  "header": {
+    "title": "Kunstrad Basketball – Audio",
+    "subtitle": "This page automatically plays all configured game sounds. Please keep the speakers turned on."
+  },
+  "status": {
+    "connected": "Connected",
+    "disconnected": "Not connected",
+    "audioOn": "Audio enabled",
+    "audioOff": "Audio disabled",
+    "enableAudio": "Enable audio",
+    "audioActive": "Audio active"
+  },
+  "devices": {
+    "label": "Output device",
+    "systemDefault": "System default",
+    "unnamed": "Device {{id}}"
+  },
+  "volume": {
+    "title": "Volume per event",
+    "description": "Adjust the balance between the game events. The values are stored locally in your browser.",
+    "categories": {
+      "score": {
+        "label": "Scoring anthems",
+        "description": "All scoring sounds (team-specific or general)."
+      },
+      "game": {
+        "label": "Game start / break / end",
+        "description": "Status announcements such as the start signal, half-time or final score."
+      },
+      "events": {
+        "label": "Game events",
+        "description": "Other triggers such as fouls or individual events."
+      },
+      "manual": {
+        "label": "Manual playback",
+        "description": "Sounds started directly from the library."
+      }
+    }
+  },
+  "events": {
+    "title": "Recent events",
+    "logDescription": "Incoming sounds are played automatically one after another.",
+    "empty": "No sound events received yet.",
+    "manual": "Manual",
+    "event": "Event",
+    "audioConnected": "Audio connected",
+    "soundFallback": "Sound #{{id}}",
+    "count_one": "{{count}} event",
+    "count_other": "{{count}} events"
+  },
+  "errors": {
+    "playbackFailed": "The sound could not be played. Please check the speakers.",
+    "devicesNotFound": "Audio output devices could not be detected.",
+    "sinkNotSupported": "Output device selection is not supported by this browser.",
+    "sinkFailed": "The output device could not be set."
+  },
+  "languageSwitcher": {
+    "label": "Choose language",
+    "aiNotice": "Machine-translated — may contain errors"
+  },
+  "languages": {
+    "de": "Deutsch",
+    "en": "English",
+    "fr": "Français",
+    "hu": "Magyar",
+    "cs": "Čeština"
+  }
+}

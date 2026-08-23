@@ -12,7 +12,7 @@ import {
 } from '../services/index.js';
 import { getAudioFileById } from '../services/audio/index.js';
 import { createRegistration, attachAudioFile } from '../services/registrations/index.js';
-import { sendRegistrationConfirmation, sendRegistrationNotification } from '../services/mail/index.js';
+import { sendRegistrationConfirmation, sendRegistrationNotification, normalizeLanguage } from '../services/mail/index.js';
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
 
@@ -138,42 +138,44 @@ router.get('/tournaments', async (_req, res) => {
 router.get('/tournaments/:id/detail', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+    return res.status(400).json({ code: 'INVALID_TOURNAMENT_ID', message: 'Ungültige Turnier-ID.' });
   }
   try {
     const tournament = await getTournament(id);
     if (!tournament || !tournament.is_public) {
-      return res.status(404).json({ message: 'Turnier nicht gefunden.' });
+      return res.status(404).json({ code: 'TOURNAMENT_NOT_FOUND', message: 'Turnier nicht gefunden.' });
     }
     res.json(await withPosterUrl(tournament));
   } catch (error) {
-    res.status(500).json({ message: 'Turnier konnte nicht geladen werden.' });
+    res.status(500).json({ code: 'TOURNAMENT_LOAD_FAILED', message: 'Turnier konnte nicht geladen werden.' });
   }
 });
 
 router.post('/tournaments/:id/register', upload.array('audio', 5), async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+    return res.status(400).json({ code: 'INVALID_TOURNAMENT_ID', message: 'Ungültige Turnier-ID.' });
   }
   try {
     const tournament = await getTournament(id);
     if (!tournament || !tournament.is_public || tournament.status !== 'planned') {
-      return res.status(404).json({ message: 'Turnier nicht gefunden oder nicht anmeldbar.' });
+      return res.status(404).json({ code: 'TOURNAMENT_NOT_REGISTRABLE', message: 'Turnier nicht gefunden oder nicht anmeldbar.' });
     }
     if (tournament.registration_closed) {
-      return res.status(400).json({ message: 'Die Anmeldung für dieses Turnier ist geschlossen.' });
+      return res.status(400).json({ code: 'REGISTRATION_CLOSED', message: 'Die Anmeldung für dieses Turnier ist geschlossen.' });
     }
 
-    const { team_name, contact_name, contact_email, audio_notes } = req.body ?? {};
+    const { team_name, contact_name, contact_email, audio_notes, language: rawLanguage } = req.body ?? {};
+    // Ungueltige oder fehlende Sprache faellt still auf 'de' zurueck.
+    const language = normalizeLanguage(rawLanguage);
     let players = [];
     try { players = JSON.parse(req.body.players || '[]'); } catch {}
 
     if (!team_name?.trim() || !contact_name?.trim() || !contact_email?.trim()) {
-      return res.status(400).json({ message: 'Teamname, Kontaktname und E-Mail sind Pflichtfelder.' });
+      return res.status(400).json({ code: 'REGISTRATION_REQUIRED_FIELDS', message: 'Teamname, Kontaktname und E-Mail sind Pflichtfelder.' });
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact_email)) {
-      return res.status(400).json({ message: 'Ungültige E-Mail-Adresse.' });
+      return res.status(400).json({ code: 'INVALID_EMAIL', message: 'Ungültige E-Mail-Adresse.' });
     }
 
     const regId = await createRegistration({
@@ -182,7 +184,8 @@ router.post('/tournaments/:id/register', upload.array('audio', 5), async (req, r
       contactName: contact_name.trim(),
       contactEmail: contact_email.trim(),
       players,
-      audioNotes: audio_notes ?? null
+      audioNotes: audio_notes ?? null,
+      language
     });
 
     for (const file of req.files ?? []) {
@@ -191,45 +194,45 @@ router.post('/tournaments/:id/register', upload.array('audio', 5), async (req, r
       }
     }
 
-    // Fire-and-forget emails
-    sendRegistrationConfirmation({ to: contact_email.trim(), tournamentName: tournament.name, teamName: team_name.trim(), contactName: contact_name.trim(), players }).catch(console.error);
+    // Fire-and-forget emails (Teilnehmer-Mail in Empfaengersprache, Admin-Mail immer Deutsch)
+    sendRegistrationConfirmation({ to: contact_email.trim(), tournamentName: tournament.name, teamName: team_name.trim(), contactName: contact_name.trim(), players, language }).catch(console.error);
     sendRegistrationNotification({ tournamentName: tournament.name, teamName: team_name.trim(), contactName: contact_name.trim(), contactEmail: contact_email.trim(), players }).catch(console.error);
 
-    res.status(201).json({ id: regId, message: 'Anmeldung erfolgreich eingereicht.' });
+    res.status(201).json({ id: regId, code: 'REGISTRATION_SUBMITTED', message: 'Anmeldung erfolgreich eingereicht.' });
   } catch (error) {
     console.error('Anmeldung fehlgeschlagen:', error);
-    res.status(500).json({ message: 'Anmeldung konnte nicht gespeichert werden.' });
+    res.status(500).json({ code: 'REGISTRATION_SAVE_FAILED', message: 'Anmeldung konnte nicht gespeichert werden.' });
   }
 });
 
 router.get('/tournaments/:id/summary', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+    return res.status(400).json({ code: 'INVALID_TOURNAMENT_ID', message: 'Ungültige Turnier-ID.' });
   }
 
   try {
     const summary = await getTournamentSummary(id);
     if (!summary) {
-      return res.status(404).json({ message: 'Turnier nicht gefunden.' });
+      return res.status(404).json({ code: 'TOURNAMENT_NOT_FOUND', message: 'Turnier nicht gefunden.' });
     }
     res.json(summary);
   } catch (error) {
     console.error('Turnierübersicht konnte nicht geladen werden:', error);
-    res.status(500).json({ message: 'Turnierübersicht konnte nicht geladen werden.' });
+    res.status(500).json({ code: 'TOURNAMENT_SUMMARY_LOAD_FAILED', message: 'Turnierübersicht konnte nicht geladen werden.' });
   }
 });
 
 router.get('/tournaments/:id/schedule', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+    return res.status(400).json({ code: 'INVALID_TOURNAMENT_ID', message: 'Ungültige Turnier-ID.' });
   }
 
   try {
     const tournament = await getTournament(id);
     if (!tournament || !tournament.is_public) {
-      return res.status(404).json({ message: 'Turnier nicht gefunden.' });
+      return res.status(404).json({ code: 'TOURNAMENT_NOT_FOUND', message: 'Turnier nicht gefunden.' });
     }
 
     const participants = await getTournamentTeams(id);
@@ -246,7 +249,7 @@ router.get('/tournaments/:id/schedule', async (req, res) => {
     });
   } catch (error) {
     console.error('Spielplan konnte nicht geladen werden:', error);
-    res.status(500).json({ message: 'Spielplan konnte nicht geladen werden.' });
+    res.status(500).json({ code: 'SCHEDULE_LOAD_FAILED', message: 'Spielplan konnte nicht geladen werden.' });
   }
 });
 

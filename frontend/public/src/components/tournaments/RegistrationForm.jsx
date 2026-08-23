@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { submitRegistration } from '../../api.js';
+import { SUPPORTED_LANGUAGES, resolveLanguage } from '../../i18n/index.js';
 
 const responsiveStyles = `
   @media (max-width: 768px) {
@@ -24,13 +26,19 @@ function emptyPlayer() {
 }
 
 export default function RegistrationForm({ tournament, onSuccess }) {
+  const { t, i18n } = useTranslation();
   const [teamName, setTeamName] = useState('');
   const [contactName, setContactName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [players, setPlayers] = useState([emptyPlayer(), emptyPlayer(), emptyPlayer(), emptyPlayer(), emptyPlayer()]);
   const [audioFile, setAudioFile] = useState(null);
+  const [language, setLanguage] = useState(() => resolveLanguage(i18n.resolvedLanguage ?? i18n.language));
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    setLanguage(resolveLanguage(i18n.resolvedLanguage ?? i18n.language));
+  }, [i18n, i18n.language, i18n.resolvedLanguage]);
 
   const updatePlayer = (i, field, value) => {
     setPlayers((prev) => prev.map((p, idx) => idx === i ? { ...p, [field]: value } : p));
@@ -42,7 +50,7 @@ export default function RegistrationForm({ tournament, onSuccess }) {
 
     const validPlayers = players.filter((p) => p.name.trim());
     if (validPlayers.length < 4) {
-      setError('Bitte mindestens 4 Spieler eintragen.');
+      setError(t('registration.minPlayers'));
       return;
     }
 
@@ -51,6 +59,7 @@ export default function RegistrationForm({ tournament, onSuccess }) {
     fd.append('contact_name', contactName.trim());
     fd.append('contact_email', contactEmail.trim());
     fd.append('players', JSON.stringify(validPlayers));
+    fd.append('language', language);
     if (audioFile) fd.append('audio', audioFile);
 
     setSubmitting(true);
@@ -58,7 +67,9 @@ export default function RegistrationForm({ tournament, onSuccess }) {
       await submitRegistration(tournament.id, fd);
       onSuccess?.();
     } catch (err) {
-      setError(err.message || 'Anmeldung fehlgeschlagen.');
+      const codeKey = err?.code ? `error.${err.code}` : null;
+      const translated = codeKey && i18n.exists(codeKey) ? t(codeKey) : null;
+      setError(translated || err.message || t('error.registrationFailed'));
     } finally {
       setSubmitting(false);
     }
@@ -82,39 +93,51 @@ export default function RegistrationForm({ tournament, onSuccess }) {
     <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1.5rem' }}>
       <style>{responsiveStyles}</style>
       <section style={{ display: 'grid', gap: '0.75rem' }}>
-        <h3 style={{ margin: 0, fontSize: '1rem', opacity: 0.9 }}>Teamdaten</h3>
+        <h3 style={{ margin: 0, fontSize: '1rem', opacity: 0.9 }}>{t('registration.teamData')}</h3>
         <label style={labelStyle}>
-          Teamname *
-          <input style={inputStyle} value={teamName} onChange={(e) => setTeamName(e.target.value)} required placeholder="z. B. Flying Wheels" />
+          {t('registration.teamName')}
+          <input style={inputStyle} value={teamName} onChange={(e) => setTeamName(e.target.value)} required placeholder={t('registration.teamNamePlaceholder')} />
         </label>
         <div className="registration-form__contact-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
           <label style={labelStyle}>
-            Kontaktperson *
-            <input style={inputStyle} value={contactName} onChange={(e) => setContactName(e.target.value)} required placeholder="Vor- und Nachname" />
+            {t('registration.contactName')}
+            <input style={inputStyle} value={contactName} onChange={(e) => setContactName(e.target.value)} required placeholder={t('registration.contactNamePlaceholder')} />
           </label>
           <label style={labelStyle}>
-            E-Mail *
-            <input style={inputStyle} type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} required placeholder="team@beispiel.de" />
+            {t('registration.email')}
+            <input style={inputStyle} type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} required placeholder={t('registration.emailPlaceholder')} />
+          </label>
+          <label style={labelStyle}>
+            {t('registration.language')}
+            <select style={inputStyle} value={language} onChange={(e) => setLanguage(e.target.value)}>
+              {SUPPORTED_LANGUAGES.map((code) => (
+                <option key={code} value={code}>
+                  {t(`languages.${code}`)}
+                </option>
+              ))}
+            </select>
           </label>
         </div>
       </section>
 
       <section style={{ display: 'grid', gap: '0.75rem' }}>
-        <h3 style={{ margin: 0, fontSize: '1rem', opacity: 0.9 }}>Spieler (4 Pflicht, 1 optional)</h3>
+        <h3 style={{ margin: 0, fontSize: '1rem', opacity: 0.9 }}>{t('registration.playersHeading')}</h3>
         {players.map((p, i) => (
           <div key={i} className="registration-form__player-row" style={{ display: 'grid', gridTemplateColumns: '1fr 80px', gap: '0.5rem', alignItems: 'end' }}>
             <label style={labelStyle}>
-              {i < 4 ? `Spieler ${i + 1} *` : `Spieler ${i + 1} (optional)`}
+              {i < 4
+                ? t('registration.playerRequired', { number: i + 1 })
+                : t('registration.playerOptional', { number: i + 1 })}
               <input
                 style={inputStyle}
                 value={p.name}
                 onChange={(e) => updatePlayer(i, 'name', e.target.value)}
                 required={i < 4}
-                placeholder="Name"
+                placeholder={t('registration.playerNamePlaceholder')}
               />
             </label>
             <label style={{ ...labelStyle }}>
-              Nummer
+              {t('registration.jerseyNumber')}
               <input
                 style={{ ...inputStyle }}
                 type="number"
@@ -130,9 +153,9 @@ export default function RegistrationForm({ tournament, onSuccess }) {
       </section>
 
       <section style={{ display: 'grid', gap: '0.75rem' }}>
-        <h3 style={{ margin: 0, fontSize: '1rem', opacity: 0.9 }}>Korbhymne</h3>
+        <h3 style={{ margin: 0, fontSize: '1rem', opacity: 0.9 }}>{t('registration.anthem')}</h3>
         <label style={labelStyle}>
-          MP3 hochladen (max. 20 MB)
+          {t('registration.anthemUpload')}
           <input
             type="file"
             accept="audio/mpeg,audio/mp3,.mp3"
@@ -141,7 +164,7 @@ export default function RegistrationForm({ tournament, onSuccess }) {
           />
         </label>
         {audioFile && (
-          <p style={{ margin: 0, opacity: 0.6, fontSize: '0.8rem' }}>Ausgewählt: {audioFile.name}</p>
+          <p style={{ margin: 0, opacity: 0.6, fontSize: '0.8rem' }}>{t('registration.anthemSelected', { name: audioFile.name })}</p>
         )}
       </section>
 
@@ -166,7 +189,7 @@ export default function RegistrationForm({ tournament, onSuccess }) {
           minHeight: '48px'
         }}
       >
-        {submitting ? 'Wird eingereicht...' : 'Jetzt anmelden'}
+        {submitting ? t('registration.submitting') : t('registration.submit')}
       </button>
     </form>
   );

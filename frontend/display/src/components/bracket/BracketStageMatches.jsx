@@ -1,4 +1,8 @@
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import useMediaQuery from '../../hooks/useMediaQuery.js';
+import { useDateLocale } from '../../i18n/index.js';
+import { formatStageLabelI18n } from '../../utils/formatting.js';
 
 function resolveParticipantName(entry, fallback) {
   if (!entry) {
@@ -75,16 +79,7 @@ const codeStyle = {
   letterSpacing: '0.08em'
 };
 
-const scheduleFormatter = new Intl.DateTimeFormat('de-DE', {
-  weekday: 'short',
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit'
-});
-
-function formatMatchDateTime(value) {
+function formatMatchDateTime(value, formatter, t) {
   if (!value) {
     return null;
   }
@@ -92,11 +87,25 @@ function formatMatchDateTime(value) {
   if (Number.isNaN(date.getTime())) {
     return null;
   }
-  const formatted = scheduleFormatter.format(date).split(', ').join(' · ');
-  return `${formatted} Uhr`;
+  const formatted = formatter.format(date).split(', ').join(' · ');
+  return t('bracket.timeValue', { time: formatted });
 }
 
 export default function BracketStageMatches({ title, stages }) {
+  const { t } = useTranslation();
+  const dateLocale = useDateLocale();
+  const scheduleFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat(dateLocale, {
+        weekday: 'short',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+    [dateLocale]
+  );
   const validStages = Array.isArray(stages)
     ? stages.filter((stage) => Array.isArray(stage.matches) && stage.matches.length > 0)
     : [];
@@ -118,10 +127,13 @@ export default function BracketStageMatches({ title, stages }) {
               const roundNumber = firstMatch?.round_number ?? firstMatch?.round ?? null;
               return (
                 <div>
-                  <h3 style={stageHeaderStyle}>{stage.stage_label || stage.label || 'Phase'}</h3>
+                  <h3 style={stageHeaderStyle}>
+                    {formatStageLabelI18n(t, stage.stage_label_i18n, stage.stage_label || stage.label) ||
+                      t('bracket.stageFallback')}
+                  </h3>
                   {roundNumber ? (
                     <p style={{ margin: 0, opacity: 0.7, fontSize: 'clamp(0.8rem, 2vw, 0.9rem)' }}>
-                      Runde {roundNumber}
+                      {t('bracket.round', { round: roundNumber })}
                     </p>
                   ) : null}
                 </div>
@@ -136,23 +148,24 @@ export default function BracketStageMatches({ title, stages }) {
                   ? `${match.result.scoreA ?? 0}:${match.result.scoreB ?? 0}`
                   : 'vs';
 
-                const scheduledLabel = formatMatchDateTime(match.scheduled_at);
+                const scheduledLabel = formatMatchDateTime(match.scheduled_at, scheduleFormatter, t);
                 const metaSegments = [];
                 if (scheduledLabel) {
                   metaSegments.push(scheduledLabel);
                 }
                 if (match.code) {
-                  metaSegments.push(`Matchcode ${match.code}`);
+                  metaSegments.push(t('bracket.matchcode', { code: match.code }));
                 } else if (hasResult && match.result?.finishedAt) {
-                  const finishedAtLabel = new Date(match.result.finishedAt).toLocaleString('de-DE', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })
+                  const finishedAtLabel = new Date(match.result.finishedAt)
+                    .toLocaleString(dateLocale, {
+                      day: '2-digit',
+                      month: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })
                     .split(', ')
                     .join(' · ');
-                  metaSegments.push(`${finishedAtLabel} Uhr`);
+                  metaSegments.push(t('bracket.timeValue', { time: finishedAtLabel }));
                 }
                 const metaLine = metaSegments.join(' · ');
 

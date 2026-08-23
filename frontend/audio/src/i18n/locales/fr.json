@@ -1,0 +1,69 @@
+{
+  "header": {
+    "title": "Kunstrad Basketball – Audio",
+    "subtitle": "Cette page joue automatiquement tous les sons de jeu configurés. Merci de laisser les haut-parleurs allumés."
+  },
+  "status": {
+    "connected": "Connecté",
+    "disconnected": "Non connecté",
+    "audioOn": "Audio activé",
+    "audioOff": "Audio désactivé",
+    "enableAudio": "Activer l'audio",
+    "audioActive": "Audio actif"
+  },
+  "devices": {
+    "label": "Périphérique de sortie",
+    "systemDefault": "Valeur par défaut du système",
+    "unnamed": "Périphérique {{id}}"
+  },
+  "volume": {
+    "title": "Volume par événement",
+    "description": "Ajustez la balance entre les événements du match. Les valeurs sont enregistrées localement dans le navigateur.",
+    "categories": {
+      "score": {
+        "label": "Hymnes de panier",
+        "description": "Tous les sons de panier (spécifiques à une équipe ou généraux)."
+      },
+      "game": {
+        "label": "Début / pause / fin du match",
+        "description": "Annonces d'état comme le signal de départ, la mi-temps ou le score final."
+      },
+      "events": {
+        "label": "Événements du match",
+        "description": "Autres déclencheurs comme les fautes ou les événements individuels."
+      },
+      "manual": {
+        "label": "Lecture manuelle",
+        "description": "Sons lancés directement depuis la bibliothèque."
+      }
+    }
+  },
+  "events": {
+    "title": "Derniers événements",
+    "logDescription": "Les sons entrants sont joués automatiquement l'un après l'autre.",
+    "empty": "Aucun événement sonore reçu pour le moment.",
+    "manual": "Manuel",
+    "event": "Événement",
+    "audioConnected": "Audio connecté",
+    "soundFallback": "Son n° {{id}}",
+    "count_one": "{{count}} événement",
+    "count_other": "{{count}} événements"
+  },
+  "errors": {
+    "playbackFailed": "Le son n'a pas pu être joué. Veuillez vérifier les haut-parleurs.",
+    "devicesNotFound": "Les périphériques de sortie audio n'ont pas pu être détectés.",
+    "sinkNotSupported": "La sélection du périphérique de sortie n'est pas prise en charge par ce navigateur.",
+    "sinkFailed": "Le périphérique de sortie n'a pas pu être défini."
+  },
+  "languageSwitcher": {
+    "label": "Choisir la langue",
+    "aiNotice": "Traduction automatique — erreurs possibles"
+  },
+  "languages": {
+    "de": "Deutsch",
+    "en": "English",
+    "fr": "Français",
+    "hu": "Magyar",
+    "cs": "Čeština"
+  }
+}

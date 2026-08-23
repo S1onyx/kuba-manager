@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import i18n from '../i18n/index.js';
 import { fetchJson } from '../utils/api.js';
 
 export default function useStandingsData(scoreboard) {
@@ -69,7 +70,7 @@ export default function useStandingsData(scoreboard) {
         setStandings(null);
         setMeta(null);
         setRecordedGamesCount(0);
-        setError('Tabelle konnte nicht geladen werden.');
+        setError(i18n.t('errors.loadStandings'));
       } finally {
         if (!cancelled) {
           setLoading(false);

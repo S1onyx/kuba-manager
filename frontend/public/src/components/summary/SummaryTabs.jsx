@@ -1,6 +1,8 @@
+import { useTranslation } from 'react-i18next';
 import { usePublicApp } from '../../context/PublicAppContext.jsx';
 
 export default function SummaryTabs() {
+  const { t } = useTranslation();
   const {
     summary: { tabs, activeTab, selectTab }
   } = usePublicApp();
@@ -25,12 +27,12 @@ export default function SummaryTabs() {
     <div className="summary-tabs" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
       {tabs.map((tab) => (
         <button
-          key={tab.id}
+          key={tab}
           type="button"
-          onClick={() => selectTab(tab.id)}
-          style={buttonStyle(activeTab === tab.id)}
+          onClick={() => selectTab(tab)}
+          style={buttonStyle(activeTab === tab)}
         >
-          {tab.label}
+          {t(`tabs.${tab}`)}
         </button>
       ))}
     </div>

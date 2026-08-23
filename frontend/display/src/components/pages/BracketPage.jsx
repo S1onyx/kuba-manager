@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import BracketView from '../bracket/BracketView.jsx';
 import useMediaQuery from '../../hooks/useMediaQuery.js';
 
@@ -8,6 +9,7 @@ export default function BracketPage({
   structureError,
   structureLoading
 }) {
+  const { t } = useTranslation();
   const isCompact = useMediaQuery('(max-width: 1100px)');
   const isMobile = useMediaQuery('(max-width: 720px)');
   const tournamentName = scoreboard?.tournamentName || structure?.tournament?.name || '';
@@ -16,11 +18,11 @@ export default function BracketPage({
   if (!scoreboard?.tournamentId) {
     content = (
       <p style={{ fontSize: 'clamp(1rem, 1.8vw, 1.4rem)', opacity: 0.8, textAlign: 'center' }}>
-        Kein Turnier ausgewählt. Bitte im Admin-Panel ein Turnier für das Scoreboard setzen.
+        {t('bracket.noTournament')}
       </p>
     );
   } else if (structureLoading) {
-    content = <p style={{ fontSize: 'clamp(1rem, 1.8vw, 1.4rem)', textAlign: 'center' }}>Lade Turnierstruktur…</p>;
+    content = <p style={{ fontSize: 'clamp(1rem, 1.8vw, 1.4rem)', textAlign: 'center' }}>{t('bracket.loading')}</p>;
   } else if (structureError) {
     content = (
       <p style={{ fontSize: 'clamp(1rem, 1.8vw, 1.4rem)', textAlign: 'center', color: '#ff8a80' }}>{structureError}</p>
@@ -28,7 +30,7 @@ export default function BracketPage({
   } else if (!structure) {
     content = (
       <p style={{ fontSize: 'clamp(1rem, 1.8vw, 1.4rem)', textAlign: 'center', opacity: 0.8 }}>
-        Noch keine Turnierstruktur verfügbar. Bitte im Admin-Panel Spielplan und Gruppen pflegen.
+        {t('bracket.noStructure')}
       </p>
     );
   } else {
@@ -72,7 +74,7 @@ export default function BracketPage({
           Kunstrad Basketball
         </h1>
         <p style={{ fontSize: subHeadingSize, opacity: 0.8, letterSpacing: '0.05em' }}>
-          Turnierbaum &amp; Gruppenübersicht
+          {t('bracket.title')}
         </p>
         {error ? (
           <p style={{ color: '#ff8a80', fontSize: 'clamp(1rem, 1.5vw, 1.2rem)', marginTop: '0.75rem' }}>{error}</p>

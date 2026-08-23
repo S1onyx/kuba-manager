@@ -1,0 +1,117 @@
+{
+  "app": {
+    "mirrorStandard": "Display 1 (Standard)",
+    "mirrorInverted": "Display 2 (invertiert)"
+  },
+  "controls": {
+    "fullscreenEnter": "Vollbild",
+    "fullscreenExit": "Vollbild verlassen",
+    "showLive": "Live-Modus anzeigen",
+    "showBracket": "Turnierbaum anzeigen",
+    "updating": "Aktualisiere…"
+  },
+  "scoreboard": {
+    "halfBadge": "{{half}}. Halbzeit",
+    "teamA": "Team A",
+    "teamB": "Team B",
+    "extraTime": "Nachspielzeit",
+    "halftimeBreak": "Halbzeit"
+  },
+  "penalties": {
+    "title": "Zeitstrafen",
+    "empty": "Keine laufenden Strafen",
+    "expired": "abgelaufen"
+  },
+  "standings": {
+    "currentTitle": "Aktuelle Gruppentabelle",
+    "loading": "Lade Tabelle...",
+    "noResults": "Noch keine Ergebnisse vorhanden.",
+    "colRank": "#",
+    "colTeam": "Team",
+    "colPlayed": "Spiele",
+    "colWon": "S",
+    "colDrawn": "U",
+    "colLost": "N",
+    "colGoals": "Tore",
+    "colDiff": "Diff",
+    "colPenalties": "Strafen",
+    "colPoints": "Punkte",
+    "colStatus": "Status"
+  },
+  "stage": {
+    "groupLabel": "Gruppe {{label}}",
+    "groupPhase": "Gruppenphase · {{label}}",
+    "knockoutPhase": "KO-Runde · {{label}}",
+    "placementPhase": "Platzierung · {{label}}",
+    "knockoutFinal": "Finale",
+    "knockoutRoundGeneric_one": "KO-Runde ({{count}} Team)",
+    "knockoutRoundGeneric_other": "KO-Runde ({{count}} Teams)",
+    "round": {
+      "p4": "Halbfinale",
+      "p8": "Viertelfinale",
+      "p16": "Achtelfinale",
+      "p32": "Sechzehntelfinale",
+      "p64": "Zweiunddreißigstelfinale",
+      "p128": "Vierundsechzigstelfinale"
+    },
+    "placementMatch": "Spiel um Platz {{from}}",
+    "placementRound": "Platzierungsrunde {{from}}–{{to}}"
+  },
+  "bracket": {
+    "title": "Turnierbaum & Gruppenübersicht",
+    "subtitle": "Gruppentabellen und KO-Spiele im Überblick",
+    "noTournament": "Kein Turnier ausgewählt. Bitte im Admin-Panel ein Turnier für das Scoreboard setzen.",
+    "loading": "Lade Turnierstruktur…",
+    "noStructure": "Noch keine Turnierstruktur verfügbar. Bitte im Admin-Panel Spielplan und Gruppen pflegen.",
+    "groupStage": "Gruppenphase",
+    "noGroupData": "Noch keine Gruppendaten vorhanden.",
+    "matchesCompleted": "Spiele abgeschlossen: {{recorded}}/{{total}}",
+    "noResults": "Keine Ergebnisse gespeichert.",
+    "knockoutTitle": "KO-Runde",
+    "placementTitle": "Platzierungsspiele",
+    "stageFallback": "Phase",
+    "round": "Runde {{round}}",
+    "matchcode": "Matchcode {{code}}",
+    "timeValue": "{{time}} Uhr",
+    "status": {
+      "qualified": "qualifiziert",
+      "inPosition": "auf Kurs",
+      "contender": "verfolgt"
+    }
+  },
+  "summary": {
+    "loading": "Lade Abschlussübersicht…",
+    "empty": "Noch keine Abschlussdaten verfügbar. Bitte Turnier im Admin-Panel abschließen.",
+    "defaultTournamentName": "Turnier",
+    "title": "Turnierende",
+    "description": "Abschlusstabelle, Finalplatzierungen und herausragende Spielerleistungen auf einen Blick.",
+    "champion": "Champion",
+    "championDecidedBy": "Entschieden im {{method}}",
+    "championFinalWin": "Finalsieg",
+    "score": "Ergebnis {{score}}",
+    "runnerUp": "Runner-Up:",
+    "placementsTitle": "Finale Platzierungen",
+    "colPlacement": "Platz",
+    "colTeam": "Team",
+    "colDecision": "Entscheidung",
+    "colOpponent": "Gegner",
+    "colResult": "Ergebnis",
+    "overallStandings": "Gesamtbilanz",
+    "topScorer": "Topscorer",
+    "threePointSpecialist": "Dreier-Spezialist",
+    "penaltyKing": "Strafbank-König",
+    "points_one": "{{count}} Punkt",
+    "points_other": "{{count}} Punkte",
+    "threes_one": "{{count}} Dreier",
+    "threes_other": "{{count}} Dreier",
+    "penaltySeconds_one": "{{count}} Sek. Strafe",
+    "penaltySeconds_other": "{{count}} Sek. Strafe",
+    "teamFallback": "Team"
+  },
+  "errors": {
+    "loadScoreboard": "Scoreboard konnte nicht geladen werden.",
+    "loadStandings": "Tabelle konnte nicht geladen werden.",
+    "loadStructure": "Turnierstruktur konnte nicht geladen werden.",
+    "loadSummary": "Turnierübersicht konnte nicht geladen werden."
+  }
+}

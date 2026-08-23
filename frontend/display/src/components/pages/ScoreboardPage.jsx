@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import Scoreboard from '../Scoreboard.jsx';
 import Timer from '../Timer.jsx';
 import PenaltiesSection from '../scoreboard/PenaltiesSection.jsx';
@@ -18,6 +19,7 @@ export default function ScoreboardPage({
   summaryError,
   summaryLoading
 }) {
+  const { t } = useTranslation();
   const isCompact = useMediaQuery('(max-width: 1100px)');
   const isMobile = useMediaQuery('(max-width: 720px)');
   const { remainingSeconds, extraElapsedSeconds, halftimePauseRemaining } = useLocalTimer(scoreboard);
@@ -27,8 +29,8 @@ export default function ScoreboardPage({
   };
 
   const teamNames = {
-    teamA: scoreboard?.teamAName ?? 'Team A',
-    teamB: scoreboard?.teamBName ?? 'Team B'
+    teamA: scoreboard?.teamAName ?? t('scoreboard.teamA'),
+    teamB: scoreboard?.teamBName ?? t('scoreboard.teamB')
   };
 
   const formattedRemaining = formatTime(remainingSeconds);
@@ -45,7 +47,7 @@ export default function ScoreboardPage({
   const tournamentName =
     scoreboard?.tournamentName || standingsMeta?.tournamentName || '';
   const stageLabel = scoreboard?.stageLabel ?? standingsMeta?.stageLabel;
-  const stageDescription = formatStageDescription(scoreboard?.stageType, stageLabel);
+  const stageDescription = formatStageDescription(scoreboard?.stageType, stageLabel, t);
   const showStandingsSection =
     scoreboard?.stageType === 'group' && Array.isArray(standings) && standings.length > 0;
 
@@ -98,7 +100,7 @@ export default function ScoreboardPage({
           textShadow: '0 2px 12px rgba(0,0,0,0.7)'
         }}
       >
-        {currentHalf}. Half
+        {t('scoreboard.halfBadge', { half: currentHalf })}
       </div>
 
       {hasHeader ? (

@@ -1,4 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import { usePublicApp } from '../../context/PublicAppContext.jsx';
+import { useDateLocale } from '../../i18n/index.js';
 import { navigateTo } from '../../hooks/useHashRoute.js';
 
 const responsiveStyles = `
@@ -20,6 +22,7 @@ const responsiveStyles = `
 `;
 
 export default function TournamentSection() {
+  const { t } = useTranslation();
   const {
     tournaments: { list, selectedId, select, loading, error },
     scoreboardState: { scoreboard, currentTournamentMeta },
@@ -28,15 +31,15 @@ export default function TournamentSection() {
 
   if (loading) {
     return (
-      <SectionWrapper title="Turniere">
-        <p style={{ opacity: 0.75 }}>Lade Turnierliste...</p>
+      <SectionWrapper title={t('tournaments.title')}>
+        <p style={{ opacity: 0.75 }}>{t('tournaments.loading')}</p>
       </SectionWrapper>
     );
   }
 
   if (error) {
     return (
-      <SectionWrapper title="Turniere">
+      <SectionWrapper title={t('tournaments.title')}>
         <p style={{ color: '#ffb0b0' }}>{error}</p>
       </SectionWrapper>
     );
@@ -44,8 +47,8 @@ export default function TournamentSection() {
 
   if (!list || list.length === 0) {
     return (
-      <SectionWrapper title="Turniere">
-        <p style={{ opacity: 0.75 }}>Noch keine Turniere als öffentlich markiert.</p>
+      <SectionWrapper title={t('tournaments.title')}>
+        <p style={{ opacity: 0.75 }}>{t('tournaments.empty')}</p>
       </SectionWrapper>
     );
   }
@@ -58,7 +61,7 @@ export default function TournamentSection() {
     <>
       <style>{responsiveStyles}</style>
       {plannedTournaments.length > 0 && (
-        <SectionWrapper title="Kommende Turniere">
+        <SectionWrapper title={t('tournaments.upcoming')}>
           <div
             style={{
               display: 'flex',
@@ -75,7 +78,7 @@ export default function TournamentSection() {
       )}
 
       {activeTournaments.length > 0 && (
-        <SectionWrapper title="Turniere">
+        <SectionWrapper title={t('tournaments.title')}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
             {activeTournaments.map((tournament) => {
               const isSelected = selectedId === tournament.id;
@@ -101,7 +104,11 @@ export default function TournamentSection() {
                   }}
                 >
                   {tournament.name}
-                  {isLive ? ' · Live' : isCompleted ? ' · Abgeschlossen' : ''}
+                  {isLive
+                    ? ` · ${t('tournaments.liveBadge')}`
+                    : isCompleted
+                      ? ` · ${t('tournaments.completedBadge')}`
+                      : ''}
                 </button>
               );
             })}
@@ -113,8 +120,10 @@ export default function TournamentSection() {
 }
 
 function PlannedTournamentCard({ tournament }) {
+  const { t } = useTranslation();
+  const dateLocale = useDateLocale();
   const formattedDate = tournament.planned_at
-    ? new Date(tournament.planned_at).toLocaleDateString('de-DE', {
+    ? new Date(tournament.planned_at).toLocaleDateString(dateLocale, {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
@@ -139,20 +148,20 @@ function PlannedTournamentCard({ tournament }) {
       {tournament.poster_url ? (
         <img
           src={tournament.poster_url}
-          alt={`Plakat ${tournament.name}`}
+          alt={t('tournaments.posterAlt', { name: tournament.name })}
           className="tournament-card__poster"
           style={{ width: '100%', height: '200px', objectFit: 'cover', display: 'block' }}
         />
       ) : (
         <div style={{ width: '100%', height: '120px', background: 'rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.3, fontSize: '0.85rem', letterSpacing: '0.08em' }}>
-          Plakat folgt
+          {t('tournaments.posterPending')}
         </div>
       )}
       <div style={{ padding: '1rem 1.25rem', display: 'grid', gap: '0.4rem', flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
           <span style={{ fontWeight: 600, fontSize: '0.95rem' }}>{tournament.name}</span>
           <span style={{ display: 'inline-block', padding: '0.15rem 0.55rem', borderRadius: '999px', background: 'rgba(255,171,64,0.2)', color: '#ffd180', fontSize: '0.7rem', letterSpacing: '0.08em' }}>
-            Geplant
+            {t('tournaments.plannedBadge')}
           </span>
         </div>
         {formattedDate && <p style={{ opacity: 0.75, fontSize: '0.85rem', margin: 0 }}>{formattedDate}</p>}
@@ -176,7 +185,7 @@ function PlannedTournamentCard({ tournament }) {
             letterSpacing: '0.04em'
           }}
         >
-          Details &amp; Anmeldung →
+          {t('tournaments.detailsCta')}
         </button>
       </div>
     </div>

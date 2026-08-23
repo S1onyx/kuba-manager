@@ -1,0 +1,69 @@
+{
+  "header": {
+    "title": "Kunstrad Basketball – Audio",
+    "subtitle": "Ez az oldal automatikusan lejátssza az összes beállított játékhangot. Kérlek, hagyd bekapcsolva a hangszórókat."
+  },
+  "status": {
+    "connected": "Csatlakozva",
+    "disconnected": "Nincs kapcsolat",
+    "audioOn": "Hang engedélyezve",
+    "audioOff": "Hang letiltva",
+    "enableAudio": "Hang engedélyezése",
+    "audioActive": "Hang aktív"
+  },
+  "devices": {
+    "label": "Kimeneti eszköz",
+    "systemDefault": "Rendszer alapértelmezett",
+    "unnamed": "Eszköz {{id}}"
+  },
+  "volume": {
+    "title": "Hangerő eseményenként",
+    "description": "Állítsd be a játékesemények egymáshoz viszonyított arányát. Az értékek helyileg, a böngészőben tárolódnak.",
+    "categories": {
+      "score": {
+        "label": "Kosárhimnuszok",
+        "description": "Minden kosárhang (csapatspecifikus vagy általános)."
+      },
+      "game": {
+        "label": "Játékkezdés / szünet / vége",
+        "description": "Állapotjelzések, például kezdőjelzés, félidő vagy végeredmény."
+      },
+      "events": {
+        "label": "Játékesemények",
+        "description": "További triggerek, például faultok vagy egyéni események."
+      },
+      "manual": {
+        "label": "Kézi lejátszás",
+        "description": "A könyvtárból közvetlenül indított hangok."
+      }
+    }
+  },
+  "events": {
+    "title": "Legutóbbi események",
+    "logDescription": "A beérkező hangok automatikusan egymás után kerülnek lejátszásra.",
+    "empty": "Még nem érkezett hangesemény.",
+    "manual": "Kézi",
+    "event": "Esemény",
+    "audioConnected": "Hang csatlakoztatva",
+    "soundFallback": "Hang #{{id}}",
+    "count_one": "{{count}} esemény",
+    "count_other": "{{count}} esemény"
+  },
+  "errors": {
+    "playbackFailed": "A hangot nem sikerült lejátszani. Kérlek, ellenőrizd a hangszórókat.",
+    "devicesNotFound": "A hangkimeneti eszközöket nem sikerült meghatározni.",
+    "sinkNotSupported": "A kimeneti eszköz kiválasztását ez a böngésző nem támogatja.",
+    "sinkFailed": "A kimeneti eszközt nem sikerült beállítani."
+  },
+  "languageSwitcher": {
+    "label": "Nyelv választása",
+    "aiNotice": "Gépi fordítás — hibák előfordulhatnak"
+  },
+  "languages": {
+    "de": "Deutsch",
+    "en": "English",
+    "fr": "Français",
+    "hu": "Magyar",
+    "cs": "Čeština"
+  }
+}

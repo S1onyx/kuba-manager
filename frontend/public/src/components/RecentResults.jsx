@@ -1,3 +1,7 @@
+import { useTranslation } from 'react-i18next';
+import { useDateLocale } from '../i18n/index.js';
+import { formatStageLabelI18n } from '../utils/stageLabels.js';
+
 const listStyle = {
   display: 'grid',
   gap: '0.8rem'
@@ -55,6 +59,8 @@ const responsiveStyles = `
 `;
 
 export default function RecentResults({ games = [] }) {
+  const { t } = useTranslation();
+  const dateLocale = useDateLocale();
   if (!games || games.length === 0) {
     return null;
   }
@@ -62,7 +68,7 @@ export default function RecentResults({ games = [] }) {
   return (
     <section style={{ display: 'grid', gap: '1rem' }}>
       <header>
-        <h3 style={{ fontSize: '1.2rem', letterSpacing: '0.05em' }}>Letzte Ergebnisse</h3>
+        <h3 style={{ fontSize: '1.2rem', letterSpacing: '0.05em' }}>{t('recentResults.title')}</h3>
       </header>
       <div style={listStyle}>
         {games.map((game) => (
@@ -75,8 +81,15 @@ export default function RecentResults({ games = [] }) {
               <strong style={{ ...teamStyle, textAlign: 'right' }}>{game.teamB}</strong>
             </div>
             <div style={metaStyle}>
-              {game.stageType === 'group' ? `Gruppe ${game.stageLabel}` : game.stageLabel || 'KO-Spiel'} ·{' '}
-              {new Date(game.created_at).toLocaleString('de-DE', {
+              {formatStageLabelI18n(
+                t,
+                game.stageLabelI18n,
+                game.stageType === 'group'
+                  ? t('recentResults.group', { label: game.stageLabel })
+                  : game.stageLabel || t('recentResults.knockoutGame')
+              )}{' '}
+              ·{' '}
+              {new Date(game.created_at).toLocaleString(dateLocale, {
                 day: '2-digit',
                 month: '2-digit',
                 hour: '2-digit',

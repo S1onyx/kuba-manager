@@ -1,9 +1,11 @@
+import { useTranslation } from 'react-i18next';
 import { usePublicApp } from '../../context/PublicAppContext.jsx';
 import NoticeBox from '../common/NoticeBox.jsx';
 import SummaryTabs from './SummaryTabs.jsx';
 import SummaryContent from './SummaryContent.jsx';
 
 export default function SummarySection() {
+  const { t } = useTranslation();
   const {
     summary: {
       tournamentSummary,
@@ -21,17 +23,17 @@ export default function SummarySection() {
       {summaryError ? <NoticeBox tone="error">{summaryError}</NoticeBox> : null}
 
       {loadingSummary && selectedId ? (
-        <p style={{ opacity: 0.75 }}>Lade Turnierstatistiken...</p>
+        <p style={{ opacity: 0.75 }}>{t('summary.loading')}</p>
       ) : null}
 
       {tournamentSummary ? (
         <>
           <header style={{ display: 'grid', gap: '0.35rem' }}>
             <h2 style={{ fontSize: 'clamp(1.25rem, 4.5vw, 1.45rem)', letterSpacing: '0.05em', overflowWrap: 'break-word' }}>
-              {tournamentSummary.tournament?.name ?? 'Turnier'}
+              {tournamentSummary.tournament?.name ?? t('summary.defaultTournamentName')}
             </h2>
             {scoreboardPublic && scoreboard?.tournamentId === tournamentSummary.tournament?.id ? (
-              <span style={{ fontSize: '0.85rem', opacity: 0.75 }}>Live aktuell ausgewählt</span>
+              <span style={{ fontSize: '0.85rem', opacity: 0.75 }}>{t('summary.liveSelected')}</span>
             ) : null}
           </header>
 
@@ -40,8 +42,7 @@ export default function SummarySection() {
         </>
       ) : !loadingSummary && selectedId ? (
         <p style={{ opacity: 0.75 }}>
-          Für {selectedTournament?.name ?? 'dieses Turnier'} liegen noch keine gespeicherten Spiele vor. Ergebnisse
-          erscheinen automatisch, sobald Partien abgeschlossen werden.
+          {t('summary.noGames', { name: selectedTournament?.name ?? t('summary.thisTournament') })}
         </p>
       ) : null}
     </section>

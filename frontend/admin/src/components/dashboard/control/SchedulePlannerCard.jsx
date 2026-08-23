@@ -1,8 +1,14 @@
+import { useTranslation } from 'react-i18next';
 import PanelCard from '../../common/PanelCard.jsx';
 import { useDashboard } from '../../../context/DashboardContext.jsx';
 import { formatDateTime } from '../../../utils/formatters.js';
+import { useDateLocale } from '../../../i18n/index.js';
+import { useFormatStageLabel } from '../../../utils/stageLabels.js';
 
 export default function SchedulePlannerCard() {
+  const { t } = useTranslation();
+  const dateLocale = useDateLocale();
+  const formatStageLabel = useFormatStageLabel();
   const {
     schedule: {
       scheduleChronological,
@@ -19,17 +25,17 @@ export default function SchedulePlannerCard() {
 
   return (
     <PanelCard
-      title="Spieltermine planen"
-      description="Lege Datum und Uhrzeit für alle Paarungen fest, um den Spieltag zu strukturieren."
+      title={t('schedule.planner.title')}
+      description={t('schedule.planner.description')}
     >
       {!resolvedTournamentId ? (
-        <p style={{ margin: 0, color: 'var(--text-muted)' }}>Bitte zuerst ein Turnier auswählen.</p>
+        <p style={{ margin: 0, color: 'var(--text-muted)' }}>{t('schedule.planner.selectTournamentFirst')}</p>
       ) : scheduleLoading ? (
-        <p style={{ margin: 0 }}>Spielplan wird geladen...</p>
+        <p style={{ margin: 0 }}>{t('schedule.planner.loading')}</p>
       ) : scheduleError ? (
         <p style={{ margin: 0, color: 'var(--warning)' }}>{scheduleError}</p>
       ) : scheduleChronological.length === 0 ? (
-        <p style={{ margin: 0 }}>Noch keine Partien im Spielplan vorhanden.</p>
+        <p style={{ margin: 0 }}>{t('schedule.planner.noMatches')}</p>
       ) : (
         <div style={{ display: 'grid', gap: '1rem' }}>
           {scheduleChronological.map((entry) => {
@@ -37,13 +43,17 @@ export default function SchedulePlannerCard() {
             const baseValue = entry.scheduled_at ? scheduleDrafts[key] ?? entry.scheduled_at : scheduleDrafts[key] ?? '';
             const saving = Boolean(scheduleSaving[key]);
             const hasScheduled = Boolean(entry.scheduled_at);
+            const stageName = formatStageLabel(
+              entry.stage_label_i18n,
+              entry.stage_label || t('phases.fallback')
+            );
             const stageInfo =
               entry.phase === 'group' && entry.round_number
-                ? `${entry.stage_label} · Runde ${entry.round_number}`
-                : entry.stage_label || 'Phase';
+                ? `${stageName} · ${t('phases.round', { round: entry.round_number })}`
+                : stageName;
             const statusLabel = hasScheduled
-              ? `Geplant: ${formatDateTime(entry.scheduled_at)}`
-              : 'Noch kein Zeitpunkt gesetzt';
+              ? t('schedule.planner.scheduledAt', { time: formatDateTime(entry.scheduled_at, dateLocale) })
+              : t('schedule.planner.notScheduled');
 
             return (
               <article
@@ -75,14 +85,14 @@ export default function SchedulePlannerCard() {
                     onClick={() => handleScheduleDraftSubmit(entry.id)}
                     disabled={saving}
                   >
-                    {saving ? 'Speichere...' : 'Speichern'}
+                    {saving ? t('common.saving') : t('common.save')}
                   </button>
                   <button
                     type="button"
                     onClick={() => handleScheduleDraftClear(entry.id)}
                     disabled={saving || (!hasScheduled && (baseValue ?? '') === '')}
                   >
-                    Löschen
+                    {t('schedule.planner.clear')}
                   </button>
                   <span style={{ fontSize: '0.85rem', opacity: 0.75 }}>{statusLabel}</span>
                 </div>

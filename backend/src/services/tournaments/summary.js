@@ -14,7 +14,7 @@ import {
   normalizeKnockoutLabel,
   knockoutRank
 } from './standings.js';
-import { canonicalGroupLabel, createGroupLabels } from './helpers.js';
+import { canonicalGroupLabel, createGroupLabels, describeStageLabel } from './helpers.js';
 
 export async function getTournamentSummary(tournamentId) {
   const tournament = await getTournament(tournamentId);
@@ -111,6 +111,26 @@ export async function getTournamentSummary(tournamentId) {
     return fallbackKey;
   };
 
+  const decidedByCodeFor = (decidedBy) => {
+    const value = String(decidedBy ?? '').trim();
+    if (!value) {
+      return null;
+    }
+    if (value === 'Gesamtbilanz') {
+      return 'overall_standings';
+    }
+    if (value === 'Teilnehmer') {
+      return 'participant';
+    }
+    if (value.toLowerCase() === 'finale') {
+      return 'final';
+    }
+    if (parsePlacementRange(value)) {
+      return 'placement_match';
+    }
+    return null;
+  };
+
   const registerPlacementResult = (teamIdentity, placement, meta = {}) => {
     if (!teamIdentity || !teamIdentity.key || !placement || placement <= 0) {
       return;
@@ -125,6 +145,7 @@ export async function getTournamentSummary(tournamentId) {
       teamId: teamIdentity.teamId ?? existing?.teamId ?? null,
       teamName: teamIdentity.teamName,
       decidedBy: meta.decidedBy ?? '',
+      decidedByCode: decidedByCodeFor(meta.decidedBy),
       opponent: meta.opponent ?? '',
       score: meta.score ?? ''
     });
@@ -422,6 +443,7 @@ const topThreePointers = playerOverview
       teamId: Number.isInteger(Number(teamId)) && Number(teamId) > 0 ? Number(teamId) : null,
       teamName: teamName || 'Team',
       decidedBy: sourceLabel,
+      decidedByCode: decidedByCodeFor(sourceLabel),
       opponent: '',
       score: ''
     });
@@ -488,6 +510,7 @@ const topThreePointers = playerOverview
     const { standings, recordedGamesCount } = await computeGroupStandings(tournament.id, canonical, {});
     groups.push({
       label: display,
+      labelI18n: describeStageLabel('group', display, { group: canonical }),
       canonicalLabel: canonical,
       recordedGamesCount,
       standings
@@ -499,6 +522,7 @@ const topThreePointers = playerOverview
     .map((game) => ({
       id: game.id,
       stageLabel: normalizeKnockoutLabel(game.stage_label),
+      stageLabelI18n: describeStageLabel('knockout', game.stage_label, {}),
       teamA: game.team_a,
       teamB: game.team_b,
       scoreA: game.score_a,
@@ -518,6 +542,7 @@ const topThreePointers = playerOverview
       id: game.id,
       stageType: game.stage_type,
       stageLabel: game.stage_label,
+      stageLabelI18n: describeStageLabel(game.stage_type, game.stage_label, {}),
       teamA: game.team_a,
       teamB: game.team_b,
       scoreA: game.score_a,

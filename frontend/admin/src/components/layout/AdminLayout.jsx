@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useMediaQuery from '../../hooks/useMediaQuery.js';
 
 const desktopShellStyle = {
@@ -43,6 +44,7 @@ const mobileTopBarStyle = {
 const mobileMainPadding = '1.25rem clamp(1rem, 4vw, 1.5rem) 2.5rem';
 
 export default function AdminLayout({ sidebar, header, children, footer }) {
+  const { t } = useTranslation();
   const isCompact = useMediaQuery('(max-width: 1100px)');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -100,7 +102,7 @@ export default function AdminLayout({ sidebar, header, children, footer }) {
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
-          <div style={{ fontWeight: 600 }}>Navigation</div>
+          <div style={{ fontWeight: 600 }}>{t('layout.navigation')}</div>
           <button
             type="button"
             onClick={closeSidebar}
@@ -112,7 +114,7 @@ export default function AdminLayout({ sidebar, header, children, footer }) {
               fontSize: '0.85rem'
             }}
           >
-            Schließen
+            {t('layout.close')}
           </button>
         </div>
         <div style={{ display: 'grid', gap: '1.75rem' }}>{sidebar}</div>
@@ -138,7 +140,7 @@ export default function AdminLayout({ sidebar, header, children, footer }) {
               letterSpacing: '0.08em'
             }}
           >
-            Menü
+            {t('layout.menu')}
           </button>
           <div style={{ fontSize: '0.78rem', letterSpacing: '0.3em', textTransform: 'uppercase', opacity: 0.7 }}>
             Kuba Admin

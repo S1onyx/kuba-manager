@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { fetchTournamentDetail } from '../../api.js';
+import { useDateLocale } from '../../i18n/index.js';
 import { navigateTo } from '../../hooks/useHashRoute.js';
 
 const responsiveStyles = `
@@ -19,6 +21,8 @@ const responsiveStyles = `
 `;
 
 export default function TournamentDetailPage({ tournamentId }) {
+  const { t } = useTranslation();
+  const dateLocale = useDateLocale();
   const [tournament, setTournament] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -28,18 +32,18 @@ export default function TournamentDetailPage({ tournamentId }) {
     setError('');
     fetchTournamentDetail(tournamentId)
       .then(setTournament)
-      .catch(() => setError('Turnier konnte nicht geladen werden.'))
+      .catch(() => setError(t('error.loadTournamentDetail')))
       .finally(() => setLoading(false));
-  }, [tournamentId]);
+  }, [tournamentId, t]);
 
   const formattedDate = tournament?.planned_at
-    ? new Date(tournament.planned_at).toLocaleDateString('de-DE', {
+    ? new Date(tournament.planned_at).toLocaleDateString(dateLocale, {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
       })
     : null;
 
   const formattedDeadline = tournament?.registration_deadline
-    ? new Date(tournament.registration_deadline).toLocaleDateString('de-DE', {
+    ? new Date(tournament.registration_deadline).toLocaleDateString(dateLocale, {
         year: 'numeric', month: 'long', day: 'numeric'
       })
     : null;
@@ -80,10 +84,10 @@ export default function TournamentDetailPage({ tournamentId }) {
           alignItems: 'center'
         }}
       >
-        ← Zurück
+        {t('tournamentDetail.back')}
       </button>
 
-      {loading && <p style={{ opacity: 0.7 }}>Lade Turnierdetails...</p>}
+      {loading && <p style={{ opacity: 0.7 }}>{t('tournamentDetail.loading')}</p>}
       {error && <p style={{ color: '#ffb0b0' }}>{error}</p>}
 
       {tournament && (
@@ -101,13 +105,13 @@ export default function TournamentDetailPage({ tournamentId }) {
                   rel="noopener noreferrer"
                   style={{ display: 'block', padding: '1.5rem', textAlign: 'center', color: '#7cb9ff' }}
                 >
-                  Plakat als PDF öffnen
+                  {t('tournamentDetail.openPosterPdf')}
                 </a>
               </object>
             ) : (
               <img
                 src={tournament.poster_url}
-                alt={`Plakat ${tournament.name}`}
+                alt={t('tournaments.posterAlt', { name: tournament.name })}
                 style={{ width: '100%', maxHeight: '600px', objectFit: 'contain', borderRadius: '16px', background: 'rgba(0,0,0,0.15)' }}
               />
             )
@@ -119,7 +123,7 @@ export default function TournamentDetailPage({ tournamentId }) {
               <span style={{
                 display: 'inline-block', padding: '0.2rem 0.75rem', borderRadius: '999px',
                 background: 'rgba(255,171,64,0.2)', color: '#ffd180', fontSize: '0.8rem', letterSpacing: '0.08em'
-              }}>Geplant</span>
+              }}>{t('tournaments.plannedBadge')}</span>
             </div>
             <button
               type="button"
@@ -132,26 +136,26 @@ export default function TournamentDetailPage({ tournamentId }) {
                 minHeight: '44px', display: 'inline-flex', alignItems: 'center'
               }}
             >
-              Jetzt anmelden →
+              {t('tournamentDetail.registerNow')}
             </button>
           </div>
 
           <div className="tournament-detail__info-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
             {formattedDate && (
               <div className="tournament-detail__card" style={cardStyle}>
-                <p style={sectionTitleStyle}>Datum</p>
+                <p style={sectionTitleStyle}>{t('tournamentDetail.date')}</p>
                 <p style={{ margin: 0 }}>{formattedDate}</p>
               </div>
             )}
             {tournament.location && (
               <div className="tournament-detail__card" style={cardStyle}>
-                <p style={sectionTitleStyle}>Ort</p>
+                <p style={sectionTitleStyle}>{t('tournamentDetail.location')}</p>
                 <p style={{ margin: 0 }}>{tournament.location}</p>
               </div>
             )}
             {formattedDeadline && (
               <div className="tournament-detail__card" style={cardStyle}>
-                <p style={sectionTitleStyle}>Anmeldefrist</p>
+                <p style={sectionTitleStyle}>{t('tournamentDetail.deadline')}</p>
                 <p style={{ margin: 0 }}>{formattedDeadline}</p>
               </div>
             )}
@@ -159,28 +163,28 @@ export default function TournamentDetailPage({ tournamentId }) {
 
           {tournament.description && (
             <div className="tournament-detail__card" style={cardStyle}>
-              <p style={sectionTitleStyle}>Über das Turnier</p>
+              <p style={sectionTitleStyle}>{t('tournamentDetail.about')}</p>
               <p style={{ margin: 0, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{tournament.description}</p>
             </div>
           )}
 
           {tournament.schedule_info && (
             <div className="tournament-detail__card" style={cardStyle}>
-              <p style={sectionTitleStyle}>Ablauf & Zeiten</p>
+              <p style={sectionTitleStyle}>{t('tournamentDetail.scheduleInfo')}</p>
               <p style={{ margin: 0, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{tournament.schedule_info}</p>
             </div>
           )}
 
           {tournament.travel_info && (
             <div className="tournament-detail__card" style={cardStyle}>
-              <p style={sectionTitleStyle}>Anreise</p>
+              <p style={sectionTitleStyle}>{t('tournamentDetail.travel')}</p>
               <p style={{ margin: 0, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{tournament.travel_info}</p>
             </div>
           )}
 
           {tournament.contact_email && (
             <div className="tournament-detail__card" style={cardStyle}>
-              <p style={sectionTitleStyle}>Kontakt</p>
+              <p style={sectionTitleStyle}>{t('tournamentDetail.contact')}</p>
               <a href={`mailto:${tournament.contact_email}`} style={{ color: '#7cb9ff', overflowWrap: 'anywhere' }}>
                 {tournament.contact_email}
               </a>
@@ -189,7 +193,7 @@ export default function TournamentDetailPage({ tournamentId }) {
 
           {tournament.registration_url && (
             <div className="tournament-detail__card" style={cardStyle}>
-              <p style={sectionTitleStyle}>Anmeldelink</p>
+              <p style={sectionTitleStyle}>{t('tournamentDetail.registrationLink')}</p>
               <a href={tournament.registration_url} target="_blank" rel="noopener noreferrer" style={{ color: '#7cb9ff', overflowWrap: 'anywhere' }}>
                 {tournament.registration_url}
               </a>
@@ -198,7 +202,7 @@ export default function TournamentDetailPage({ tournamentId }) {
 
           {Array.isArray(tournament.links) && tournament.links.length > 0 && (
             <div className="tournament-detail__card" style={cardStyle}>
-              <p style={sectionTitleStyle}>Links</p>
+              <p style={sectionTitleStyle}>{t('tournamentDetail.links')}</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {tournament.links.map((link, index) => (
                   <a key={index} href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: '#7cb9ff', overflowWrap: 'anywhere' }}>
@@ -216,7 +220,7 @@ export default function TournamentDetailPage({ tournamentId }) {
               className="tournament-detail__cta"
               style={{ padding: '0.85rem 2.5rem', borderRadius: '999px', border: 'none', background: 'rgba(86,160,255,0.8)', color: '#fff', fontSize: '1rem', fontWeight: 700, cursor: 'pointer', letterSpacing: '0.04em', minHeight: '48px', display: 'inline-flex', alignItems: 'center' }}
             >
-              Team anmelden →
+              {t('tournamentDetail.registerTeam')}
             </button>
           </div>
         </>

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { updateDisplayView } from '../utils/api.js';
 
 const baseStyle = {
@@ -21,12 +22,13 @@ const baseStyle = {
 };
 
 export default function DisplayViewToggle({ displayView, style = {} }) {
+  const { t } = useTranslation();
   const [pending, setPending] = useState(false);
 
   const nextView = displayView === 'bracket' ? 'scoreboard' : 'bracket';
   const label = useMemo(
-    () => (displayView === 'bracket' ? 'Live-Modus anzeigen' : 'Turnierbaum anzeigen'),
-    [displayView]
+    () => (displayView === 'bracket' ? t('controls.showLive') : t('controls.showBracket')),
+    [displayView, t]
   );
 
   const handleClick = async () => {
@@ -50,7 +52,7 @@ export default function DisplayViewToggle({ displayView, style = {} }) {
 
   return (
     <button type="button" onClick={handleClick} disabled={pending || !displayView} style={buttonStyle}>
-      {pending ? 'Aktualisiere…' : label}
+      {pending ? t('controls.updating') : label}
     </button>
   );
 }

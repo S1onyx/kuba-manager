@@ -23,7 +23,7 @@ router.get('/', async (req, res) => {
     res.json(players);
   } catch (error) {
     console.error('Players konnten nicht geladen werden:', error);
-    res.status(500).json({ message: 'Players konnten nicht geladen werden.' });
+    res.status(500).json({ code: 'PLAYERS_LOAD_FAILED', message: 'Players konnten nicht geladen werden.' });
   }
 });
 
@@ -32,36 +32,36 @@ router.post('/', async (req, res) => {
     const payload = req.body ?? {};
     const { teamId } = payload;
     if (teamId === undefined || teamId === null || teamId === '') {
-      return res.status(400).json({ message: 'teamId ist erforderlich.' });
+      return res.status(400).json({ code: 'TEAM_ID_REQUIRED', message: 'teamId ist erforderlich.' });
     }
     const team = await getTeam(teamId);
     if (!team) {
-      return res.status(404).json({ message: 'Team wurde nicht gefunden.' });
+      return res.status(404).json({ code: 'TEAM_NOT_FOUND', message: 'Team wurde nicht gefunden.' });
     }
     const player = await createPlayer(payload);
     res.status(201).json(player);
   } catch (error) {
     console.error('Player konnte nicht erstellt werden:', error);
-    res.status(400).json({ message: 'Player konnte nicht erstellt werden.', detail: error.message });
+    res.status(400).json({ code: 'PLAYER_CREATE_FAILED', message: 'Player konnte nicht erstellt werden.', detail: error.message });
   }
 });
 
 router.put('/:id', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Player-ID.' });
+    return res.status(400).json({ code: 'INVALID_PLAYER_ID', message: 'Ungültige Player-ID.' });
   }
 
   try {
     const existing = await getPlayer(id);
     if (!existing) {
-      return res.status(404).json({ message: 'Player wurde nicht gefunden.' });
+      return res.status(404).json({ code: 'PLAYER_NOT_FOUND', message: 'Player wurde nicht gefunden.' });
     }
 
     if (req.body?.teamId && Number(req.body.teamId) !== existing.team_id) {
       const targetTeam = await getTeam(req.body.teamId);
       if (!targetTeam) {
-        return res.status(404).json({ message: 'Ziel-Team wurde nicht gefunden.' });
+        return res.status(404).json({ code: 'TARGET_TEAM_NOT_FOUND', message: 'Ziel-Team wurde nicht gefunden.' });
       }
       await movePlayer(id, targetTeam.id);
     }
@@ -70,27 +70,27 @@ router.put('/:id', async (req, res) => {
     res.json(player);
   } catch (error) {
     console.error('Player konnte nicht aktualisiert werden:', error);
-    res.status(400).json({ message: 'Player konnte nicht aktualisiert werden.', detail: error.message });
+    res.status(400).json({ code: 'PLAYER_UPDATE_FAILED', message: 'Player konnte nicht aktualisiert werden.', detail: error.message });
   }
 });
 
 router.delete('/:id', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Player-ID.' });
+    return res.status(400).json({ code: 'INVALID_PLAYER_ID', message: 'Ungültige Player-ID.' });
   }
 
   try {
     const existing = await getPlayer(id);
     if (!existing) {
-      return res.status(404).json({ message: 'Player wurde nicht gefunden.' });
+      return res.status(404).json({ code: 'PLAYER_NOT_FOUND', message: 'Player wurde nicht gefunden.' });
     }
 
     await deletePlayer(id);
     res.status(204).end();
   } catch (error) {
     console.error('Player konnte nicht gelöscht werden:', error);
-    res.status(500).json({ message: 'Player konnte nicht gelöscht werden.' });
+    res.status(500).json({ code: 'PLAYER_DELETE_FAILED', message: 'Player konnte nicht gelöscht werden.' });
   }
 });
 

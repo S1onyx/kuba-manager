@@ -1,14 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   fetchTournamentStructure,
   updateTournamentTeams
 } from '../utils/api.js';
+import { formatApiError } from '../utils/apiError.js';
 
 export default function useTournamentStructure({
   expandedTournamentId,
   teams,
   updateMessage
 }) {
+  const { t } = useTranslation();
   const [tournamentStructure, setTournamentStructure] = useState(null);
   const [structureTournamentId, setStructureTournamentId] = useState(null);
   const [structureLoading, setStructureLoading] = useState(false);
@@ -38,7 +41,7 @@ export default function useTournamentStructure({
     structureData.groups.forEach((group) => {
       group.slots.forEach((slot) => {
         const key = String(slot.slotNumber);
-        const name = slot.displayName || `Team ${slot.slotNumber}`;
+        const name = slot.displayName || t('tournaments.details.teamFallback', { number: slot.slotNumber });
         const placeholder = slot.placeholder || name;
         const teamId = slot.teamId ? String(slot.teamId) : '';
 
@@ -58,7 +61,7 @@ export default function useTournamentStructure({
 
     setSlotAssignments(current);
     setSlotInitialAssignments(initial);
-  }, []);
+  }, [t]);
 
   const loadTournamentStructure = useCallback(
     async (id, options = {}) => {
@@ -92,7 +95,7 @@ export default function useTournamentStructure({
         initializeSlotAssignments(data);
       } catch (error) {
         console.error(error);
-        setStructureError('Turnierstruktur konnte nicht geladen werden.');
+        setStructureError(formatApiError(error, t, 'feedback.structureLoadFailed'));
         if (resetState) {
           setTournamentStructure(null);
           setStructureTournamentId(null);
@@ -105,7 +108,7 @@ export default function useTournamentStructure({
         }
       }
     },
-    [initializeSlotAssignments]
+    [initializeSlotAssignments, t]
   );
 
   useEffect(() => {
@@ -137,12 +140,12 @@ export default function useTournamentStructure({
       next[key] = {
         ...previous,
         name: nameValue,
-        placeholder: trimmed || previous.placeholder || `Team ${slotNumber}`,
+        placeholder: trimmed || previous.placeholder || t('tournaments.details.teamFallback', { number: slotNumber }),
         teamId
       };
       return next;
     });
-  }, [teamNameById]);
+  }, [teamNameById, t]);
 
   const handleSlotTeamSelect = useCallback((slotNumber, value) => {
     const key = String(slotNumber);
@@ -156,19 +159,19 @@ export default function useTournamentStructure({
           ...previous,
           teamId: normalized,
           name: selectedName,
-          placeholder: selectedName || `Team ${slotNumber}`
+          placeholder: selectedName || t('tournaments.details.teamFallback', { number: slotNumber })
         };
       } else {
         next[key] = {
           ...previous,
           teamId: '',
           name: previous.name,
-          placeholder: (previous.name ?? '').trim() || `Team ${slotNumber}`
+          placeholder: (previous.name ?? '').trim() || t('tournaments.details.teamFallback', { number: slotNumber })
         };
       }
       return next;
     });
-  }, [teamNameById]);
+  }, [teamNameById, t]);
 
   const handleSlotReset = useCallback((slotNumber) => {
     const key = String(slotNumber);
@@ -178,14 +181,14 @@ export default function useTournamentStructure({
         next[key] = { ...slotInitialAssignments[key] };
       } else {
         next[key] = {
-          name: `Team ${slotNumber}`,
-          placeholder: `Team ${slotNumber}`,
+          name: t('tournaments.details.teamFallback', { number: slotNumber }),
+          placeholder: t('tournaments.details.teamFallback', { number: slotNumber }),
           teamId: ''
         };
       }
       return next;
     });
-  }, [slotInitialAssignments]);
+  }, [slotInitialAssignments, t]);
 
   const handleResetAllSlots = useCallback(() => {
     setSlotAssignments(() => {
@@ -216,7 +219,7 @@ export default function useTournamentStructure({
         const fallback =
           (entry?.teamId ? teamNameById.get(entry.teamId) : null) ||
           slotInitialAssignments[slotKey]?.name ||
-          `Team ${slotNumber}`;
+          t('tournaments.details.teamFallback', { number: slotNumber });
         return {
           slot_number: slotNumber,
           team_id: teamIdValue,
@@ -232,12 +235,13 @@ export default function useTournamentStructure({
         setTournamentStructure(data);
         setStructureTournamentId(expandedTournamentId);
         initializeSlotAssignments(data);
-        updateMessage('info', 'Teamzuweisungen gespeichert.');
+        updateMessage('info', t('feedback.assignmentsSaved'));
         return true;
       } catch (error) {
         console.error(error);
-        setStructureError('Teamzuweisungen konnten nicht gespeichert werden.');
-        updateMessage('error', 'Teamzuweisungen konnten nicht gespeichert werden.');
+        const message = formatApiError(error, t, 'feedback.assignmentsSaveFailed');
+        setStructureError(message);
+        updateMessage('error', message);
         return false;
       } finally {
         setStructureSaving(false);
@@ -249,7 +253,8 @@ export default function useTournamentStructure({
       slotInitialAssignments,
       teamNameById,
       initializeSlotAssignments,
-      updateMessage
+      updateMessage,
+      t
     ]
   );
 

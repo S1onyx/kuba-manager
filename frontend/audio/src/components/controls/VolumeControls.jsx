@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useAudioApp } from '../../context/AudioContext.jsx';
 
 function formatPercent(value) {
@@ -5,6 +6,7 @@ function formatPercent(value) {
 }
 
 export default function VolumeControls() {
+  const { t } = useTranslation();
   const { volume } = useAudioApp();
   if (!volume) {
     return null;
@@ -23,9 +25,9 @@ export default function VolumeControls() {
         }}
       >
         <div style={{ display: 'grid', gap: '0.3rem' }}>
-          <h2 style={{ margin: 0, fontSize: '1.3rem', letterSpacing: '0.06em' }}>Lautstärke je Ereignis</h2>
+          <h2 style={{ margin: 0, fontSize: '1.3rem', letterSpacing: '0.06em' }}>{t('volume.title')}</h2>
           <span style={{ fontSize: '0.9rem', opacity: 0.75 }}>
-            Passe das Verhältnis der Spielereignisse zueinander an. Die Werte werden lokal im Browser gespeichert.
+            {t('volume.description')}
           </span>
         </div>
       </header>
@@ -34,13 +36,14 @@ export default function VolumeControls() {
         {categories.map((category) => {
           const value = settings?.[category.key] ?? 1;
           const percent = Math.round(value * 100);
+          const description = t(`volume.categories.${category.key}.description`);
           return (
             <label key={category.key} className="volume-control">
               <div className="volume-control__label">
                 <div>
-                  <strong>{category.label}</strong>
-                  {category.description ? (
-                    <p className="volume-control__description">{category.description}</p>
+                  <strong>{t(`volume.categories.${category.key}.label`)}</strong>
+                  {description ? (
+                    <p className="volume-control__description">{description}</p>
                   ) : null}
                 </div>
                 <span className="volume-control__value">{formatPercent(value)}</span>

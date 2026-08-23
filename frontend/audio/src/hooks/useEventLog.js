@@ -9,7 +9,7 @@ export default function useEventLog() {
     setEvents((prev) => [event, ...prev].slice(0, MAX_EVENTS));
   }, []);
 
-  const addSystemEvent = useCallback((timestamp, label = 'Audio verbunden') => {
+  const addSystemEvent = useCallback((timestamp, label = null) => {
     addEvent({
       key: 'audio_ready',
       triggeredAt: timestamp,

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import AdminLayout from '../components/layout/AdminLayout.jsx';
 import ScoreboardSummary from '../components/dashboard/ScoreboardSummary.jsx';
 import SidebarNavigation from '../components/dashboard/SidebarNavigation.jsx';
@@ -22,6 +23,7 @@ import useAudioManager from '../hooks/useAudioManager.js';
 import { DashboardProvider } from '../context/DashboardContext.jsx';
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('control');
   const feedback = useFeedback();
 
@@ -148,7 +150,7 @@ export default function Dashboard() {
   );
 
   if (scoreboardCtrl.loading && !scoreboardCtrl.scoreboard) {
-    return <p style={{ padding: '2rem', color: 'var(--text-secondary)' }}>Lade Scoreboard...</p>;
+    return <p style={{ padding: '2rem', color: 'var(--text-secondary)' }}>{t('dashboard.loading')}</p>;
   }
 
   return (

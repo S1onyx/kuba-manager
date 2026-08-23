@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDateLocale } from '../i18n/index.js';
 
 const gridLayout = {
   display: 'grid',
@@ -46,7 +48,7 @@ const responsiveStyles = `
   }
 `;
 
-function LeaderList({ title, entries = [], valueLabel }) {
+function LeaderList({ title, entries = [], valueLabel, teamFallback }) {
   if (!entries.length) {
     return null;
   }
@@ -66,7 +68,7 @@ function LeaderList({ title, entries = [], valueLabel }) {
               </strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', opacity: 0.8 }}>
-              <span>{entry.teamName ?? 'Team'}</span>
+              <span>{entry.teamName ?? teamFallback}</span>
               <span>{valueLabel(entry)}</span>
             </div>
           </li>
@@ -105,10 +107,12 @@ const getSortableValue = (player, key) => {
 };
 
 export default function PlayerStatsTable({ stats }) {
+  const { t } = useTranslation();
+  const dateLocale = useDateLocale();
   const [sortConfig, setSortConfig] = useState({ key: 'points', direction: 'desc' });
 
   if (!stats) {
-    return <p style={{ opacity: 0.75 }}>Noch keine Spielerstatistiken verfügbar.</p>;
+    return <p style={{ opacity: 0.75 }}>{t('playerStats.empty')}</p>;
   }
 
   const topScorers = stats.leaders?.topScorers ?? [];
@@ -122,7 +126,7 @@ export default function PlayerStatsTable({ stats }) {
     topThreePointers.length === 0 &&
     allPlayers.length === 0
   ) {
-    return <p style={{ opacity: 0.75 }}>Noch keine Spielerstatistiken verfügbar.</p>;
+    return <p style={{ opacity: 0.75 }}>{t('playerStats.empty')}</p>;
   }
 
   const handleSortChange = (key) => {
@@ -155,11 +159,11 @@ export default function PlayerStatsTable({ stats }) {
       const aVal = getSortableValue(a, key);
       const bVal = getSortableValue(b, key);
       if (typeof aVal === 'string' || typeof bVal === 'string') {
-        return aVal.localeCompare(bVal, 'de', { sensitivity: 'base' }) * multiplier;
+        return aVal.localeCompare(bVal, dateLocale, { sensitivity: 'base' }) * multiplier;
       }
       return (aVal - bVal) * multiplier;
     });
-  }, [allPlayers, sortConfig]);
+  }, [allPlayers, sortConfig, dateLocale]);
 
   const tableEntries = sortedPlayers;
 
@@ -183,27 +187,28 @@ export default function PlayerStatsTable({ stats }) {
   return (
     <section style={gridLayout}>
       <header style={{ display: 'grid', gap: '0.35rem' }}>
-        <h3 style={{ fontSize: '1.25rem', letterSpacing: '0.05em' }}>Spielerstatistiken</h3>
-        <p style={{ opacity: 0.75, fontSize: '0.95rem' }}>
-          Top-Leistungen nach Punkten, Strafen und Dreiern. Die Tabelle listet die aktivsten Spieler des Turniers.
-        </p>
+        <h3 style={{ fontSize: '1.25rem', letterSpacing: '0.05em' }}>{t('playerStats.title')}</h3>
+        <p style={{ opacity: 0.75, fontSize: '0.95rem' }}>{t('playerStats.description')}</p>
       </header>
 
       <div style={leaderGridStyle}>
         <LeaderList
-          title="Topscorer"
+          title={t('playerStats.topScorers')}
           entries={topScorers}
-          valueLabel={(entry) => `${entry.points ?? 0} Pkt`}
+          valueLabel={(entry) => t('playerStats.pointsValue', { count: entry.points ?? 0 })}
+          teamFallback={t('playerStats.teamFallback')}
         />
         <LeaderList
-          title="Meiste Strafminuten"
+          title={t('playerStats.mostPenalized')}
           entries={mostPenalized}
           valueLabel={(entry) => `${entry.penaltySeconds ?? 0}s`}
+          teamFallback={t('playerStats.teamFallback')}
         />
         <LeaderList
-          title="Dreier-Spezialisten"
+          title={t('playerStats.topThreePointers')}
           entries={topThreePointers}
-          valueLabel={(entry) => `${entry.breakdown?.['3'] ?? 0} Dreier`}
+          valueLabel={(entry) => t('playerStats.threes', { count: entry.breakdown?.['3'] ?? 0 })}
+          teamFallback={t('playerStats.teamFallback')}
         />
       </div>
 
@@ -219,7 +224,7 @@ export default function PlayerStatsTable({ stats }) {
                     style={buildSortButtonStyle('name')}
                     onClick={() => handleSortChange('name')}
                   >
-                    Spieler {renderSortIndicator('name')}
+                    {t('playerStats.colPlayer')} {renderSortIndicator('name')}
                   </button>
                 </th>
                 <th style={{ padding: '0.75rem 1rem' }}>
@@ -229,7 +234,7 @@ export default function PlayerStatsTable({ stats }) {
                     style={buildSortButtonStyle('teamName')}
                     onClick={() => handleSortChange('teamName')}
                   >
-                    Team {renderSortIndicator('teamName')}
+                    {t('playerStats.colTeam')} {renderSortIndicator('teamName')}
                   </button>
                 </th>
                 <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
@@ -239,7 +244,7 @@ export default function PlayerStatsTable({ stats }) {
                     style={buildSortButtonStyle('points', 'right')}
                     onClick={() => handleSortChange('points')}
                   >
-                    Punkte {renderSortIndicator('points')}
+                    {t('playerStats.colPoints')} {renderSortIndicator('points')}
                   </button>
                 </th>
                 <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
@@ -249,7 +254,7 @@ export default function PlayerStatsTable({ stats }) {
                     style={buildSortButtonStyle('games', 'right')}
                     onClick={() => handleSortChange('games')}
                   >
-                    Spiele {renderSortIndicator('games')}
+                    {t('playerStats.colGames')} {renderSortIndicator('games')}
                   </button>
                 </th>
                 <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
@@ -259,7 +264,7 @@ export default function PlayerStatsTable({ stats }) {
                     style={buildSortButtonStyle('pointsPerGame', 'right')}
                     onClick={() => handleSortChange('pointsPerGame')}
                   >
-                    Punkte/Spiel {renderSortIndicator('pointsPerGame')}
+                    {t('playerStats.colPointsPerGame')} {renderSortIndicator('pointsPerGame')}
                   </button>
                 </th>
                 <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
@@ -269,7 +274,7 @@ export default function PlayerStatsTable({ stats }) {
                     style={buildSortButtonStyle('penalties', 'right')}
                     onClick={() => handleSortChange('penalties')}
                   >
-                    Strafen {renderSortIndicator('penalties')}
+                    {t('playerStats.colPenalties')} {renderSortIndicator('penalties')}
                   </button>
                 </th>
                 <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
@@ -279,7 +284,7 @@ export default function PlayerStatsTable({ stats }) {
                     style={buildSortButtonStyle('penaltySeconds', 'right')}
                     onClick={() => handleSortChange('penaltySeconds')}
                   >
-                    Strafsek. {renderSortIndicator('penaltySeconds')}
+                    {t('playerStats.colPenaltySeconds')} {renderSortIndicator('penaltySeconds')}
                   </button>
                 </th>
               </tr>

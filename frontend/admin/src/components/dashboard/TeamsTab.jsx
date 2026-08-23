@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import PanelCard from '../common/PanelCard.jsx';
 import { useDashboard } from '../../context/DashboardContext.jsx';
 
 export default function TeamsTab() {
+  const { t } = useTranslation();
   const {
     teams: {
       teams,
@@ -22,8 +24,8 @@ export default function TeamsTab() {
   return (
     <div style={{ display: 'grid', gap: '1.75rem' }}>
       <PanelCard
-        title="Teams organisieren"
-        description="Lege neue Teams an oder bearbeite bestehende Mannschaften. Diese stehen in Scoreboard und Turnierstruktur zur Auswahl."
+        title={t('teams.organizeTitle')}
+        description={t('teams.organizeDescription')}
       >
         <form
           onSubmit={handleTeamCreateSubmit}
@@ -32,23 +34,23 @@ export default function TeamsTab() {
           <input
             value={teamCreateName}
             onChange={(event) => setTeamCreateName(event.target.value)}
-            placeholder="Teamname"
+            placeholder={t('teams.namePlaceholder')}
             style={{ flex: '1 1 260px' }}
           />
-          <button type="submit">Team anlegen</button>
+          <button type="submit">{t('teams.create')}</button>
         </form>
       </PanelCard>
 
       <PanelCard
-        title="Teamübersicht"
-        description="Aktualisiere Teamnamen oder entferne Teams, die nicht mehr benötigt werden."
+        title={t('teams.listTitle')}
+        description={t('teams.listDescription')}
       >
         {teamsLoading ? (
-          <p style={{ margin: 0 }}>Teams werden geladen...</p>
+          <p style={{ margin: 0 }}>{t('teams.loading')}</p>
         ) : teamsError ? (
           <p style={{ margin: 0, color: 'var(--warning)' }}>{teamsError}</p>
         ) : teams.length === 0 ? (
-          <p style={{ margin: 0 }}>Noch keine Teams angelegt.</p>
+          <p style={{ margin: 0 }}>{t('teams.empty')}</p>
         ) : (
           <div style={{ display: 'grid', gap: '0.9rem' }}>
             {teams.map((team) => {
@@ -82,23 +84,23 @@ export default function TeamsTab() {
                     {isEditing ? (
                       <>
                         <button type="button" onClick={() => handleTeamSave(team.id)}>
-                          Speichern
+                          {t('common.save')}
                         </button>
                         <button type="button" onClick={() => cancelTeamEdit(team.id)}>
-                          Abbrechen
+                          {t('common.cancel')}
                         </button>
                       </>
                     ) : (
                       <>
                         <button type="button" onClick={() => startTeamEdit(team)}>
-                          Bearbeiten
+                          {t('common.edit')}
                         </button>
                         <button
                           type="button"
                           onClick={() => handleTeamDelete(team.id)}
                           style={{ background: 'rgba(211,47,47,0.85)', color: '#fff' }}
                         >
-                          Löschen
+                          {t('common.delete')}
                         </button>
                       </>
                     )}

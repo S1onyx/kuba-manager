@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import GroupStandings from '../GroupStandings.jsx';
 import { formatGroupLabel } from '../../utils/formatting.js';
 
@@ -13,20 +14,22 @@ const headerStyle = {
 };
 
 export default function StandingsSection({ visible, meta, loading, error, standings }) {
+  const { t } = useTranslation();
+
   if (!visible) {
     return null;
   }
 
-  const stageSuffix = meta?.stageLabel ? ` – ${formatGroupLabel(meta.stageLabel)}` : '';
+  const stageSuffix = meta?.stageLabel ? ` – ${formatGroupLabel(meta.stageLabel, t)}` : '';
 
   return (
     <section style={sectionStyle}>
       <h3 style={headerStyle}>
-        Aktuelle Gruppentabelle
+        {t('standings.currentTitle')}
         {stageSuffix}
       </h3>
       {loading ? (
-        <p style={{ textAlign: 'left' }}>Lade Tabelle...</p>
+        <p style={{ textAlign: 'left' }}>{t('standings.loading')}</p>
       ) : error ? (
         <p style={{ textAlign: 'left', color: '#ff8a80' }}>{error}</p>
       ) : (

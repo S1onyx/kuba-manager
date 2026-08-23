@@ -1,0 +1,69 @@
+{
+  "header": {
+    "title": "Kunstrad Basketball – Audio",
+    "subtitle": "Diese Seite spielt automatisch alle konfigurierten Spielsounds ab. Bitte Lautsprecher eingeschaltet lassen."
+  },
+  "status": {
+    "connected": "Verbunden",
+    "disconnected": "Nicht verbunden",
+    "audioOn": "Audio aktiviert",
+    "audioOff": "Audio deaktiviert",
+    "enableAudio": "Audio aktivieren",
+    "audioActive": "Audio aktiv"
+  },
+  "devices": {
+    "label": "Ausgabegerät",
+    "systemDefault": "Systemstandard",
+    "unnamed": "Gerät {{id}}"
+  },
+  "volume": {
+    "title": "Lautstärke je Ereignis",
+    "description": "Passe das Verhältnis der Spielereignisse zueinander an. Die Werte werden lokal im Browser gespeichert.",
+    "categories": {
+      "score": {
+        "label": "Korbhymnen",
+        "description": "Alle Treffersounds (Team-spezifisch oder allgemein)."
+      },
+      "game": {
+        "label": "Spielstart / Pause / Ende",
+        "description": "Statusmeldungen wie Startsignal, Halbzeit- oder Endstand."
+      },
+      "events": {
+        "label": "Spielereignisse",
+        "description": "Weitere Trigger wie Fouls oder individuelle Events."
+      },
+      "manual": {
+        "label": "Manuelle Wiedergabe",
+        "description": "Sounds, die direkt aus der Bibliothek gestartet werden."
+      }
+    }
+  },
+  "events": {
+    "title": "Letzte Ereignisse",
+    "logDescription": "Eingehende Sounds werden automatisch nacheinander wiedergegeben.",
+    "empty": "Noch keine Sound-Ereignisse empfangen.",
+    "manual": "Manuell",
+    "event": "Ereignis",
+    "audioConnected": "Audio verbunden",
+    "soundFallback": "Sound #{{id}}",
+    "count_one": "{{count}} Ereignis",
+    "count_other": "{{count}} Ereignisse"
+  },
+  "errors": {
+    "playbackFailed": "Sound konnte nicht abgespielt werden. Bitte Lautsprecher prüfen.",
+    "devicesNotFound": "Audioausgabegeräte konnten nicht ermittelt werden.",
+    "sinkNotSupported": "Ausgabegeräte-Auswahl wird von diesem Browser nicht unterstützt.",
+    "sinkFailed": "Ausgabegerät konnte nicht gesetzt werden."
+  },
+  "languageSwitcher": {
+    "label": "Sprache wählen",
+    "aiNotice": "Automatisch übersetzt — Fehler möglich"
+  },
+  "languages": {
+    "de": "Deutsch",
+    "en": "English",
+    "fr": "Français",
+    "hu": "Magyar",
+    "cs": "Čeština"
+  }
+}

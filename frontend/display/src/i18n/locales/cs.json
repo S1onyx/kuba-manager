@@ -1,0 +1,121 @@
+{
+  "app": {
+    "mirrorStandard": "Displej 1 (standardní)",
+    "mirrorInverted": "Displej 2 (invertovaný)"
+  },
+  "controls": {
+    "fullscreenEnter": "Celá obrazovka",
+    "fullscreenExit": "Ukončit celou obrazovku",
+    "showLive": "Zobrazit živý režim",
+    "showBracket": "Zobrazit turnajový pavouk",
+    "updating": "Aktualizace…"
+  },
+  "scoreboard": {
+    "halfBadge": "{{half}}. poločas",
+    "teamA": "Tým A",
+    "teamB": "Tým B",
+    "extraTime": "Nastavený čas",
+    "halftimeBreak": "Poločas"
+  },
+  "penalties": {
+    "title": "Časové tresty",
+    "empty": "Žádné probíhající tresty",
+    "expired": "vypršel"
+  },
+  "standings": {
+    "currentTitle": "Aktuální tabulka skupiny",
+    "loading": "Načítání tabulky...",
+    "noResults": "Zatím žádné výsledky.",
+    "colRank": "#",
+    "colTeam": "Tým",
+    "colPlayed": "Zápasy",
+    "colWon": "V",
+    "colDrawn": "R",
+    "colLost": "P",
+    "colGoals": "Koše",
+    "colDiff": "Rozdíl",
+    "colPenalties": "Tresty",
+    "colPoints": "Body",
+    "colStatus": "Stav"
+  },
+  "stage": {
+    "groupLabel": "Skupina {{label}}",
+    "groupPhase": "Skupinová fáze · {{label}}",
+    "knockoutPhase": "Vyřazovací fáze · {{label}}",
+    "placementPhase": "Umístění · {{label}}",
+    "knockoutFinal": "Finále",
+    "knockoutRoundGeneric_one": "Vyřazovací kolo ({{count}} tým)",
+    "knockoutRoundGeneric_few": "Vyřazovací kolo ({{count}} týmy)",
+    "knockoutRoundGeneric_many": "Vyřazovací kolo ({{count}} týmů)",
+    "round": {
+      "p4": "Semifinále",
+      "p8": "Čtvrtfinále",
+      "p16": "Osmifinále",
+      "p32": "Šestnáctifinále",
+      "p64": "Dvaatřicetifinále",
+      "p128": "Čtyřiašedesátifinále"
+    },
+    "placementMatch": "Zápas o {{from}}. místo",
+    "placementRound": "Kolo o umístění {{from}}–{{to}}"
+  },
+  "bracket": {
+    "title": "Turnajový pavouk a přehled skupin",
+    "subtitle": "Tabulky skupin a vyřazovací zápasy přehledně",
+    "noTournament": "Není vybrán žádný turnaj. Nastavte prosím turnaj pro výsledkovou tabuli v administračním panelu.",
+    "loading": "Načítání struktury turnaje…",
+    "noStructure": "Struktura turnaje zatím není k dispozici. Spravujte prosím rozpis a skupiny v administračním panelu.",
+    "groupStage": "Skupinová fáze",
+    "noGroupData": "Údaje o skupinách zatím nejsou k dispozici.",
+    "matchesCompleted": "Odehrané zápasy: {{recorded}}/{{total}}",
+    "noResults": "Nejsou uloženy žádné výsledky.",
+    "knockoutTitle": "Vyřazovací fáze",
+    "placementTitle": "Zápasy o umístění",
+    "stageFallback": "Fáze",
+    "round": "{{round}}. kolo",
+    "matchcode": "Kód zápasu {{code}}",
+    "timeValue": "{{time}}",
+    "status": {
+      "qualified": "postoupil",
+      "inPosition": "na cestě",
+      "contender": "dotahuje"
+    }
+  },
+  "summary": {
+    "loading": "Načítání závěrečného přehledu…",
+    "empty": "Závěrečná data zatím nejsou k dispozici. Dokončete prosím turnaj v administračním panelu.",
+    "defaultTournamentName": "Turnaj",
+    "title": "Konec turnaje",
+    "description": "Konečná tabulka, výsledné pořadí a výjimečné výkony hráčů přehledně.",
+    "champion": "Vítěz",
+    "championDecidedBy": "Rozhodnuto: {{method}}",
+    "championFinalWin": "Vítězství ve finále",
+    "score": "Výsledek {{score}}",
+    "runnerUp": "Finalista:",
+    "placementsTitle": "Konečné pořadí",
+    "colPlacement": "Pořadí",
+    "colTeam": "Tým",
+    "colDecision": "Rozhodnutí",
+    "colOpponent": "Soupeř",
+    "colResult": "Výsledek",
+    "overallStandings": "Celková bilance",
+    "topScorer": "Nejlepší střelec",
+    "threePointSpecialist": "Specialista na trojky",
+    "penaltyKing": "Král trestné lavice",
+    "points_one": "{{count}} bod",
+    "points_few": "{{count}} body",
+    "points_many": "{{count}} bodů",
+    "threes_one": "{{count}} trojka",
+    "threes_few": "{{count}} trojky",
+    "threes_many": "{{count}} trojek",
+    "penaltySeconds_one": "{{count}} sekunda trestu",
+    "penaltySeconds_few": "{{count}} sekundy trestu",
+    "penaltySeconds_many": "{{count}} sekund trestu",
+    "teamFallback": "Tým"
+  },
+  "errors": {
+    "loadScoreboard": "Výsledkovou tabuli se nepodařilo načíst.",
+    "loadStandings": "Tabulku se nepodařilo načíst.",
+    "loadStructure": "Strukturu turnaje se nepodařilo načíst.",
+    "loadSummary": "Přehled turnaje se nepodařilo načíst."
+  }
+}

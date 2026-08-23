@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 const cardStyle = {
   display: 'grid',
   gap: '1.5rem',
@@ -138,29 +140,30 @@ function formatTime(seconds = 0) {
   return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
 
-function buildStatusLabel(scoreboard) {
-  if (!scoreboard) return 'Keine Daten';
-  if (scoreboard.isHalftimeBreak) return 'Halbzeitpause';
+function buildStatusLabel(scoreboard, t) {
+  if (!scoreboard) return t('currentMatch.noData');
+  if (scoreboard.isHalftimeBreak) return t('currentMatch.halftimeBreak');
   if (scoreboard.isExtraTime) {
-    return scoreboard.isRunning ? 'Nachspielzeit · läuft' : 'Nachspielzeit';
+    return scoreboard.isRunning ? t('currentMatch.extraTimeRunning') : t('currentMatch.extraTime');
   }
-  return scoreboard.isRunning ? 'Live' : 'Pause';
+  return scoreboard.isRunning ? t('currentMatch.live') : t('currentMatch.pause');
 }
 
-function buildStageLabel(scoreboard) {
+function buildStageLabel(scoreboard, t) {
   if (!scoreboard?.stageType || !scoreboard?.stageLabel) {
     return null;
   }
   if (scoreboard.stageType === 'group') {
-    return `Gruppenphase – ${scoreboard.stageLabel}`;
+    return t('currentMatch.groupStage', { label: scoreboard.stageLabel });
   }
   return scoreboard.stageLabel;
 }
 
 export default function CurrentMatchCard({ scoreboard }) {
-  const status = buildStatusLabel(scoreboard);
-  const stageLabel = buildStageLabel(scoreboard);
-  const halfInfo = scoreboard?.currentHalf ? `Halbzeit ${scoreboard.currentHalf}` : '';
+  const { t } = useTranslation();
+  const status = buildStatusLabel(scoreboard, t);
+  const stageLabel = buildStageLabel(scoreboard, t);
+  const halfInfo = scoreboard?.currentHalf ? t('currentMatch.half', { half: scoreboard.currentHalf }) : '';
   const timer = formatTime(scoreboard?.remainingSeconds ?? 0);
   const extraTime = (scoreboard?.extraSeconds ?? 0) > 0 ? formatTime(scoreboard.extraSeconds) : null;
   const penaltiesA = scoreboard?.penalties?.a?.length ?? 0;
@@ -200,8 +203,8 @@ export default function CurrentMatchCard({ scoreboard }) {
 
             <div className="current-card__teams" style={teamsWrapperStyle}>
               <div className="current-card__team current-card__team--left" style={leftTeamColumnStyle}>
-                <div className="current-card__team-name" style={teamNameStyle}>{scoreboard.teamAName || 'Team A'}</div>
-                <div style={{ fontSize: '0.85rem', opacity: 0.75 }}>Strafen: {penaltiesA}</div>
+                <div className="current-card__team-name" style={teamNameStyle}>{scoreboard.teamAName || t('currentMatch.teamA')}</div>
+                <div style={{ fontSize: '0.85rem', opacity: 0.75 }}>{t('currentMatch.penalties', { count: penaltiesA })}</div>
               </div>
 
               <div className="current-card__score" style={scoreStyle}>
@@ -209,20 +212,22 @@ export default function CurrentMatchCard({ scoreboard }) {
               </div>
 
               <div className="current-card__team current-card__team--right" style={teamColumnStyle}>
-                <div className="current-card__team-name" style={teamNameStyle}>{scoreboard.teamBName || 'Team B'}</div>
-                <div style={{ fontSize: '0.85rem', opacity: 0.75 }}>Strafen: {penaltiesB}</div>
+                <div className="current-card__team-name" style={teamNameStyle}>{scoreboard.teamBName || t('currentMatch.teamB')}</div>
+                <div style={{ fontSize: '0.85rem', opacity: 0.75 }}>{t('currentMatch.penalties', { count: penaltiesB })}</div>
               </div>
             </div>
 
             <div className="current-card__info" style={infoMetaStyle}>
-              <span>Zeit: {timer}</span>
+              <span>{t('currentMatch.time', { time: timer })}</span>
               {halfInfo ? <span>{halfInfo}</span> : null}
-              {extraTime ? <span>Nachspielzeit {extraTime}</span> : null}
-              {scoreboard.halftimeSeconds ? <span>Halbzeit bei {formatTime(scoreboard.halftimeSeconds)}</span> : null}
+              {extraTime ? <span>{t('currentMatch.extraTimeInfo', { time: extraTime })}</span> : null}
+              {scoreboard.halftimeSeconds ? (
+                <span>{t('currentMatch.halftimeAt', { time: formatTime(scoreboard.halftimeSeconds) })}</span>
+              ) : null}
             </div>
           </>
         ) : (
-          <p style={{ textAlign: 'center', opacity: 0.8 }}>Kein aktuelles Spiel ausgewählt.</p>
+          <p style={{ textAlign: 'center', opacity: 0.8 }}>{t('currentMatch.noMatch')}</p>
         )}
       </section>
       <style>{responsiveStyles}</style>

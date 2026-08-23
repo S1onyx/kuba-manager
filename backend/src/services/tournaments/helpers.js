@@ -232,6 +232,100 @@ export function getRoundLabel(participantCount) {
   return labels.get(participantCount) || `KO-Runde (${participantCount} Teams)`;
 }
 
+const KNOCKOUT_PARTICIPANTS_BY_LABEL = new Map([
+  ['finale', 2],
+  ['halbfinale', 4],
+  ['viertelfinale', 8],
+  ['achtelfinale', 16],
+  ['sechzehntelfinale', 32],
+  ['zweiunddreißigstelfinale', 64],
+  ['vierundsechzigstelfinale', 128]
+]);
+
+function parseKnockoutParticipants(label) {
+  const normalized = String(label ?? '').trim().toLowerCase();
+  if (!normalized) {
+    return null;
+  }
+  const known = KNOCKOUT_PARTICIPANTS_BY_LABEL.get(normalized);
+  if (known !== undefined) {
+    return known;
+  }
+  const generic = normalized.match(/(\d+)\s*teams?/);
+  if (generic) {
+    const count = Number(generic[1]);
+    return Number.isFinite(count) && count > 0 ? count : null;
+  }
+  return null;
+}
+
+function normalizeRoundNumber(value) {
+  const numeric = Number(value);
+  return Number.isInteger(numeric) && numeric > 0 ? numeric : null;
+}
+
+function normalizeRange(a, b) {
+  const from = Math.min(a, b);
+  const to = Math.max(a, b);
+  return [from, to];
+}
+
+// Liefert strukturierte, sprachneutrale Metadaten zu einem (deutschen) Stage-Label.
+// Das originale Label bleibt unveraendert der Identifikator; diese Metadaten
+// ermoeglichen Frontends eine lokalisierte Darstellung.
+// Rueckgabe: { type, round, participants, group, rangeFrom, rangeTo } (je nach type teilweise null).
+export function describeStageLabel(phase, stageLabel, extras = {}) {
+  const label = String(stageLabel ?? '').trim();
+  const round = normalizeRoundNumber(extras.round);
+
+  if (phase === 'group') {
+    const group = canonicalGroupLabel(extras.group ?? label) || null;
+    return { type: 'group', group, round, participants: null, rangeFrom: null, rangeTo: null };
+  }
+
+  if (phase === 'knockout') {
+    const participants = parseKnockoutParticipants(label);
+    return {
+      type: participants === 2 ? 'knockout_final' : 'knockout_round',
+      group: null,
+      round,
+      participants,
+      rangeFrom: null,
+      rangeTo: null
+    };
+  }
+
+  if (phase === 'placement') {
+    const placementMatch = label.match(/platz\s*(\d+)\s*\/\s*(\d+)/i);
+    if (placementMatch) {
+      const [rangeFrom, rangeTo] = normalizeRange(Number(placementMatch[1]), Number(placementMatch[2]));
+      return {
+        type: 'placement_match',
+        group: null,
+        round,
+        participants: rangeTo - rangeFrom + 1,
+        rangeFrom,
+        rangeTo
+      };
+    }
+    const roundMatch = label.match(/(\d+)\s*-\s*(\d+)/);
+    if (roundMatch) {
+      const [rangeFrom, rangeTo] = normalizeRange(Number(roundMatch[1]), Number(roundMatch[2]));
+      return {
+        type: 'placement_round',
+        group: null,
+        round,
+        participants: rangeTo - rangeFrom + 1,
+        rangeFrom,
+        rangeTo
+      };
+    }
+    return { type: 'placement_round', group: null, round, participants: null, rangeFrom: null, rangeTo: null };
+  }
+
+  return null;
+}
+
 export function createSlotSource(slot, groupLabel) {
   return {
     type: 'slot',
@@ -316,7 +410,12 @@ export function generateClassificationStages(sources, basePlacement, prefix) {
       });
     }
 
-    stages.push({ key: `${prefix}-${depth}-${branch || 'A'}`, label, matches });
+    stages.push({
+      key: `${prefix}-${depth}-${branch || 'A'}`,
+      label,
+      label_i18n: describeStageLabel('placement', label, { round: depth }),
+      matches
+    });
 
     if (isFinal) {
       return;
@@ -363,6 +462,7 @@ export function generateKnockoutStages({ initialParticipants, knockoutRounds, cl
     mainStages.push({
       key: `main-${stageIndex}`,
       label: stageLabel,
+      label_i18n: describeStageLabel('knockout', stageLabel, { round: stageIndex + 1 }),
       matches,
       participantsCount: teamsInRound
     });

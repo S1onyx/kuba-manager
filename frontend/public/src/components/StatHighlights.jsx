@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 const gridStyle = {
   display: 'grid',
   gap: '1rem',
@@ -45,21 +47,22 @@ const responsiveStyles = `
 `;
 
 export default function StatHighlights({ totals }) {
+  const { t } = useTranslation();
   if (!totals) {
     return null;
   }
 
   const items = [
-    { label: 'Teams', value: totals.totalTeams ?? 0 },
-    { label: 'Spiele', value: totals.totalGames ?? 0 },
-    { label: 'Gesamtpunkte', value: totals.totalGoals ?? 0 },
-    { label: 'Strafen', value: totals.totalPenalties ?? 0 }
+    { label: t('stats.teams'), value: totals.totalTeams ?? 0 },
+    { label: t('stats.games'), value: totals.totalGames ?? 0 },
+    { label: t('stats.totalPoints'), value: totals.totalGoals ?? 0 },
+    { label: t('stats.penalties'), value: totals.totalPenalties ?? 0 }
   ];
 
   return (
     <section>
       <header style={{ marginBottom: '1rem' }}>
-        <h3 style={{ fontSize: '1.2rem', letterSpacing: '0.05em' }}>Turnier-Statistiken</h3>
+        <h3 style={{ fontSize: '1.2rem', letterSpacing: '0.05em' }}>{t('stats.title')}</h3>
       </header>
       <div className="stats-grid" style={gridStyle}>
         {items.map((item) => (

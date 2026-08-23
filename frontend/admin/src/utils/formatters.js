@@ -5,11 +5,11 @@ export function formatTime(seconds = 0) {
   return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
 
-export function formatDateTime(isoString) {
+export function formatDateTime(isoString, locale = 'de-DE') {
   if (!isoString) return '';
   try {
     const date = new Date(isoString);
-    return date.toLocaleString('de-DE', {
+    return date.toLocaleString(locale, {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',

@@ -45,25 +45,25 @@ router.get('/', async (_req, res) => {
     res.json(tournaments);
   } catch (error) {
     console.error('Turniere konnten nicht geladen werden:', error);
-    res.status(500).json({ message: 'Turniere konnten nicht geladen werden.' });
+    res.status(500).json({ code: 'TOURNAMENTS_LOAD_FAILED', message: 'Turniere konnten nicht geladen werden.' });
   }
 });
 
 router.get('/:id', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+    return res.status(400).json({ code: 'INVALID_TOURNAMENT_ID', message: 'Ungültige Turnier-ID.' });
   }
 
   try {
     const tournament = await getTournament(id);
     if (!tournament) {
-      return res.status(404).json({ message: 'Turnier nicht gefunden.' });
+      return res.status(404).json({ code: 'TOURNAMENT_NOT_FOUND', message: 'Turnier nicht gefunden.' });
     }
     res.json(await withPosterUrl(tournament));
   } catch (error) {
     console.error('Turnier konnte nicht geladen werden:', error);
-    res.status(500).json({ message: 'Turnier konnte nicht geladen werden.' });
+    res.status(500).json({ code: 'TOURNAMENT_LOAD_FAILED', message: 'Turnier konnte nicht geladen werden.' });
   }
 });
 
@@ -86,14 +86,14 @@ router.post('/', async (req, res) => {
     res.status(201).json(tournament);
   } catch (error) {
     console.error('Turnier konnte nicht erstellt werden:', error);
-    res.status(400).json({ message: 'Turnier konnte nicht erstellt werden.', detail: error.message });
+    res.status(400).json({ code: 'TOURNAMENT_CREATE_FAILED', message: 'Turnier konnte nicht erstellt werden.', detail: error.message });
   }
 });
 
 router.put('/:id', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+    return res.status(400).json({ code: 'INVALID_TOURNAMENT_ID', message: 'Ungültige Turnier-ID.' });
   }
 
   const { name, group_count, knockout_rounds, is_public, team_count, classification_mode, status, planned_at, description, location, schedule_info, travel_info, contact_email, registration_url, registration_deadline, links } = req.body ?? {};
@@ -117,34 +117,34 @@ router.put('/:id', async (req, res) => {
       links
     });
     if (!updated) {
-      return res.status(404).json({ message: 'Turnier nicht gefunden.' });
+      return res.status(404).json({ code: 'TOURNAMENT_NOT_FOUND', message: 'Turnier nicht gefunden.' });
     }
     res.json(await withPosterUrl(updated));
   } catch (error) {
     console.error('Turnier konnte nicht aktualisiert werden:', error);
-    res.status(400).json({ message: 'Turnier konnte nicht aktualisiert werden.', detail: error.message });
+    res.status(400).json({ code: 'TOURNAMENT_UPDATE_FAILED', message: 'Turnier konnte nicht aktualisiert werden.', detail: error.message });
   }
 });
 
 router.post('/:id/poster', upload.single('file'), async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+    return res.status(400).json({ code: 'INVALID_TOURNAMENT_ID', message: 'Ungültige Turnier-ID.' });
   }
 
   const file = req.file;
   if (!file) {
-    return res.status(400).json({ message: 'Bitte eine Bilddatei hochladen.' });
+    return res.status(400).json({ code: 'POSTER_FILE_REQUIRED', message: 'Bitte eine Bilddatei hochladen.' });
   }
 
   if (!file.mimetype.startsWith('image/') && file.mimetype !== 'application/pdf') {
-    return res.status(400).json({ message: 'Es werden nur Bild- und PDF-Dateien unterstützt.' });
+    return res.status(400).json({ code: 'UNSUPPORTED_POSTER_FILE_TYPE', message: 'Es werden nur Bild- und PDF-Dateien unterstützt.' });
   }
 
   try {
     const tournament = await getTournament(id);
     if (!tournament) {
-      return res.status(404).json({ message: 'Turnier nicht gefunden.' });
+      return res.status(404).json({ code: 'TOURNAMENT_NOT_FOUND', message: 'Turnier nicht gefunden.' });
     }
 
     const record = await storePosterUpload({
@@ -158,14 +158,14 @@ router.post('/:id/poster', upload.single('file'), async (req, res) => {
     res.json(await withPosterUrl(updated));
   } catch (error) {
     console.error('Turnier-Poster konnte nicht gespeichert werden:', error);
-    res.status(400).json({ message: error.message || 'Turnier-Poster konnte nicht gespeichert werden.' });
+    res.status(400).json({ code: 'TOURNAMENT_POSTER_SAVE_FAILED', message: error.message || 'Turnier-Poster konnte nicht gespeichert werden.' });
   }
 });
 
 router.post('/:id/completion', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+    return res.status(400).json({ code: 'INVALID_TOURNAMENT_ID', message: 'Ungültige Turnier-ID.' });
   }
 
   const { completed } = req.body ?? {};
@@ -174,7 +174,7 @@ router.post('/:id/completion', async (req, res) => {
   try {
     const updated = await setTournamentCompletionStatus(id, desired);
     if (!updated) {
-      return res.status(404).json({ message: 'Turnier nicht gefunden.' });
+      return res.status(404).json({ code: 'TOURNAMENT_NOT_FOUND', message: 'Turnier nicht gefunden.' });
     }
 
     const snapshot = getScoreboardState();
@@ -185,32 +185,32 @@ router.post('/:id/completion', async (req, res) => {
     res.json(updated);
   } catch (error) {
     console.error('Turnierstatus konnte nicht aktualisiert werden:', error);
-    res.status(500).json({ message: 'Turnierstatus konnte nicht aktualisiert werden.' });
+    res.status(500).json({ code: 'TOURNAMENT_STATUS_UPDATE_FAILED', message: 'Turnierstatus konnte nicht aktualisiert werden.' });
   }
 });
 
 router.delete('/:id', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+    return res.status(400).json({ code: 'INVALID_TOURNAMENT_ID', message: 'Ungültige Turnier-ID.' });
   }
 
   try {
     const deleted = await deleteTournament(id);
     if (!deleted) {
-      return res.status(404).json({ message: 'Turnier nicht gefunden.' });
+      return res.status(404).json({ code: 'TOURNAMENT_NOT_FOUND', message: 'Turnier nicht gefunden.' });
     }
     res.status(204).end();
   } catch (error) {
     console.error('Turnier konnte nicht gelöscht werden:', error);
-    res.status(500).json({ message: 'Turnier konnte nicht gelöscht werden.' });
+    res.status(500).json({ code: 'TOURNAMENT_DELETE_FAILED', message: 'Turnier konnte nicht gelöscht werden.' });
   }
 });
 
 router.get('/:id/stages', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+    return res.status(400).json({ code: 'INVALID_TOURNAMENT_ID', message: 'Ungültige Turnier-ID.' });
   }
 
   try {
@@ -218,14 +218,14 @@ router.get('/:id/stages', async (req, res) => {
     res.json(stages);
   } catch (error) {
     console.error('Turnierphasen konnten nicht geladen werden:', error);
-    res.status(500).json({ message: 'Turnierphasen konnten nicht geladen werden.' });
+    res.status(500).json({ code: 'TOURNAMENT_STAGES_LOAD_FAILED', message: 'Turnierphasen konnten nicht geladen werden.' });
   }
 });
 
 router.get('/:id/schedule', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+    return res.status(400).json({ code: 'INVALID_TOURNAMENT_ID', message: 'Ungültige Turnier-ID.' });
   }
 
   try {
@@ -238,25 +238,25 @@ router.get('/:id/schedule', async (req, res) => {
     });
   } catch (error) {
     console.error('Turnier-Spielplan konnte nicht geladen werden:', error);
-    res.status(500).json({ message: 'Turnier-Spielplan konnte nicht geladen werden.' });
+    res.status(500).json({ code: 'TOURNAMENT_SCHEDULE_LOAD_FAILED', message: 'Turnier-Spielplan konnte nicht geladen werden.' });
   }
 });
 
 router.put('/:id/schedule/:scheduleId', async (req, res) => {
   const tournamentId = Number(req.params.id);
   if (!Number.isInteger(tournamentId) || tournamentId <= 0) {
-    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+    return res.status(400).json({ code: 'INVALID_TOURNAMENT_ID', message: 'Ungültige Turnier-ID.' });
   }
 
   const scheduleId = Number(req.params.scheduleId);
   if (!Number.isInteger(scheduleId) || scheduleId <= 0) {
-    return res.status(400).json({ message: 'Ungültige Spielplan-ID.' });
+    return res.status(400).json({ code: 'INVALID_SCHEDULE_ENTRY_ID', message: 'Ungültige Spielplan-ID.' });
   }
 
   try {
     const updated = await updateTournamentScheduleEntry(tournamentId, scheduleId, req.body ?? {});
     if (!updated) {
-      return res.status(404).json({ message: 'Spielplan-Eintrag nicht gefunden.' });
+      return res.status(404).json({ code: 'SCHEDULE_ENTRY_NOT_FOUND', message: 'Spielplan-Eintrag nicht gefunden.' });
     }
     res.json(updated);
   } catch (error) {
@@ -267,6 +267,7 @@ router.put('/:id/schedule/:scheduleId', async (req, res) => {
         ? 400
         : 500;
     res.status(status).json({
+      code: 'SCHEDULE_ENTRY_UPDATE_FAILED',
       message: 'Spielplan-Eintrag konnte nicht aktualisiert werden.',
       detail: error.message
     });
@@ -276,25 +277,25 @@ router.put('/:id/schedule/:scheduleId', async (req, res) => {
 router.get('/:id/structure', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+    return res.status(400).json({ code: 'INVALID_TOURNAMENT_ID', message: 'Ungültige Turnier-ID.' });
   }
 
   try {
     const structure = await getTournamentStructureDetails(id);
     if (!structure) {
-      return res.status(404).json({ message: 'Turnier nicht gefunden.' });
+      return res.status(404).json({ code: 'TOURNAMENT_NOT_FOUND', message: 'Turnier nicht gefunden.' });
     }
     res.json(structure);
   } catch (error) {
     console.error('Turnierstruktur konnte nicht geladen werden:', error);
-    res.status(500).json({ message: 'Turnierstruktur konnte nicht geladen werden.' });
+    res.status(500).json({ code: 'TOURNAMENT_STRUCTURE_LOAD_FAILED', message: 'Turnierstruktur konnte nicht geladen werden.' });
   }
 });
 
 router.put('/:id/teams', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+    return res.status(400).json({ code: 'INVALID_TOURNAMENT_ID', message: 'Ungültige Turnier-ID.' });
   }
 
   const payload = req.body ?? {};
@@ -305,7 +306,7 @@ router.put('/:id/teams', async (req, res) => {
       : null;
 
   if (!assignments) {
-    return res.status(400).json({ message: 'Bitte eine Liste von Teamzuweisungen bereitstellen (assignments).' });
+    return res.status(400).json({ code: 'INVALID_TEAM_ASSIGNMENTS', message: 'Bitte eine Liste von Teamzuweisungen bereitstellen (assignments).' });
   }
 
   try {
@@ -317,6 +318,7 @@ router.put('/:id/teams', async (req, res) => {
       ? 400
       : 500;
     res.status(status).json({
+      code: 'TEAM_ASSIGNMENTS_SAVE_FAILED',
       message: 'Teamzuweisungen konnten nicht gespeichert werden.',
       detail: error.message
     });
@@ -325,7 +327,7 @@ router.put('/:id/teams', async (req, res) => {
 
 router.post('/:id/registration-closed', async (req, res) => {
   const id = Number(req.params.id);
-  if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+  if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ code: 'INVALID_TOURNAMENT_ID', message: 'Ungültige Turnier-ID.' });
   const { closed } = req.body ?? {};
   try {
     const conn = await import('../db/connection.js');
@@ -334,19 +336,19 @@ router.post('/:id/registration-closed', async (req, res) => {
     conn.persistDatabase(db, SQL);
     res.json({ ok: true, registration_closed: Boolean(closed) });
   } catch (error) {
-    res.status(500).json({ message: 'Konnte Anmeldestatus nicht ändern.' });
+    res.status(500).json({ code: 'REGISTRATION_CLOSED_UPDATE_FAILED', message: 'Konnte Anmeldestatus nicht ändern.' });
   }
 });
 
 router.post('/:id/activate', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+    return res.status(400).json({ code: 'INVALID_TOURNAMENT_ID', message: 'Ungültige Turnier-ID.' });
   }
   try {
     const tournament = await getTournament(id);
-    if (!tournament) return res.status(404).json({ message: 'Turnier nicht gefunden.' });
-    if (tournament.status !== 'planned') return res.status(400).json({ message: 'Turnier ist nicht im Status "geplant".' });
+    if (!tournament) return res.status(404).json({ code: 'TOURNAMENT_NOT_FOUND', message: 'Turnier nicht gefunden.' });
+    if (tournament.status !== 'planned') return res.status(400).json({ code: 'TOURNAMENT_NOT_PLANNED', message: 'Turnier ist nicht im Status "geplant".' });
 
     const { group_count, knockout_rounds, teams: teamsPayload } = req.body ?? {};
     const conn = await import('../db/connection.js');
@@ -378,7 +380,7 @@ router.post('/:id/activate', async (req, res) => {
 
     const finalTeamCount = db.exec('SELECT COUNT(*) FROM tournament_teams WHERE tournament_id = ?', [id])[0]?.values[0][0] ?? 0;
     if (finalTeamCount < 2) {
-      return res.status(400).json({ message: `Mindestens 2 Teams nötig (aktuell: ${finalTeamCount}).` });
+      return res.status(400).json({ code: 'TOURNAMENT_MIN_TEAMS_REQUIRED', message: `Mindestens 2 Teams nötig (aktuell: ${finalTeamCount}).` });
     }
 
     const updated = await updateTournament(id, {
@@ -392,21 +394,21 @@ router.post('/:id/activate', async (req, res) => {
     res.json(await withPosterUrl(updated));
   } catch (error) {
     console.error('Turnier konnte nicht aktiviert werden:', error);
-    res.status(500).json({ message: error.message || 'Turnier konnte nicht aktiviert werden.' });
+    res.status(500).json({ code: 'TOURNAMENT_ACTIVATION_FAILED', message: error.message || 'Turnier konnte nicht aktiviert werden.' });
   }
 });
 
 router.get('/:id/registrations', async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ message: 'Ungültige Turnier-ID.' });
+    return res.status(400).json({ code: 'INVALID_TOURNAMENT_ID', message: 'Ungültige Turnier-ID.' });
   }
   try {
     const registrations = await listRegistrations(id);
     res.json(registrations);
   } catch (error) {
     console.error('Anmeldungen konnten nicht geladen werden:', error);
-    res.status(500).json({ message: 'Anmeldungen konnten nicht geladen werden.' });
+    res.status(500).json({ code: 'REGISTRATIONS_LOAD_FAILED', message: 'Anmeldungen konnten nicht geladen werden.' });
   }
 });
 
@@ -415,21 +417,21 @@ router.patch('/:id/registrations/:regId', async (req, res) => {
   const regId = Number(req.params.regId);
   const { status } = req.body ?? {};
   if (!Number.isInteger(regId) || regId <= 0) {
-    return res.status(400).json({ message: 'Ungültige Anmeldungs-ID.' });
+    return res.status(400).json({ code: 'INVALID_REGISTRATION_ID', message: 'Ungültige Anmeldungs-ID.' });
   }
   const allowed = ['pending', 'confirmed', 'rejected'];
   if (!allowed.includes(status)) {
-    return res.status(400).json({ message: 'Ungültiger Status.' });
+    return res.status(400).json({ code: 'INVALID_REGISTRATION_STATUS', message: 'Ungültiger Status.' });
   }
   try {
     const tournament = await getTournament(tournamentId);
 
     if (status === 'confirmed') {
       const reg = await confirmRegistration(regId);
-      sendRegistrationApproved({ to: reg.contactEmail, tournamentName: tournament?.name ?? '', teamName: reg.teamName, contactName: reg.contactName }).catch(console.error);
+      sendRegistrationApproved({ to: reg.contactEmail, tournamentName: tournament?.name ?? '', teamName: reg.teamName, contactName: reg.contactName, language: reg.language }).catch(console.error);
     } else if (status === 'rejected') {
       const reg = await rejectRegistration(regId);
-      sendRegistrationRejected({ to: reg.contactEmail, tournamentName: tournament?.name ?? '', teamName: reg.teamName, contactName: reg.contactName }).catch(console.error);
+      sendRegistrationRejected({ to: reg.contactEmail, tournamentName: tournament?.name ?? '', teamName: reg.teamName, contactName: reg.contactName, language: reg.language }).catch(console.error);
     } else {
       await updateRegistrationStatus(regId, status);
     }
@@ -437,7 +439,7 @@ router.patch('/:id/registrations/:regId', async (req, res) => {
     res.json({ ok: true });
   } catch (error) {
     console.error('Status konnte nicht aktualisiert werden:', error);
-    res.status(500).json({ message: error.message || 'Status konnte nicht aktualisiert werden.' });
+    res.status(500).json({ code: 'REGISTRATION_STATUS_UPDATE_FAILED', message: error.message || 'Status konnte nicht aktualisiert werden.' });
   }
 });
 
