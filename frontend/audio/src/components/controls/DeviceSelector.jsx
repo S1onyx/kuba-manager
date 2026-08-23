@@ -4,7 +4,7 @@ export default function DeviceSelector({ devices, value, onChange, disabled }) {
   }
 
   return (
-    <label style={{ display: 'grid', gap: '0.3rem', fontSize: '0.92rem' }}>
+    <label className="device-selector" style={{ display: 'grid', gap: '0.3rem', fontSize: '0.92rem' }}>
       Ausgabegerät
       <select value={value} onChange={(event) => onChange(event.target.value)} disabled={disabled}>
         <option value="default">Systemstandard</option>

@@ -23,8 +23,43 @@ const dialogStyle = {
   display: 'grid',
   gap: '1.5rem',
   maxHeight: '90vh',
-  overflowY: 'auto'
+  overflowY: 'auto',
+  WebkitOverflowScrolling: 'touch'
 };
+
+const responsiveStyles = `
+  @media (max-width: 768px) {
+    .impressum-overlay {
+      padding: 0.75rem;
+      align-items: flex-start;
+    }
+    .impressum-dialog {
+      padding: 1.25rem 1.1rem;
+      gap: 1.1rem;
+      border-radius: 12px;
+      max-height: calc(100vh - 1.5rem);
+      max-height: calc(100dvh - 1.5rem);
+    }
+    .impressum-dialog__title {
+      font-size: 1.45rem !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .impressum-overlay {
+      padding: 0.5rem;
+    }
+    .impressum-dialog {
+      padding: 1.1rem 0.9rem;
+      max-height: calc(100vh - 1rem);
+      max-height: calc(100dvh - 1rem);
+    }
+    .impressum-field__label {
+      min-width: 0 !important;
+      display: block !important;
+    }
+  }
+`;
 
 const sectionStyle = {
   display: 'grid',
@@ -79,14 +114,14 @@ function Field({ label, value, render }) {
   if (render) {
     return (
       <p style={{ margin: 0, lineHeight: 1.5 }}>
-        <strong style={{ display: 'inline-block', minWidth: '8.5rem' }}>{label}:</strong> {render()}
+        <strong className="impressum-field__label" style={{ display: 'inline-block', minWidth: '8.5rem' }}>{label}:</strong> {render()}
       </p>
     );
   }
 
   return (
     <p style={{ margin: 0, lineHeight: 1.5 }}>
-      <strong style={{ display: 'inline-block', minWidth: '8.5rem' }}>{label}:</strong> {value}
+      <strong className="impressum-field__label" style={{ display: 'inline-block', minWidth: '8.5rem' }}>{label}:</strong> {value}
     </p>
   );
 }
@@ -119,6 +154,7 @@ export default function Impressum({ data = defaultImpressum, onClose }) {
 
   return (
     <div
+      className="impressum-overlay"
       style={overlayStyle}
       role="dialog"
       aria-modal="true"
@@ -126,15 +162,17 @@ export default function Impressum({ data = defaultImpressum, onClose }) {
       aria-describedby="impressum-desc"
       onClick={onClose}
     >
+      <style>{responsiveStyles}</style>
       <div
         ref={dialogRef}
+        className="impressum-dialog"
         style={dialogStyle}
         onClick={(event) => event.stopPropagation()}
         tabIndex={-1}
       >
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
           <div>
-            <h2 id="impressum-title" style={{ margin: 0, fontSize: '1.8rem', letterSpacing: '0.08em' }}>
+            <h2 id="impressum-title" className="impressum-dialog__title" style={{ margin: 0, fontSize: '1.8rem', letterSpacing: '0.08em' }}>
               Impressum
             </h2>
             <p id="impressum-desc" style={{ margin: '0.4rem 0 0', opacity: 0.75 }}>
@@ -152,7 +190,11 @@ export default function Impressum({ data = defaultImpressum, onClose }) {
               padding: '0.35rem 0.75rem',
               borderRadius: '999px',
               cursor: 'pointer',
-              fontSize: '0.85rem'
+              fontSize: '0.85rem',
+              minHeight: '44px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              flexShrink: 0
             }}
           >
             Schließen

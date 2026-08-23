@@ -28,7 +28,11 @@ export default function useDisplayScaling(dependencies = []) {
       const availableWidth = Math.max(container.clientWidth - paddingX, 50);
       const availableHeight = Math.max(container.clientHeight - paddingY, 50);
       const nextScale = Math.min(availableWidth / contentWidth, availableHeight / contentHeight);
-      const clamped = Math.max(Math.min(nextScale, 2.2), 0.45);
+      // Minimum dynamisch: auf kleinen Screens (z.B. 375px Portrait) darf unter 0.45
+      // skaliert werden, damit die Bühne immer komplett in Breite UND Höhe passt.
+      // Auf großen Screens bleibt das bisherige Verhalten (Untergrenze 0.45) unverändert.
+      const minScale = Math.min(0.45, nextScale);
+      const clamped = Math.max(Math.min(nextScale, 2.2), minScale);
       if (Math.abs(clamped - scaleRef.current) > 0.0005) {
         scaleRef.current = clamped;
         setScale(clamped);

@@ -268,7 +268,7 @@ export default function TournamentDetailsPanel({
             {showActivateForm && (
               <div style={{ background: 'rgba(0,0,0,0.3)', borderRadius: '12px', padding: '1.25rem', display: 'grid', gap: '1rem', border: '1px solid rgba(64,200,120,0.2)' }}>
                 <h3 style={{ margin: 0, fontSize: '1rem' }}>Turnier-Konfiguration</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <div className="admin-grid-2col">
                   <label style={{ display: 'grid', gap: '0.3rem', fontSize: '0.875rem' }}>
                     Gruppen
                     <input type="number" min="1" value={activateGroupCount} onChange={(e) => setActivateGroupCount(e.target.value)}
@@ -304,7 +304,7 @@ export default function TournamentDetailsPanel({
                   </button>
                 </div>
 
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                   <button type="button" onClick={handleActivate} disabled={activating}
                     style={{ padding: '0.55rem 1.25rem', borderRadius: '8px', border: 'none', background: activating ? 'rgba(64,200,120,0.15)' : 'rgba(64,200,120,0.4)', color: '#7dffb3', fontWeight: 600, cursor: activating ? 'not-allowed' : 'pointer' }}>
                     {activating ? 'Wird aktiviert...' : '🚀 Jetzt aktivieren'}
@@ -322,7 +322,7 @@ export default function TournamentDetailsPanel({
               <div key={reg.id} style={{ background: 'rgba(0,0,0,0.25)', borderRadius: '10px', padding: '1rem', display: 'grid', gap: '0.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                   <strong>{reg.teamName}</strong>
-                  <div style={{ display: 'flex', gap: '0.4rem' }}>
+                  <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
                     {['pending', 'confirmed', 'rejected'].map((s) => (
                       <button
                         key={s}

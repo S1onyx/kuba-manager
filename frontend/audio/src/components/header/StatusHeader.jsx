@@ -10,7 +10,15 @@ export default function StatusHeader() {
   return (
     <header style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
       <div style={{ display: 'grid', gap: '0.35rem' }}>
-        <h1 style={{ margin: 0, fontSize: '2.4rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+        <h1
+          style={{
+            margin: 0,
+            fontSize: 'clamp(1.5rem, 6vw, 2.4rem)',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            overflowWrap: 'break-word'
+          }}
+        >
           Kunstrad Basketball – Audio
         </h1>
         <p style={{ margin: 0, opacity: 0.78 }}>
@@ -18,7 +26,7 @@ export default function StatusHeader() {
         </p>
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+      <div className="status-header__actions" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
         <StatusIndicator
           color={connection.connected ? '#4caf50' : '#f44336'}
           label={connection.connected ? 'Verbunden' : 'Nicht verbunden'}

@@ -40,7 +40,7 @@ export default function ScoreboardSummary({
           <span style={{ fontSize: '0.82rem', letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.72 }}>
             Teams
           </span>
-          <div style={{ fontSize: '1.6rem', fontWeight: 700, letterSpacing: '0.01em' }}>
+          <div style={{ fontSize: 'clamp(1.15rem, 4.5vw, 1.6rem)', fontWeight: 700, letterSpacing: '0.01em' }}>
             {scoreboard.teamAName} <span style={{ opacity: 0.7 }}>vs</span> {scoreboard.teamBName}
           </div>
         </div>
@@ -57,7 +57,7 @@ export default function ScoreboardSummary({
             boxShadow: '0 16px 25px rgba(0,0,0,0.25)'
           }}
         >
-          <span style={{ fontSize: '1.7rem' }}>
+          <span style={{ fontSize: 'clamp(1.25rem, 5vw, 1.7rem)' }}>
             {scoreboard.scoreA ?? 0} : {scoreboard.scoreB ?? 0}
           </span>
           <span style={{ opacity: 0.8, fontSize: '0.95rem' }}>

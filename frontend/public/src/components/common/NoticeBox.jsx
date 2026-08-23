@@ -11,6 +11,8 @@ export default function NoticeBox({ tone = 'info', children }) {
         padding: '1rem',
         borderRadius: '12px',
         textAlign: tone === 'warning' ? 'center' : 'left',
+        lineHeight: 1.5,
+        overflowWrap: 'break-word',
         ...palette
       }}
     >

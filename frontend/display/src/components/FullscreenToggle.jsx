@@ -3,6 +3,12 @@ import { useEffect, useMemo, useState } from 'react';
 const buttonBaseStyle = {
   zIndex: 1000,
   padding: '0.65rem 1.1rem',
+  // Touch-Target mindestens 44px (Mobile)
+  minHeight: '44px',
+  minWidth: '44px',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   borderRadius: '999px',
   border: '1px solid rgba(255,255,255,0.35)',
   background: 'rgba(0, 0, 0, 0.45)',

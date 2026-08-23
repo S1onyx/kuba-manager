@@ -25,7 +25,7 @@ export default function TeamSelectionCard() {
         }}
         style={{ display: 'grid', gap: '1rem' }}
       >
-        <div style={{ display: 'grid', gap: '1.25rem', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
+        <div style={{ display: 'grid', gap: '1.25rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))' }}>
           {[
             { idField: 'teamAId', nameField: 'teamAName', label: 'Team A' },
             { idField: 'teamBId', nameField: 'teamBName', label: 'Team B' }

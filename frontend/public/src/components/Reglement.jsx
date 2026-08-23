@@ -15,10 +15,36 @@ const heroCardStyle = {
 
 const heroTitleStyle = {
   margin: 0,
-  fontSize: '1.9rem',
+  fontSize: 'clamp(1.35rem, 5vw, 1.9rem)',
   letterSpacing: '0.08em',
   textTransform: 'uppercase'
 };
+
+const responsiveStyles = `
+  @media (max-width: 768px) {
+    .reglement-hero {
+      padding: 1.4rem 1.2rem;
+      border-radius: 18px;
+    }
+    .reglement-card {
+      padding: 1.15rem 1.1rem;
+      border-radius: 14px;
+      gap: 0.8rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .reglement-hero {
+      padding: 1.2rem 1rem;
+    }
+    .reglement-card {
+      padding: 1rem 0.9rem;
+    }
+    .reglement-card ul {
+      padding-left: 0.95rem;
+    }
+  }
+`;
 
 const heroSubtitleStyle = {
   margin: 0,
@@ -333,7 +359,8 @@ function renderBody(body) {
 export default function Reglement() {
   return (
     <section style={wrapperStyle}>
-      <article style={heroCardStyle}>
+      <style>{responsiveStyles}</style>
+      <article className="reglement-hero" style={heroCardStyle}>
         <header style={{ display: 'grid', gap: '0.45rem' }}>
           <h2 style={heroTitleStyle}>Reglement Kunstrad Basketball</h2>
           <p style={heroSubtitleStyle}>
@@ -348,7 +375,7 @@ export default function Reglement() {
 
       <div style={sectionGridStyle}>
         {sections.map((section) => (
-          <article key={section.title} style={sectionCardStyle}>
+          <article key={section.title} className="reglement-card" style={sectionCardStyle}>
             <h3 style={sectionHeadingStyle}>{section.title}</h3>
             <div style={{ display: 'grid', gap: '0.85rem' }}>
               {section.subsections.map((subsection) => (

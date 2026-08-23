@@ -30,7 +30,8 @@ export default function ScoreControlCard() {
             <div
               key={teamKey}
               style={{
-                minWidth: '220px',
+                minWidth: 'min(220px, 100%)',
+                flex: '1 1 220px',
                 padding: '1rem',
                 borderRadius: 'var(--radius-md)',
                 background: 'rgba(8, 20, 35, 0.55)',

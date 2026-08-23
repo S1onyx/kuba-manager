@@ -18,7 +18,7 @@ const placementTableStyle = {
 const leadersGridStyle = {
   display: 'grid',
   gap: '1rem',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))'
+  gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))'
 };
 
 function LeaderCard({ title, player, formatter }) {
@@ -54,7 +54,7 @@ export default function TournamentFinalOverview({ summary }) {
   return (
     <section style={sectionStyle}>
       <header>
-        <h2 style={{ margin: 0, fontSize: '1.4rem', letterSpacing: '0.05em' }}>Turnierende</h2>
+        <h2 style={{ margin: 0, fontSize: 'clamp(1.2rem, 4vw, 1.4rem)', letterSpacing: '0.05em' }}>Turnierende</h2>
         <p style={{ margin: '0.35rem 0 0', opacity: 0.75 }}>
           Finale Platzierungen, Siegerinformationen und herausragende Spieler des Turniers.
         </p>
@@ -63,7 +63,7 @@ export default function TournamentFinalOverview({ summary }) {
       {champion ? (
         <article style={{ ...panelStyle, textAlign: 'center' }}>
           <p style={{ margin: 0, letterSpacing: '0.2em', fontSize: '0.85rem', opacity: 0.7 }}>Champion</p>
-          <h3 style={{ fontSize: '2rem', margin: '0.35rem 0' }}>{champion.teamName}</h3>
+          <h3 style={{ fontSize: 'clamp(1.5rem, 6vw, 2rem)', margin: '0.35rem 0' }}>{champion.teamName}</h3>
           <p style={{ margin: 0, opacity: 0.75 }}>
             {champion.decidedBy ? `Entschieden im ${champion.decidedBy}` : 'Finalsieg'}
             {champion.score ? ` · ${champion.score}` : ''}
@@ -79,8 +79,8 @@ export default function TournamentFinalOverview({ summary }) {
       {placements.length > 0 ? (
         <article style={panelStyle}>
           <h3 style={{ marginTop: 0, fontSize: '1.2rem' }}>Platzierungen</h3>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={placementTableStyle}>
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <table style={{ ...placementTableStyle, minWidth: '480px' }}>
               <thead style={{ opacity: 0.7, fontSize: '0.85rem' }}>
                 <tr>
                   <th style={{ textAlign: 'left', padding: '0.5rem 0.4rem' }}>Platz</th>

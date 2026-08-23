@@ -1,6 +1,24 @@
 import { useState } from 'react';
 import { submitRegistration } from '../../api.js';
 
+const responsiveStyles = `
+  @media (max-width: 768px) {
+    .registration-form__contact-grid {
+      grid-template-columns: 1fr;
+    }
+    .registration-form__submit {
+      width: 100%;
+      justify-self: stretch;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .registration-form__player-row {
+      grid-template-columns: 1fr 64px;
+    }
+  }
+`;
+
 function emptyPlayer() {
   return { name: '', jerseyNumber: '' };
 }
@@ -53,7 +71,8 @@ export default function RegistrationForm({ tournament, onSuccess }) {
     border: '1px solid rgba(255,255,255,0.15)',
     background: 'rgba(255,255,255,0.06)',
     color: '#fff',
-    fontSize: '0.95rem',
+    fontSize: '1rem',
+    minHeight: '44px',
     boxSizing: 'border-box'
   };
 
@@ -61,13 +80,14 @@ export default function RegistrationForm({ tournament, onSuccess }) {
 
   return (
     <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1.5rem' }}>
+      <style>{responsiveStyles}</style>
       <section style={{ display: 'grid', gap: '0.75rem' }}>
         <h3 style={{ margin: 0, fontSize: '1rem', opacity: 0.9 }}>Teamdaten</h3>
         <label style={labelStyle}>
           Teamname *
           <input style={inputStyle} value={teamName} onChange={(e) => setTeamName(e.target.value)} required placeholder="z. B. Flying Wheels" />
         </label>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+        <div className="registration-form__contact-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
           <label style={labelStyle}>
             Kontaktperson *
             <input style={inputStyle} value={contactName} onChange={(e) => setContactName(e.target.value)} required placeholder="Vor- und Nachname" />
@@ -82,7 +102,7 @@ export default function RegistrationForm({ tournament, onSuccess }) {
       <section style={{ display: 'grid', gap: '0.75rem' }}>
         <h3 style={{ margin: 0, fontSize: '1rem', opacity: 0.9 }}>Spieler (4 Pflicht, 1 optional)</h3>
         {players.map((p, i) => (
-          <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 80px', gap: '0.5rem', alignItems: 'end' }}>
+          <div key={i} className="registration-form__player-row" style={{ display: 'grid', gridTemplateColumns: '1fr 80px', gap: '0.5rem', alignItems: 'end' }}>
             <label style={labelStyle}>
               {i < 4 ? `Spieler ${i + 1} *` : `Spieler ${i + 1} (optional)`}
               <input
@@ -132,6 +152,7 @@ export default function RegistrationForm({ tournament, onSuccess }) {
       <button
         type="submit"
         disabled={submitting}
+        className="registration-form__submit"
         style={{
           padding: '0.75rem 2rem',
           borderRadius: '999px',
@@ -141,7 +162,8 @@ export default function RegistrationForm({ tournament, onSuccess }) {
           fontSize: '1rem',
           fontWeight: 600,
           cursor: submitting ? 'not-allowed' : 'pointer',
-          justifySelf: 'start'
+          justifySelf: 'start',
+          minHeight: '48px'
         }}
       >
         {submitting ? 'Wird eingereicht...' : 'Jetzt anmelden'}

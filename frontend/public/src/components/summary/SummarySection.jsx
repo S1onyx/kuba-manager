@@ -27,7 +27,7 @@ export default function SummarySection() {
       {tournamentSummary ? (
         <>
           <header style={{ display: 'grid', gap: '0.35rem' }}>
-            <h2 style={{ fontSize: '1.45rem', letterSpacing: '0.05em' }}>
+            <h2 style={{ fontSize: 'clamp(1.25rem, 4.5vw, 1.45rem)', letterSpacing: '0.05em', overflowWrap: 'break-word' }}>
               {tournamentSummary.tournament?.name ?? 'Turnier'}
             </h2>
             {scoreboardPublic && scoreboard?.tournamentId === tournamentSummary.tournament?.id ? (

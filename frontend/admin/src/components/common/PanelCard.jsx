@@ -14,15 +14,16 @@ export default function PanelCard({ title, description, action, children, tone }
         borderRadius: 'var(--radius-lg)',
         border: `1px solid ${borderColor}`,
         background,
-        padding: 'clamp(1.1rem, 3.5vw, 1.5rem) clamp(1.2rem, 4vw, 1.75rem)',
+        padding: 'clamp(1.1rem, 3.5vw, 1.5rem) clamp(1rem, 4vw, 1.75rem)',
         display: 'grid',
-        gap: '1.25rem'
+        gap: '1.25rem',
+        minWidth: 0
       }}
     >
       {title ? (
         <header style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
-          <div style={{ display: 'grid', gap: '0.35rem' }}>
-            <h3 style={{ margin: 0, fontSize: '1.2rem' }}>{title}</h3>
+          <div style={{ display: 'grid', gap: '0.35rem', minWidth: 0 }}>
+            <h3 style={{ margin: 0, fontSize: 'clamp(1.05rem, 3.5vw, 1.2rem)' }}>{title}</h3>
             {description ? (
               <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: 1.5 }}>
                 {description}
@@ -32,7 +33,7 @@ export default function PanelCard({ title, description, action, children, tone }
           {action ? <div style={{ display: 'flex', alignItems: 'center' }}>{action}</div> : null}
         </header>
       ) : null}
-      <div style={{ display: 'grid', gap: '1.25rem' }}>{children}</div>
+      <div style={{ display: 'grid', gap: '1.25rem', minWidth: 0 }}>{children}</div>
     </section>
   );
 }

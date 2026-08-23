@@ -1,6 +1,24 @@
 import { usePublicApp } from '../../context/PublicAppContext.jsx';
 import { navigateTo } from '../../hooks/useHashRoute.js';
 
+const responsiveStyles = `
+  @media (max-width: 768px) {
+    .tournament-card {
+      width: 100%;
+      max-width: 420px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .tournament-card {
+      max-width: 100%;
+    }
+    .tournament-card__poster {
+      height: 170px !important;
+    }
+  }
+`;
+
 export default function TournamentSection() {
   const {
     tournaments: { list, selectedId, select, loading, error },
@@ -38,6 +56,7 @@ export default function TournamentSection() {
 
   return (
     <>
+      <style>{responsiveStyles}</style>
       {plannedTournaments.length > 0 && (
         <SectionWrapper title="Kommende Turniere">
           <div
@@ -68,6 +87,9 @@ export default function TournamentSection() {
                   type="button"
                   onClick={() => select(tournament.id)}
                   style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    minHeight: '44px',
                     padding: '0.6rem 1.1rem',
                     borderRadius: '999px',
                     border: '1px solid rgba(255,255,255,0.25)',
@@ -102,6 +124,7 @@ function PlannedTournamentCard({ tournament }) {
 
   return (
     <div
+      className="tournament-card"
       style={{
         background: 'rgba(0,0,0,0.35)',
         borderRadius: '16px',
@@ -117,11 +140,12 @@ function PlannedTournamentCard({ tournament }) {
         <img
           src={tournament.poster_url}
           alt={`Plakat ${tournament.name}`}
+          className="tournament-card__poster"
           style={{ width: '100%', height: '200px', objectFit: 'cover', display: 'block' }}
         />
       ) : (
-        <div style={{ width: '100%', height: '120px', background: 'rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.3, fontSize: '2rem' }}>
-          🏆
+        <div style={{ width: '100%', height: '120px', background: 'rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.3, fontSize: '0.85rem', letterSpacing: '0.08em' }}>
+          Plakat folgt
         </div>
       )}
       <div style={{ padding: '1rem 1.25rem', display: 'grid', gap: '0.4rem', flex: 1 }}>
@@ -140,6 +164,7 @@ function PlannedTournamentCard({ tournament }) {
           onClick={() => navigateTo(`/turnier/${tournament.id}`)}
           style={{
             width: '100%',
+            minHeight: '44px',
             padding: '0.55rem',
             borderRadius: '8px',
             border: '1px solid rgba(86,160,255,0.4)',

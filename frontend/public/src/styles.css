@@ -88,6 +88,17 @@ table {
   border-spacing: 0;
 }
 
+img,
+video {
+  max-width: 100%;
+}
+
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
 :focus {
   outline: 2px solid rgba(255,255,255,0.35);
   outline-offset: 2px;
@@ -137,6 +148,10 @@ table {
 /* ─── Pill button ─────────────────────────────────────────────── */
 
 .pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
   padding: 0.5rem 1.05rem;
   border-radius: var(--radius-pill);
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -166,6 +181,10 @@ table {
 }
 
 .public-footer__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
   padding: 0.4rem 1rem;
   border-radius: var(--radius-pill);
   border: 1px solid rgba(255, 255, 255, 0.35);

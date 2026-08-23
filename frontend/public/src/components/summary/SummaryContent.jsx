@@ -69,12 +69,12 @@ export default function SummaryContent() {
 
     return (
       <section style={{ display: 'grid', gap: '1.25rem' }}>
-        <h2 style={{ fontSize: '1.4rem', letterSpacing: '0.05em' }}>Gruppenübersicht</h2>
+        <h2 style={{ fontSize: 'clamp(1.2rem, 4vw, 1.4rem)', letterSpacing: '0.05em' }}>Gruppenübersicht</h2>
         <div
           style={{
             display: 'grid',
             gap: '1.25rem',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))'
           }}
         >
           {groups.map((group) => (

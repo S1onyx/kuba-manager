@@ -1,6 +1,6 @@
-import fs from 'fs';
-import { promises as fsPromises } from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import { promises as fsPromises } from 'node:fs';
+import path from 'node:path';
 import crypto from 'crypto';
 import { databasePaths, getConnection, persistDatabase } from '../../db/connection.js';
 import { getAudioStorageDirectory } from '../audio/index.js';

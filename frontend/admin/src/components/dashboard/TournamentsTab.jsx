@@ -133,7 +133,7 @@ export default function TournamentsTab() {
               <div style={{ gridColumn: '1 / -1', display: 'grid', gap: '0.5rem' }}>
                 <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Links</span>
                 {(tournamentForm.links ?? []).map((link, index) => (
-                  <div key={index} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr auto', gap: '0.4rem', alignItems: 'center' }}>
+                  <div key={index} className="admin-link-row">
                     <input
                       placeholder="Bezeichnung (z. B. WhatsApp)"
                       value={link.label}
@@ -322,7 +322,7 @@ export default function TournamentsTab() {
                         <div style={{ display: 'grid', gap: '0.5rem' }}>
                           <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Links</span>
                           {(edit.links ?? []).map((link, index) => (
-                            <div key={index} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr auto', gap: '0.4rem', alignItems: 'center' }}>
+                            <div key={index} className="admin-link-row">
                               <input
                                 placeholder="Bezeichnung (z. B. WhatsApp)"
                                 value={link.label}

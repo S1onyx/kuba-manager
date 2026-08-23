@@ -2,6 +2,22 @@ import { useEffect, useState } from 'react';
 import { fetchTournamentDetail } from '../../api.js';
 import { navigateTo } from '../../hooks/useHashRoute.js';
 
+const responsiveStyles = `
+  @media (max-width: 768px) {
+    .tournament-detail__card {
+      padding: 1.1rem 1rem;
+      border-radius: 12px;
+    }
+    .tournament-detail__info-grid {
+      grid-template-columns: 1fr;
+    }
+    .tournament-detail__cta {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+`;
+
 export default function TournamentDetailPage({ tournamentId }) {
   const [tournament, setTournament] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -45,7 +61,8 @@ export default function TournamentDetailPage({ tournamentId }) {
   };
 
   return (
-    <div style={{ display: 'grid', gap: '1.5rem', maxWidth: '860px', margin: '0 auto', paddingBottom: '3rem' }}>
+    <div style={{ display: 'grid', gap: '1.5rem', maxWidth: '860px', margin: '0 auto', paddingBottom: '3rem', width: '100%' }}>
+      <style>{responsiveStyles}</style>
       <button
         type="button"
         onClick={() => navigateTo('/')}
@@ -57,7 +74,10 @@ export default function TournamentDetailPage({ tournamentId }) {
           borderRadius: '999px',
           padding: '0.4rem 1rem',
           cursor: 'pointer',
-          fontSize: '0.875rem'
+          fontSize: '0.875rem',
+          minHeight: '44px',
+          display: 'inline-flex',
+          alignItems: 'center'
         }}
       >
         ← Zurück
@@ -104,31 +124,33 @@ export default function TournamentDetailPage({ tournamentId }) {
             <button
               type="button"
               onClick={() => navigateTo(`/anmelden/${tournament.id}`)}
+              className="tournament-detail__cta"
               style={{
                 padding: '0.65rem 1.5rem', borderRadius: '999px', border: 'none',
                 background: 'rgba(86,160,255,0.8)', color: '#fff', fontSize: '0.95rem',
-                fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap'
+                fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
+                minHeight: '44px', display: 'inline-flex', alignItems: 'center'
               }}
             >
               Jetzt anmelden →
             </button>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+          <div className="tournament-detail__info-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
             {formattedDate && (
-              <div style={cardStyle}>
+              <div className="tournament-detail__card" style={cardStyle}>
                 <p style={sectionTitleStyle}>Datum</p>
                 <p style={{ margin: 0 }}>{formattedDate}</p>
               </div>
             )}
             {tournament.location && (
-              <div style={cardStyle}>
+              <div className="tournament-detail__card" style={cardStyle}>
                 <p style={sectionTitleStyle}>Ort</p>
                 <p style={{ margin: 0 }}>{tournament.location}</p>
               </div>
             )}
             {formattedDeadline && (
-              <div style={cardStyle}>
+              <div className="tournament-detail__card" style={cardStyle}>
                 <p style={sectionTitleStyle}>Anmeldefrist</p>
                 <p style={{ margin: 0 }}>{formattedDeadline}</p>
               </div>
@@ -136,50 +158,50 @@ export default function TournamentDetailPage({ tournamentId }) {
           </div>
 
           {tournament.description && (
-            <div style={cardStyle}>
+            <div className="tournament-detail__card" style={cardStyle}>
               <p style={sectionTitleStyle}>Über das Turnier</p>
               <p style={{ margin: 0, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{tournament.description}</p>
             </div>
           )}
 
           {tournament.schedule_info && (
-            <div style={cardStyle}>
+            <div className="tournament-detail__card" style={cardStyle}>
               <p style={sectionTitleStyle}>Ablauf & Zeiten</p>
               <p style={{ margin: 0, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{tournament.schedule_info}</p>
             </div>
           )}
 
           {tournament.travel_info && (
-            <div style={cardStyle}>
+            <div className="tournament-detail__card" style={cardStyle}>
               <p style={sectionTitleStyle}>Anreise</p>
               <p style={{ margin: 0, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{tournament.travel_info}</p>
             </div>
           )}
 
           {tournament.contact_email && (
-            <div style={cardStyle}>
+            <div className="tournament-detail__card" style={cardStyle}>
               <p style={sectionTitleStyle}>Kontakt</p>
-              <a href={`mailto:${tournament.contact_email}`} style={{ color: '#7cb9ff' }}>
+              <a href={`mailto:${tournament.contact_email}`} style={{ color: '#7cb9ff', overflowWrap: 'anywhere' }}>
                 {tournament.contact_email}
               </a>
             </div>
           )}
 
           {tournament.registration_url && (
-            <div style={cardStyle}>
+            <div className="tournament-detail__card" style={cardStyle}>
               <p style={sectionTitleStyle}>Anmeldelink</p>
-              <a href={tournament.registration_url} target="_blank" rel="noopener noreferrer" style={{ color: '#7cb9ff' }}>
+              <a href={tournament.registration_url} target="_blank" rel="noopener noreferrer" style={{ color: '#7cb9ff', overflowWrap: 'anywhere' }}>
                 {tournament.registration_url}
               </a>
             </div>
           )}
 
           {Array.isArray(tournament.links) && tournament.links.length > 0 && (
-            <div style={cardStyle}>
+            <div className="tournament-detail__card" style={cardStyle}>
               <p style={sectionTitleStyle}>Links</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {tournament.links.map((link, index) => (
-                  <a key={index} href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: '#7cb9ff' }}>
+                  <a key={index} href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: '#7cb9ff', overflowWrap: 'anywhere' }}>
                     {link.label || link.url}
                   </a>
                 ))}
@@ -191,7 +213,8 @@ export default function TournamentDetailPage({ tournamentId }) {
             <button
               type="button"
               onClick={() => navigateTo(`/anmelden/${tournament.id}`)}
-              style={{ padding: '0.85rem 2.5rem', borderRadius: '999px', border: 'none', background: 'rgba(86,160,255,0.8)', color: '#fff', fontSize: '1rem', fontWeight: 700, cursor: 'pointer', letterSpacing: '0.04em' }}
+              className="tournament-detail__cta"
+              style={{ padding: '0.85rem 2.5rem', borderRadius: '999px', border: 'none', background: 'rgba(86,160,255,0.8)', color: '#fff', fontSize: '1rem', fontWeight: 700, cursor: 'pointer', letterSpacing: '0.04em', minHeight: '48px', display: 'inline-flex', alignItems: 'center' }}
             >
               Team anmelden →
             </button>

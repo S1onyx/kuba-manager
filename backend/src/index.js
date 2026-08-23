@@ -1,5 +1,5 @@
 import express from 'express';
-import http from 'http';
+import http from 'node:http';
 import cors from 'cors';
 import { Server as SocketIO } from 'socket.io';
 import dotenv from 'dotenv';
@@ -12,8 +12,9 @@ import playerRoutes from './routes/players.js';
 import audioRoutes from './routes/audio.js';
 import inboundRoutes from './routes/inbound.js';
 import { getAudioStorageDirectory, initTimerCueSettings } from './services/index.js';
+import { getRegistrationAudioDir } from './services/registrations/index.js';
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const app = express();
 const server = http.createServer(app);
@@ -34,8 +35,6 @@ app.use(
     }
   })
 );
-
-import { getRegistrationAudioDir } from './services/registrations/index.js';
 
 app.use(
   '/media/reg-audio',

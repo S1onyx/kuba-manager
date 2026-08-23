@@ -1,6 +1,11 @@
+// 100dvh nutzen, damit die mobile Browser-Adressleiste das Layout nicht verschiebt;
+// 100vh bleibt als Fallback für Browser ohne dvh-Support.
+const supportsDynamicViewportHeight =
+  typeof CSS !== 'undefined' && typeof CSS.supports === 'function' && CSS.supports('height', '100dvh');
+
 const rootWrapperStyle = {
   width: '100vw',
-  height: '100vh',
+  height: supportsDynamicViewportHeight ? '100dvh' : '100vh',
   background: 'radial-gradient(circle at top, #1f3b73 0%, #0b1a2b 55%, #050d1a 100%)',
   color: '#ffffff',
   overflow: 'hidden',

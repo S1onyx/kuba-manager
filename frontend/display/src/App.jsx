@@ -146,6 +146,12 @@ export default function App() {
         onClick={() => setMirrorMode((prev) => !prev)}
         style={{
           padding: '0.55rem 1rem',
+          // Touch-Target mindestens 44px (Mobile)
+          minHeight: '44px',
+          minWidth: '44px',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           borderRadius: '999px',
           border: '1px solid rgba(255,255,255,0.3)',
           background: mirrorMode ? 'rgba(148, 77, 255, 0.4)' : 'rgba(0, 0, 0, 0.45)',

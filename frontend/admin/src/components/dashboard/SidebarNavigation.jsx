@@ -23,7 +23,7 @@ export default function SidebarNavigation({
         >
           Kuba Manager
         </div>
-        <h1 style={{ margin: 0, fontSize: '1.8rem', letterSpacing: '0.06em' }}>Admin Panel</h1>
+        <h1 style={{ margin: 0, fontSize: 'clamp(1.35rem, 5vw, 1.8rem)', letterSpacing: '0.06em' }}>Admin Panel</h1>
         <p style={{ margin: 0, fontSize: '0.92rem', color: 'var(--text-muted)' }}>
           Steuere Scoreboard, Audio und Turnierablauf zentral.
         </p>

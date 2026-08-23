@@ -30,7 +30,7 @@ export default function PenaltyManagerCard() {
               key={teamKey}
               style={{
                 flex: '1 1 260px',
-                minWidth: '260px',
+                minWidth: 'min(260px, 100%)',
                 display: 'grid',
                 gap: '0.9rem',
                 padding: '1.1rem',
@@ -73,8 +73,8 @@ export default function PenaltyManagerCard() {
                   />
                 </label>
 
-                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                  <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', flex: '0 0 160px' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', flex: '1 1 160px' }}>
                     Dauer
                     <select
                       value={form.preset}
@@ -110,6 +110,7 @@ export default function PenaltyManagerCard() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
+                        flexWrap: 'wrap',
                         gap: '0.75rem',
                         padding: '0.5rem 0.65rem',
                         borderRadius: 'var(--radius-sm)',

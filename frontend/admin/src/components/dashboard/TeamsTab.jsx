@@ -61,6 +61,7 @@ export default function TeamsTab() {
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
+                    flexWrap: 'wrap',
                     gap: '0.75rem',
                     padding: '0.85rem 1rem',
                     borderRadius: 'var(--radius-sm)',

@@ -45,23 +45,12 @@ export default function TimerControlCard() {
       description="Verwalte Uhr, Halbzeiten und Nachspielzeit. Starte, pausiere oder beende Spiele zentral."
     >
       <div style={{ display: 'grid', gap: '1.1rem' }}>
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '1rem',
-            alignItems: 'center',
-            padding: '1rem',
-            borderRadius: 'var(--radius-md)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            background: 'rgba(8, 20, 35, 0.55)'
-          }}
-        >
+        <div className="admin-timer-bar">
           <div style={{ display: 'grid', gap: '0.35rem' }}>
             <span style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.18em', opacity: 0.65 }}>
               Restzeit
             </span>
-            <div style={{ fontSize: '1.8rem', fontWeight: 700 }}>
+            <div style={{ fontSize: 'clamp(1.4rem, 6vw, 1.8rem)', fontWeight: 700 }}>
               {formattedRemaining}
             </div>
             <span style={{ fontSize: '0.9rem', opacity: 0.7 }}>Status: {statusLabel}</span>
@@ -80,7 +69,7 @@ export default function TimerControlCard() {
             ) : null}
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginLeft: 'auto', alignItems: 'flex-end' }}>
+          <div className="admin-timer-bar__controls">
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
               <button type="button" onClick={handleStart} disabled={scoreboard.isRunning}>
                 Start
@@ -121,7 +110,7 @@ export default function TimerControlCard() {
           </button>
         </form>
 
-        <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
+        <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))' }}>
           <form
             onSubmit={(event) => {
               event.preventDefault();
