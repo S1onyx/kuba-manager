@@ -7,8 +7,12 @@ import en from './locales/en.json';
 import fr from './locales/fr.json';
 import hu from './locales/hu.json';
 import cs from './locales/cs.json';
+import swg from './locales/swg.json';
+import gsw from './locales/gsw.json';
+import zh from './locales/zh.json';
+import ja from './locales/ja.json';
 
-export const SUPPORTED_LANGUAGES = ['de', 'en', 'fr', 'hu', 'cs'];
+export const SUPPORTED_LANGUAGES = ['de', 'en', 'fr', 'hu', 'cs', 'swg', 'gsw', 'zh', 'ja'];
 
 export const DEFAULT_LANGUAGE = 'de';
 
@@ -17,7 +21,11 @@ const DATE_LOCALES = {
   en: 'en-GB',
   fr: 'fr-FR',
   hu: 'hu-HU',
-  cs: 'cs-CZ'
+  cs: 'cs-CZ',
+  swg: 'de-DE',
+  gsw: 'de-CH',
+  zh: 'zh-CN',
+  ja: 'ja-JP'
 };
 
 // Beamer-/TV-Anzeige ohne Interaktion: Sprache kommt aus ?lang= und wird in
@@ -31,7 +39,11 @@ i18n
       en: { translation: en },
       fr: { translation: fr },
       hu: { translation: hu },
-      cs: { translation: cs }
+      cs: { translation: cs },
+      swg: { translation: swg },
+      gsw: { translation: gsw },
+      zh: { translation: zh },
+      ja: { translation: ja }
     },
     fallbackLng: DEFAULT_LANGUAGE,
     supportedLngs: SUPPORTED_LANGUAGES,

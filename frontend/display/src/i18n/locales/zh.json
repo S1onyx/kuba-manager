@@ -1,0 +1,113 @@
+{
+  "app": {
+    "mirrorStandard": "显示屏 1（标准）",
+    "mirrorInverted": "显示屏 2（反向）"
+  },
+  "controls": {
+    "fullscreenEnter": "全屏",
+    "fullscreenExit": "退出全屏",
+    "showLive": "显示实时模式",
+    "showBracket": "显示淘汰赛对阵图",
+    "updating": "更新中…"
+  },
+  "scoreboard": {
+    "halfBadge": "第 {{half}} 半场",
+    "teamA": "A 队",
+    "teamB": "B 队",
+    "extraTime": "补时",
+    "halftimeBreak": "中场休息"
+  },
+  "penalties": {
+    "title": "罚时",
+    "empty": "没有进行中的处罚",
+    "expired": "已结束"
+  },
+  "standings": {
+    "currentTitle": "当前小组积分榜",
+    "loading": "正在加载积分榜...",
+    "noResults": "暂无比赛结果。",
+    "colRank": "#",
+    "colTeam": "队伍",
+    "colPlayed": "场次",
+    "colWon": "胜",
+    "colDrawn": "平",
+    "colLost": "负",
+    "colGoals": "进球",
+    "colDiff": "净胜",
+    "colPenalties": "处罚",
+    "colPoints": "积分",
+    "colStatus": "状态"
+  },
+  "stage": {
+    "groupLabel": "{{label}} 组",
+    "groupPhase": "小组赛 · {{label}}",
+    "knockoutPhase": "淘汰赛 · {{label}}",
+    "placementPhase": "排位赛 · {{label}}",
+    "knockoutFinal": "决赛",
+    "knockoutRoundGeneric_other": "淘汰赛（{{count}} 支队伍）",
+    "round": {
+      "p4": "半决赛",
+      "p8": "四分之一决赛",
+      "p16": "十六强赛",
+      "p32": "三十二强赛",
+      "p64": "六十四强赛",
+      "p128": "一百二十八强赛"
+    },
+    "placementMatch": "第 {{from}} 名排位赛",
+    "placementRound": "第 {{from}}–{{to}} 名排位赛"
+  },
+  "bracket": {
+    "title": "淘汰赛对阵图与小组概览",
+    "subtitle": "小组积分榜与淘汰赛一览",
+    "noTournament": "未选择比赛。请在管理面板中为记分牌设置比赛。",
+    "loading": "正在加载赛事结构…",
+    "noStructure": "暂无赛事结构。请在管理面板中维护赛程和小组。",
+    "groupStage": "小组赛",
+    "noGroupData": "暂无小组数据。",
+    "matchesCompleted": "已完成比赛：{{recorded}}/{{total}}",
+    "noResults": "未保存任何结果。",
+    "knockoutTitle": "淘汰赛",
+    "placementTitle": "排位赛",
+    "stageFallback": "阶段",
+    "round": "第 {{round}} 轮",
+    "matchcode": "比赛代码 {{code}}",
+    "timeValue": "{{time}} 点",
+    "status": {
+      "qualified": "已晋级",
+      "inPosition": "晋级在望",
+      "contender": "追赶中"
+    }
+  },
+  "summary": {
+    "loading": "正在加载总结概览…",
+    "empty": "暂无总结数据。请在管理面板中完成比赛。",
+    "defaultTournamentName": "锦标赛",
+    "title": "比赛结束",
+    "description": "最终积分榜、最终排名和杰出球员表现一览。",
+    "champion": "冠军",
+    "championDecidedBy": "通过{{method}}决出",
+    "championFinalWin": "决赛胜利",
+    "score": "比分 {{score}}",
+    "runnerUp": "亚军：",
+    "placementsTitle": "最终排名",
+    "colPlacement": "名次",
+    "colTeam": "队伍",
+    "colDecision": "决胜方式",
+    "colOpponent": "对手",
+    "colResult": "结果",
+    "overallStandings": "总战绩",
+    "topScorer": "最佳射手",
+    "threePointSpecialist": "三分球专家",
+    "penaltyKing": "处罚之王",
+    "points_other": "{{count}} 分",
+    "threes_other": "{{count}} 个三分球",
+    "penaltySeconds_other": "{{count}} 秒处罚",
+    "teamFallback": "队伍"
+  },
+  "errors": {
+    "loadScoreboard": "无法加载记分牌。",
+    "loadStandings": "无法加载积分榜。",
+    "loadStructure": "无法加载赛事结构。",
+    "loadSummary": "无法加载赛事概览。"
+  }
+}

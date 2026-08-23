@@ -1,0 +1,73 @@
+{
+  "header": {
+    "title": "Kunstrad Basketball – Audio",
+    "subtitle": "Des Seitl spielt automatisch alli konfigurierte Spielsounds ab. Bitte d'Lautsprecher oigschaldet losse."
+  },
+  "status": {
+    "connected": "Vorbunde",
+    "disconnected": "Ned vorbunde",
+    "audioOn": "Audio aktiviert",
+    "audioOff": "Audio deaktiviert",
+    "enableAudio": "Audio aktiviere",
+    "audioActive": "Audio aktiv"
+  },
+  "devices": {
+    "label": "Ausgabegerät",
+    "systemDefault": "Systemstandard",
+    "unnamed": "Gerät {{id}}"
+  },
+  "volume": {
+    "title": "Lautstärke je Ereignis",
+    "description": "Pass s'Verhältnis dr Spielereignis zueinander o. D'Werde werde lokal im Browser gschpeichert.",
+    "categories": {
+      "score": {
+        "label": "Korbhymne",
+        "description": "Alli Treffersounds (team-spezifisch oder allgemein)."
+      },
+      "game": {
+        "label": "Spielstart / Pause / Ende",
+        "description": "Statusmeldunga wia Startsignal, Halbzeit- oder Endstand."
+      },
+      "events": {
+        "label": "Spielereignis",
+        "description": "Weitre Trigger wia Fouls oder individuelle Events."
+      },
+      "manual": {
+        "label": "Manuelle Wiedergab",
+        "description": "Sounds, dia direkt aus dr Bibliothek gschtartet werde."
+      }
+    }
+  },
+  "events": {
+    "title": "Letzte Ereignis",
+    "logDescription": "Eingehende Sounds werde automatisch nacheinander abgschpielt.",
+    "empty": "Noch koi Sound-Ereignis empfanga.",
+    "manual": "Manuell",
+    "event": "Ereignis",
+    "audioConnected": "Audio vorbunde",
+    "soundFallback": "Sound #{{id}}",
+    "count_one": "{{count}} Ereignis",
+    "count_other": "{{count}} Ereignis"
+  },
+  "errors": {
+    "playbackFailed": "Dr Sound hod ned abgschpielt werda kenna. Bitte d'Lautsprecher prüefa.",
+    "devicesNotFound": "Audioausgabegerät hend ned ermittelt werda kenna.",
+    "sinkNotSupported": "D'Ausgabegeräte-Auswahl werd vo dem Browser ned unterstützt.",
+    "sinkFailed": "S'Ausgabegerät hod ned gsetzt werda kenna."
+  },
+  "languageSwitcher": {
+    "label": "Schbror auswähla",
+    "aiNotice": "Automatisch übersetzt — Fehler möglich"
+  },
+  "languages": {
+    "de": "Deutsch",
+    "en": "English",
+    "fr": "Français",
+    "hu": "Magyar",
+    "cs": "Čeština",
+    "swg": "Schwäbisch",
+    "gsw": "Schwizerdütsch",
+    "zh": "Chinesisch",
+    "ja": "Japanisch"
+  }
+}

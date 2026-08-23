@@ -5,13 +5,21 @@ import contentEn from './reglement/content.en.js';
 import contentFr from './reglement/content.fr.js';
 import contentHu from './reglement/content.hu.js';
 import contentCs from './reglement/content.cs.js';
+import contentSwg from './reglement/content.swg.js';
+import contentGsw from './reglement/content.gsw.js';
+import contentZh from './reglement/content.zh.js';
+import contentJa from './reglement/content.ja.js';
 
 const REGLEMENT_CONTENT = {
   de: contentDe,
   en: contentEn,
   fr: contentFr,
   hu: contentHu,
-  cs: contentCs
+  cs: contentCs,
+  swg: contentSwg,
+  gsw: contentGsw,
+  zh: contentZh,
+  ja: contentJa
 };
 
 const REGLEMENT_PDF_URL = '/reglement/reglement-kunstrad-basketball.pdf';

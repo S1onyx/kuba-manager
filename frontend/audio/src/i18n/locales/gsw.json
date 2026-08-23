@@ -1,0 +1,73 @@
+{
+  "header": {
+    "title": "Kunstrad Basketball – Audio",
+    "subtitle": "Die Siite spilt automatisch alli konfigurierte Spielsounds ab. Bitte d'Luutsprecher iigschaltet la."
+  },
+  "status": {
+    "connected": "Verbunde",
+    "disconnected": "Nöd verbunde",
+    "audioOn": "Audio aktiviert",
+    "audioOff": "Audio deaktiviert",
+    "enableAudio": "Audio aktiviere",
+    "audioActive": "Audio aktiv"
+  },
+  "devices": {
+    "label": "Usgabgrät",
+    "systemDefault": "Systemstandard",
+    "unnamed": "Grät {{id}}"
+  },
+  "volume": {
+    "title": "Luutstärchi pro Ereignis",
+    "description": "Pass s'Verhältnis vo de Spielereignis zuenand aa. D'Wärt wärde lokal im Browser gspeicheret.",
+    "categories": {
+      "score": {
+        "label": "Chorbhymne",
+        "description": "Alli Träffersounds (team-spezifisch oder allgemein)."
+      },
+      "game": {
+        "label": "Spielstart / Pause / Änd",
+        "description": "Statusmäldige wie Startsignal, Halbziit- oder Ändstand."
+      },
+      "events": {
+        "label": "Spielereignis",
+        "description": "Witeri Trigger wie Fouls oder individuelli Events."
+      },
+      "manual": {
+        "label": "Manuelli Wiedergab",
+        "description": "Sounds, wo diräkt us dr Bibliothek gstartet wärde."
+      }
+    }
+  },
+  "events": {
+    "title": "Letschti Ereignis",
+    "logDescription": "Iichomendi Sounds wärde automatisch nacheinand abgspilt.",
+    "empty": "Nonig kei Sound-Ereignis empfange.",
+    "manual": "Manuell",
+    "event": "Ereignis",
+    "audioConnected": "Audio verbunde",
+    "soundFallback": "Sound #{{id}}",
+    "count_one": "{{count}} Ereignis",
+    "count_other": "{{count}} Ereignis"
+  },
+  "errors": {
+    "playbackFailed": "Dr Sound het nid chönne abgspilt wärde. Bitte d'Luutsprecher prüefe.",
+    "devicesNotFound": "Audiousgabgrät hend nid chönne ermittlet wärde.",
+    "sinkNotSupported": "D'Uswahl vom Usgabgrät wird vo däm Browser nöd unterstützt.",
+    "sinkFailed": "S'Usgabgrät het nid chönne gsetzt wärde."
+  },
+  "languageSwitcher": {
+    "label": "Sprooch wehle",
+    "aiNotice": "Automatisch übersetzt — Fähler möglich"
+  },
+  "languages": {
+    "de": "Deutsch",
+    "en": "English",
+    "fr": "Français",
+    "hu": "Magyar",
+    "cs": "Čeština",
+    "swg": "Schwäbisch",
+    "gsw": "Schwiizerdütsch",
+    "zh": "Chinesisch",
+    "ja": "Japanisch"
+  }
+}

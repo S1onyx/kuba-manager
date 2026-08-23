@@ -64,6 +64,10 @@
     "en": "English",
     "fr": "Français",
     "hu": "Magyar",
-    "cs": "Čeština"
+    "cs": "Čeština",
+    "swg": "Sváb",
+    "gsw": "Svájci német",
+    "zh": "Kínai",
+    "ja": "Japán"
   }
 }

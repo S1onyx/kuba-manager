@@ -1,0 +1,117 @@
+{
+  "app": {
+    "mirrorStandard": "Display 1 (Standard)",
+    "mirrorInverted": "Display 2 (umgkehrt)"
+  },
+  "controls": {
+    "fullscreenEnter": "Vollbild",
+    "fullscreenExit": "Vollbild verlossa",
+    "showLive": "Live-Modus zoiga",
+    "showBracket": "Turnierbaum zoiga",
+    "updating": "Aktualisiere…"
+  },
+  "scoreboard": {
+    "halfBadge": "{{half}}. Halbzeit",
+    "teamA": "Team A",
+    "teamB": "Team B",
+    "extraTime": "Nochspielzeit",
+    "halftimeBreak": "Halbzeit"
+  },
+  "penalties": {
+    "title": "Zeitstrafa",
+    "empty": "Koi laufende Strafa",
+    "expired": "abgloffa"
+  },
+  "standings": {
+    "currentTitle": "Aktuelle Gruppatabälle",
+    "loading": "Lade Tabälle...",
+    "noResults": "Noch koi Ergebnis do.",
+    "colRank": "#",
+    "colTeam": "Team",
+    "colPlayed": "Spiele",
+    "colWon": "S",
+    "colDrawn": "U",
+    "colLost": "N",
+    "colGoals": "Tore",
+    "colDiff": "Diff",
+    "colPenalties": "Strafa",
+    "colPoints": "Pünkt",
+    "colStatus": "Status"
+  },
+  "stage": {
+    "groupLabel": "Gruppe {{label}}",
+    "groupPhase": "Gruppaphase · {{label}}",
+    "knockoutPhase": "KO-Runde · {{label}}",
+    "placementPhase": "Platzierung · {{label}}",
+    "knockoutFinal": "s'Finale",
+    "knockoutRoundGeneric_one": "KO-Runde ({{count}} Team)",
+    "knockoutRoundGeneric_other": "KO-Runde ({{count}} Teams)",
+    "round": {
+      "p4": "Halbfinale",
+      "p8": "Viertelfinale",
+      "p16": "Achdlfinale",
+      "p32": "Sechzehndelfinale",
+      "p64": "Zwoiunddreißigsdelfinale",
+      "p128": "Vierundsechzigsdlfinale"
+    },
+    "placementMatch": "Spiel um Platz {{from}}",
+    "placementRound": "Platzierungsrunde {{from}}–{{to}}"
+  },
+  "bracket": {
+    "title": "Turnierbaum & Gruppenübersicht",
+    "subtitle": "Gruppatabälle ond KO-Spiele im Überblick",
+    "noTournament": "Koi Turnier ausgewählt. Bitte im Admin-Panel a Turnier für s'Scoreboard setze.",
+    "loading": "Lade Turnierstruktur…",
+    "noStructure": "Noch koi Turnierstruktur do. Bitte im Admin-Panel Spielplan ond Gruppa pflega.",
+    "groupStage": "Gruppaphase",
+    "noGroupData": "Noch koi Gruppendate do.",
+    "matchesCompleted": "Spiele abgschlossa: {{recorded}}/{{total}}",
+    "noResults": "Koi Ergebnis gschpeichert.",
+    "knockoutTitle": "KO-Runde",
+    "placementTitle": "Platzierungsspiele",
+    "stageFallback": "Phase",
+    "round": "Runde {{round}}",
+    "matchcode": "Matchcode {{code}}",
+    "timeValue": "{{time}} Uhr",
+    "status": {
+      "qualified": "qualifiziert",
+      "inPosition": "uf Kurs",
+      "contender": "verfolgt"
+    }
+  },
+  "summary": {
+    "loading": "Lade Abschlussübersicht…",
+    "empty": "Noch koi Abschlussdate do. Bitte s'Turnier im Admin-Panel abschließe.",
+    "defaultTournamentName": "Turnier",
+    "title": "Turnierend",
+    "description": "Abschlusstabälle, Finalplatzierunga ond herausragende Spielerleischdunga uf oin Blick.",
+    "champion": "Champion",
+    "championDecidedBy": "Entschiede im {{method}}",
+    "championFinalWin": "Finalsieg",
+    "score": "Ergebnis {{score}}",
+    "runnerUp": "Runner-Up:",
+    "placementsTitle": "Finale Platzierunga",
+    "colPlacement": "Platz",
+    "colTeam": "Team",
+    "colDecision": "Entscheidung",
+    "colOpponent": "Gegner",
+    "colResult": "Ergebnis",
+    "overallStandings": "Gesamtbilanz",
+    "topScorer": "Topscorer",
+    "threePointSpecialist": "Dreier-Spezialischt",
+    "penaltyKing": "Strafbank-König",
+    "points_one": "{{count}} Punkt",
+    "points_other": "{{count}} Pünkt",
+    "threes_one": "{{count}} Dreier",
+    "threes_other": "{{count}} Dreier",
+    "penaltySeconds_one": "{{count}} Sek. Strafe",
+    "penaltySeconds_other": "{{count}} Sek. Strafa",
+    "teamFallback": "Team"
+  },
+  "errors": {
+    "loadScoreboard": "S'Scoreboard hod ned glade werda kenna.",
+    "loadStandings": "D'Tabälle hod ned glade werda kenna.",
+    "loadStructure": "D'Turnierstruktur hod ned glade werda kenna.",
+    "loadSummary": "D'Turnierübersicht hod ned glade werda kenna."
+  }
+}

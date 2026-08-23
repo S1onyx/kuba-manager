@@ -1,0 +1,72 @@
+{
+  "header": {
+    "title": "Kunstrad Basketball – Audio",
+    "subtitle": "このページは設定されたすべてのゲームサウンドを自動再生します。スピーカーの電源を入れたままにしてください。"
+  },
+  "status": {
+    "connected": "接続中",
+    "disconnected": "未接続",
+    "audioOn": "オーディオ有効",
+    "audioOff": "オーディオ無効",
+    "enableAudio": "オーディオを有効化",
+    "audioActive": "オーディオ有効"
+  },
+  "devices": {
+    "label": "出力デバイス",
+    "systemDefault": "システム標準",
+    "unnamed": "デバイス {{id}}"
+  },
+  "volume": {
+    "title": "イベントごとの音量",
+    "description": "ゲームイベント同士の音量バランスを調整します。設定値はブラウザにローカル保存されます。",
+    "categories": {
+      "score": {
+        "label": "得点アンセム",
+        "description": "すべての得点サウンド（チーム専用または汎用）。"
+      },
+      "game": {
+        "label": "試合開始 / 休憩 / 終了",
+        "description": "開始信号、ハーフタイム、最終スコアなどのステータス通知。"
+      },
+      "events": {
+        "label": "ゲームイベント",
+        "description": "ファウルや個別イベントなどのその他のトリガー。"
+      },
+      "manual": {
+        "label": "手動再生",
+        "description": "ライブラリから直接再生されるサウンド。"
+      }
+    }
+  },
+  "events": {
+    "title": "最近のイベント",
+    "logDescription": "受信したサウンドは自動的に順番に再生されます。",
+    "empty": "サウンドイベントはまだ受信されていません。",
+    "manual": "手動",
+    "event": "イベント",
+    "audioConnected": "オーディオ接続済み",
+    "soundFallback": "サウンド #{{id}}",
+    "count_other": "{{count}} 件のイベント"
+  },
+  "errors": {
+    "playbackFailed": "サウンドを再生できませんでした。スピーカーを確認してください。",
+    "devicesNotFound": "オーディオ出力デバイスを検出できませんでした。",
+    "sinkNotSupported": "このブラウザは出力デバイスの選択に対応していません。",
+    "sinkFailed": "出力デバイスを設定できませんでした。"
+  },
+  "languageSwitcher": {
+    "label": "言語を選択",
+    "aiNotice": "機械翻訳 — 誤りがある可能性があります"
+  },
+  "languages": {
+    "de": "Deutsch",
+    "en": "English",
+    "fr": "Français",
+    "hu": "Magyar",
+    "cs": "Čeština",
+    "swg": "シュヴァーベン語",
+    "gsw": "スイスドイツ語",
+    "zh": "中国語",
+    "ja": "日本語"
+  }
+}

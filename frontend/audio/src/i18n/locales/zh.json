@@ -1,0 +1,72 @@
+{
+  "header": {
+    "title": "Kunstrad Basketball – Audio",
+    "subtitle": "本页面会自动播放所有配置的比赛音效。请保持扬声器开启。"
+  },
+  "status": {
+    "connected": "已连接",
+    "disconnected": "未连接",
+    "audioOn": "音频已启用",
+    "audioOff": "音频已禁用",
+    "enableAudio": "启用音频",
+    "audioActive": "音频已激活"
+  },
+  "devices": {
+    "label": "输出设备",
+    "systemDefault": "系统默认",
+    "unnamed": "设备 {{id}}"
+  },
+  "volume": {
+    "title": "各事件的音量",
+    "description": "调整各比赛事件之间的音量比例。这些值会保存在浏览器本地。",
+    "categories": {
+      "score": {
+        "label": "进球音乐",
+        "description": "所有进球音效（球队专属或通用）。"
+      },
+      "game": {
+        "label": "比赛开始 / 暂停 / 结束",
+        "description": "状态提示，如开始信号、中场或终场比分。"
+      },
+      "events": {
+        "label": "比赛事件",
+        "description": "其他触发器，如犯规或自定义事件。"
+      },
+      "manual": {
+        "label": "手动播放",
+        "description": "直接从音效库启动的声音。"
+      }
+    }
+  },
+  "events": {
+    "title": "最近事件",
+    "logDescription": "收到的声音会自动依次播放。",
+    "empty": "尚未收到任何声音事件。",
+    "manual": "手动",
+    "event": "事件",
+    "audioConnected": "音频已连接",
+    "soundFallback": "声音 #{{id}}",
+    "count_other": "{{count}} 个事件"
+  },
+  "errors": {
+    "playbackFailed": "无法播放声音。请检查扬声器。",
+    "devicesNotFound": "无法检测到音频输出设备。",
+    "sinkNotSupported": "此浏览器不支持选择输出设备。",
+    "sinkFailed": "无法设置输出设备。"
+  },
+  "languageSwitcher": {
+    "label": "选择语言",
+    "aiNotice": "机器翻译——可能有误"
+  },
+  "languages": {
+    "de": "Deutsch",
+    "en": "English",
+    "fr": "Français",
+    "hu": "Magyar",
+    "cs": "Čeština",
+    "swg": "施瓦本语",
+    "gsw": "瑞士德语",
+    "zh": "中文",
+    "ja": "日语"
+  }
+}

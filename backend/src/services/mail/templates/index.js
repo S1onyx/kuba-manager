@@ -3,11 +3,15 @@ import * as en from './en.js';
 import * as fr from './fr.js';
 import * as hu from './hu.js';
 import * as cs from './cs.js';
+import * as swg from './swg.js';
+import * as gsw from './gsw.js';
+import * as zh from './zh.js';
+import * as ja from './ja.js';
 
-export const SUPPORTED_MAIL_LANGUAGES = ['de', 'en', 'fr', 'hu', 'cs'];
+export const SUPPORTED_MAIL_LANGUAGES = ['de', 'en', 'fr', 'hu', 'cs', 'swg', 'gsw', 'zh', 'ja'];
 export const DEFAULT_MAIL_LANGUAGE = 'de';
 
-const TEMPLATES = { de, en, fr, hu, cs };
+const TEMPLATES = { de, en, fr, hu, cs, swg, gsw, zh, ja };
 
 // Akzeptiert auch Region-Formen wie 'en-US' oder 'fr-CH'; unbekannte Sprachen
 // fallen auf Deutsch zurueck.

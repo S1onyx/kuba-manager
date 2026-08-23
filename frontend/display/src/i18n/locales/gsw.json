@@ -1,0 +1,117 @@
+{
+  "app": {
+    "mirrorStandard": "Display 1 (Standard)",
+    "mirrorInverted": "Display 2 (umgechehrt)"
+  },
+  "controls": {
+    "fullscreenEnter": "Vollbild",
+    "fullscreenExit": "Vollbild verla",
+    "showLive": "Live-Modus zeige",
+    "showBracket": "Turnierboum zeige",
+    "updating": "Aktualisiere…"
+  },
+  "scoreboard": {
+    "halfBadge": "{{half}}. Halbziit",
+    "teamA": "Team A",
+    "teamB": "Team B",
+    "extraTime": "Nachspiilziit",
+    "halftimeBreak": "Halbziit"
+  },
+  "penalties": {
+    "title": "Ziitstrafe",
+    "empty": "Kei laufendi Strafe",
+    "expired": "abglaufe"
+  },
+  "standings": {
+    "currentTitle": "Aktuelli Gruppetabäu",
+    "loading": "Lade Tabäu...",
+    "noResults": "Nonig kei Ergebnis da.",
+    "colRank": "#",
+    "colTeam": "Team",
+    "colPlayed": "Spiu",
+    "colWon": "S",
+    "colDrawn": "U",
+    "colLost": "N",
+    "colGoals": "Tor",
+    "colDiff": "Diff",
+    "colPenalties": "Strafe",
+    "colPoints": "Pünkt",
+    "colStatus": "Status"
+  },
+  "stage": {
+    "groupLabel": "Gruppe {{label}}",
+    "groupPhase": "Grupphase · {{label}}",
+    "knockoutPhase": "KO-Rundi · {{label}}",
+    "placementPhase": "Platzierig · {{label}}",
+    "knockoutFinal": "s'Finäle",
+    "knockoutRoundGeneric_one": "KO-Rundi ({{count}} Team)",
+    "knockoutRoundGeneric_other": "KO-Rundi ({{count}} Teams)",
+    "round": {
+      "p4": "Halbfinäle",
+      "p8": "Viertufinäle",
+      "p16": "Achtufinäle",
+      "p32": "Sächzägstufinäle",
+      "p64": "Zwöiunddryssgstufinäle",
+      "p128": "Vierundsächzgstufinäle"
+    },
+    "placementMatch": "Spiu um Platz {{from}}",
+    "placementRound": "Platzierigsrundi {{from}}–{{to}}"
+  },
+  "bracket": {
+    "title": "Turnierboum & Gruppeübersicht",
+    "subtitle": "Gruppetabäu und KO-Spiu im Überblick",
+    "noTournament": "Kei Turnier uusgwehlt. Bitte im Admin-Panel es Turnier für s'Scoreboard setze.",
+    "loading": "Lade Turnierstruktur…",
+    "noStructure": "Nonig kei Turnierstruktur verfüegbar. Bitte im Admin-Panel Spiuplan und Gruppe pflege.",
+    "groupStage": "Grupphase",
+    "noGroupData": "Nonig kei Gruppedate da.",
+    "matchesCompleted": "Spiu abgschlosse: {{recorded}}/{{total}}",
+    "noResults": "Kei Ergebnis gspeicheret.",
+    "knockoutTitle": "KO-Rundi",
+    "placementTitle": "Platzierigsspiu",
+    "stageFallback": "Phase",
+    "round": "Rundi {{round}}",
+    "matchcode": "Matchcode {{code}}",
+    "timeValue": "{{time}} Uhr",
+    "status": {
+      "qualified": "qualifiziert",
+      "inPosition": "uf Kurs",
+      "contender": "verfolgt"
+    }
+  },
+  "summary": {
+    "loading": "Lade Abschlussübersicht…",
+    "empty": "Nonig kei Abschlussdate da. Bitte s'Turnier im Admin-Panel abschliisse.",
+    "defaultTournamentName": "Turnier",
+    "title": "Turnieränd",
+    "description": "Abschlusstabäu, Finäuplatzierige und hervorragendi Spielerleischtige uf e Blick.",
+    "champion": "Champion",
+    "championDecidedBy": "Entschide im {{method}}",
+    "championFinalWin": "Finäusig",
+    "score": "Ergebnis {{score}}",
+    "runnerUp": "Runner-Up:",
+    "placementsTitle": "Finäui Platzierige",
+    "colPlacement": "Platz",
+    "colTeam": "Team",
+    "colDecision": "Entscheidig",
+    "colOpponent": "Geegner",
+    "colResult": "Ergebnis",
+    "overallStandings": "Gsamtbilanz",
+    "topScorer": "Topscorer",
+    "threePointSpecialist": "Dröier-Spezialischt",
+    "penaltyKing": "Strafbank-Chönig",
+    "points_one": "{{count}} Punkt",
+    "points_other": "{{count}} Pünkt",
+    "threes_one": "{{count}} Dröier",
+    "threes_other": "{{count}} Dröier",
+    "penaltySeconds_one": "{{count}} Sek. Strafe",
+    "penaltySeconds_other": "{{count}} Sek. Strafe",
+    "teamFallback": "Team"
+  },
+  "errors": {
+    "loadScoreboard": "S'Scoreboard het nid chönne glade wärde.",
+    "loadStandings": "D'Tabäu het nid chönne glade wärde.",
+    "loadStructure": "D'Turnierstruktur het nid chönne glade wärde.",
+    "loadSummary": "D'Turnierübersicht het nid chönne glade wärde."
+  }
+}

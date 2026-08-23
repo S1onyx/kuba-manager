@@ -13,7 +13,11 @@
     "en": "English",
     "fr": "Français",
     "hu": "Magyar",
-    "cs": "Čeština"
+    "cs": "Čeština",
+    "swg": "Schwäbisch",
+    "gsw": "Schweizerdeutsch",
+    "zh": "Chinesisch",
+    "ja": "Japanisch"
   },
   "footer": {
     "impressum": "Impressum"

@@ -1,0 +1,113 @@
+{
+  "app": {
+    "mirrorStandard": "ディスプレイ 1（標準）",
+    "mirrorInverted": "ディスプレイ 2（反転）"
+  },
+  "controls": {
+    "fullscreenEnter": "全画面",
+    "fullscreenExit": "全画面を終了",
+    "showLive": "ライブモードを表示",
+    "showBracket": "トーナメント表を表示",
+    "updating": "更新中…"
+  },
+  "scoreboard": {
+    "halfBadge": "第 {{half}} ハーフ",
+    "teamA": "チーム A",
+    "teamB": "チーム B",
+    "extraTime": "追加タイム",
+    "halftimeBreak": "ハーフタイム"
+  },
+  "penalties": {
+    "title": "タイムペナルティ",
+    "empty": "進行中のペナルティはありません",
+    "expired": "終了"
+  },
+  "standings": {
+    "currentTitle": "現在のグループ順位表",
+    "loading": "順位表を読み込み中...",
+    "noResults": "まだ結果がありません。",
+    "colRank": "#",
+    "colTeam": "チーム",
+    "colPlayed": "試合",
+    "colWon": "勝",
+    "colDrawn": "分",
+    "colLost": "負",
+    "colGoals": "得点",
+    "colDiff": "得失",
+    "colPenalties": "ペナルティ",
+    "colPoints": "勝ち点",
+    "colStatus": "状態"
+  },
+  "stage": {
+    "groupLabel": "グループ {{label}}",
+    "groupPhase": "グループステージ · {{label}}",
+    "knockoutPhase": "ノックアウトラウンド · {{label}}",
+    "placementPhase": "順位決定戦 · {{label}}",
+    "knockoutFinal": "決勝",
+    "knockoutRoundGeneric_other": "ノックアウトラウンド（{{count}} チーム）",
+    "round": {
+      "p4": "準決勝",
+      "p8": "準々決勝",
+      "p16": "ベスト16",
+      "p32": "ベスト32",
+      "p64": "ベスト64",
+      "p128": "ベスト128"
+    },
+    "placementMatch": "{{from}} 位決定戦",
+    "placementRound": "{{from}}–{{to}} 位決定ラウンド"
+  },
+  "bracket": {
+    "title": "トーナメント表とグループ概要",
+    "subtitle": "グループ順位表とノックアウト試合の一覧",
+    "noTournament": "トーナメントが選択されていません。管理パネルでスコアボード用のトーナメントを設定してください。",
+    "loading": "トーナメント構成を読み込み中…",
+    "noStructure": "トーナメント構成がまだありません。管理パネルでスケジュールとグループを整備してください。",
+    "groupStage": "グループステージ",
+    "noGroupData": "グループデータがまだありません。",
+    "matchesCompleted": "完了した試合: {{recorded}}/{{total}}",
+    "noResults": "保存された結果はありません。",
+    "knockoutTitle": "ノックアウトラウンド",
+    "placementTitle": "順位決定戦",
+    "stageFallback": "フェーズ",
+    "round": "ラウンド {{round}}",
+    "matchcode": "マッチコード {{code}}",
+    "timeValue": "{{time}} 時",
+    "status": {
+      "qualified": "突破",
+      "inPosition": "突破圏内",
+      "contender": "追走中"
+    }
+  },
+  "summary": {
+    "loading": "最終概要を読み込み中…",
+    "empty": "最終データがまだありません。管理パネルでトーナメントを完了してください。",
+    "defaultTournamentName": "トーナメント",
+    "title": "トーナメント終了",
+    "description": "最終順位表、最終順位、優れた選手の活躍を一目で確認できます。",
+    "champion": "チャンピオン",
+    "championDecidedBy": "{{method}}で決定",
+    "championFinalWin": "決勝勝利",
+    "score": "結果 {{score}}",
+    "runnerUp": "準優勝：",
+    "placementsTitle": "最終順位",
+    "colPlacement": "順位",
+    "colTeam": "チーム",
+    "colDecision": "決着",
+    "colOpponent": "対戦相手",
+    "colResult": "結果",
+    "overallStandings": "総合成績",
+    "topScorer": "得点王",
+    "threePointSpecialist": "3ポイントスペシャリスト",
+    "penaltyKing": "ペナルティキング",
+    "points_other": "{{count}} 得点",
+    "threes_other": "{{count}} 本の3ポイント",
+    "penaltySeconds_other": "{{count}} 秒のペナルティ",
+    "teamFallback": "チーム"
+  },
+  "errors": {
+    "loadScoreboard": "スコアボードを読み込めませんでした。",
+    "loadStandings": "順位表を読み込めませんでした。",
+    "loadStructure": "トーナメント構成を読み込めませんでした。",
+    "loadSummary": "トーナメント概要を読み込めませんでした。"
+  }
+}

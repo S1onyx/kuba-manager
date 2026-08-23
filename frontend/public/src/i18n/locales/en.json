@@ -13,7 +13,11 @@
     "en": "English",
     "fr": "Français",
     "hu": "Magyar",
-    "cs": "Čeština"
+    "cs": "Čeština",
+    "swg": "Swabian",
+    "gsw": "Swiss German",
+    "zh": "Chinese",
+    "ja": "Japanese"
   },
   "footer": {
     "impressum": "Legal notice"

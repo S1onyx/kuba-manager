@@ -8,7 +8,11 @@
     "en": "English",
     "fr": "Français",
     "hu": "Magyar",
-    "cs": "Čeština"
+    "cs": "Čeština",
+    "swg": "Swabian",
+    "gsw": "Swiss German",
+    "zh": "Chinese",
+    "ja": "Japanese"
   },
   "common": {
     "save": "Save",
