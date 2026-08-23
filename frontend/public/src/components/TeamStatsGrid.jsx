@@ -1,7 +1,7 @@
 const gridStyle = {
   display: 'grid',
   gap: '1rem',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))'
+  gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))'
 };
 
 const cardStyle = {
@@ -30,7 +30,7 @@ const scoreStyle = {
 const responsiveStyles = `
   @media (max-width: 768px) {
     .team-grid {
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr));
       gap: 0.85rem;
     }
     .team-grid__card {
@@ -43,11 +43,8 @@ const responsiveStyles = `
   }
 
   @media (max-width: 480px) {
-    .team-grid {
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    }
     .team-grid__title {
-      font-size: 1.05rem;
+      font-size: 1.1rem;
     }
   }
 `;

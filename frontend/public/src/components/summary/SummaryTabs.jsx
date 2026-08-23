@@ -1,23 +1,5 @@
 import { usePublicApp } from '../../context/PublicAppContext.jsx';
 
-const responsiveStyles = `
-  @media (max-width: 768px) {
-    .summary-tabs {
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: thin;
-      padding-bottom: 0.25rem;
-      margin: 0 -0.25rem;
-      padding-left: 0.25rem;
-      padding-right: 0.25rem;
-    }
-    .summary-tabs button {
-      flex-shrink: 0;
-    }
-  }
-`;
-
 export default function SummaryTabs() {
   const {
     summary: { tabs, activeTab, selectTab }
@@ -41,7 +23,6 @@ export default function SummaryTabs() {
 
   return (
     <div className="summary-tabs" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-      <style>{responsiveStyles}</style>
       {tabs.map((tab) => (
         <button
           key={tab.id}

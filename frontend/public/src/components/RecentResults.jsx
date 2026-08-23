@@ -14,7 +14,7 @@ const itemStyle = {
 
 const rowStyle = {
   display: 'grid',
-  gridTemplateColumns: '1fr auto 1fr',
+  gridTemplateColumns: 'minmax(0, 1fr) auto minmax(0, 1fr)',
   alignItems: 'center',
   fontSize: '0.95rem',
   columnGap: '0.75rem'
@@ -30,8 +30,9 @@ const teamStyle = {
 const scoreStyle = {
   fontWeight: 700,
   letterSpacing: '0.04em',
-  minWidth: '4.5rem',
-  textAlign: 'center'
+  minWidth: '3.5rem',
+  textAlign: 'center',
+  whiteSpace: 'nowrap'
 };
 
 const metaStyle = {
@@ -47,20 +48,8 @@ const responsiveStyles = `
       padding: 0.75rem 0.9rem;
     }
     .recent-results__row {
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       column-gap: 0.5rem;
-    }
-  }
-
-  @media (max-width: 520px) {
-    .recent-results__row {
-      grid-template-columns: 1fr;
-      text-align: center;
-      row-gap: 0.35rem;
-    }
-    .recent-results__score {
-      order: -1;
     }
   }
 `;

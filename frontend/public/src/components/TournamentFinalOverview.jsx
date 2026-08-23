@@ -21,6 +21,14 @@ const leadersGridStyle = {
   gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))'
 };
 
+const responsiveStyles = `
+  @media (max-width: 480px) {
+    .final-table__col--optional {
+      display: none;
+    }
+  }
+`;
+
 function LeaderCard({ title, player, formatter }) {
   if (!player) {
     return null;
@@ -53,6 +61,7 @@ export default function TournamentFinalOverview({ summary }) {
 
   return (
     <section style={sectionStyle}>
+      <style>{responsiveStyles}</style>
       <header>
         <h2 style={{ margin: 0, fontSize: 'clamp(1.2rem, 4vw, 1.4rem)', letterSpacing: '0.05em' }}>Turnierende</h2>
         <p style={{ margin: '0.35rem 0 0', opacity: 0.75 }}>
@@ -80,14 +89,14 @@ export default function TournamentFinalOverview({ summary }) {
         <article style={panelStyle}>
           <h3 style={{ marginTop: 0, fontSize: '1.2rem' }}>Platzierungen</h3>
           <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-            <table style={{ ...placementTableStyle, minWidth: '480px' }}>
+            <table style={placementTableStyle}>
               <thead style={{ opacity: 0.7, fontSize: '0.85rem' }}>
                 <tr>
                   <th style={{ textAlign: 'left', padding: '0.5rem 0.4rem' }}>Platz</th>
                   <th style={{ textAlign: 'left', padding: '0.5rem 0.4rem' }}>Team</th>
                   <th style={{ textAlign: 'left', padding: '0.5rem 0.4rem' }}>Entscheidung</th>
-                  <th style={{ textAlign: 'left', padding: '0.5rem 0.4rem' }}>Gegner</th>
-                  <th style={{ textAlign: 'left', padding: '0.5rem 0.4rem' }}>Ergebnis</th>
+                  <th className="final-table__col--optional" style={{ textAlign: 'left', padding: '0.5rem 0.4rem' }}>Gegner</th>
+                  <th className="final-table__col--optional" style={{ textAlign: 'left', padding: '0.5rem 0.4rem' }}>Ergebnis</th>
                 </tr>
               </thead>
               <tbody>
@@ -96,8 +105,8 @@ export default function TournamentFinalOverview({ summary }) {
                     <td style={{ padding: '0.5rem 0.4rem', fontWeight: 700 }}>#{entry.placement}</td>
                     <td style={{ padding: '0.5rem 0.4rem' }}>{entry.teamName}</td>
                     <td style={{ padding: '0.5rem 0.4rem', opacity: 0.75 }}>{entry.decidedBy || 'Gesamtbilanz'}</td>
-                    <td style={{ padding: '0.5rem 0.4rem', opacity: 0.75 }}>{entry.opponent || '—'}</td>
-                    <td style={{ padding: '0.5rem 0.4rem', opacity: 0.75 }}>{entry.score || '—'}</td>
+                    <td className="final-table__col--optional" style={{ padding: '0.5rem 0.4rem', opacity: 0.75 }}>{entry.opponent || '—'}</td>
+                    <td className="final-table__col--optional" style={{ padding: '0.5rem 0.4rem', opacity: 0.75 }}>{entry.score || '—'}</td>
                   </tr>
                 ))}
               </tbody>

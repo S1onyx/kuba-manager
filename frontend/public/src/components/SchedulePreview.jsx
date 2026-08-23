@@ -26,7 +26,7 @@ const roundHeaderStyle = {
 
 const matchRowStyle = {
   display: 'grid',
-  gridTemplateColumns: '1fr auto 1fr',
+  gridTemplateColumns: 'minmax(0, 1fr) auto minmax(0, 1fr)',
   alignItems: 'center',
   columnGap: '0.7rem',
   fontSize: '0.95rem'
@@ -49,16 +49,8 @@ const responsiveStyles = `
       padding: 1rem 1.05rem;
     }
     .schedule-preview__match {
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
       column-gap: 0.45rem;
-    }
-  }
-
-  @media (max-width: 520px) {
-    .schedule-preview__match {
-      grid-template-columns: 1fr;
-      row-gap: 0.35rem;
-      text-align: center;
+      font-size: 0.9rem;
     }
   }
 
@@ -69,6 +61,9 @@ const responsiveStyles = `
   }
 
   .schedule-preview__view-button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     padding: 0.25rem 0.9rem;
     border-radius: 999px;
     border: 1px solid rgba(255,255,255,0.25);
@@ -104,7 +99,7 @@ const responsiveStyles = `
 
   .schedule-timeline__row {
     display: grid;
-    grid-template-columns: minmax(140px, 0.55fr) 26px minmax(0, 1fr);
+    grid-template-columns: minmax(110px, 0.5fr) 20px minmax(0, 1fr);
     gap: 0.85rem;
     align-items: stretch;
   }
@@ -195,9 +190,10 @@ const responsiveStyles = `
     color: #ffeab4;
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     .schedule-timeline__row {
       grid-template-columns: 1fr;
+      gap: 0.5rem;
     }
 
     .schedule-timeline__marker {
@@ -295,7 +291,8 @@ function renderGroupSchedule(groupStages, formatDateTime) {
                               opacity: match.result?.hasResult ? 1 : 0.7,
                               fontWeight: match.result?.hasResult ? 700 : 400,
                               letterSpacing: '0.02em',
-                              minWidth: '4.5rem',
+                              minWidth: '3.5rem',
+                              whiteSpace: 'nowrap',
                               textAlign: 'center'
                             }}
                           >

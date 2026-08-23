@@ -50,24 +50,25 @@ const leftTeamColumnStyle = {
 };
 
 const teamNameStyle = {
-  fontSize: '2.05rem',
+  fontSize: 'clamp(1.05rem, 4.5vw, 2.05rem)',
   fontWeight: 600,
   textTransform: 'uppercase',
-  letterSpacing: '0.08em',
+  letterSpacing: '0.06em',
   lineHeight: 1.15,
   wordBreak: 'break-word',
   whiteSpace: 'normal'
 };
 
 const scoreStyle = {
-  fontSize: '4.4rem',
+  fontSize: 'clamp(2.4rem, 10vw, 4.4rem)',
   fontWeight: 700,
   lineHeight: 1,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  minWidth: '5.5rem',
-  textAlign: 'center'
+  padding: '0 0.25rem',
+  textAlign: 'center',
+  whiteSpace: 'nowrap'
 };
 
 const infoMetaStyle = {
@@ -81,65 +82,51 @@ const responsiveStyles = `
   @media (max-width: 768px) {
     .current-card {
       gap: 1.25rem;
-      padding: 1.5rem;
+      padding: 1.4rem;
     }
+    .current-card__teams {
+      gap: 0.6rem;
+    }
+    .current-card__info {
+      justify-content: center;
+      gap: 0.75rem 1rem;
+      font-size: 0.9rem;
+    }
+    .current-card__badge {
+      font-size: 0.8rem;
+      padding: 0.3rem 0.7rem;
+    }
+    .current-card__status {
+      text-align: left !important;
+    }
+  }
+  @media (max-width: 480px) {
+    .current-card {
+      padding: 1.1rem;
+      gap: 1rem;
+    }
+    .current-card__header {
+      flex-direction: column;
+      align-items: flex-start !important;
+    }
+    .current-card__info {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.35rem;
+    }
+  }
+  @media (max-width: 380px) {
     .current-card__teams {
       grid-template-columns: 1fr;
       text-align: center;
-      gap: 0.75rem;
+      gap: 0.5rem;
     }
     .current-card__team {
       justify-items: center !important;
       text-align: center !important;
     }
-    .current-card__team-name {
-      font-size: clamp(1.25rem, 4vw, 1.6rem);
-      letter-spacing: 0.05em;
-    }
-    .current-card__score {
-      font-size: 3.4rem;
-      min-width: auto;
-    }
-    .current-card__info {
-      justify-content: center;
-      gap: 0.75rem;
-      font-size: 0.9rem;
-    }
-    .current-card__badge {
-      font-size: 0.75rem;
-      padding: 0.3rem 0.7rem;
-    }
     .current-card__status {
       width: 100%;
-      text-align: center;
-    }
-  }
-  @media (max-width: 480px) {
-    .current-card {
-      padding: 1.35rem;
-    }
-    .current-card__teams {
-      gap: 0.65rem;
-    }
-    .current-card__team-name {
-      font-size: clamp(1.1rem, 5.2vw, 1.3rem);
-      line-height: 1.25;
-      letter-spacing: 0.04em;
-    }
-    .current-card__score {
-      font-size: 2.8rem;
-      padding: 0 0.25rem;
-      width: 100%;
-    }
-    .current-card__info {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 0.5rem;
-      font-size: 0.85rem;
-    }
-    .current-card__status {
-      font-size: 0.85rem;
     }
   }
 `;
@@ -184,7 +171,7 @@ export default function CurrentMatchCard({ scoreboard }) {
       <section className="current-card" style={cardStyle}>
         {scoreboard ? (
           <>
-            <header style={headerStyle}>
+            <header className="current-card__header" style={headerStyle}>
               <div style={{ display: 'grid', gap: '0.35rem' }}>
                 {scoreboard.tournamentName ? (
                   <span style={{ fontSize: '1rem', opacity: 0.8 }}>{scoreboard.tournamentName}</span>

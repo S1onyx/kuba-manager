@@ -56,6 +56,15 @@ body {
   box-sizing: border-box;
 }
 
+/* Grid-/Flex-Kinder duerfen unter ihre Content-Breite schrumpfen,
+   sonst sprengen breite Inhalte (Tabellen, Tab-Zeilen) die Seite horizontal. */
+.public-layout section,
+.public-layout article,
+.public-layout header,
+.public-layout div {
+  min-width: 0;
+}
+
 a {
   color: inherit;
 }
@@ -198,38 +207,19 @@ textarea {
 /* ─── Responsive ──────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
-  :root {
-    font-size: 15px;
-  }
-
   body {
     background: radial-gradient(circle at top, #1f3b73 0%, #0b1a2b 45%, #050d1a 100%);
   }
 
   .public-layout {
-    gap: 1.75rem;
-    padding: 1.8rem clamp(1.1rem, 4vw, 2rem);
-  }
-}
-
-@media (max-width: 600px) {
-  :root {
-    font-size: 14px;
-  }
-
-  .public-layout {
-    padding: 1.5rem clamp(1rem, 5vw, 1.6rem);
     gap: 1.5rem;
+    padding: 1.75rem clamp(1rem, 4vw, 2rem);
   }
 }
 
-@media (max-width: 420px) {
-  :root {
-    font-size: 13px;
-  }
-
+@media (max-width: 480px) {
   .public-layout {
-    padding: 1.35rem 1rem 2rem;
-    gap: 1.35rem;
+    padding: 1.25rem 0.9rem 2rem;
+    gap: 1.25rem;
   }
 }

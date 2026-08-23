@@ -28,29 +28,24 @@ const headerCellStyle = {
 const responsiveStyles = `
   @media (max-width: 768px) {
     .group-card {
-      padding: 1.1rem 1.25rem;
+      padding: 1.1rem 1.15rem;
       gap: 0.9rem;
     }
-    .group-card__header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.4rem;
-    }
     .group-card table {
-      font-size: 0.85rem;
+      font-size: 0.9rem;
     }
   }
 
   @media (max-width: 480px) {
     .group-card {
-      padding: 1rem;
+      padding: 0.9rem;
     }
     .group-card table thead th,
     .group-card table tbody td {
       padding: 0.35rem;
     }
     .group-card table thead th {
-      font-size: 0.7rem;
+      font-size: 0.72rem;
     }
   }
 `;

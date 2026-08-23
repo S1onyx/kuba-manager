@@ -8,7 +8,7 @@ const gridLayout = {
 const leaderGridStyle = {
   display: 'grid',
   gap: '1rem',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))'
+  gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))'
 };
 
 const leaderCardStyle = {

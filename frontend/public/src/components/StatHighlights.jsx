@@ -1,7 +1,7 @@
 const gridStyle = {
   display: 'grid',
   gap: '1rem',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))'
+  gridTemplateColumns: 'repeat(auto-fit, minmax(min(160px, 100%), 1fr))'
 };
 
 const cardStyle = {
@@ -26,7 +26,7 @@ const valueStyle = {
 const responsiveStyles = `
   @media (max-width: 768px) {
     .stats-grid {
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr));
       gap: 0.85rem;
     }
     .stats-grid__card {
@@ -36,7 +36,7 @@ const responsiveStyles = `
 
   @media (max-width: 480px) {
     .stats-grid {
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      grid-template-columns: repeat(2, 1fr);
     }
     .stats-grid__value {
       font-size: 1.4rem;
