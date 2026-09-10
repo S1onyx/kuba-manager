@@ -9,10 +9,10 @@ import { formatDateTime } from '../../utils/formatters.js';
 import { useDateLocale } from '../../i18n/index.js';
 
 const EXPORT_SECTIONS = [
-  { id: 'schedule', labelKey: 'export.sectionSchedule', descKey: 'export.sectionScheduleDesc', icon: '📅' },
-  { id: 'standings', labelKey: 'export.sectionStandings', descKey: 'export.sectionStandingsDesc', icon: '📊' },
-  { id: 'results', labelKey: 'export.sectionResults', descKey: 'export.sectionResultsDesc', icon: '🏆' },
-  { id: 'final', labelKey: 'export.sectionFinal', descKey: 'export.sectionFinalDesc', icon: '🥇' }
+  { id: 'schedule', labelKey: 'export.sectionSchedule', descKey: 'export.sectionScheduleDesc' },
+  { id: 'standings', labelKey: 'export.sectionStandings', descKey: 'export.sectionStandingsDesc' },
+  { id: 'results', labelKey: 'export.sectionResults', descKey: 'export.sectionResultsDesc' },
+  { id: 'final', labelKey: 'export.sectionFinal', descKey: 'export.sectionFinalDesc' }
 ];
 
 export default function ExportTab() {
@@ -122,7 +122,7 @@ export default function ExportTab() {
           {EXPORT_SECTIONS.map((section) => (
             <PanelCard
               key={section.id}
-              title={`${section.icon}  ${t(section.labelKey)}`}
+              title={t(section.labelKey)}
               description={t(section.descKey)}
               action={
                 <button
