@@ -18,7 +18,8 @@ export const CONTROL_TABS = [
   { id: 'history', labelKey: 'tabs.history' },
   { id: 'players', labelKey: 'tabs.players' },
   { id: 'teams', labelKey: 'tabs.teams' },
-  { id: 'tournaments', labelKey: 'tabs.tournaments' }
+  { id: 'tournaments', labelKey: 'tabs.tournaments' },
+  { id: 'export', labelKey: 'tabs.export' }
 ];
 
 export const TOURNAMENT_CLASSIFICATION_OPTIONS = [

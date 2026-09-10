@@ -407,6 +407,10 @@ export function fetchRegistrations(tournamentId) {
   return request(`/tournaments/${tournamentId}/registrations`);
 }
 
+export function fetchTournamentSummary(id) {
+  return request(`/public/tournaments/${id}/summary`);
+}
+
 export function updateRegistrationStatus(tournamentId, regId, status) {
   return request(`/tournaments/${tournamentId}/registrations/${regId}`, {
     method: 'PATCH',

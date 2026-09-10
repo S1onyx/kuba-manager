@@ -503,3 +503,214 @@ a {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ── Export-Tab Vorschau (Bildschirm) ── */
+
+.export-preview {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  border-left: 2px solid var(--border-color);
+  padding-left: 1rem;
+}
+
+/* ── Print-Overlay (nur beim Drucken sichtbar) ── */
+
+.print-overlay {
+  display: none;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .print-overlay,
+  .print-overlay * {
+    visibility: visible;
+  }
+
+  .print-overlay {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    color: #000;
+    font-family: 'Inter', -apple-system, sans-serif;
+    padding: 0;
+    margin: 0;
+  }
+
+  @page {
+    size: A4;
+    margin: 18mm 16mm;
+  }
+
+  .print-header {
+    text-align: center;
+    border-bottom: 2px solid #000;
+    padding-bottom: 0.8rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .print-header h1 {
+    font-size: 1.6rem;
+    margin: 0 0 0.3rem;
+    letter-spacing: 0.03em;
+  }
+
+  .print-header p {
+    margin: 0.15rem 0;
+    font-size: 0.9rem;
+  }
+
+  .print-header__generated {
+    font-size: 0.75rem !important;
+    color: #555;
+  }
+
+  .print-section h2 {
+    font-size: 1.3rem;
+    margin: 0 0 1rem;
+    border-bottom: 1px solid #999;
+    padding-bottom: 0.3rem;
+  }
+
+  .print-section h3 {
+    font-size: 1.05rem;
+    margin: 1.2rem 0 0.5rem;
+  }
+
+  .print-section h4 {
+    font-size: 0.95rem;
+    margin: 0.8rem 0 0.3rem;
+  }
+
+  .print-block {
+    margin-bottom: 1.2rem;
+    page-break-inside: avoid;
+  }
+
+  .print-group {
+    margin-bottom: 1rem;
+    page-break-inside: avoid;
+  }
+
+  .print-round {
+    margin-bottom: 0.6rem;
+    page-break-inside: avoid;
+  }
+
+  .print-round__label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 0.3rem;
+    color: #333;
+  }
+
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+  }
+
+  .print-table th,
+  .print-table td {
+    border: 1px solid #bbb;
+    padding: 0.35rem 0.5rem;
+    text-align: center;
+  }
+
+  .print-table th {
+    background: #e8e8e8;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+  }
+
+  .print-table tbody tr:nth-child(even) {
+    background: #f5f5f5;
+  }
+
+  .print-table__team {
+    text-align: left;
+    font-weight: 600;
+  }
+
+  .print-table__score {
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .print-table__points {
+    font-weight: 700;
+  }
+
+  .print-table--standings th,
+  .print-table--standings td {
+    font-size: 0.78rem;
+    padding: 0.3rem 0.4rem;
+  }
+
+  .print-champion {
+    text-align: center;
+    border: 2px solid #000;
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .print-champion__label {
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin: 0;
+    color: #333;
+  }
+
+  .print-champion__name {
+    font-size: 1.8rem;
+    margin: 0.3rem 0;
+  }
+
+  .print-leaders__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+  }
+
+  .print-leader-card {
+    border: 1px solid #999;
+    padding: 0.7rem;
+    text-align: center;
+  }
+
+  .print-leader-card__title {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+    color: #555;
+  }
+
+  .print-leader-card__name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0.3rem 0 0;
+  }
+
+  .print-leader-card__team {
+    font-size: 0.8rem;
+    margin: 0;
+    color: #666;
+  }
+
+  .print-leader-card__value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0.3rem 0 0;
+  }
+}

@@ -1,0 +1,570 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import PanelCard from '../common/PanelCard.jsx';
+import { useDashboard } from '../../context/DashboardContext.jsx';
+import { fetchTournamentSummary } from '../../utils/api.js';
+import { formatApiError } from '../../utils/apiError.js';
+import { formatStageLabelI18n } from '../../utils/stageLabels.js';
+import { formatDateTime } from '../../utils/formatters.js';
+import { useDateLocale } from '../../i18n/index.js';
+
+const EXPORT_SECTIONS = [
+  { id: 'schedule', labelKey: 'export.sectionSchedule', descKey: 'export.sectionScheduleDesc', icon: '📅' },
+  { id: 'standings', labelKey: 'export.sectionStandings', descKey: 'export.sectionStandingsDesc', icon: '📊' },
+  { id: 'results', labelKey: 'export.sectionResults', descKey: 'export.sectionResultsDesc', icon: '🏆' },
+  { id: 'final', labelKey: 'export.sectionFinal', descKey: 'export.sectionFinalDesc', icon: '🥇' }
+];
+
+export default function ExportTab() {
+  const { t } = useTranslation();
+  const dateLocale = useDateLocale();
+  const { matchContext, tournaments } = useDashboard();
+  const resolvedTournamentId = matchContext?.resolvedTournamentId ?? null;
+  const tournamentList = tournaments?.tournaments ?? [];
+
+  const [selectedTournamentId, setSelectedTournamentId] = useState(resolvedTournamentId ?? '');
+  const [summary, setSummary] = useState(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [summaryError, setSummaryError] = useState('');
+  const [printMode, setPrintMode] = useState(null);
+
+  useEffect(() => {
+    if (resolvedTournamentId && !selectedTournamentId) {
+      setSelectedTournamentId(String(resolvedTournamentId));
+    }
+  }, [resolvedTournamentId, selectedTournamentId]);
+
+  const activeTournamentId = useMemo(() => {
+    const id = Number(selectedTournamentId);
+    return Number.isInteger(id) && id > 0 ? id : null;
+  }, [selectedTournamentId]);
+
+  const loadSummary = useCallback(
+    async (id) => {
+      if (!id) {
+        setSummary(null);
+        setSummaryError('');
+        return;
+      }
+      setSummaryLoading(true);
+      setSummaryError('');
+      try {
+        const data = await fetchTournamentSummary(id);
+        setSummary(data);
+      } catch (err) {
+        console.error(err);
+        setSummary(null);
+        setSummaryError(formatApiError(err, t, 'export.loadFailed'));
+      } finally {
+        setSummaryLoading(false);
+      }
+    },
+    [t]
+  );
+
+  useEffect(() => {
+    loadSummary(activeTournamentId);
+  }, [activeTournamentId, loadSummary]);
+
+  const handlePrint = useCallback((mode) => {
+    setPrintMode(mode);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        window.print();
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    const handleAfterPrint = () => setPrintMode(null);
+    window.addEventListener('afterprint', handleAfterPrint);
+    return () => window.removeEventListener('afterprint', handleAfterPrint);
+  }, []);
+
+  const tournamentName = summary?.tournament?.name ?? '';
+  const tournamentLocation = summary?.tournament?.location ?? '';
+  const tournamentDate = summary?.tournament?.planned_at ?? '';
+
+  return (
+    <div style={{ display: 'grid', gap: '1.75rem' }}>
+      <PanelCard
+        title={t('export.title')}
+        description={t('export.description')}
+      >
+        <div style={{ display: 'grid', gap: '1rem' }}>
+          <label style={{ display: 'grid', gap: '0.3rem' }}>
+            {t('export.selectTournament')}
+            <select
+              value={selectedTournamentId}
+              onChange={(event) => setSelectedTournamentId(event.target.value)}
+            >
+              <option value="">{t('export.noTournamentSelected')}</option>
+              {tournamentList.map((tournament) => (
+                <option key={tournament.id} value={String(tournament.id)}>
+                  {tournament.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          {summaryError ? (
+            <p style={{ margin: 0, color: 'var(--danger)' }}>{summaryError}</p>
+          ) : null}
+
+          {summaryLoading ? (
+            <p style={{ margin: 0, color: 'var(--text-muted)' }}>{t('export.loading')}</p>
+          ) : null}
+        </div>
+      </PanelCard>
+
+      {!activeTournamentId || !summary ? null : (
+        <div style={{ display: 'grid', gap: '1.25rem' }}>
+          {EXPORT_SECTIONS.map((section) => (
+            <PanelCard
+              key={section.id}
+              title={`${section.icon}  ${t(section.labelKey)}`}
+              description={t(section.descKey)}
+              action={
+                <button
+                  type="button"
+                  onClick={() => handlePrint(section.id)}
+                  disabled={summaryLoading}
+                >
+                  {t('export.printButton')}
+                </button>
+              }
+            >
+              <PrintPreview
+                mode={section.id}
+                summary={summary}
+                t={t}
+                dateLocale={dateLocale}
+                tournamentName={tournamentName}
+                tournamentLocation={tournamentLocation}
+                tournamentDate={tournamentDate}
+              />
+            </PanelCard>
+          ))}
+        </div>
+      )}
+
+      <PrintOverlay
+        mode={printMode}
+        summary={summary}
+        t={t}
+        dateLocale={dateLocale}
+        tournamentName={tournamentName}
+        tournamentLocation={tournamentLocation}
+        tournamentDate={tournamentDate}
+      />
+    </div>
+  );
+}
+
+function PrintPreview({ mode, summary, t, dateLocale, tournamentName, tournamentLocation, tournamentDate }) {
+  return (
+    <div className="export-preview">
+      {mode === 'schedule' ? (
+        <PrintSchedule summary={summary} t={t} dateLocale={dateLocale} tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} />
+      ) : null}
+      {mode === 'standings' ? (
+        <PrintStandings summary={summary} t={t} tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} />
+      ) : null}
+      {mode === 'results' ? (
+        <PrintResults summary={summary} t={t} dateLocale={dateLocale} tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} />
+      ) : null}
+      {mode === 'final' ? (
+        <PrintFinal summary={summary} t={t} tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} />
+      ) : null}
+    </div>
+  );
+}
+
+function PrintOverlay({ mode, summary, t, dateLocale, tournamentName, tournamentLocation, tournamentDate }) {
+  if (!mode || !summary) {
+    return null;
+  }
+  return (
+    <div className="print-overlay">
+      <PrintHeader tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} t={t} />
+      {mode === 'schedule' ? (
+        <PrintSchedule summary={summary} t={t} dateLocale={dateLocale} tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} />
+      ) : null}
+      {mode === 'standings' ? (
+        <PrintStandings summary={summary} t={t} tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} />
+      ) : null}
+      {mode === 'results' ? (
+        <PrintResults summary={summary} t={t} dateLocale={dateLocale} tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} />
+      ) : null}
+      {mode === 'final' ? (
+        <PrintFinal summary={summary} t={t} tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} />
+      ) : null}
+    </div>
+  );
+}
+
+function PrintHeader({ tournamentName, tournamentLocation, tournamentDate, t }) {
+  return (
+    <header className="print-header">
+      <h1>{tournamentName}</h1>
+      <p>
+        {[tournamentLocation, tournamentDate ? formatDateTime(tournamentDate) : null].filter(Boolean).join(' · ')}
+      </p>
+      <p className="print-header__generated">{t('export.generatedAt', { time: formatDateTime(new Date().toISOString()) })}</p>
+    </header>
+  );
+}
+
+function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocation, tournamentDate }) {
+  const schedule = summary?.schedule;
+  if (!schedule) {
+    return <p>{t('export.noData')}</p>;
+  }
+
+  const hasGroup = Array.isArray(schedule.group) && schedule.group.length > 0;
+  const hasKnockout = Array.isArray(schedule.knockout) && schedule.knockout.length > 0;
+  const hasPlacement = Array.isArray(schedule.placement) && schedule.placement.length > 0;
+
+  if (!hasGroup && !hasKnockout && !hasPlacement) {
+    return <p>{t('export.noData')}</p>;
+  }
+
+  const formatMatchTime = (value) => {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleString(dateLocale, {
+      weekday: 'short',
+      day: '2-digit',
+      month: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  return (
+    <section className="print-section">
+      <h2>{t('export.scheduleTitle')}</h2>
+
+      {hasGroup ? (
+        <div className="print-block">
+          <h3>{t('export.phaseGroup')}</h3>
+          {schedule.group.map((stage) => (
+            <div key={stage.stage_label} className="print-group">
+              <h4>{stage.stage_label}</h4>
+              {(stage.rounds ?? []).map((round) => (
+                <div key={`${stage.stage_label}-${round.round}`} className="print-round">
+                  <p className="print-round__label">{t('export.round', { round: round.round })}</p>
+                  <table className="print-table">
+                    <thead>
+                      <tr>
+                        <th>{t('export.colTime')}</th>
+                        <th className="print-table__team">{t('export.colHome')}</th>
+                        <th className="print-table__score">{t('export.colScore')}</th>
+                        <th className="print-table__team">{t('export.colAway')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(round.matches ?? []).map((match) => (
+                        <tr key={match.id ?? `${stage.stage_label}-${round.round}-${match.match_order}`}>
+                          <td>{formatMatchTime(match.scheduled_at) || '—'}</td>
+                          <td className="print-table__team">{match.home_label || '—'}</td>
+                          <td className="print-table__score">
+                            {match.result?.hasResult ? `${match.result.scoreA ?? 0} : ${match.result.scoreB ?? 0}` : '—'}
+                          </td>
+                          <td className="print-table__team">{match.away_label || '—'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {hasKnockout ? (
+        <div className="print-block">
+          <h3>{t('export.phaseKnockout')}</h3>
+          {schedule.knockout.map((stage) => (
+            <div key={stage.stage_label} className="print-group">
+              <h4>{stage.stage_label}</h4>
+              <table className="print-table">
+                <thead>
+                  <tr>
+                    <th>{t('export.colTime')}</th>
+                    <th className="print-table__team">{t('export.colHome')}</th>
+                    <th className="print-table__score">{t('export.colScore')}</th>
+                    <th className="print-table__team">{t('export.colAway')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(stage.matches ?? []).map((match) => (
+                    <tr key={match.id ?? `${stage.stage_label}-${match.match_order}`}>
+                      <td>{formatMatchTime(match.scheduled_at) || '—'}</td>
+                      <td className="print-table__team">{match.home_label || '—'}</td>
+                      <td className="print-table__score">
+                        {match.result?.hasResult ? `${match.result.scoreA ?? 0} : ${match.result.scoreB ?? 0}` : '—'}
+                      </td>
+                      <td className="print-table__team">{match.away_label || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {hasPlacement ? (
+        <div className="print-block">
+          <h3>{t('export.phasePlacement')}</h3>
+          {schedule.placement.map((stage) => (
+            <div key={stage.stage_label} className="print-group">
+              <h4>{stage.stage_label}</h4>
+              <table className="print-table">
+                <thead>
+                  <tr>
+                    <th>{t('export.colTime')}</th>
+                    <th className="print-table__team">{t('export.colHome')}</th>
+                    <th className="print-table__score">{t('export.colScore')}</th>
+                    <th className="print-table__team">{t('export.colAway')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(stage.matches ?? []).map((match) => (
+                    <tr key={match.id ?? `${stage.stage_label}-${match.match_order}`}>
+                      <td>{formatMatchTime(match.scheduled_at) || '—'}</td>
+                      <td className="print-table__team">{match.home_label || '—'}</td>
+                      <td className="print-table__score">
+                        {match.result?.hasResult ? `${match.result.scoreA ?? 0} : ${match.result.scoreB ?? 0}` : '—'}
+                      </td>
+                      <td className="print-table__team">{match.away_label || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+function PrintStandings({ summary, t, tournamentName, tournamentLocation, tournamentDate }) {
+  const groupStandings = summary?.groupStandings ?? [];
+  if (groupStandings.length === 0) {
+    return <p>{t('export.noData')}</p>;
+  }
+
+  return (
+    <section className="print-section">
+      <h2>{t('export.standingsTitle')}</h2>
+      <div className="print-block">
+        {groupStandings.map((group, index) => (
+          <div key={group.label ?? index} className="print-group">
+            <h4>{group.label}</h4>
+            <p className="print-round__label">{t('export.gamesCount', { count: group.recordedGamesCount ?? 0 })}</p>
+            {(group.standings ?? []).length === 0 ? (
+              <p>{t('export.noResults')}</p>
+            ) : (
+              <table className="print-table print-table--standings">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th className="print-table__team">{t('export.colTeam')}</th>
+                    <th>{t('export.colPlayed')}</th>
+                    <th>{t('export.colWon')}</th>
+                    <th>{t('export.colDrawn')}</th>
+                    <th>{t('export.colLost')}</th>
+                    <th>{t('export.colGoals')}</th>
+                    <th>{t('export.colDiff')}</th>
+                    <th>{t('export.colPenalties')}</th>
+                    <th>{t('export.colPoints')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {group.standings.map((entry, rank) => (
+                    <tr key={entry.team}>
+                      <td>{rank + 1}</td>
+                      <td className="print-table__team">{entry.team}</td>
+                      <td>{entry.played}</td>
+                      <td>{entry.wins}</td>
+                      <td>{entry.draws}</td>
+                      <td>{entry.losses}</td>
+                      <td>{entry.goalsFor}:{entry.goalsAgainst}</td>
+                      <td>{entry.goalDiff}</td>
+                      <td>{entry.penalties}</td>
+                      <td className="print-table__points">{entry.points}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PrintResults({ summary, t, dateLocale, tournamentName, tournamentLocation, tournamentDate }) {
+  const recentGames = summary?.recentGames ?? [];
+  if (recentGames.length === 0) {
+    return <p>{t('export.noData')}</p>;
+  }
+
+  const formatGameDate = (value) => {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleString(dateLocale, {
+      day: '2-digit',
+      month: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  return (
+    <section className="print-section">
+      <h2>{t('export.resultsTitle')}</h2>
+      <div className="print-block">
+        <table className="print-table">
+          <thead>
+            <tr>
+              <th className="print-table__team">{t('export.colHome')}</th>
+              <th className="print-table__score">{t('export.colScore')}</th>
+              <th className="print-table__team">{t('export.colAway')}</th>
+              <th>{t('export.colStage')}</th>
+              <th>{t('export.colDate')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {recentGames.map((game) => (
+              <tr key={game.id}>
+                <td className="print-table__team">{game.teamA}</td>
+                <td className="print-table__score">{game.scoreA} : {game.scoreB}</td>
+                <td className="print-table__team">{game.teamB}</td>
+                <td>
+                  {formatStageLabelI18n(game.stageLabelI18n, t, game.stageLabel || t('export.knockoutGame'))}
+                </td>
+                <td>{formatGameDate(game.created_at)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function PrintFinal({ summary, t, tournamentName, tournamentLocation, tournamentDate }) {
+  const placements = summary?.finalPlacements ?? [];
+  const leaders = summary?.playerStats?.leaders ?? {};
+  const champion = placements[0];
+  const runnerUp = placements[1];
+
+  if (placements.length === 0 && !champion) {
+    return <p>{t('export.noData')}</p>;
+  }
+
+  const methodLabel = (entry) => {
+    switch (entry?.decidedByCode) {
+      case 'final':
+        return t('export.methodFinal');
+      case 'placement_match': {
+        const nums = String(entry.decidedBy ?? '').match(/(\d+)\s*[/\-]\s*(\d+)/);
+        const from = nums ? Number(nums[1]) : entry.placement % 2 === 1 ? entry.placement : entry.placement - 1;
+        const to = nums ? Number(nums[2]) : from + 1;
+        return t('export.methodPlacementMatch', { from, to });
+      }
+      case 'overall_standings':
+        return t('export.methodOverallStandings');
+      case 'participant':
+        return t('export.methodParticipant');
+      default:
+        return entry?.decidedBy || '';
+    }
+  };
+
+  return (
+    <section className="print-section">
+      <h2>{t('export.finalTitle')}</h2>
+
+      {champion ? (
+        <div className="print-block print-champion">
+          <p className="print-champion__label">{t('export.champion')}</p>
+          <h3 className="print-champion__name">{champion.teamName}</h3>
+          {runnerUp ? (
+            <p>
+              <strong>{t('export.runnerUp')}</strong> {runnerUp.teamName}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+
+      {placements.length > 0 ? (
+        <div className="print-block">
+          <h3>{t('export.placements')}</h3>
+          <table className="print-table">
+            <thead>
+              <tr>
+                <th>{t('export.colPlacement')}</th>
+                <th className="print-table__team">{t('export.colTeam')}</th>
+                <th>{t('export.colDecision')}</th>
+                <th>{t('export.colOpponent')}</th>
+                <th>{t('export.colResult')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {placements.map((entry) => (
+                <tr key={`${entry.teamName}-${entry.placement}`}>
+                  <td>#{entry.placement}</td>
+                  <td className="print-table__team">{entry.teamName}</td>
+                  <td>{methodLabel(entry) || t('export.overallRecord')}</td>
+                  <td>{entry.opponent || '—'}</td>
+                  <td>{entry.score || '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
+
+      {leaders.topScorers?.[0] || leaders.topThreePointers?.[0] || leaders.mostPenalized?.[0] ? (
+        <div className="print-block print-leaders">
+          <h3>{t('export.leaders')}</h3>
+          <div className="print-leaders__grid">
+            {leaders.topScorers?.[0] ? (
+              <div className="print-leader-card">
+                <p className="print-leader-card__title">{t('export.topScorer')}</p>
+                <p className="print-leader-card__name">{leaders.topScorers[0].name}</p>
+                <p className="print-leader-card__team">{leaders.topScorers[0].teamName || ''}</p>
+                <p className="print-leader-card__value">{t('export.pointsValue', { count: leaders.topScorers[0].points ?? 0 })}</p>
+              </div>
+            ) : null}
+            {leaders.topThreePointers?.[0] ? (
+              <div className="print-leader-card">
+                <p className="print-leader-card__title">{t('export.threePointSpecialist')}</p>
+                <p className="print-leader-card__name">{leaders.topThreePointers[0].name}</p>
+                <p className="print-leader-card__team">{leaders.topThreePointers[0].teamName || ''}</p>
+                <p className="print-leader-card__value">{t('export.threes', { count: leaders.topThreePointers[0].breakdown?.['3'] ?? 0 })}</p>
+              </div>
+            ) : null}
+            {leaders.mostPenalized?.[0] ? (
+              <div className="print-leader-card">
+                <p className="print-leader-card__title">{t('export.penaltySeconds')}</p>
+                <p className="print-leader-card__name">{leaders.mostPenalized[0].name}</p>
+                <p className="print-leader-card__team">{leaders.mostPenalized[0].teamName || ''}</p>
+                <p className="print-leader-card__value">{t('export.secondsValue', { count: leaders.mostPenalized[0].penaltySeconds ?? 0 })}</p>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+    </section>
+  );
+}
