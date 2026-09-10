@@ -5,6 +5,7 @@ import { useDashboard } from '../../../context/DashboardContext.jsx';
 import { fetchRegistrations, updateRegistrationStatus, activateTournament, setRegistrationClosed } from '../../../utils/api.js';
 import { formatApiError } from '../../../utils/apiError.js';
 import { useDateLocale } from '../../../i18n/index.js';
+import { resolveMediaUrl } from '../../../config.js';
 
 export default function TournamentDetailsPanel({
   tournament,
@@ -208,16 +209,16 @@ export default function TournamentDetailsPanel({
               {tournament.poster_url ? (
                 tournament.poster_mime_type === 'application/pdf' ? (
                   <object
-                    data={tournament.poster_url}
+                    data={resolveMediaUrl(tournament.poster_url)}
                     type="application/pdf"
                     style={{ width: '100%', aspectRatio: '1 / 1.414', borderRadius: '8px', background: 'rgba(0,0,0,0.3)', display: 'block' }}
                   >
-                    <a href={tournament.poster_url} target="_blank" rel="noopener noreferrer" style={{ display: 'block', padding: '1rem', textAlign: 'center', color: '#7cb9ff' }}>
+                    <a href={resolveMediaUrl(tournament.poster_url)} target="_blank" rel="noopener noreferrer" style={{ display: 'block', padding: '1rem', textAlign: 'center', color: '#7cb9ff' }}>
                       {t('tournaments.details.openPdf')}
                     </a>
                   </object>
                 ) : (
-                  <img src={tournament.poster_url} alt={t('tournaments.details.posterAlt')} style={{ maxWidth: '100%', maxHeight: '240px', objectFit: 'contain', borderRadius: '8px', background: 'rgba(0,0,0,0.3)' }} />
+                  <img src={resolveMediaUrl(tournament.poster_url)} alt={t('tournaments.details.posterAlt')} style={{ maxWidth: '100%', maxHeight: '240px', objectFit: 'contain', borderRadius: '8px', background: 'rgba(0,0,0,0.3)' }} />
                 )
               ) : (
                 <p style={{ margin: 0, opacity: 0.6 }}>{t('tournaments.details.noPoster')}</p>

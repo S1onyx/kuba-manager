@@ -18,6 +18,12 @@ export const BACKEND_URL =
     ? import.meta.env.VITE_BACKEND_URL
     : defaultBackendUrl;
 
+export function resolveMediaUrl(path) {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  return `${BACKEND_URL}${path}`;
+}
+
 const DEFAULT_ADMIN_USERNAME = 'admin';
 const DEFAULT_ADMIN_PASSWORD = 'kuba-manager';
 
