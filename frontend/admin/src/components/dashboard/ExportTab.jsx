@@ -335,45 +335,43 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
     );
   };
 
+  const sortStagesByTime = (stages) => {
+    return [...stages].sort((a, b) => {
+      const allA = a.rounds ? a.rounds.flatMap((r) => r.matches ?? []) : (a.matches ?? []);
+      const allB = b.rounds ? b.rounds.flatMap((r) => r.matches ?? []) : (b.matches ?? []);
+      const minA = allA.reduce((min, m) => {
+        const t2 = m.scheduled_at ? new Date(m.scheduled_at).getTime() : Infinity;
+        return t2 < min ? t2 : min;
+      }, Infinity);
+      const minB = allB.reduce((min, m) => {
+        const t2 = m.scheduled_at ? new Date(m.scheduled_at).getTime() : Infinity;
+        return t2 < min ? t2 : min;
+      }, Infinity);
+      return minA - minB;
+    });
+  };
+
+  const renderPhase = (stages, titleKey) => {
+    const sorted = sortStagesByTime(stages);
+    return (
+      <div className="print-block">
+        <h3>{t(titleKey)}</h3>
+        {sorted.map((stage) => (
+          <div key={stage.stage_label} className="print-group">
+            <h4 className="print-group-title">{stage.stage_label}</h4>
+            {renderStageTable(stage, stage.stage_label)}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <section className="print-section">
       <h2>{t('export.scheduleTitle')}</h2>
-
-      {hasGroup ? (
-        <div className="print-block">
-          <h3>{t('export.phaseGroup')}</h3>
-          {schedule.group.map((stage) => (
-            <div key={stage.stage_label} className="print-group">
-              <h4 className="print-group-title">{stage.stage_label}</h4>
-              {renderStageTable(stage, stage.stage_label)}
-            </div>
-          ))}
-        </div>
-      ) : null}
-
-      {hasKnockout ? (
-        <div className="print-block">
-          <h3>{t('export.phaseKnockout')}</h3>
-          {schedule.knockout.map((stage) => (
-            <div key={stage.stage_label} className="print-group">
-              <h4 className="print-group-title">{stage.stage_label}</h4>
-              {renderStageTable(stage, stage.stage_label)}
-            </div>
-          ))}
-        </div>
-      ) : null}
-
-      {hasPlacement ? (
-        <div className="print-block">
-          <h3>{t('export.phasePlacement')}</h3>
-          {schedule.placement.map((stage) => (
-            <div key={stage.stage_label} className="print-group">
-              <h4 className="print-group-title">{stage.stage_label}</h4>
-              {renderStageTable(stage, stage.stage_label)}
-            </div>
-          ))}
-        </div>
-      ) : null}
+      {hasGroup ? renderPhase(schedule.group, 'export.phaseGroup') : null}
+      {hasKnockout ? renderPhase(schedule.knockout, 'export.phaseKnockout') : null}
+      {hasPlacement ? renderPhase(schedule.placement, 'export.phasePlacement') : null}
     </section>
   );
 }
