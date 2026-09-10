@@ -208,15 +208,15 @@ export default function TournamentDetailsPanel({
               <h3 style={{ margin: 0, fontSize: '1rem' }}>{t('tournaments.details.poster')}</h3>
               {tournament.poster_url ? (
                 tournament.poster_mime_type === 'application/pdf' ? (
-                  <object
-                    data={resolveMediaUrl(tournament.poster_url)}
-                    type="application/pdf"
-                    style={{ width: '100%', aspectRatio: '1 / 1.414', borderRadius: '8px', background: 'rgba(0,0,0,0.3)', display: 'block' }}
+                  <a
+                    href={resolveMediaUrl(tournament.poster_url)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1rem', borderRadius: '8px', background: 'rgba(0,0,0,0.3)', color: '#7cb9ff', textDecoration: 'none', fontSize: '0.9rem' }}
                   >
-                    <a href={resolveMediaUrl(tournament.poster_url)} target="_blank" rel="noopener noreferrer" style={{ display: 'block', padding: '1rem', textAlign: 'center', color: '#7cb9ff' }}>
-                      {t('tournaments.details.openPdf')}
-                    </a>
-                  </object>
+                    <span style={{ fontSize: '1.2rem' }}>📄</span>
+                    {t('tournaments.details.openPdf')}
+                  </a>
                 ) : (
                   <img src={resolveMediaUrl(tournament.poster_url)} alt={t('tournaments.details.posterAlt')} style={{ maxWidth: '100%', maxHeight: '240px', objectFit: 'contain', borderRadius: '8px', background: 'rgba(0,0,0,0.3)' }} />
                 )
