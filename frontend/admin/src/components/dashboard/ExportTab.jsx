@@ -261,6 +261,15 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
     );
   };
 
+  let gameCounter = 0;
+
+  const formatTimeOrNumber = (scheduledAt) => {
+    const timeStr = formatMatchTime(scheduledAt);
+    if (timeStr) return timeStr;
+    gameCounter += 1;
+    return `#${gameCounter}`;
+  };
+
   const renderScheduleRows = (rounds, keyPrefix) => {
     const rows = [];
     rounds.forEach((round) => {
@@ -273,7 +282,7 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
       matches.forEach((match) => {
         rows.push(
           <tr key={match.id ?? `${keyPrefix}-${round.round}-${match.match_order}`}>
-            <td className="print-time">{formatMatchTime(match.scheduled_at)}</td>
+            <td className="print-time">{formatTimeOrNumber(match.scheduled_at)}</td>
             <td className="print-team">{match.home_label || ''}</td>
             {renderScoreCells(match)}
             <td className="print-team">{match.away_label || ''}</td>
@@ -300,7 +309,7 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
           ? renderScheduleRows(stage.rounds, keyPrefix)
           : (stage.matches ?? []).map((match) => (
               <tr key={match.id ?? `${keyPrefix}-${match.match_order}`}>
-                <td className="print-time">{formatMatchTime(match.scheduled_at)}</td>
+                <td className="print-time">{formatTimeOrNumber(match.scheduled_at)}</td>
                 <td className="print-team">{match.home_label || ''}</td>
                 {renderScoreCells(match)}
                 <td className="print-team">{match.away_label || ''}</td>
