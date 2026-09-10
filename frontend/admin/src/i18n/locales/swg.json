@@ -781,6 +781,7 @@
     "methodOverallStandings": "Gsamttabella",
     "methodParticipant": "Teilnehmer",
     "overallRecord": "Gsamtwertung",
-    "knockoutGame": "KO-Schbiil"
+    "knockoutGame": "KO-Schbiil",
+    "colScoreShort": ":"
   }
 }

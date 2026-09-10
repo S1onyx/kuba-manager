@@ -781,6 +781,7 @@
     "methodOverallStandings": "Gesamttabelle",
     "methodParticipant": "Teilnehmer",
     "overallRecord": "Gesamtwertung",
-    "knockoutGame": "KO-Spiel"
+    "knockoutGame": "KO-Spiel",
+    "colScoreShort": ":"
   }
 }

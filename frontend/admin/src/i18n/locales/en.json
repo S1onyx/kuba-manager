@@ -781,6 +781,7 @@
     "methodOverallStandings": "Overall Table",
     "methodParticipant": "Participant",
     "overallRecord": "Overall Record",
-    "knockoutGame": "Knockout Game"
+    "knockoutGame": "Knockout Game",
+    "colScoreShort": ":"
   }
 }

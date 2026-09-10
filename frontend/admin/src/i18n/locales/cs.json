@@ -799,6 +799,7 @@
     "methodOverallStandings": "Celková tabulka",
     "methodParticipant": "Účastník",
     "overallRecord": "Celkové hodnocení",
-    "knockoutGame": "Vyřazovací zápas"
+    "knockoutGame": "Vyřazovací zápas",
+    "colScoreShort": ":"
   }
 }

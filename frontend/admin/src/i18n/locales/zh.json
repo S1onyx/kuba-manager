@@ -772,6 +772,7 @@
     "methodOverallStandings": "总积分表",
     "methodParticipant": "参赛者",
     "overallRecord": "总成绩",
-    "knockoutGame": "淘汰赛"
+    "knockoutGame": "淘汰赛",
+    "colScoreShort": ":"
   }
 }

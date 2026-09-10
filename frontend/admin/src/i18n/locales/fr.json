@@ -781,6 +781,7 @@
     "methodOverallStandings": "Classement général",
     "methodParticipant": "Participant",
     "overallRecord": "Classement général",
-    "knockoutGame": "Match à élimination"
+    "knockoutGame": "Match à élimination",
+    "colScoreShort": ":"
   }
 }

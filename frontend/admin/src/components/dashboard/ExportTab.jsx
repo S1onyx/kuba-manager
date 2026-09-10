@@ -242,6 +242,47 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
     });
   };
 
+  const renderScoreCell = (match) => {
+    if (match.result?.hasResult) {
+      return (
+        <>
+          <td className="print-table__score print-table__score--filled">{match.result.scoreA ?? 0}</td>
+          <td className="print-table__score print-table__score--filled">{match.result.scoreB ?? 0}</td>
+        </>
+      );
+    }
+    return (
+      <>
+        <td className="print-table__score print-table__score--blank" />
+        <td className="print-table__score print-table__score--blank" />
+      </>
+    );
+  };
+
+  const renderScheduleTable = (matches, keyPrefix) => (
+    <table className="print-table print-table--schedule">
+      <thead>
+        <tr>
+          <th className="print-table__time">{t('export.colTime')}</th>
+          <th className="print-table__team">{t('export.colHome')}</th>
+          <th className="print-table__score">{t('export.colScoreShort')}</th>
+          <th className="print-table__score">{t('export.colScoreShort')}</th>
+          <th className="print-table__team">{t('export.colAway')}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {matches.map((match) => (
+          <tr key={match.id ?? `${keyPrefix}-${match.match_order}`}>
+            <td className="print-table__time">{formatMatchTime(match.scheduled_at) || ''}</td>
+            <td className="print-table__team">{match.home_label || ''}</td>
+            {renderScoreCell(match)}
+            <td className="print-table__team">{match.away_label || ''}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+
   return (
     <section className="print-section">
       <h2>{t('export.scheduleTitle')}</h2>
@@ -255,28 +296,7 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
               {(stage.rounds ?? []).map((round) => (
                 <div key={`${stage.stage_label}-${round.round}`} className="print-round">
                   <p className="print-round__label">{t('export.round', { round: round.round })}</p>
-                  <table className="print-table">
-                    <thead>
-                      <tr>
-                        <th>{t('export.colTime')}</th>
-                        <th className="print-table__team">{t('export.colHome')}</th>
-                        <th className="print-table__score">{t('export.colScore')}</th>
-                        <th className="print-table__team">{t('export.colAway')}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(round.matches ?? []).map((match) => (
-                        <tr key={match.id ?? `${stage.stage_label}-${round.round}-${match.match_order}`}>
-                          <td>{formatMatchTime(match.scheduled_at) || '—'}</td>
-                          <td className="print-table__team">{match.home_label || '—'}</td>
-                          <td className="print-table__score">
-                            {match.result?.hasResult ? `${match.result.scoreA ?? 0} : ${match.result.scoreB ?? 0}` : '—'}
-                          </td>
-                          <td className="print-table__team">{match.away_label || '—'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  {renderScheduleTable(round.matches ?? [], `${stage.stage_label}-${round.round}`)}
                 </div>
               ))}
             </div>
@@ -290,28 +310,7 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
           {schedule.knockout.map((stage) => (
             <div key={stage.stage_label} className="print-group">
               <h4>{stage.stage_label}</h4>
-              <table className="print-table">
-                <thead>
-                  <tr>
-                    <th>{t('export.colTime')}</th>
-                    <th className="print-table__team">{t('export.colHome')}</th>
-                    <th className="print-table__score">{t('export.colScore')}</th>
-                    <th className="print-table__team">{t('export.colAway')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(stage.matches ?? []).map((match) => (
-                    <tr key={match.id ?? `${stage.stage_label}-${match.match_order}`}>
-                      <td>{formatMatchTime(match.scheduled_at) || '—'}</td>
-                      <td className="print-table__team">{match.home_label || '—'}</td>
-                      <td className="print-table__score">
-                        {match.result?.hasResult ? `${match.result.scoreA ?? 0} : ${match.result.scoreB ?? 0}` : '—'}
-                      </td>
-                      <td className="print-table__team">{match.away_label || '—'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              {renderScheduleTable(stage.matches ?? [], stage.stage_label)}
             </div>
           ))}
         </div>
@@ -323,28 +322,7 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
           {schedule.placement.map((stage) => (
             <div key={stage.stage_label} className="print-group">
               <h4>{stage.stage_label}</h4>
-              <table className="print-table">
-                <thead>
-                  <tr>
-                    <th>{t('export.colTime')}</th>
-                    <th className="print-table__team">{t('export.colHome')}</th>
-                    <th className="print-table__score">{t('export.colScore')}</th>
-                    <th className="print-table__team">{t('export.colAway')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(stage.matches ?? []).map((match) => (
-                    <tr key={match.id ?? `${stage.stage_label}-${match.match_order}`}>
-                      <td>{formatMatchTime(match.scheduled_at) || '—'}</td>
-                      <td className="print-table__team">{match.home_label || '—'}</td>
-                      <td className="print-table__score">
-                        {match.result?.hasResult ? `${match.result.scoreA ?? 0} : ${match.result.scoreB ?? 0}` : '—'}
-                      </td>
-                      <td className="print-table__team">{match.away_label || '—'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              {renderScheduleTable(stage.matches ?? [], stage.stage_label)}
             </div>
           ))}
         </div>

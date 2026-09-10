@@ -781,6 +781,7 @@
     "methodOverallStandings": "Összesített táblázat",
     "methodParticipant": "Résztvevő",
     "overallRecord": "Összesített eredmény",
-    "knockoutGame": "Kieséses mérkőzés"
+    "knockoutGame": "Kieséses mérkőzés",
+    "colScoreShort": ":"
   }
 }
