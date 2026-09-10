@@ -53,7 +53,8 @@
     "history": "Előzmények",
     "players": "Játékosok",
     "teams": "Csapatok",
-    "tournaments": "Tornák"
+    "tournaments": "Tornák",
+    "export": "PDF-export / Nyomtatás"
   },
   "displayViews": {
     "scoreboard": "Élő állás",

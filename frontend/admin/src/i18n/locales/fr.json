@@ -53,7 +53,8 @@
     "history": "Historique",
     "players": "Joueurs",
     "teams": "Équipes",
-    "tournaments": "Tournois"
+    "tournaments": "Tournois",
+    "export": "Export PDF / Impression"
   },
   "displayViews": {
     "scoreboard": "Score en direct",

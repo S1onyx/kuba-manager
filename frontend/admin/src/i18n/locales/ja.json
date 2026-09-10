@@ -53,7 +53,8 @@
     "history": "履歴",
     "players": "選手",
     "teams": "チーム",
-    "tournaments": "大会"
+    "tournaments": "大会",
+    "export": "PDFエクスポート / 印刷"
   },
   "displayViews": {
     "scoreboard": "ライブスコア",

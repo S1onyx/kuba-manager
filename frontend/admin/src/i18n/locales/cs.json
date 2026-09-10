@@ -53,7 +53,8 @@
     "history": "Historie",
     "players": "Hráči",
     "teams": "Týmy",
-    "tournaments": "Turnaje"
+    "tournaments": "Turnaje",
+    "export": "Export PDF / Tisk"
   },
   "displayViews": {
     "scoreboard": "Živý stav",

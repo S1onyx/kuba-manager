@@ -53,7 +53,8 @@
     "history": "History",
     "players": "Players",
     "teams": "Teams",
-    "tournaments": "Tournaments"
+    "tournaments": "Tournaments",
+    "export": "PDF Export / Print"
   },
   "displayViews": {
     "scoreboard": "Live Score",

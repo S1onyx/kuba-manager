@@ -53,7 +53,8 @@
     "history": "Historie",
     "players": "Spieler",
     "teams": "Teams",
-    "tournaments": "Turniere"
+    "tournaments": "Turniere",
+    "export": "PDF-Export / Drucken"
   },
   "displayViews": {
     "scoreboard": "Live-Spielstand",
