@@ -8,6 +8,7 @@ import { formatApiError } from '../../utils/apiError.js';
 import { formatStageLabelI18n } from '../../utils/stageLabels.js';
 import { formatDateTime } from '../../utils/formatters.js';
 import { useDateLocale } from '../../i18n/index.js';
+import useMediaQuery from '../../hooks/useMediaQuery.js';
 
 const EXPORT_SECTIONS = [
   { id: 'schedule', labelKey: 'export.sectionSchedule', descKey: 'export.sectionScheduleDesc' },
@@ -85,6 +86,12 @@ export default function ExportTab() {
   const tournamentName = summary?.tournament?.name ?? '';
   const tournamentLocation = summary?.tournament?.location ?? '';
   const tournamentDate = summary?.tournament?.planned_at ?? '';
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  const [expandedSection, setExpandedSection] = useState(null);
+
+  const toggleSection = useCallback((id) => {
+    setExpandedSection((prev) => (prev === id ? null : id));
+  }, []);
 
   return (
     <div style={{ display: 'grid', gap: '1.75rem' }}>
@@ -93,9 +100,10 @@ export default function ExportTab() {
         description={t('export.description')}
       >
         <div style={{ display: 'grid', gap: '1rem' }}>
-          <label style={{ display: 'grid', gap: '0.3rem' }}>
+          <label className="export-select-label">
             {t('export.selectTournament')}
             <select
+              className="export-select"
               value={selectedTournamentId}
               onChange={(event) => setSelectedTournamentId(event.target.value)}
             >
@@ -109,43 +117,83 @@ export default function ExportTab() {
           </label>
 
           {summaryError ? (
-            <p style={{ margin: 0, color: 'var(--danger)' }}>{summaryError}</p>
+            <div className="export-error">{summaryError}</div>
           ) : null}
 
           {summaryLoading ? (
-            <p style={{ margin: 0, color: 'var(--text-muted)' }}>{t('export.loading')}</p>
+            <div className="export-loading">
+              <div className="export-spinner" />
+              <span>{t('export.loading')}</span>
+            </div>
+          ) : null}
+
+          {!summaryLoading && !summaryError && !activeTournamentId ? (
+            <div className="export-empty">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+              </svg>
+              <span>{t('export.emptyHint')}</span>
+            </div>
           ) : null}
         </div>
       </PanelCard>
 
       {!activeTournamentId || !summary ? null : (
         <div style={{ display: 'grid', gap: '1.25rem' }}>
-          {EXPORT_SECTIONS.map((section) => (
-            <PanelCard
-              key={section.id}
-              title={t(section.labelKey)}
-              description={t(section.descKey)}
-              action={
-                <button
-                  type="button"
-                  onClick={() => handlePrint(section.id)}
-                  disabled={summaryLoading}
-                >
-                  {t('export.printButton')}
-                </button>
-              }
-            >
-              <PrintPreview
-                mode={section.id}
-                summary={summary}
-                t={t}
-                dateLocale={dateLocale}
-                tournamentName={tournamentName}
-                tournamentLocation={tournamentLocation}
-                tournamentDate={tournamentDate}
-              />
-            </PanelCard>
-          ))}
+          {EXPORT_SECTIONS.map((section) => {
+            const isExpanded = !isMobile || expandedSection === section.id;
+            return (
+              <PanelCard
+                key={section.id}
+                title={t(section.labelKey)}
+                description={!isMobile ? t(section.descKey) : undefined}
+                action={
+                  <div className="export-actions">
+                    {isMobile ? (
+                      <button
+                        type="button"
+                        className="export-toggle-btn"
+                        onClick={() => toggleSection(section.id)}
+                        aria-expanded={isExpanded}
+                      >
+                        {isExpanded ? t('export.collapse') : t('export.expand')}
+                      </button>
+                    ) : null}
+                    <button
+                      type="button"
+                      className="export-print-btn"
+                      onClick={() => handlePrint(section.id)}
+                      disabled={summaryLoading}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <polyline points="6 9 6 2 18 2 18 9" />
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                        <rect x="6" y="14" width="12" height="8" />
+                      </svg>
+                      {t('export.printButton')}
+                    </button>
+                  </div>
+                }
+              >
+                {isExpanded ? (
+                  <div className="export-preview-scroll">
+                    <PrintPreview
+                      mode={section.id}
+                      summary={summary}
+                      t={t}
+                      dateLocale={dateLocale}
+                      tournamentName={tournamentName}
+                      tournamentLocation={tournamentLocation}
+                      tournamentDate={tournamentDate}
+                    />
+                  </div>
+                ) : null}
+              </PanelCard>
+            );
+          })}
         </div>
       )}
 

@@ -774,6 +774,9 @@
     "overallRecord": "総合成績",
     "knockoutGame": "決勝トーナメント戦",
     "colScoreShort": ":",
-    "groupLabel": "グループ{{group}}"
+    "groupLabel": "グループ{{group}}",
+    "emptyHint": "印刷テンプレートを表示するにはトーナメントを選択してください",
+    "collapse": "折りたたむ",
+    "expand": "展開"
   }
 }

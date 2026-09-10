@@ -783,6 +783,9 @@
     "overallRecord": "Gsamtwertung",
     "knockoutGame": "KO-Schbiil",
     "colScoreShort": ":",
-    "groupLabel": "Gruppa {{group}}"
+    "groupLabel": "Gruppa {{group}}",
+    "emptyHint": "Turnier auswaehla zum Druckvorlaga agucka",
+    "collapse": "Zuklappa",
+    "expand": "Ufklappa"
   }
 }

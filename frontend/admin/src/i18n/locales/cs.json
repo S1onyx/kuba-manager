@@ -801,6 +801,9 @@
     "overallRecord": "Celkové hodnocení",
     "knockoutGame": "Vyřazovací zápas",
     "colScoreShort": ":",
-    "groupLabel": "Skupina {{group}}"
+    "groupLabel": "Skupina {{group}}",
+    "emptyHint": "Vyberte turnaj pro zobrazeni tiskovych sablon",
+    "collapse": "Sbalit",
+    "expand": "Rozbalit"
   }
 }

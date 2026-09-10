@@ -783,6 +783,9 @@
     "overallRecord": "Összesített eredmény",
     "knockoutGame": "Kieséses mérkőzés",
     "colScoreShort": ":",
-    "groupLabel": "{{group}} csoport"
+    "groupLabel": "{{group}} csoport",
+    "emptyHint": "Valasszon tornait a nyomtatasi sablonok megtekintesehez",
+    "collapse": "Osszecsukas",
+    "expand": "Kibontas"
   }
 }

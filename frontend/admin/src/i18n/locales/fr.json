@@ -783,6 +783,9 @@
     "overallRecord": "Classement général",
     "knockoutGame": "Match à élimination",
     "colScoreShort": ":",
-    "groupLabel": "Groupe {{group}}"
+    "groupLabel": "Groupe {{group}}",
+    "emptyHint": "Selectionnez un tournoi pour voir les modeles",
+    "collapse": "Reduire",
+    "expand": "Developper"
   }
 }

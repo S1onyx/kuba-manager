@@ -504,13 +504,127 @@ a {
   }
 }
 
-/* ── Export-Tab Vorschau (Bildschirm) ── */
+/* ── Export-Tab UI ── */
+
+.export-select-label {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.export-select {
+  width: 100%;
+}
+
+.export-error {
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 95, 95, 0.12);
+  border: 1px solid rgba(255, 95, 95, 0.35);
+  color: #fecdd3;
+  font-size: 0.9rem;
+}
+
+.export-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+}
+
+.export-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(76, 201, 255, 0.2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: export-spin 0.7s linear infinite;
+}
+
+@keyframes export-spin {
+  to { transform: rotate(360deg); }
+}
+
+.export-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem 1rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+  opacity: 0.7;
+}
+
+.export-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.export-print-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.15rem !important;
+  background: rgba(76, 201, 255, 0.18) !important;
+  border-color: rgba(76, 201, 255, 0.35) !important;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.export-print-btn:hover:not(:disabled) {
+  background: rgba(76, 201, 255, 0.28) !important;
+  border-color: rgba(76, 201, 255, 0.55) !important;
+}
+
+.export-toggle-btn {
+  padding: 0.4rem 0.85rem !important;
+  font-size: 0.82rem;
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.export-preview-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 
 .export-preview {
   font-size: 0.85rem;
   opacity: 0.85;
   border-left: 2px solid var(--border-color);
   padding-left: 1rem;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .export-preview {
+    font-size: 0.78rem;
+    border-left: none;
+    padding-left: 0;
+  }
+
+  .export-print-btn {
+    min-height: 48px;
+    width: 100%;
+    justify-content: center;
+    font-size: 1rem;
+  }
+
+  .export-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .export-toggle-btn {
+    width: 100%;
+    min-height: 44px;
+  }
 }
 
 /* ── Print-Overlay (nur beim Drucken sichtbar) ── */

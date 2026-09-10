@@ -774,6 +774,9 @@
     "overallRecord": "总成绩",
     "knockoutGame": "淘汰赛",
     "colScoreShort": ":",
-    "groupLabel": "{{group}}组"
+    "groupLabel": "{{group}}组",
+    "emptyHint": "选择比赛以查看打印模板",
+    "collapse": "收起",
+    "expand": "展开"
   }
 }

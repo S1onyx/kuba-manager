@@ -783,6 +783,9 @@
     "overallRecord": "Gsamtwertig",
     "knockoutGame": "KO-Schbiil",
     "colScoreShort": ":",
-    "groupLabel": "Gruppe {{group}}"
+    "groupLabel": "Gruppe {{group}}",
+    "emptyHint": "Turnier uswaehle zum Druckvorlaage aazluege",
+    "collapse": "Iiklappe",
+    "expand": "Ufklappe"
   }
 }

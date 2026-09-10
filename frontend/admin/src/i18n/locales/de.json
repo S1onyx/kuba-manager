@@ -783,6 +783,9 @@
     "overallRecord": "Gesamtwertung",
     "knockoutGame": "KO-Spiel",
     "colScoreShort": ":",
-    "groupLabel": "Gruppe {{group}}"
+    "groupLabel": "Gruppe {{group}}",
+    "emptyHint": "Turnier auswaehlen um Druckvorlagen zu sehen",
+    "collapse": "Einklappen",
+    "expand": "Aufklappen"
   }
 }

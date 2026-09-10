@@ -783,6 +783,9 @@
     "overallRecord": "Overall Record",
     "knockoutGame": "Knockout Game",
     "colScoreShort": ":",
-    "groupLabel": "Group {{group}}"
+    "groupLabel": "Group {{group}}",
+    "emptyHint": "Select a tournament to see print templates",
+    "collapse": "Collapse",
+    "expand": "Expand"
   }
 }
