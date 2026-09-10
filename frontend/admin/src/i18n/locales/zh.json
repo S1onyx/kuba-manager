@@ -773,6 +773,7 @@
     "methodParticipant": "参赛者",
     "overallRecord": "总成绩",
     "knockoutGame": "淘汰赛",
-    "colScoreShort": ":"
+    "colScoreShort": ":",
+    "groupLabel": "{{group}}组"
   }
 }

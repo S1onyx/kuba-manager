@@ -782,6 +782,7 @@
     "methodParticipant": "Résztvevő",
     "overallRecord": "Összesített eredmény",
     "knockoutGame": "Kieséses mérkőzés",
-    "colScoreShort": ":"
+    "colScoreShort": ":",
+    "groupLabel": "{{group}} csoport"
   }
 }

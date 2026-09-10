@@ -782,6 +782,7 @@
     "methodParticipant": "Teilnehmer",
     "overallRecord": "Gesamtwertung",
     "knockoutGame": "KO-Spiel",
-    "colScoreShort": ":"
+    "colScoreShort": ":",
+    "groupLabel": "Gruppe {{group}}"
   }
 }

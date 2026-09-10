@@ -782,6 +782,7 @@
     "methodParticipant": "Teilnehmer",
     "overallRecord": "Gsamtwertung",
     "knockoutGame": "KO-Schbiil",
-    "colScoreShort": ":"
+    "colScoreShort": ":",
+    "groupLabel": "Gruppa {{group}}"
   }
 }

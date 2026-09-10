@@ -800,6 +800,7 @@
     "methodParticipant": "Účastník",
     "overallRecord": "Celkové hodnocení",
     "knockoutGame": "Vyřazovací zápas",
-    "colScoreShort": ":"
+    "colScoreShort": ":",
+    "groupLabel": "Skupina {{group}}"
   }
 }

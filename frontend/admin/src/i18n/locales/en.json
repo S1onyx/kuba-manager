@@ -782,6 +782,7 @@
     "methodParticipant": "Participant",
     "overallRecord": "Overall Record",
     "knockoutGame": "Knockout Game",
-    "colScoreShort": ":"
+    "colScoreShort": ":",
+    "groupLabel": "Group {{group}}"
   }
 }

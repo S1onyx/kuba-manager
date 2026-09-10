@@ -773,6 +773,7 @@
     "methodParticipant": "参加者",
     "overallRecord": "総合成績",
     "knockoutGame": "決勝トーナメント戦",
-    "colScoreShort": ":"
+    "colScoreShort": ":",
+    "groupLabel": "グループ{{group}}"
   }
 }

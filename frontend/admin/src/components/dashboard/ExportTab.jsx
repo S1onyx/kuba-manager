@@ -231,6 +231,32 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
     return <p>{t('export.noData')}</p>;
   }
 
+  const groupStandings = summary?.groupStandings ?? [];
+  const completedGroups = new Set();
+  groupStandings.forEach((g) => {
+    if (g.recordedGamesCount >= g.totalMatches && g.totalMatches > 0) {
+      completedGroups.add(g.label);
+    }
+  });
+
+  const resolveLabel = (match, side) => {
+    const source = side === 'home' ? match.home_source : match.away_source;
+    const label = side === 'home' ? match.home_label : match.away_label;
+
+    if (source?.type === 'groupPosition' && !completedGroups.has(source.group)) {
+      return `${source.position}. ${t('export.groupLabel', { group: source.group })}`;
+    }
+
+    if (source?.type === 'previousMatch') {
+      const detail = match[side];
+      if (!detail?.teamId) {
+        return detail?.placeholder || label || '';
+      }
+    }
+
+    return label || '';
+  };
+
   const formatMatchTime = (value) => {
     if (!value) return '';
     const date = new Date(value);
@@ -296,9 +322,9 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
         rows.push(
           <tr key={match.id ?? `${keyPrefix}-${round.round}-${match.match_order}`}>
             <td className="print-time">{formatTimeOrNumber(match.scheduled_at)}</td>
-            <td className="print-team">{match.home_label || ''}</td>
+            <td className="print-team">{resolveLabel(match, 'home')}</td>
             {renderScoreCells(match)}
-            <td className="print-team">{match.away_label || ''}</td>
+            <td className="print-team">{resolveLabel(match, 'away')}</td>
           </tr>
         );
       });
@@ -325,9 +351,9 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
             : sortedMatches.map((match) => (
                 <tr key={match.id ?? `${keyPrefix}-${match.match_order}`}>
                   <td className="print-time">{formatTimeOrNumber(match.scheduled_at)}</td>
-                  <td className="print-team">{match.home_label || ''}</td>
+                  <td className="print-team">{resolveLabel(match, 'home')}</td>
                   {renderScoreCells(match)}
-                  <td className="print-team">{match.away_label || ''}</td>
+                  <td className="print-team">{resolveLabel(match, 'away')}</td>
                 </tr>
               ))}
         </tbody>
