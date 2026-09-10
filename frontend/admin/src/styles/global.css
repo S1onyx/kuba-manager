@@ -520,21 +520,12 @@ a {
 }
 
 @media print {
-  body * {
-    visibility: hidden;
-  }
-
-  .print-overlay,
-  .print-overlay * {
-    visibility: visible;
+  #root {
+    display: none !important;
   }
 
   .print-overlay {
     display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
     background: #fff;
     color: #000;
     font-family: 'Inter', -apple-system, sans-serif;
@@ -544,7 +535,7 @@ a {
 
   @page {
     size: A4;
-    margin: 18mm 16mm;
+    margin: 15mm 14mm;
   }
 
   .print-header {

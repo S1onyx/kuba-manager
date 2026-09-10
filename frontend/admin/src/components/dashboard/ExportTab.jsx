@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import PanelCard from '../common/PanelCard.jsx';
 import { useDashboard } from '../../context/DashboardContext.jsx';
@@ -184,7 +185,7 @@ function PrintOverlay({ mode, summary, t, dateLocale, tournamentName, tournament
   if (!mode || !summary) {
     return null;
   }
-  return (
+  return createPortal(
     <div className="print-overlay">
       <PrintHeader tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} t={t} />
       {mode === 'schedule' ? (
@@ -199,7 +200,8 @@ function PrintOverlay({ mode, summary, t, dateLocale, tournamentName, tournament
       {mode === 'final' ? (
         <PrintFinal summary={summary} t={t} tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} />
       ) : null}
-    </div>
+    </div>,
+    document.body
   );
 }
 
