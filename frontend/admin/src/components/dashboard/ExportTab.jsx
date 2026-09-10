@@ -242,43 +242,68 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
     });
   };
 
-  const renderScoreCell = (match) => {
+  const renderScoreCells = (match) => {
     if (match.result?.hasResult) {
       return (
         <>
-          <td className="print-table__score print-table__score--filled">{match.result.scoreA ?? 0}</td>
-          <td className="print-table__score print-table__score--filled">{match.result.scoreB ?? 0}</td>
+          <td className="print-score print-score--filled">{match.result.scoreA ?? 0}</td>
+          <td className="print-score print-score--filled">{match.result.scoreB ?? 0}</td>
         </>
       );
     }
     return (
       <>
-        <td className="print-table__score print-table__score--blank" />
-        <td className="print-table__score print-table__score--blank" />
+        <td className="print-score print-score--blank" />
+        <td className="print-score print-score--blank" />
       </>
     );
   };
 
-  const renderScheduleTable = (matches, keyPrefix) => (
-    <table className="print-table print-table--schedule">
+  const renderScheduleRows = (rounds, keyPrefix) => {
+    const rows = [];
+    rounds.forEach((round) => {
+      const matches = round.matches ?? [];
+      rows.push(
+        <tr key={`${keyPrefix}-round-${round.round}`} className="print-round-row">
+          <td colSpan={5} className="print-round-cell">{t('export.round', { round: round.round })}</td>
+        </tr>
+      );
+      matches.forEach((match) => {
+        rows.push(
+          <tr key={match.id ?? `${keyPrefix}-${round.round}-${match.match_order}`}>
+            <td className="print-time">{formatMatchTime(match.scheduled_at)}</td>
+            <td className="print-team">{match.home_label || ''}</td>
+            {renderScoreCells(match)}
+            <td className="print-team">{match.away_label || ''}</td>
+          </tr>
+        );
+      });
+    });
+    return rows;
+  };
+
+  const renderStageTable = (stage, keyPrefix) => (
+    <table className="print-schedule">
       <thead>
         <tr>
-          <th className="print-table__time">{t('export.colTime')}</th>
-          <th className="print-table__team">{t('export.colHome')}</th>
-          <th className="print-table__score">{t('export.colScoreShort')}</th>
-          <th className="print-table__score">{t('export.colScoreShort')}</th>
-          <th className="print-table__team">{t('export.colAway')}</th>
+          <th className="print-schedule__time">{t('export.colTime')}</th>
+          <th className="print-schedule__team">{t('export.colHome')}</th>
+          <th className="print-schedule__score" />
+          <th className="print-schedule__score" />
+          <th className="print-schedule__team">{t('export.colAway')}</th>
         </tr>
       </thead>
       <tbody>
-        {matches.map((match) => (
-          <tr key={match.id ?? `${keyPrefix}-${match.match_order}`}>
-            <td className="print-table__time">{formatMatchTime(match.scheduled_at) || ''}</td>
-            <td className="print-table__team">{match.home_label || ''}</td>
-            {renderScoreCell(match)}
-            <td className="print-table__team">{match.away_label || ''}</td>
-          </tr>
-        ))}
+        {stage.rounds
+          ? renderScheduleRows(stage.rounds, keyPrefix)
+          : (stage.matches ?? []).map((match) => (
+              <tr key={match.id ?? `${keyPrefix}-${match.match_order}`}>
+                <td className="print-time">{formatMatchTime(match.scheduled_at)}</td>
+                <td className="print-team">{match.home_label || ''}</td>
+                {renderScoreCells(match)}
+                <td className="print-team">{match.away_label || ''}</td>
+              </tr>
+            ))}
       </tbody>
     </table>
   );
@@ -292,13 +317,8 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
           <h3>{t('export.phaseGroup')}</h3>
           {schedule.group.map((stage) => (
             <div key={stage.stage_label} className="print-group">
-              <h4>{stage.stage_label}</h4>
-              {(stage.rounds ?? []).map((round) => (
-                <div key={`${stage.stage_label}-${round.round}`} className="print-round">
-                  <p className="print-round__label">{t('export.round', { round: round.round })}</p>
-                  {renderScheduleTable(round.matches ?? [], `${stage.stage_label}-${round.round}`)}
-                </div>
-              ))}
+              <h4 className="print-group-title">{stage.stage_label}</h4>
+              {renderStageTable(stage, stage.stage_label)}
             </div>
           ))}
         </div>
@@ -309,8 +329,8 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
           <h3>{t('export.phaseKnockout')}</h3>
           {schedule.knockout.map((stage) => (
             <div key={stage.stage_label} className="print-group">
-              <h4>{stage.stage_label}</h4>
-              {renderScheduleTable(stage.matches ?? [], stage.stage_label)}
+              <h4 className="print-group-title">{stage.stage_label}</h4>
+              {renderStageTable(stage, stage.stage_label)}
             </div>
           ))}
         </div>
@@ -321,8 +341,8 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
           <h3>{t('export.phasePlacement')}</h3>
           {schedule.placement.map((stage) => (
             <div key={stage.stage_label} className="print-group">
-              <h4>{stage.stage_label}</h4>
-              {renderScheduleTable(stage.matches ?? [], stage.stage_label)}
+              <h4 className="print-group-title">{stage.stage_label}</h4>
+              {renderStageTable(stage, stage.stage_label)}
             </div>
           ))}
         </div>
