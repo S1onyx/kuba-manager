@@ -22,7 +22,7 @@ export default function TeamsTab() {
   } = useDashboard();
 
   return (
-    <div style={{ display: 'grid', gap: '1.75rem' }}>
+    <div className="tab-container">
       <PanelCard
         title={t('teams.organizeTitle')}
         description={t('teams.organizeDescription')}
@@ -57,20 +57,7 @@ export default function TeamsTab() {
               const edit = teamEdits[team.id];
               const isEditing = Boolean(edit);
               return (
-                <article
-                  key={team.id}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    gap: '0.75rem',
-                    padding: '0.85rem 1rem',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    background: 'rgba(8,20,35,0.5)'
-                  }}
-                >
+                <article key={team.id} className="card-item--flat">
                   {isEditing ? (
                     <input
                       value={edit.name}
@@ -97,8 +84,8 @@ export default function TeamsTab() {
                         </button>
                         <button
                           type="button"
+                          className="btn-danger"
                           onClick={() => handleTeamDelete(team.id)}
-                          style={{ background: 'rgba(211,47,47,0.85)', color: '#fff' }}
                         >
                           {t('common.delete')}
                         </button>

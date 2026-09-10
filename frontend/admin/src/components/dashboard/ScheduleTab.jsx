@@ -4,7 +4,7 @@ import SchedulePlannerCard from './control/SchedulePlannerCard.jsx';
 
 export default function ScheduleTab() {
   return (
-    <div style={{ display: 'grid', gap: '1.75rem' }}>
+    <div className="tab-container">
       <MatchContextCard />
       <ScheduleBulkActionsCard />
       <SchedulePlannerCard />

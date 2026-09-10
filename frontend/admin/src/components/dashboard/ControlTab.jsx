@@ -8,7 +8,7 @@ import PenaltyManagerCard from './control/PenaltyManagerCard.jsx';
 
 export default function ControlTab() {
   return (
-    <div style={{ display: 'grid', gap: '1.75rem' }}>
+    <div className="tab-container">
       <DisplaySettingsCard />
       <MatchContextCard />
       <ScheduleIntegrationCard />

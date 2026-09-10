@@ -212,7 +212,7 @@ export default function TimerControlCard() {
             onClick={() =>
               handleFinishGame()
             }
-            style={{ background: 'rgba(211,47,47,0.85)', color: '#fff' }}
+            className="btn-danger"
           >
             {t('control.timer.finishGame')}
           </button>

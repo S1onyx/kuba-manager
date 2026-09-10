@@ -54,17 +54,7 @@ export default function HistoryTab() {
               : '';
 
             return (
-              <article
-                key={game.id}
-                style={{
-                  borderRadius: 'var(--radius-md)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  background: 'rgba(8, 20, 35, 0.55)',
-                  padding: '1.1rem 1.25rem',
-                  display: 'grid',
-                  gap: '0.9rem'
-                }}
-              >
+              <article key={game.id} className="card-item">
                 <header
                   style={{
                     display: 'flex',
@@ -83,16 +73,16 @@ export default function HistoryTab() {
                     onSubmit={handleHistoryEditSubmit}
                     style={{ display: 'grid', gap: '0.75rem', background: 'rgba(0,0,0,0.2)', padding: '0.75rem', borderRadius: 'var(--radius-sm)' }}
                   >
-                    <div style={{ display: 'grid', gap: '0.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
-                      <label style={{ display: 'grid', gap: '0.3rem' }}>
+                    <div className="form-grid">
+                      <label className="form-field">
                         {t('common.teamA')}
                         <input value={editForm.team_a} onChange={(event) => handleHistoryEditChange('team_a', event.target.value)} />
                       </label>
-                      <label style={{ display: 'grid', gap: '0.3rem' }}>
+                      <label className="form-field">
                         {t('common.teamB')}
                         <input value={editForm.team_b} onChange={(event) => handleHistoryEditChange('team_b', event.target.value)} />
                       </label>
-                      <label style={{ display: 'grid', gap: '0.3rem' }}>
+                      <label className="form-field">
                         {t('history.scoreA')}
                         <input
                           type="number"
@@ -101,7 +91,7 @@ export default function HistoryTab() {
                           onChange={(event) => handleHistoryEditChange('score_a', event.target.value)}
                         />
                       </label>
-                      <label style={{ display: 'grid', gap: '0.3rem' }}>
+                      <label className="form-field">
                         {t('history.scoreB')}
                         <input
                           type="number"
@@ -112,8 +102,8 @@ export default function HistoryTab() {
                       </label>
                     </div>
 
-                    <div style={{ display: 'grid', gap: '0.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
-                      <label style={{ display: 'grid', gap: '0.3rem' }}>
+                    <div className="form-grid">
+                      <label className="form-field">
                         {t('history.extraPlanned')}
                         <input
                           value={editForm.extra_seconds}
@@ -121,7 +111,7 @@ export default function HistoryTab() {
                           placeholder={t('history.mmssPlaceholder')}
                         />
                       </label>
-                      <label style={{ display: 'grid', gap: '0.3rem' }}>
+                      <label className="form-field">
                         {t('history.extraElapsed')}
                         <input
                           value={editForm.extra_elapsed_seconds}
@@ -129,7 +119,7 @@ export default function HistoryTab() {
                           placeholder={t('history.mmssPlaceholder')}
                         />
                       </label>
-                      <label style={{ display: 'grid', gap: '0.3rem' }}>
+                      <label className="form-field">
                         {t('history.penaltiesA')}
                         <input
                           type="number"
@@ -138,7 +128,7 @@ export default function HistoryTab() {
                           onChange={(event) => handleHistoryEditChange('penalty_count_a', event.target.value)}
                         />
                       </label>
-                      <label style={{ display: 'grid', gap: '0.3rem' }}>
+                      <label className="form-field">
                         {t('history.penaltiesB')}
                         <input
                           type="number"
@@ -149,7 +139,7 @@ export default function HistoryTab() {
                       </label>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '0.75rem' }}>
+                    <div className="btn-row">
                       <button type="submit">{t('common.save')}</button>
                       <button type="button" onClick={cancelHistoryEdit}>
                         {t('common.cancel')}
@@ -189,8 +179,8 @@ export default function HistoryTab() {
                       </button>
                       <button
                         type="button"
+                        className="btn-danger"
                         onClick={() => handleHistoryDelete(game.id)}
-                        style={{ background: 'rgba(211,47,47,0.85)', color: '#fff' }}
                       >
                         {t('common.delete')}
                       </button>

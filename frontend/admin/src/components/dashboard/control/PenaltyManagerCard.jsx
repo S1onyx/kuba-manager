@@ -136,8 +136,8 @@ export default function PenaltyManagerCard() {
                       </div>
                       <button
                         type="button"
+                        className="btn-danger"
                         onClick={() => handlePenaltyRemove(penalty.id)}
-                        style={{ background: 'rgba(211,47,47,0.85)', color: '#fff' }}
                       >
                         {t('control.penalties.remove')}
                       </button>

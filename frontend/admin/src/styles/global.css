@@ -422,6 +422,73 @@ a {
   }
 }
 
+/* ── Wiederverwendbare Utility-Klassen ── */
+
+.tab-container {
+  display: grid;
+  gap: 1.75rem;
+}
+
+.btn-danger {
+  background: rgba(211, 47, 47, 0.85);
+  color: #fff;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: rgba(211, 47, 47, 1);
+}
+
+.card-item {
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(8, 20, 35, 0.55);
+  padding: 1.1rem 1.25rem;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.card-item--flat {
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(8, 20, 35, 0.5);
+  padding: 0.85rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.form-grid {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.form-field {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.btn-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.status-text {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.status-text--error {
+  color: var(--warning);
+}
+
+.status-text--muted {
+  color: var(--text-muted);
+}
+
 /* Responsive Hilfsklassen für Inline-Style-Layouts */
 
 .admin-link-row {

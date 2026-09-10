@@ -24,14 +24,14 @@ export default function PlayersTab() {
   } = useDashboard();
 
   return (
-    <div style={{ display: 'grid', gap: '1.75rem' }}>
+    <div className="tab-container">
       <PanelCard
         title={t('players.createTitle')}
         description={t('players.createDescription')}
       >
         <form onSubmit={handlePlayerCreateSubmit} style={{ display: 'grid', gap: '1rem' }}>
-          <div style={{ display: 'grid', gap: '0.85rem', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
-            <label style={{ display: 'grid', gap: '0.3rem' }}>
+          <div className="form-grid">
+            <label className="form-field">
               {t('players.team')}
               <select
                 value={playerCreate.teamId}
@@ -46,7 +46,7 @@ export default function PlayersTab() {
                 ))}
               </select>
             </label>
-            <label style={{ display: 'grid', gap: '0.3rem' }}>
+            <label className="form-field">
               {t('players.playerName')}
               <input
                 value={playerCreate.name}
@@ -55,7 +55,7 @@ export default function PlayersTab() {
                 required
               />
             </label>
-            <label style={{ display: 'grid', gap: '0.3rem' }}>
+            <label className="form-field">
               {t('players.jerseyNumber')}
               <input
                 value={playerCreate.jerseyNumber}
@@ -63,7 +63,7 @@ export default function PlayersTab() {
                 placeholder={t('players.jerseyPlaceholder')}
               />
             </label>
-            <label style={{ display: 'grid', gap: '0.3rem' }}>
+            <label className="form-field">
               {t('players.positionOptional')}
               <input
                 value={playerCreate.position}
@@ -83,31 +83,21 @@ export default function PlayersTab() {
         description={t('players.listDescription')}
       >
         {playersLoading ? (
-          <p style={{ margin: 0 }}>{t('players.loading')}</p>
+          <p className="status-text">{t('players.loading')}</p>
         ) : playersError ? (
-          <p style={{ margin: 0, color: 'var(--warning)' }}>{playersError}</p>
+          <p className="status-text status-text--error">{playersError}</p>
         ) : (
           <div style={{ display: 'grid', gap: '1.2rem' }}>
             {teams.map((team) => {
               const teamPlayers = playersByTeam.get(String(team.id)) ?? [];
               return (
-                <article
-                  key={team.id}
-                  style={{
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    background: 'rgba(8,20,35,0.55)',
-                    padding: '1rem 1.2rem',
-                    display: 'grid',
-                    gap: '0.75rem'
-                  }}
-                >
+                <article key={team.id} className="card-item">
                   <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <strong>{team.name}</strong>
                     <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>{t('players.count', { count: teamPlayers.length })}</span>
                   </header>
                   {teamPlayers.length === 0 ? (
-                    <p style={{ margin: 0, color: 'var(--text-muted)' }}>{t('players.empty')}</p>
+                    <p className="status-text status-text--muted">{t('players.empty')}</p>
                   ) : (
                     <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '0.75rem' }}>
                       {teamPlayers.map((player) => {
@@ -131,7 +121,7 @@ export default function PlayersTab() {
                                 }}
                                 style={{ display: 'grid', gap: '0.6rem' }}
                               >
-                                <div style={{ display: 'grid', gap: '0.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
+                                <div className="form-grid">
                                   <input
                                     value={edit.name}
                                     onChange={(event) => handlePlayerEditChange(player.id, 'name', event.target.value)}
@@ -160,7 +150,7 @@ export default function PlayersTab() {
                                     ))}
                                   </select>
                                 </div>
-                                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                <div className="btn-row">
                                   <button type="submit">{t('common.save')}</button>
                                   <button type="button" onClick={() => cancelPlayerEdit(player.id)}>
                                     {t('common.cancel')}
@@ -178,14 +168,14 @@ export default function PlayersTab() {
                                     <span style={{ fontSize: '0.8rem', opacity: 0.75 }}>{player.position}</span>
                                   ) : null}
                                 </div>
-                                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                <div className="btn-row">
                                   <button type="button" onClick={() => startPlayerEdit(player)}>
                                     {t('common.edit')}
                                   </button>
                                   <button
                                     type="button"
+                                    className="btn-danger"
                                     onClick={() => handlePlayerDelete(player.id)}
-                                    style={{ background: 'rgba(211,47,47,0.85)', color: '#fff' }}
                                   >
                                     {t('common.delete')}
                                   </button>

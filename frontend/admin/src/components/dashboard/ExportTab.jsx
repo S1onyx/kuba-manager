@@ -6,9 +6,30 @@ import { useDashboard } from '../../context/DashboardContext.jsx';
 import { fetchTournamentSummary } from '../../utils/api.js';
 import { formatApiError } from '../../utils/apiError.js';
 import { formatStageLabelI18n } from '../../utils/stageLabels.js';
-import { formatDateTime } from '../../utils/formatters.js';
+import { formatDateTime, formatMatchTime, formatShortDateTime } from '../../utils/formatters.js';
 import { useDateLocale } from '../../i18n/index.js';
 import useMediaQuery from '../../hooks/useMediaQuery.js';
+
+function sortMatchesByTime(a, b) {
+  const ta = a.scheduled_at ? new Date(a.scheduled_at).getTime() : Infinity;
+  const tb = b.scheduled_at ? new Date(b.scheduled_at).getTime() : Infinity;
+  if (ta !== tb) return ta - tb;
+  return (a.match_order ?? 0) - (b.match_order ?? 0);
+}
+
+function getEarliestTime(stage) {
+  const matches = stage.rounds
+    ? stage.rounds.flatMap((r) => r.matches ?? [])
+    : (stage.matches ?? []);
+  return matches.reduce((min, m) => {
+    const t = m.scheduled_at ? new Date(m.scheduled_at).getTime() : Infinity;
+    return t < min ? t : min;
+  }, Infinity);
+}
+
+function sortStagesByTime(stages) {
+  return [...stages].sort((a, b) => getEarliestTime(a) - getEarliestTime(b));
+}
 
 const EXPORT_SECTIONS = [
   { id: 'schedule', labelKey: 'export.sectionSchedule', descKey: 'export.sectionScheduleDesc' },
@@ -94,7 +115,7 @@ export default function ExportTab() {
   }, []);
 
   return (
-    <div style={{ display: 'grid', gap: '1.75rem' }}>
+    <div className="tab-container">
       <PanelCard
         title={t('export.title')}
         description={t('export.description')}
@@ -185,9 +206,6 @@ export default function ExportTab() {
                       summary={summary}
                       t={t}
                       dateLocale={dateLocale}
-                      tournamentName={tournamentName}
-                      tournamentLocation={tournamentLocation}
-                      tournamentDate={tournamentDate}
                     />
                   </div>
                 ) : null}
@@ -210,21 +228,23 @@ export default function ExportTab() {
   );
 }
 
-function PrintPreview({ mode, summary, t, dateLocale, tournamentName, tournamentLocation, tournamentDate }) {
+const PRINT_COMPONENTS = {
+  schedule: PrintSchedule,
+  standings: PrintStandings,
+  results: PrintResults,
+  final: PrintFinal
+};
+
+function PrintContent({ mode, summary, t, dateLocale }) {
+  const Component = PRINT_COMPONENTS[mode];
+  if (!Component) return null;
+  return <Component summary={summary} t={t} dateLocale={dateLocale} />;
+}
+
+function PrintPreview({ mode, summary, t, dateLocale }) {
   return (
     <div className="export-preview">
-      {mode === 'schedule' ? (
-        <PrintSchedule summary={summary} t={t} dateLocale={dateLocale} tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} />
-      ) : null}
-      {mode === 'standings' ? (
-        <PrintStandings summary={summary} t={t} tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} />
-      ) : null}
-      {mode === 'results' ? (
-        <PrintResults summary={summary} t={t} dateLocale={dateLocale} tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} />
-      ) : null}
-      {mode === 'final' ? (
-        <PrintFinal summary={summary} t={t} tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} />
-      ) : null}
+      <PrintContent mode={mode} summary={summary} t={t} dateLocale={dateLocale} />
     </div>
   );
 }
@@ -236,18 +256,7 @@ function PrintOverlay({ mode, summary, t, dateLocale, tournamentName, tournament
   return createPortal(
     <div className="print-overlay">
       <PrintHeader tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} t={t} />
-      {mode === 'schedule' ? (
-        <PrintSchedule summary={summary} t={t} dateLocale={dateLocale} tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} />
-      ) : null}
-      {mode === 'standings' ? (
-        <PrintStandings summary={summary} t={t} tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} />
-      ) : null}
-      {mode === 'results' ? (
-        <PrintResults summary={summary} t={t} dateLocale={dateLocale} tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} />
-      ) : null}
-      {mode === 'final' ? (
-        <PrintFinal summary={summary} t={t} tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} />
-      ) : null}
+      <PrintContent mode={mode} summary={summary} t={t} dateLocale={dateLocale} />
     </div>,
     document.body
   );
@@ -265,7 +274,7 @@ function PrintHeader({ tournamentName, tournamentLocation, tournamentDate, t }) 
   );
 }
 
-function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocation, tournamentDate }) {
+function PrintSchedule({ summary, t, dateLocale }) {
   const schedule = summary?.schedule;
   if (!schedule) {
     return <p>{t('export.noData')}</p>;
@@ -305,19 +314,6 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
     return label || '';
   };
 
-  const formatMatchTime = (value) => {
-    if (!value) return '';
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return '';
-    return date.toLocaleString(dateLocale, {
-      weekday: 'short',
-      day: '2-digit',
-      month: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
   const renderScoreCells = (match) => {
     if (match.result?.hasResult) {
       return (
@@ -337,15 +333,8 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
 
   let gameCounter = 0;
 
-  const sortByTime = (a, b) => {
-    const ta = a.scheduled_at ? new Date(a.scheduled_at).getTime() : Infinity;
-    const tb = b.scheduled_at ? new Date(b.scheduled_at).getTime() : Infinity;
-    if (ta !== tb) return ta - tb;
-    return (a.match_order ?? 0) - (b.match_order ?? 0);
-  };
-
   const formatTimeOrNumber = (scheduledAt) => {
-    const timeStr = formatMatchTime(scheduledAt);
+    const timeStr = formatMatchTime(scheduledAt, dateLocale);
     if (timeStr) return timeStr;
     gameCounter += 1;
     return `#${gameCounter}`;
@@ -360,7 +349,7 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
       return (a.round ?? 0) - (b.round ?? 0);
     });
     sortedRounds.forEach((round) => {
-      const matches = [...(round.matches ?? [])].sort(sortByTime);
+      const matches = [...(round.matches ?? [])].sort(sortMatchesByTime);
       rows.push(
         <tr key={`${keyPrefix}-round-${round.round}`} className="print-round-row">
           <td colSpan={5} className="print-round-cell">{t('export.round', { round: round.round })}</td>
@@ -381,7 +370,7 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
   };
 
   const renderStageTable = (stage, keyPrefix) => {
-    const sortedMatches = [...(stage.matches ?? [])].sort(sortByTime);
+    const sortedMatches = [...(stage.matches ?? [])].sort(sortMatchesByTime);
     return (
       <table className="print-schedule">
         <thead>
@@ -407,22 +396,6 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
         </tbody>
       </table>
     );
-  };
-
-  const sortStagesByTime = (stages) => {
-    return [...stages].sort((a, b) => {
-      const allA = a.rounds ? a.rounds.flatMap((r) => r.matches ?? []) : (a.matches ?? []);
-      const allB = b.rounds ? b.rounds.flatMap((r) => r.matches ?? []) : (b.matches ?? []);
-      const minA = allA.reduce((min, m) => {
-        const t2 = m.scheduled_at ? new Date(m.scheduled_at).getTime() : Infinity;
-        return t2 < min ? t2 : min;
-      }, Infinity);
-      const minB = allB.reduce((min, m) => {
-        const t2 = m.scheduled_at ? new Date(m.scheduled_at).getTime() : Infinity;
-        return t2 < min ? t2 : min;
-      }, Infinity);
-      return minA - minB;
-    });
   };
 
   const renderPhase = (stages, titleKey) => {
@@ -455,7 +428,7 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
   );
 }
 
-function PrintStandings({ summary, t, tournamentName, tournamentLocation, tournamentDate }) {
+function PrintStandings({ summary, t }) {
   const groupStandings = summary?.groupStandings ?? [];
   if (groupStandings.length === 0) {
     return <p>{t('export.noData')}</p>;
@@ -512,23 +485,11 @@ function PrintStandings({ summary, t, tournamentName, tournamentLocation, tourna
   );
 }
 
-function PrintResults({ summary, t, dateLocale, tournamentName, tournamentLocation, tournamentDate }) {
+function PrintResults({ summary, t, dateLocale }) {
   const recentGames = summary?.recentGames ?? [];
   if (recentGames.length === 0) {
     return <p>{t('export.noData')}</p>;
   }
-
-  const formatGameDate = (value) => {
-    if (!value) return '';
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return '';
-    return date.toLocaleString(dateLocale, {
-      day: '2-digit',
-      month: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
 
   return (
     <section className="print-section">
@@ -553,7 +514,7 @@ function PrintResults({ summary, t, dateLocale, tournamentName, tournamentLocati
                 <td>
                   {formatStageLabelI18n(game.stageLabelI18n, t, game.stageLabel || t('export.knockoutGame'))}
                 </td>
-                <td>{formatGameDate(game.created_at)}</td>
+                <td>{formatShortDateTime(game.created_at, dateLocale)}</td>
               </tr>
             ))}
           </tbody>
@@ -563,7 +524,7 @@ function PrintResults({ summary, t, dateLocale, tournamentName, tournamentLocati
   );
 }
 
-function PrintFinal({ summary, t, tournamentName, tournamentLocation, tournamentDate }) {
+function PrintFinal({ summary, t }) {
   const placements = summary?.finalPlacements ?? [];
   const leaders = summary?.playerStats?.leaders ?? {};
   const champion = placements[0];

@@ -39,7 +39,7 @@ export default function AudioTab() {
   const countdownVal = countdownInput !== '' ? countdownInput : String(timerCueSettings?.countdownFrom ?? 5);
 
   return (
-    <div style={{ display: 'grid', gap: '1.75rem' }} className="audio-tab">
+    <div className="tab-container audio-tab">
       <PanelCard
         title={t('audio.controlTitle')}
         description={t('audio.controlDescription')}
@@ -262,9 +262,9 @@ export default function AudioTab() {
                     </button>
                     <button
                       type="button"
+                      className="btn-danger"
                       onClick={() => handleAudioLibraryDelete(file.id)}
                       disabled={busy}
-                      style={{ background: 'rgba(211,47,47,0.85)', color: '#fff' }}
                     >
                       {t('common.delete')}
                     </button>

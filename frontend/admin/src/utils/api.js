@@ -58,20 +58,14 @@ export function updateTeams(payload) {
 }
 
 export function mutateScore(team, points, options = {}) {
-  const payload = { team, points };
-  if (options.playerId !== undefined && options.playerId !== null && options.playerId !== '') {
-    payload.playerId = options.playerId;
-  }
-  if (options.shotType) {
-    payload.shotType = options.shotType;
-  }
-  if (options.description) {
-    payload.description = options.description;
-  }
-  if (options.affectStats !== undefined) {
-    payload.affectStats = options.affectStats;
-  }
-
+  const payload = {
+    team,
+    points,
+    ...(options.playerId != null && options.playerId !== '' && { playerId: options.playerId }),
+    ...(options.shotType && { shotType: options.shotType }),
+    ...(options.description && { description: options.description }),
+    ...(options.affectStats !== undefined && { affectStats: options.affectStats })
+  };
   return request('/scoreboard/score', {
     method: 'POST',
     body: JSON.stringify(payload)
@@ -111,13 +105,13 @@ export function setScoreboardTimer(seconds) {
 }
 
 export function addPenalty(team, name, seconds, options = {}) {
-  const payload = { team, name, seconds };
-  if (options.playerId !== undefined && options.playerId !== null && options.playerId !== '') {
-    payload.playerId = options.playerId;
-  }
-  if (options.description) {
-    payload.description = options.description;
-  }
+  const payload = {
+    team,
+    name,
+    seconds,
+    ...(options.playerId != null && options.playerId !== '' && { playerId: options.playerId }),
+    ...(options.description && { description: options.description })
+  };
   return request('/scoreboard/penalties', {
     method: 'POST',
     body: JSON.stringify(payload)

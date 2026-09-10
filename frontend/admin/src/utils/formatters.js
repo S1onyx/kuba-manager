@@ -21,6 +21,31 @@ export function formatDateTime(isoString, locale = 'de-DE') {
   }
 }
 
+export function formatMatchTime(isoString, locale) {
+  if (!isoString) return '';
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleString(locale, {
+    weekday: 'short',
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+export function formatShortDateTime(isoString, locale) {
+  if (!isoString) return '';
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleString(locale, {
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
 export function formatDateTimeLocalInput(isoString) {
   if (!isoString) {
     return '';

@@ -39,7 +39,7 @@ export default function TournamentsTab() {
   );
 
   return (
-    <div style={{ display: 'grid', gap: '1.75rem' }}>
+    <div className="tab-container">
       <PanelCard
         title={t('tournaments.createTitle')}
         description={t('tournaments.createDescription')}
@@ -515,8 +515,8 @@ export default function TournamentsTab() {
                         </button>
                         <button
                           type="button"
+                          className="btn-danger"
                           onClick={() => handleTournamentDelete(tournament.id)}
-                          style={{ background: 'rgba(211,47,47,0.85)', color: '#fff' }}
                         >
                           {t('common.delete')}
                         </button>
