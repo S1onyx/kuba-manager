@@ -366,12 +366,17 @@ function PrintSchedule({ summary, t, dateLocale, tournamentName, tournamentLocat
     );
   };
 
+  const koAndPlacement = [
+    ...(schedule.knockout ?? []),
+    ...(schedule.placement ?? [])
+  ];
+  const hasKoOrPlacement = koAndPlacement.length > 0;
+
   return (
     <section className="print-section">
       <h2>{t('export.scheduleTitle')}</h2>
       {hasGroup ? renderPhase(schedule.group, 'export.phaseGroup') : null}
-      {hasKnockout ? renderPhase(schedule.knockout, 'export.phaseKnockout') : null}
-      {hasPlacement ? renderPhase(schedule.placement, 'export.phasePlacement') : null}
+      {hasKoOrPlacement ? renderPhase(koAndPlacement, 'export.phaseKnockout') : null}
     </section>
   );
 }
