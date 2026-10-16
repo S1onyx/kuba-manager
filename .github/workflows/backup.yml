@@ -47,14 +47,19 @@ jobs:
             ls -lh "$BACKUP_DIR" | tail -20
 
       - name: Fetch latest backup off-server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.DEPLOY_KEY }}
-          source: "kuba-backups/kuba-backend-data-latest.tar.gz"
-          target: "backup-artifact"
-          strip_components: 1
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+        run: |
+          set -eo pipefail
+          mkdir -p ~/.ssh backup-artifact
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
+            "$SSH_USER@$SERVER_IP:kuba-backups/kuba-backend-data-latest.tar.gz" \
+            backup-artifact/
+          ls -lh backup-artifact/
 
       - name: Upload backup as artifact (90 days retention)
         uses: actions/upload-artifact@v6.0.0
