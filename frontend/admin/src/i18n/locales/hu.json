@@ -305,7 +305,9 @@
     "filterAnthems": "Himnuszok",
     "filterOther": "Egyéb",
     "noFilterResults": "Nincs találat a szűrésre.",
-    "filterTriggersPlaceholder": "Szűrés esemény vagy csapat szerint..."
+    "filterTriggersPlaceholder": "Szűrés esemény vagy csapat szerint...",
+    "filterTournament": "Verseny",
+    "filterAllTournaments": "Összes verseny"
   },
   "history": {
     "title": "Előzmények",

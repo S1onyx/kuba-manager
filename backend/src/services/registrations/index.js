@@ -196,14 +196,14 @@ export async function confirmRegistration(regId) {
   persistDatabase(db, SQL);
 
   // 5. Copy Korbhymne into audio library and wire trigger (fire-and-forget)
-  _copyKorbhymneAsync(regId, reg.teamName, teamId).catch((err) =>
+  _copyKorbhymneAsync(regId, reg.teamName, teamId, reg.tournamentId).catch((err) =>
     console.error('[registrations] Korbhymne copy failed:', err)
   );
 
   return { ...reg, status: 'confirmed', teamId };
 }
 
-async function _copyKorbhymneAsync(regId, teamName, teamId) {
+async function _copyKorbhymneAsync(regId, teamName, teamId, tournamentId) {
   // Re-read audio file from DB using fresh connection to avoid stale state
   const { db: freshDb } = await getConnection();
   const stmt = freshDb.prepare(
@@ -231,9 +231,9 @@ async function _copyKorbhymneAsync(regId, teamName, teamId) {
 
   // Insert into audio_files
   db2.run(
-    `INSERT INTO audio_files (label, original_name, file_name, mime_type, size_bytes, usage, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-    [`Korbhymne – ${teamName}`, audioRow.original_name, destName, 'audio/mpeg', stat.size, 'library']
+    `INSERT INTO audio_files (label, original_name, file_name, mime_type, size_bytes, usage, tournament_id, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+    [`Korbhymne – ${teamName}`, audioRow.original_name, destName, 'audio/mpeg', stat.size, 'library', tournamentId ?? null]
   );
   const audioFileId = db2.exec('SELECT last_insert_rowid() as id')[0].values[0][0];
 

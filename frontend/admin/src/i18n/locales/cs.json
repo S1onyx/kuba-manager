@@ -311,7 +311,9 @@
     "filterAnthems": "Hymny",
     "filterOther": "Ostatní",
     "noFilterResults": "Filtru neodpovídají žádné soubory.",
-    "filterTriggersPlaceholder": "Filtrovat podle události nebo týmu..."
+    "filterTriggersPlaceholder": "Filtrovat podle události nebo týmu...",
+    "filterTournament": "Turnaj",
+    "filterAllTournaments": "Všechny turnaje"
   },
   "history": {
     "title": "Historie",

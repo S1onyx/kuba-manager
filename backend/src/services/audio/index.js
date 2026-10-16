@@ -29,6 +29,8 @@ function mapAudioFile(row) {
     mime_type: row.mime_type,
     size_bytes: Number(row.size_bytes ?? 0),
     usage: sanitizeUsage(row.usage),
+    tournament_id: row.tournament_id ?? null,
+    tournament_name: row.tournament_name ?? null,
     created_at: row.created_at,
     updated_at: row.updated_at,
     url: buildFileUrl(row.file_name)
@@ -138,9 +140,10 @@ export async function storeUploadedAudio({ buffer, originalName, mimeType, label
 export async function listAudioFiles() {
   const { db } = await getConnection();
   const stmt = db.prepare(`
-    SELECT *
-    FROM audio_files
-    ORDER BY datetime(created_at) DESC, id DESC
+    SELECT f.*, t.name AS tournament_name
+    FROM audio_files f
+    LEFT JOIN tournaments t ON t.id = f.tournament_id
+    ORDER BY datetime(f.created_at) DESC, f.id DESC
   `);
   const rows = [];
   try {

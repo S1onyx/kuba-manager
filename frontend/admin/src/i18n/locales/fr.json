@@ -305,7 +305,9 @@
     "filterAnthems": "Hymnes",
     "filterOther": "Autres",
     "noFilterResults": "Aucun fichier audio trouvé.",
-    "filterTriggersPlaceholder": "Filtrer par événement ou équipe..."
+    "filterTriggersPlaceholder": "Filtrer par événement ou équipe...",
+    "filterTournament": "Tournoi",
+    "filterAllTournaments": "Tous les tournois"
   },
   "history": {
     "title": "Historique",

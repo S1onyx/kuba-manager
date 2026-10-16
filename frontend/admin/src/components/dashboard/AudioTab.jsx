@@ -45,8 +45,22 @@ export default function AudioTab() {
   const countdownVal = countdownInput !== '' ? countdownInput : String(timerCueSettings?.countdownFrom ?? 5);
 
   const isKorbhymne = (file) => String(file.label ?? '').startsWith('Korbhymne');
+  const [libraryTournament, setLibraryTournament] = useState('all');
+  const anthemTournaments = Array.from(
+    audioLibrary
+      .filter(isKorbhymne)
+      .reduce((map, file) => {
+        if (file.tournament_id != null && !map.has(file.tournament_id)) {
+          map.set(file.tournament_id, file.tournament_name || `Turnier #${file.tournament_id}`);
+        }
+        return map;
+      }, new Map())
+  );
   const filteredLibrary = audioLibrary.filter((file) => {
-    if (libraryCategory === 'anthems' && !isKorbhymne(file)) return false;
+    if (libraryCategory === 'anthems') {
+      if (!isKorbhymne(file)) return false;
+      if (libraryTournament !== 'all' && file.tournament_id !== Number(libraryTournament)) return false;
+    }
     if (libraryCategory === 'other' && isKorbhymne(file)) return false;
     const needle = librarySearch.trim().toLowerCase();
     if (!needle) return true;
@@ -321,6 +335,19 @@ export default function AudioTab() {
                 {category.label}
               </button>
             ))}
+            {libraryCategory === 'anthems' && anthemTournaments.length > 0 && (
+              <select
+                value={libraryTournament}
+                onChange={(event) => setLibraryTournament(event.target.value)}
+                aria-label={t('audio.filterTournament')}
+                style={{ padding: '0.4rem 0.7rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff', fontSize: '0.85rem' }}
+              >
+                <option value="all">{t('audio.filterAllTournaments')}</option>
+                {anthemTournaments.map(([id, name]) => (
+                  <option key={id} value={String(id)}>{name}</option>
+                ))}
+              </select>
+            )}
           </div>
         )}
 
@@ -338,6 +365,11 @@ export default function AudioTab() {
                     <strong style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
                       {describeAudioFile(file)}
                       <AudioDuration fileName={file.file_name} />
+                      {file.tournament_name ? (
+                        <span style={{ fontSize: '0.75rem', fontWeight: 400, opacity: 0.55, whiteSpace: 'nowrap' }}>
+                          · {file.tournament_name}
+                        </span>
+                      ) : null}
                     </strong>
                     <span style={{ fontSize: '0.82rem', opacity: 0.65 }}>{file.original_name}</span>
                   </div>

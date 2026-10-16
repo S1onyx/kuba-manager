@@ -305,7 +305,9 @@
     "filterAnthems": "Korbhymne",
     "filterOther": "Sonstige",
     "noFilterResults": "Nix gfonde mit dem Filter.",
-    "filterTriggersPlaceholder": "Noch Ereignis odr Team filtra..."
+    "filterTriggersPlaceholder": "Noch Ereignis odr Team filtra...",
+    "filterTournament": "Turnier",
+    "filterAllTournaments": "All Turniere"
   },
   "history": {
     "title": "Historie",

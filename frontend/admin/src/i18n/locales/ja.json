@@ -302,7 +302,9 @@
     "filterAnthems": "得点ソング",
     "filterOther": "その他",
     "noFilterResults": "条件に合う音声ファイルがありません。",
-    "filterTriggersPlaceholder": "イベントやチームで絞り込み..."
+    "filterTriggersPlaceholder": "イベントやチームで絞り込み...",
+    "filterTournament": "大会",
+    "filterAllTournaments": "すべての大会"
   },
   "history": {
     "title": "履歴",

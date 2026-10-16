@@ -305,7 +305,9 @@
     "filterAnthems": "Anthems",
     "filterOther": "Other",
     "noFilterResults": "No audio files match the filter.",
-    "filterTriggersPlaceholder": "Filter by event or team..."
+    "filterTriggersPlaceholder": "Filter by event or team...",
+    "filterTournament": "Tournament",
+    "filterAllTournaments": "All tournaments"
   },
   "history": {
     "title": "History",

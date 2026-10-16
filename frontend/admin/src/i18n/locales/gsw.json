@@ -305,7 +305,9 @@
     "filterAnthems": "Korbhymne",
     "filterOther": "Sunstigi",
     "noFilterResults": "Nüt gfunde mit dem Filter.",
-    "filterTriggersPlaceholder": "Noch Ereignis oder Team filtere..."
+    "filterTriggersPlaceholder": "Noch Ereignis oder Team filtere...",
+    "filterTournament": "Turnier",
+    "filterAllTournaments": "Alli Turnier"
   },
   "history": {
     "title": "Historie",
