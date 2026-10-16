@@ -304,7 +304,8 @@
     "filterAll": "Tous",
     "filterAnthems": "Hymnes",
     "filterOther": "Autres",
-    "noFilterResults": "Aucun fichier audio trouvé."
+    "noFilterResults": "Aucun fichier audio trouvé.",
+    "filterTriggersPlaceholder": "Filtrer par événement ou équipe..."
   },
   "history": {
     "title": "Historique",

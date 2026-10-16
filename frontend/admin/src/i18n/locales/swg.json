@@ -304,7 +304,8 @@
     "filterAll": "All",
     "filterAnthems": "Korbhymne",
     "filterOther": "Sonstige",
-    "noFilterResults": "Nix gfonde mit dem Filter."
+    "noFilterResults": "Nix gfonde mit dem Filter.",
+    "filterTriggersPlaceholder": "Noch Ereignis odr Team filtra..."
   },
   "history": {
     "title": "Historie",

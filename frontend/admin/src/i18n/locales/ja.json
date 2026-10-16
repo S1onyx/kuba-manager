@@ -301,7 +301,8 @@
     "filterAll": "すべて",
     "filterAnthems": "得点ソング",
     "filterOther": "その他",
-    "noFilterResults": "条件に合う音声ファイルがありません。"
+    "noFilterResults": "条件に合う音声ファイルがありません。",
+    "filterTriggersPlaceholder": "イベントやチームで絞り込み..."
   },
   "history": {
     "title": "履歴",

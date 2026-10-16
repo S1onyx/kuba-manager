@@ -310,7 +310,8 @@
     "filterAll": "Vše",
     "filterAnthems": "Hymny",
     "filterOther": "Ostatní",
-    "noFilterResults": "Filtru neodpovídají žádné soubory."
+    "noFilterResults": "Filtru neodpovídají žádné soubory.",
+    "filterTriggersPlaceholder": "Filtrovat podle události nebo týmu..."
   },
   "history": {
     "title": "Historie",

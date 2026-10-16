@@ -304,7 +304,8 @@
     "filterAll": "Alle",
     "filterAnthems": "Korbhymnen",
     "filterOther": "Sonstige",
-    "noFilterResults": "Keine Audiodateien gefunden."
+    "noFilterResults": "Keine Audiodateien gefunden.",
+    "filterTriggersPlaceholder": "Nach Ereignis oder Team filtern..."
   },
   "history": {
     "title": "Historie",

@@ -304,7 +304,8 @@
     "filterAll": "Összes",
     "filterAnthems": "Himnuszok",
     "filterOther": "Egyéb",
-    "noFilterResults": "Nincs találat a szűrésre."
+    "noFilterResults": "Nincs találat a szűrésre.",
+    "filterTriggersPlaceholder": "Szűrés esemény vagy csapat szerint..."
   },
   "history": {
     "title": "Előzmények",

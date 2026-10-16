@@ -304,7 +304,8 @@
     "filterAll": "Alli",
     "filterAnthems": "Korbhymne",
     "filterOther": "Sunstigi",
-    "noFilterResults": "Nüt gfunde mit dem Filter."
+    "noFilterResults": "Nüt gfunde mit dem Filter.",
+    "filterTriggersPlaceholder": "Noch Ereignis oder Team filtere..."
   },
   "history": {
     "title": "Historie",

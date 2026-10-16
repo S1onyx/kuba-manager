@@ -39,6 +39,8 @@ export default function AudioTab() {
   const [countdownInput, setCountdownInput] = useState('');
   const [librarySearch, setLibrarySearch] = useState('');
   const [libraryCategory, setLibraryCategory] = useState('all');
+  const [triggerSearch, setTriggerSearch] = useState('');
+  const [triggerCategory, setTriggerCategory] = useState('all');
   const warningVal = warningInput !== '' ? warningInput : String(timerCueSettings?.warningSeconds ?? 15);
   const countdownVal = countdownInput !== '' ? countdownInput : String(timerCueSettings?.countdownFrom ?? 5);
 
@@ -57,6 +59,16 @@ export default function AudioTab() {
     { id: 'other', label: t('audio.filterOther') }
   ];
 
+  const isTeamScoreTrigger = (trigger) => String(trigger.key ?? '').startsWith('score_team_');
+  const filteredTriggers = audioTriggers.filter((trigger) => {
+    if (triggerCategory === 'anthems' && !isTeamScoreTrigger(trigger)) return false;
+    if (triggerCategory === 'other' && isTeamScoreTrigger(trigger)) return false;
+    const needle = triggerSearch.trim().toLowerCase();
+    if (!needle) return true;
+    const haystack = `${trigger.label ?? ''} ${trigger.description ?? ''}`.toLowerCase();
+    return haystack.includes(needle);
+  });
+
   return (
     <div className="tab-container audio-tab">
       <PanelCard
@@ -71,11 +83,35 @@ export default function AudioTab() {
         title={t('audio.triggersTitle')}
         description={t('audio.triggersDescription')}
       >
+        {audioTriggers.length > 0 && (
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            <input
+              type="search"
+              value={triggerSearch}
+              onChange={(event) => setTriggerSearch(event.target.value)}
+              placeholder={t('audio.filterTriggersPlaceholder')}
+              style={{ flex: 1, minWidth: '180px', padding: '0.45rem 0.7rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff', fontSize: '0.875rem' }}
+            />
+            {libraryCategories.map((category) => (
+              <button
+                key={category.id}
+                type="button"
+                onClick={() => setTriggerCategory(category.id)}
+                style={{ padding: '0.4rem 1rem', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.2)', background: triggerCategory === category.id ? 'rgba(86,160,255,0.2)' : 'transparent', color: '#fff', cursor: 'pointer', fontSize: '0.85rem' }}
+              >
+                {category.label}
+              </button>
+            ))}
+          </div>
+        )}
+
         {audioTriggers.length === 0 ? (
           <p style={{ margin: 0, opacity: 0.7 }}>{t('audio.noTriggers')}</p>
+        ) : filteredTriggers.length === 0 ? (
+          <p style={{ margin: 0, opacity: 0.7 }}>{t('audio.noFilterResults')}</p>
         ) : (
           <div className="audio-trigger-list">
-            {audioTriggers.map((trigger) => {
+            {filteredTriggers.map((trigger) => {
               const busy = Boolean(audioTriggerBusy[trigger.key] || audioUploadBusy[trigger.key]);
               const currentFile = trigger.file;
               return (

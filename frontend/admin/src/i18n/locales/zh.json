@@ -301,7 +301,8 @@
     "filterAll": "全部",
     "filterAnthems": "得分歌曲",
     "filterOther": "其他",
-    "noFilterResults": "没有符合条件的音频文件。"
+    "noFilterResults": "没有符合条件的音频文件。",
+    "filterTriggersPlaceholder": "按事件或球队筛选..."
   },
   "history": {
     "title": "历史记录",
