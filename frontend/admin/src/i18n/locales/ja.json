@@ -296,7 +296,12 @@
     "libraryLabelPlaceholder": "例: イントロ音楽",
     "uploadFile": "ファイルをアップロード",
     "noFiles": "音声ファイルがまだありません。",
-    "soundFallback": "サウンド #{{id}}"
+    "soundFallback": "サウンド #{{id}}",
+    "filterPlaceholder": "チーム名や名前で絞り込み...",
+    "filterAll": "すべて",
+    "filterAnthems": "得点ソング",
+    "filterOther": "その他",
+    "noFilterResults": "条件に合う音声ファイルがありません。"
   },
   "history": {
     "title": "履歴",

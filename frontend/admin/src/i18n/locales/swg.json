@@ -299,7 +299,12 @@
     "libraryLabelPlaceholder": "z. B. Intro Musik",
     "uploadFile": "Datei hochlada",
     "noFiles": "Noch koi Audiodateie vorhandä.",
-    "soundFallback": "Sound #{{id}}"
+    "soundFallback": "Sound #{{id}}",
+    "filterPlaceholder": "Noch Team odr Name filtra...",
+    "filterAll": "All",
+    "filterAnthems": "Korbhymne",
+    "filterOther": "Sonstige",
+    "noFilterResults": "Nix gfonde mit dem Filter."
   },
   "history": {
     "title": "Historie",

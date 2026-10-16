@@ -299,7 +299,12 @@
     "libraryLabelPlaceholder": "e.g. Intro music",
     "uploadFile": "Upload file",
     "noFiles": "No audio files available yet.",
-    "soundFallback": "Sound #{{id}}"
+    "soundFallback": "Sound #{{id}}",
+    "filterPlaceholder": "Filter by team or name...",
+    "filterAll": "All",
+    "filterAnthems": "Anthems",
+    "filterOther": "Other",
+    "noFilterResults": "No audio files match the filter."
   },
   "history": {
     "title": "History",

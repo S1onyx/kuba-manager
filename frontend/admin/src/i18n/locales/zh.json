@@ -296,7 +296,12 @@
     "libraryLabelPlaceholder": "例如 开场音乐",
     "uploadFile": "上传文件",
     "noFiles": "暂无音频文件。",
-    "soundFallback": "音效 #{{id}}"
+    "soundFallback": "音效 #{{id}}",
+    "filterPlaceholder": "按球队或名称筛选...",
+    "filterAll": "全部",
+    "filterAnthems": "得分歌曲",
+    "filterOther": "其他",
+    "noFilterResults": "没有符合条件的音频文件。"
   },
   "history": {
     "title": "历史记录",

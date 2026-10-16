@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PanelCard from '../common/PanelCard.jsx';
+import AudioDuration from '../common/AudioDuration.jsx';
 import { useDashboard } from '../../context/DashboardContext.jsx';
 import { resolveMediaUrl } from '../../config.js';
 
@@ -36,8 +37,25 @@ export default function AudioTab() {
 
   const [warningInput, setWarningInput] = useState('');
   const [countdownInput, setCountdownInput] = useState('');
+  const [librarySearch, setLibrarySearch] = useState('');
+  const [libraryCategory, setLibraryCategory] = useState('all');
   const warningVal = warningInput !== '' ? warningInput : String(timerCueSettings?.warningSeconds ?? 15);
   const countdownVal = countdownInput !== '' ? countdownInput : String(timerCueSettings?.countdownFrom ?? 5);
+
+  const isKorbhymne = (file) => String(file.label ?? '').startsWith('Korbhymne');
+  const filteredLibrary = audioLibrary.filter((file) => {
+    if (libraryCategory === 'anthems' && !isKorbhymne(file)) return false;
+    if (libraryCategory === 'other' && isKorbhymne(file)) return false;
+    const needle = librarySearch.trim().toLowerCase();
+    if (!needle) return true;
+    const haystack = `${file.label ?? ''} ${file.original_name ?? ''}`.toLowerCase();
+    return haystack.includes(needle);
+  });
+  const libraryCategories = [
+    { id: 'all', label: t('audio.filterAll') },
+    { id: 'anthems', label: t('audio.filterAnthems') },
+    { id: 'other', label: t('audio.filterOther') }
+  ];
 
   return (
     <div className="tab-container audio-tab">
@@ -83,8 +101,9 @@ export default function AudioTab() {
 
                   {currentFile ? (
                     <div className="audio-trigger-card__current">
-                      <span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
                         {t('audio.currentSound')} <strong>{describeAudioFile(currentFile)}</strong>
+                        <AudioDuration fileName={currentFile.file_name} />
                       </span>
                       <div className="audio-trigger-card__currentButtons">
                         <button
@@ -94,6 +113,12 @@ export default function AudioTab() {
                         >
                           {t('audio.play')}
                         </button>
+                        <a
+                          href={resolveMediaUrl(`/api/audio/library/${currentFile.id}/download`)}
+                          className="audio-library-item__download"
+                        >
+                          {t('common.download')}
+                        </a>
                         <button
                           type="button"
                           onClick={() => handleAudioTriggerClear(trigger.key)}
@@ -241,16 +266,43 @@ export default function AudioTab() {
           </label>
         </form>
 
+        {audioLibrary.length > 0 && (
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            <input
+              type="search"
+              value={librarySearch}
+              onChange={(event) => setLibrarySearch(event.target.value)}
+              placeholder={t('audio.filterPlaceholder')}
+              style={{ flex: 1, minWidth: '180px', padding: '0.45rem 0.7rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff', fontSize: '0.875rem' }}
+            />
+            {libraryCategories.map((category) => (
+              <button
+                key={category.id}
+                type="button"
+                onClick={() => setLibraryCategory(category.id)}
+                style={{ padding: '0.4rem 1rem', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.2)', background: libraryCategory === category.id ? 'rgba(86,160,255,0.2)' : 'transparent', color: '#fff', cursor: 'pointer', fontSize: '0.85rem' }}
+              >
+                {category.label}
+              </button>
+            ))}
+          </div>
+        )}
+
         {audioLibrary.length === 0 ? (
           <p style={{ margin: 0, opacity: 0.7 }}>{t('audio.noFiles')}</p>
+        ) : filteredLibrary.length === 0 ? (
+          <p style={{ margin: 0, opacity: 0.7 }}>{t('audio.noFilterResults')}</p>
         ) : (
           <div style={{ display: 'grid', gap: '0.75rem' }}>
-            {audioLibrary.map((file) => {
+            {filteredLibrary.map((file) => {
               const busy = Boolean(audioManualBusy[file.id]);
               return (
                 <article key={file.id} className="audio-library-item">
                   <div className="audio-library-item__info">
-                    <strong>{describeAudioFile(file)}</strong>
+                    <strong style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                      {describeAudioFile(file)}
+                      <AudioDuration fileName={file.file_name} />
+                    </strong>
                     <span style={{ fontSize: '0.82rem', opacity: 0.65 }}>{file.original_name}</span>
                   </div>
                   <div className="audio-library-item__actions">

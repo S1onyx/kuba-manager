@@ -299,7 +299,12 @@
     "libraryLabelPlaceholder": "z. B. Intro Musik",
     "uploadFile": "Datei ufelade",
     "noFiles": "Nonig kei Audiodateie vorhande.",
-    "soundFallback": "Sound #{{id}}"
+    "soundFallback": "Sound #{{id}}",
+    "filterPlaceholder": "Noch Team oder Name filtere...",
+    "filterAll": "Alli",
+    "filterAnthems": "Korbhymne",
+    "filterOther": "Sunstigi",
+    "noFilterResults": "Nüt gfunde mit dem Filter."
   },
   "history": {
     "title": "Historie",

@@ -299,7 +299,12 @@
     "libraryLabelPlaceholder": "p. ex. Musique d'intro",
     "uploadFile": "Téléverser un fichier",
     "noFiles": "Aucun fichier audio disponible pour le moment.",
-    "soundFallback": "Son n° {{id}}"
+    "soundFallback": "Son n° {{id}}",
+    "filterPlaceholder": "Filtrer par équipe ou nom...",
+    "filterAll": "Tous",
+    "filterAnthems": "Hymnes",
+    "filterOther": "Autres",
+    "noFilterResults": "Aucun fichier audio trouvé."
   },
   "history": {
     "title": "Historique",

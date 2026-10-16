@@ -299,7 +299,12 @@
     "libraryLabelPlaceholder": "z. B. Intro Musik",
     "uploadFile": "Datei hochladen",
     "noFiles": "Noch keine Audiodateien vorhanden.",
-    "soundFallback": "Sound #{{id}}"
+    "soundFallback": "Sound #{{id}}",
+    "filterPlaceholder": "Nach Team oder Name filtern...",
+    "filterAll": "Alle",
+    "filterAnthems": "Korbhymnen",
+    "filterOther": "Sonstige",
+    "noFilterResults": "Keine Audiodateien gefunden."
   },
   "history": {
     "title": "Historie",

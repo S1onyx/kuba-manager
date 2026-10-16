@@ -305,7 +305,12 @@
     "libraryLabelPlaceholder": "např. Úvodní hudba",
     "uploadFile": "Nahrát soubor",
     "noFiles": "Zatím nejsou k dispozici žádné zvukové soubory.",
-    "soundFallback": "Zvuk č. {{id}}"
+    "soundFallback": "Zvuk č. {{id}}",
+    "filterPlaceholder": "Filtrovat podle týmu nebo názvu...",
+    "filterAll": "Vše",
+    "filterAnthems": "Hymny",
+    "filterOther": "Ostatní",
+    "noFilterResults": "Filtru neodpovídají žádné soubory."
   },
   "history": {
     "title": "Historie",

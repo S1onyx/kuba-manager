@@ -299,7 +299,12 @@
     "libraryLabelPlaceholder": "pl. Bevezető zene",
     "uploadFile": "Fájl feltöltése",
     "noFiles": "Még nincsenek hangfájlok.",
-    "soundFallback": "{{id}}. hang"
+    "soundFallback": "{{id}}. hang",
+    "filterPlaceholder": "Szűrés csapat vagy név szerint...",
+    "filterAll": "Összes",
+    "filterAnthems": "Himnuszok",
+    "filterOther": "Egyéb",
+    "noFilterResults": "Nincs találat a szűrésre."
   },
   "history": {
     "title": "Előzmények",
