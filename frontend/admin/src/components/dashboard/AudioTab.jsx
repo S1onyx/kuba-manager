@@ -45,7 +45,7 @@ export default function AudioTab() {
   const countdownVal = countdownInput !== '' ? countdownInput : String(timerCueSettings?.countdownFrom ?? 5);
 
   const isKorbhymne = (file) => String(file.label ?? '').startsWith('Korbhymne');
-  const [libraryTournament, setLibraryTournament] = useState('all');
+  const [anthemTournament, setAnthemTournament] = useState('all');
   const anthemTournaments = Array.from(
     audioLibrary
       .filter(isKorbhymne)
@@ -59,7 +59,7 @@ export default function AudioTab() {
   const filteredLibrary = audioLibrary.filter((file) => {
     if (libraryCategory === 'anthems') {
       if (!isKorbhymne(file)) return false;
-      if (libraryTournament !== 'all' && file.tournament_id !== Number(libraryTournament)) return false;
+      if (anthemTournament !== 'all' && file.tournament_id !== Number(anthemTournament)) return false;
     }
     if (libraryCategory === 'other' && isKorbhymne(file)) return false;
     const needle = librarySearch.trim().toLowerCase();
@@ -75,7 +75,10 @@ export default function AudioTab() {
 
   const isTeamScoreTrigger = (trigger) => String(trigger.key ?? '').startsWith('score_team_');
   const filteredTriggers = audioTriggers.filter((trigger) => {
-    if (triggerCategory === 'anthems' && !isTeamScoreTrigger(trigger)) return false;
+    if (triggerCategory === 'anthems') {
+      if (!isTeamScoreTrigger(trigger)) return false;
+      if (anthemTournament !== 'all' && trigger.file?.tournament_id !== Number(anthemTournament)) return false;
+    }
     if (triggerCategory === 'other' && isTeamScoreTrigger(trigger)) return false;
     const needle = triggerSearch.trim().toLowerCase();
     if (!needle) return true;
@@ -116,10 +119,23 @@ export default function AudioTab() {
                 {category.label}
               </button>
             ))}
+            {triggerCategory === 'anthems' && anthemTournaments.length > 0 && (
+              <select
+                value={anthemTournament}
+                onChange={(event) => setAnthemTournament(event.target.value)}
+                aria-label={t('audio.filterTournament')}
+                style={{ padding: '0.4rem 0.7rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff', fontSize: '0.85rem' }}
+              >
+                <option value="all">{t('audio.filterAllTournaments')}</option>
+                {anthemTournaments.map(([id, name]) => (
+                  <option key={id} value={String(id)}>{name}</option>
+                ))}
+              </select>
+            )}
           </div>
         )}
 
-        {audioTriggers.length === 0 ? (
+      {audioTriggers.length === 0 ? (
           <p style={{ margin: 0, opacity: 0.7 }}>{t('audio.noTriggers')}</p>
         ) : filteredTriggers.length === 0 ? (
           <p style={{ margin: 0, opacity: 0.7 }}>{t('audio.noFilterResults')}</p>
@@ -337,8 +353,8 @@ export default function AudioTab() {
             ))}
             {libraryCategory === 'anthems' && anthemTournaments.length > 0 && (
               <select
-                value={libraryTournament}
-                onChange={(event) => setLibraryTournament(event.target.value)}
+                value={anthemTournament}
+                onChange={(event) => setAnthemTournament(event.target.value)}
                 aria-label={t('audio.filterTournament')}
                 style={{ padding: '0.4rem 0.7rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff', fontSize: '0.85rem' }}
               >

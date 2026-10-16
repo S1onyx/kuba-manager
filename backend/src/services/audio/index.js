@@ -58,6 +58,7 @@ function mapAudioTrigger(row) {
       mime_type: row.file_mime_type,
       size_bytes: row.file_size_bytes,
       usage: row.file_usage,
+      tournament_id: row.file_tournament_id ?? null,
       created_at: row.file_created_at,
       updated_at: row.file_updated_at
     });
@@ -261,6 +262,7 @@ export async function listAudioTriggers() {
       f.mime_type AS file_mime_type,
       f.size_bytes AS file_size_bytes,
       f.usage AS file_usage,
+      f.tournament_id AS file_tournament_id,
       f.created_at AS file_created_at,
       f.updated_at AS file_updated_at
     FROM audio_triggers t
