@@ -242,10 +242,10 @@ async function _copyKorbhymneAsync(regId, teamName, teamId, tournamentId) {
   const triggerLabel = `Korb ${teamName}`;
   // Upsert trigger record
   db2.run(
-    `INSERT INTO audio_triggers (key, label, description, is_active, audio_file_id, updated_at)
-     VALUES (?, ?, ?, 1, ?, datetime('now'))
-     ON CONFLICT(key) DO UPDATE SET audio_file_id = excluded.audio_file_id, updated_at = datetime('now')`,
-    [triggerKey, triggerLabel, 'Korbhymne (automatisch)', audioFileId]
+    `INSERT INTO audio_triggers (key, label, description, is_active, audio_file_id, tournament_id, updated_at)
+     VALUES (?, ?, ?, 1, ?, ?, datetime('now'))
+     ON CONFLICT(key) DO UPDATE SET audio_file_id = excluded.audio_file_id, tournament_id = excluded.tournament_id, updated_at = datetime('now')`,
+    [triggerKey, triggerLabel, 'Korbhymne (automatisch)', audioFileId, tournamentId ?? null]
   );
 
   persistDatabase(db2, SQL2);

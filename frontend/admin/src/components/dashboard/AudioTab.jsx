@@ -47,11 +47,11 @@ export default function AudioTab() {
   const isKorbhymne = (file) => String(file.label ?? '').startsWith('Korbhymne');
   const [anthemTournament, setAnthemTournament] = useState('all');
   const anthemTournaments = Array.from(
-    audioLibrary
-      .filter(isKorbhymne)
-      .reduce((map, file) => {
-        if (file.tournament_id != null && !map.has(file.tournament_id)) {
-          map.set(file.tournament_id, file.tournament_name || `Turnier #${file.tournament_id}`);
+    audioTriggers
+      .filter((trigger) => String(trigger.key ?? '').startsWith('score_team_'))
+      .reduce((map, trigger) => {
+        if (trigger.tournament_id != null && !map.has(trigger.tournament_id)) {
+          map.set(trigger.tournament_id, trigger.tournament_name || `Turnier #${trigger.tournament_id}`);
         }
         return map;
       }, new Map())
@@ -77,7 +77,7 @@ export default function AudioTab() {
   const filteredTriggers = audioTriggers.filter((trigger) => {
     if (triggerCategory === 'anthems') {
       if (!isTeamScoreTrigger(trigger)) return false;
-      if (anthemTournament !== 'all' && trigger.file?.tournament_id !== Number(anthemTournament)) return false;
+      if (anthemTournament !== 'all' && trigger.tournament_id !== Number(anthemTournament)) return false;
     }
     if (triggerCategory === 'other' && isTeamScoreTrigger(trigger)) return false;
     const needle = triggerSearch.trim().toLowerCase();
@@ -148,7 +148,14 @@ export default function AudioTab() {
                 <article key={trigger.key} className="audio-trigger-card">
                   <div className="audio-trigger-card__header">
                     <div className="audio-trigger-card__headerText">
-                      <strong>{trigger.label}</strong>
+                      <strong>
+                        {trigger.label}
+                        {trigger.tournament_name ? (
+                          <span style={{ fontSize: '0.75rem', fontWeight: 400, opacity: 0.55, marginLeft: '0.4rem' }}>
+                            · {trigger.tournament_name}
+                          </span>
+                        ) : null}
+                      </strong>
                       {trigger.description ? (
                         <span style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>
                           {trigger.description}

@@ -46,6 +46,8 @@ function mapAudioTrigger(row) {
     label: row.label,
     description: row.description ?? '',
     is_active: Number(row.is_active ?? 0) === 1,
+    tournament_id: row.tournament_id ?? null,
+    tournament_name: row.tournament_name ?? null,
     updated_at: row.updated_at
   };
 
@@ -190,27 +192,27 @@ export async function deleteAudioFile(id) {
   return true;
 }
 
-async function ensureScoreTriggerRecord(key, label, description = '') {
+async function ensureScoreTriggerRecord(key, label, description = '', tournamentId = null) {
   const { SQL, db } = await getConnection();
   let changed = false;
 
-  const selectStmt = db.prepare('SELECT label, description FROM audio_triggers WHERE key = ?');
+  const selectStmt = db.prepare('SELECT label, description, tournament_id FROM audio_triggers WHERE key = ?');
   selectStmt.bind([key]);
   const existing = selectStmt.step() ? selectStmt.getAsObject() : null;
   selectStmt.free();
 
   if (!existing) {
     const insertStmt = db.prepare(
-      'INSERT INTO audio_triggers (key, label, description, is_active, updated_at) VALUES (?, ?, ?, 1, datetime(\'now\'))'
+      'INSERT INTO audio_triggers (key, label, description, is_active, tournament_id, updated_at) VALUES (?, ?, ?, 1, ?, datetime(\'now\'))'
     );
-    insertStmt.run([key, label, description]);
+    insertStmt.run([key, label, description, tournamentId ?? null]);
     insertStmt.free();
     changed = true;
-  } else if (existing.label !== label || existing.description !== description) {
+  } else if (existing.label !== label || existing.description !== description || (tournamentId != null && existing.tournament_id !== tournamentId)) {
     const updateStmt = db.prepare(
-      'UPDATE audio_triggers SET label = ?, description = ?, updated_at = datetime(\'now\') WHERE key = ?'
+      'UPDATE audio_triggers SET label = ?, description = ?, tournament_id = COALESCE(?, tournament_id), updated_at = datetime(\'now\') WHERE key = ?'
     );
-    updateStmt.run([label, description, key]);
+    updateStmt.run([label, description, tournamentId ?? null, key]);
     updateStmt.free();
     changed = true;
   }
@@ -222,7 +224,7 @@ async function ensureScoreTriggerRecord(key, label, description = '') {
   return changed;
 }
 
-export async function ensureScoreTriggerForTeam(teamId, teamName) {
+export async function ensureScoreTriggerForTeam(teamId, teamName, tournamentId = null) {
   const numeric = Number(teamId);
   if (!Number.isInteger(numeric) || numeric <= 0) {
     return null;
@@ -232,17 +234,21 @@ export async function ensureScoreTriggerForTeam(teamId, teamName) {
   const labelBase = (teamName ?? '').toString().trim();
   const label = labelBase ? `Korb ${labelBase}` : `Korb Team ${numeric}`;
   const description = 'Team-spezifischer Korb-Sound';
-  await ensureScoreTriggerRecord(key, label, description);
+  await ensureScoreTriggerRecord(key, label, description, tournamentId);
   return key;
 }
 
 async function ensureTeamScoreTriggers() {
   const { db } = await getConnection();
-  const teamsStmt = db.prepare('SELECT id, name FROM teams');
+  const teamsStmt = db.prepare(`
+    SELECT t.id, t.name,
+      (SELECT MAX(tt.tournament_id) FROM tournament_teams tt WHERE tt.team_id = t.id) AS tournament_id
+    FROM teams t
+  `);
   try {
     while (teamsStmt.step()) {
       const row = teamsStmt.getAsObject();
-      await ensureScoreTriggerForTeam(row.id, row.name);
+      await ensureScoreTriggerForTeam(row.id, row.name, row.tournament_id ?? null);
     }
   } finally {
     teamsStmt.free();
@@ -264,9 +270,11 @@ export async function listAudioTriggers() {
       f.usage AS file_usage,
       f.tournament_id AS file_tournament_id,
       f.created_at AS file_created_at,
-      f.updated_at AS file_updated_at
+      f.updated_at AS file_updated_at,
+      tn.name AS tournament_name
     FROM audio_triggers t
     LEFT JOIN audio_files f ON f.id = t.audio_file_id
+    LEFT JOIN tournaments tn ON tn.id = t.tournament_id
     ORDER BY t.label ASC
   `);
 

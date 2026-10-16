@@ -227,6 +227,22 @@ export default function initializeSchema(db) {
     );
   `);
 
+  const audioTriggersInfo = db.exec('PRAGMA table_info(audio_triggers)');
+  const audioTriggerColumns = (audioTriggersInfo[0]?.values ?? []).map(([, name]) => name);
+  if (!audioTriggerColumns.includes('tournament_id')) {
+    db.exec('ALTER TABLE audio_triggers ADD COLUMN tournament_id INTEGER');
+    // Einmal-Backfill: Team-Korb-Trigger dem (neuesten) Turnier ihres Teams zuordnen
+    db.exec(`
+      UPDATE audio_triggers
+      SET tournament_id = (
+        SELECT MAX(tt.tournament_id)
+        FROM tournament_teams tt
+        WHERE tt.team_id = CAST(substr(audio_triggers.key, length('score_team_') + 1) AS INTEGER)
+      )
+      WHERE key LIKE 'score_team\\_%' ESCAPE '\\' AND tournament_id IS NULL
+    `);
+  }
+
   const defaultTriggers = [
     ['game_start', 'Spielstart', 'Wird beim Starten des Spiels abgespielt.'],
     ['game_pause', 'Spielpause', 'Wird beim Pausieren des Spiels abgespielt.'],
