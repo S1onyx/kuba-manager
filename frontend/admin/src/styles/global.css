@@ -401,6 +401,17 @@ a {
   flex-wrap: wrap;
 }
 
+.audio-library-item__download {
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(124, 185, 255, 0.4);
+  background: rgba(124, 185, 255, 0.1);
+  color: #7cb9ff;
+  font-size: 0.85rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
 @media (max-width: 720px) {
   .audio-trigger-card__inputs {
     grid-template-columns: minmax(0, 1fr);

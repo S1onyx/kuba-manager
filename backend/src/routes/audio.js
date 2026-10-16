@@ -1,5 +1,7 @@
 import express from 'express';
 import multer from 'multer';
+import path from 'node:path';
+import fs from 'node:fs';
 import {
   listAudioTriggers,
   getAudioTrigger,
@@ -9,6 +11,7 @@ import {
   upsertTriggerFileFromUpload,
   storeLibraryUpload,
   getAudioFileById,
+  getAudioStorageDirectory,
   assignFileToTrigger,
   getTimerCueSettings,
   updateTimerCueSettings
@@ -165,6 +168,28 @@ router.delete('/library/:id', async (req, res) => {
   } catch (error) {
     console.error('Audiodatei konnte nicht gelöscht werden:', error);
     res.status(500).json({ code: 'AUDIO_DELETE_FAILED', message: 'Audiodatei konnte nicht gelöscht werden.' });
+  }
+});
+
+router.get('/library/:id/download', async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ code: 'INVALID_AUDIO_ID', message: 'Ungültige Audio-ID.' });
+  }
+
+  try {
+    const file = await getAudioFileById(id);
+    if (!file) {
+      return res.status(404).json({ code: 'AUDIO_FILE_NOT_FOUND', message: 'Audiodatei nicht gefunden.' });
+    }
+    const filePath = path.join(getAudioStorageDirectory(), path.basename(file.file_name));
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ code: 'AUDIO_FILE_NOT_FOUND', message: 'Audiodatei nicht gefunden.' });
+    }
+    res.download(filePath, file.original_name);
+  } catch (error) {
+    console.error('Audiodatei konnte nicht geladen werden:', error);
+    res.status(500).json({ code: 'AUDIO_DOWNLOAD_FAILED', message: 'Audiodatei konnte nicht geladen werden.' });
   }
 });
 

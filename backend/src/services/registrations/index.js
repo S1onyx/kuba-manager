@@ -97,6 +97,20 @@ export async function listRegistrations(tournamentId) {
   return rows;
 }
 
+export async function getRegistrationAudioFile(registrationId, fileName) {
+  if (!fileName || fileName !== path.basename(fileName)) return null;
+  const { db } = await getConnection();
+  const stmt = db.prepare(
+    'SELECT file_name, original_name FROM registration_audio_files WHERE registration_id = ? AND file_name = ?'
+  );
+  try {
+    stmt.bind([Number(registrationId), fileName]);
+    return stmt.step() ? stmt.getAsObject() : null;
+  } finally {
+    stmt.free();
+  }
+}
+
 export async function getRegistration(id) {
   const { db } = await getConnection();
   const stmt = db.prepare('SELECT * FROM tournament_registrations WHERE id = ?');

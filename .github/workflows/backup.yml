@@ -1,0 +1,70 @@
+name: Backup Backend Data
+
+on:
+  schedule:
+    # Taeglich 03:15 UTC (vor dem woechentlichen Maintenance-Run 03:00 So)
+    - cron: '15 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  backup:
+    name: Backup backend-data volume (SQLite, Audio, Poster)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create compressed backup on server
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            set -eo pipefail
+            BACKUP_DIR="$HOME/kuba-backups"
+            mkdir -p "$BACKUP_DIR"
+            TS=$(date +%Y%m%d-%H%M%S)
+            FILE="kuba-backend-data-${TS}.tar.gz"
+
+            echo "=== Creating backup ${FILE} ==="
+            docker run --rm \
+              -v kuba_backend-data:/data:ro \
+              -v "${BACKUP_DIR}:/backup" \
+              alpine tar czf "/backup/${FILE}" -C /data .
+
+            echo "=== Verify archive integrity ==="
+            tar tzf "${BACKUP_DIR}/${FILE}" > /dev/null
+            ls -lh "${BACKUP_DIR}/${FILE}"
+
+            # Feste Kopie fuer den Runner-Download
+            cp "${BACKUP_DIR}/${FILE}" "${BACKUP_DIR}/kuba-backend-data-latest.tar.gz"
+
+            echo "=== Freshness check (scoreboard.sqlite mtime) ==="
+            docker run --rm -v kuba_backend-data:/data:ro alpine \
+              ls -l /data/scoreboard.sqlite
+
+            echo "=== Retention: keep last 14 days ==="
+            find "$BACKUP_DIR" -name 'kuba-backend-data-2*.tar.gz' -mtime +14 -delete -print || true
+            df -h /
+            ls -lh "$BACKUP_DIR" | tail -20
+
+      - name: Fetch latest backup off-server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          source: "kuba-backups/kuba-backend-data-latest.tar.gz"
+          target: "backup-artifact"
+          strip_components: 1
+
+      - name: Upload backup as artifact (90 days retention)
+        uses: actions/upload-artifact@v6.0.0
+        with:
+          name: kuba-backup-${{ github.run_id }}
+          path: backup-artifact/kuba-backend-data-latest.tar.gz
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "::error title=Backup failed::Kuba-Manager backup failed. Check server disk space and Docker volume 'kuba_backend-data'."

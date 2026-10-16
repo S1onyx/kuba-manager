@@ -351,9 +351,30 @@ export default function TournamentDetailsPanel({
                   {reg.players.map((p) => `${p.name}${p.jerseyNumber ? ` #${p.jerseyNumber}` : ''}`).join(', ')}
                 </p>
                 {reg.audioFiles?.length > 0 && (
-                  <p style={{ margin: 0, opacity: 0.6, fontSize: '0.8rem' }}>
-                    {t('tournaments.details.audioFiles', { files: reg.audioFiles.map((f) => f.originalName).join(', ') })}
-                  </p>
+                  <div style={{ display: 'grid', gap: '0.35rem' }}>
+                    {reg.audioFiles.map((file) => (
+                      <div key={file.fileName} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', fontSize: '0.8rem', opacity: 0.85 }}>
+                        <span style={{ opacity: 0.6 }}>🎵</span>
+                        <span style={{ flex: 1, minWidth: '120px', overflowWrap: 'anywhere' }}>{file.label || file.originalName}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const audio = new Audio(resolveMediaUrl(file.url));
+                            audio.play().catch(() => {});
+                          }}
+                          style={{ padding: '0.2rem 0.6rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: 'transparent', color: '#fff', fontSize: '0.75rem', cursor: 'pointer' }}
+                        >
+                          {t('audio.play')}
+                        </button>
+                        <a
+                          href={resolveMediaUrl(`/api/tournaments/${tournament.id}/registrations/${reg.id}/audio/${encodeURIComponent(file.fileName)}/download`)}
+                          style={{ padding: '0.2rem 0.6rem', borderRadius: '6px', border: '1px solid rgba(124,185,255,0.4)', background: 'rgba(124,185,255,0.1)', color: '#7cb9ff', fontSize: '0.75rem', textDecoration: 'none' }}
+                        >
+                          {t('common.download')}
+                        </a>
+                      </div>
+                    ))}
+                  </div>
                 )}
                 {reg.audioNotes && <p style={{ margin: 0, opacity: 0.6, fontSize: '0.8rem', fontStyle: 'italic' }}>{reg.audioNotes}</p>}
                 <p style={{ margin: 0, opacity: 0.4, fontSize: '0.75rem' }}>{new Date(reg.createdAt).toLocaleString(dateLocale)}</p>

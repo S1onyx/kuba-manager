@@ -89,6 +89,14 @@ export async function updateTeam(id, { name }) {
 
   db.run('UPDATE games SET team_a = ? WHERE team_a_id = ?', [trimmedName, existing.id]);
   db.run('UPDATE games SET team_b = ? WHERE team_b_id = ?', [trimmedName, existing.id]);
+
+  // Text-Kopien des Teamnamens syncen (Platzhalter nur überschreiben, wenn
+  // er noch dem alten Teamnamen entspricht, nicht bei manuellen Slot-Namen)
+  db.run('UPDATE tournament_teams SET placeholder = ? WHERE team_id = ? AND placeholder = ?', [trimmedName, existing.id, existing.name]);
+  db.run('UPDATE tournament_registrations SET team_name = ? WHERE team_id = ?', [trimmedName, existing.id]);
+  db.run('UPDATE audio_triggers SET label = ? WHERE key = ?', [`Korb ${trimmedName}`, `score_team_${existing.id}`]);
+  db.run('UPDATE audio_files SET label = ? WHERE label = ?', [`Korbhymne – ${trimmedName}`, `Korbhymne – ${existing.name}`]);
+
   persistDatabase(db, SQL);
   return getTeam(existing.id);
 }

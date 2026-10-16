@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PanelCard from '../common/PanelCard.jsx';
 import { useDashboard } from '../../context/DashboardContext.jsx';
+import { resolveMediaUrl } from '../../config.js';
 
 export default function AudioTab() {
   const { t } = useTranslation();
@@ -260,6 +261,12 @@ export default function AudioTab() {
                     >
                       {t('audio.play')}
                     </button>
+                    <a
+                      href={resolveMediaUrl(`/api/audio/library/${file.id}/download`)}
+                      className="audio-library-item__download"
+                    >
+                      {t('common.download')}
+                    </a>
                     <button
                       type="button"
                       className="btn-danger"

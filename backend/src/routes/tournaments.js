@@ -1,6 +1,8 @@
 import express from 'express';
 import multer from 'multer';
-import { listRegistrations, confirmRegistration, rejectRegistration, updateRegistrationStatus } from '../services/registrations/index.js';
+import { listRegistrations, confirmRegistration, rejectRegistration, updateRegistrationStatus, getRegistrationAudioFile, getRegistrationAudioDir } from '../services/registrations/index.js';
+import path from 'node:path';
+import fs from 'node:fs';
 import { sendRegistrationApproved, sendRegistrationRejected } from '../services/mail/index.js';
 import {
   createTournament,
@@ -409,6 +411,27 @@ router.get('/:id/registrations', async (req, res) => {
   } catch (error) {
     console.error('Anmeldungen konnten nicht geladen werden:', error);
     res.status(500).json({ code: 'REGISTRATIONS_LOAD_FAILED', message: 'Anmeldungen konnten nicht geladen werden.' });
+  }
+});
+
+router.get('/:id/registrations/:regId/audio/:fileName/download', async (req, res) => {
+  const regId = Number(req.params.regId);
+  if (!Number.isInteger(regId) || regId <= 0) {
+    return res.status(400).json({ code: 'INVALID_REGISTRATION_ID', message: 'Ungültige Anmeldungs-ID.' });
+  }
+  try {
+    const file = await getRegistrationAudioFile(regId, String(req.params.fileName));
+    if (!file) {
+      return res.status(404).json({ code: 'AUDIO_FILE_NOT_FOUND', message: 'Audiodatei nicht gefunden.' });
+    }
+    const filePath = path.join(getRegistrationAudioDir(), file.file_name);
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ code: 'AUDIO_FILE_NOT_FOUND', message: 'Audiodatei nicht gefunden.' });
+    }
+    res.download(filePath, file.original_name);
+  } catch (error) {
+    console.error('Registrierungs-Audio konnte nicht geladen werden:', error);
+    res.status(500).json({ code: 'AUDIO_DOWNLOAD_FAILED', message: 'Audiodatei konnte nicht geladen werden.' });
   }
 });
 
