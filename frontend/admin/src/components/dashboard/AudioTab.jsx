@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import PanelCard from '../common/PanelCard.jsx';
 import AudioDuration from '../common/AudioDuration.jsx';
 import { useDashboard } from '../../context/DashboardContext.jsx';
-import { resolveMediaUrl } from '../../config.js';
+import { downloadProtectedFile } from '../../utils/api.js';
 
 export default function AudioTab() {
   const { t } = useTranslation();
@@ -186,12 +186,13 @@ export default function AudioTab() {
                         >
                           {t('audio.play')}
                         </button>
-                        <a
-                          href={resolveMediaUrl(`/api/audio/library/${currentFile.id}/download`)}
+                        <button
+                          type="button"
+                          onClick={() => downloadProtectedFile(`/api/audio/library/${currentFile.id}/download`).catch(() => alert(t('error.generic')))}
                           className="audio-library-item__download"
                         >
                           {t('common.download')}
-                        </a>
+                        </button>
                         <button
                           type="button"
                           onClick={() => handleAudioTriggerClear(trigger.key)}
@@ -404,12 +405,13 @@ export default function AudioTab() {
                     >
                       {t('audio.play')}
                     </button>
-                    <a
-                      href={resolveMediaUrl(`/api/audio/library/${file.id}/download`)}
+                    <button
+                      type="button"
+                      onClick={() => downloadProtectedFile(`/api/audio/library/${file.id}/download`).catch(() => alert(t('error.generic')))}
                       className="audio-library-item__download"
                     >
                       {t('common.download')}
-                    </a>
+                    </button>
                     <button
                       type="button"
                       className="btn-danger"

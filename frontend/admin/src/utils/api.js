@@ -1,7 +1,35 @@
-import { BACKEND_URL } from '../config.js';
+import { BACKEND_URL, ADMIN_SESSION_KEY } from '../config.js';
 
 const BASE = BACKEND_URL;
 const API_BASE = `${BASE}/api`;
+
+export const AUTH_EXPIRED_EVENT = 'kuba-admin-auth-expired';
+
+export function getSessionToken() {
+  return window.localStorage.getItem(ADMIN_SESSION_KEY);
+}
+
+function setSessionToken(token) {
+  if (token) {
+    window.localStorage.setItem(ADMIN_SESSION_KEY, token);
+  } else {
+    window.localStorage.removeItem(ADMIN_SESSION_KEY);
+  }
+}
+
+async function authorizedFetch(url, options = {}) {
+  const token = getSessionToken();
+  const headers = { ...(options.headers || {}) };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  const response = await fetch(url, { ...options, headers });
+  if (response.status === 401 && token) {
+    setSessionToken(null);
+    window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT));
+  }
+  return response;
+}
 
 async function request(path, options = {}) {
   const isFormData = options?.body instanceof FormData;
@@ -14,7 +42,7 @@ async function request(path, options = {}) {
     headers['Content-Type'] = 'application/json';
   }
 
-  const response = await fetch(`${API_BASE}${path}`, {
+  const response = await authorizedFetch(`${API_BASE}${path}`, {
     ...options,
     headers
   });
@@ -44,6 +72,38 @@ async function request(path, options = {}) {
   }
 
   return response.json();
+}
+
+export async function login(username, password) {
+  const session = await request('/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) });
+  setSessionToken(session.token);
+  return session;
+}
+
+export function checkSession() {
+  return request('/auth/session');
+}
+
+function fileNameFromDisposition(header) {
+  const encoded = /filename\*=UTF-8''([^;]+)/i.exec(header ?? '');
+  if (encoded) return decodeURIComponent(encoded[1]);
+  const plain = /filename="?([^";]+)"?/i.exec(header ?? '');
+  return plain ? plain[1] : '';
+}
+
+export async function downloadProtectedFile(path) {
+  const response = await authorizedFetch(`${BASE}${path}`);
+  if (!response.ok) {
+    throw new Error('Download failed');
+  }
+  const url = URL.createObjectURL(await response.blob());
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileNameFromDisposition(response.headers.get('Content-Disposition'));
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 export function fetchScoreboard() {

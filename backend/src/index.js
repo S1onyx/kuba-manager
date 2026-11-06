@@ -11,12 +11,15 @@ import teamRoutes from './routes/teams.js';
 import playerRoutes from './routes/players.js';
 import audioRoutes from './routes/audio.js';
 import inboundRoutes from './routes/inbound.js';
+import authRoutes from './routes/auth.js';
+import { getAuthConfig, requireAdmin, requireAdminExcept } from './auth/index.js';
 import { getAudioStorageDirectory, initTimerCueSettings } from './services/index.js';
 import { getRegistrationAudioDir } from './services/registrations/index.js';
 
 dotenv.config({ quiet: true });
 
 const app = express();
+app.set('trust proxy', 1);
 const server = http.createServer(app);
 const io = new SocketIO(server, {
   cors: { origin: '*' }
@@ -45,13 +48,30 @@ app.use(
   })
 );
 
-app.use('/api/scoreboard', scoreboardRoutes);
-app.use('/api/tournaments', tournamentRoutes);
+const displayScoreboardRoutes = [
+  ['GET', '/'],
+  ['GET', '/standings'],
+  ['GET', '/structure'],
+  ['POST', '/display']
+];
+
+app.use('/api/auth', authRoutes);
+app.use('/api/scoreboard', requireAdminExcept(displayScoreboardRoutes), scoreboardRoutes);
+app.use('/api/tournaments', requireAdmin, tournamentRoutes);
 app.use('/api/public', publicRoutes);
-app.use('/api/teams', teamRoutes);
-app.use('/api/players', playerRoutes);
-app.use('/api/audio', audioRoutes);
+app.use('/api/teams', requireAdmin, teamRoutes);
+app.use('/api/players', requireAdmin, playerRoutes);
+app.use('/api/audio', requireAdmin, audioRoutes);
 app.use('/api/inbound', inboundRoutes);
+
+const authConfig = getAuthConfig();
+if (!authConfig.passwordHash) {
+  console.warn(
+    authConfig.devFallback
+      ? '[auth] ADMIN_PASSWORD_HASH nicht gesetzt – Entwicklungs-Login mit Standardpasswort aktiv.'
+      : '[auth] ADMIN_PASSWORD_HASH nicht gesetzt – Admin-Login ist deaktiviert.'
+  );
+}
 
 initTimerCueSettings().catch((err) => console.error('Timer-Cue-Einstellungen konnten nicht geladen werden:', err));
 

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PanelCard from '../../common/PanelCard.jsx';
 import { useDashboard } from '../../../context/DashboardContext.jsx';
-import { fetchRegistrations, updateRegistrationStatus, activateTournament, setRegistrationClosed } from '../../../utils/api.js';
+import { fetchRegistrations, updateRegistrationStatus, activateTournament, setRegistrationClosed, downloadProtectedFile } from '../../../utils/api.js';
 import { formatApiError } from '../../../utils/apiError.js';
 import { useDateLocale } from '../../../i18n/index.js';
 import { resolveMediaUrl } from '../../../config.js';
@@ -430,12 +430,13 @@ export default function TournamentDetailsPanel({
                         >
                           {t('audio.play')}
                         </button>
-                        <a
-                          href={resolveMediaUrl(`/api/tournaments/${tournament.id}/registrations/${reg.id}/audio/${encodeURIComponent(file.fileName)}/download`)}
-                          style={{ padding: '0.2rem 0.6rem', borderRadius: '6px', border: '1px solid rgba(124,185,255,0.4)', background: 'rgba(124,185,255,0.1)', color: '#7cb9ff', fontSize: '0.75rem', textDecoration: 'none' }}
+                        <button
+                          type="button"
+                          onClick={() => downloadProtectedFile(`/api/tournaments/${tournament.id}/registrations/${reg.id}/audio/${encodeURIComponent(file.fileName)}/download`).catch(() => alert(t('error.generic')))}
+                          style={{ padding: '0.2rem 0.6rem', borderRadius: '6px', border: '1px solid rgba(124,185,255,0.4)', background: 'rgba(124,185,255,0.1)', color: '#7cb9ff', fontSize: '0.75rem', cursor: 'pointer' }}
                         >
                           {t('common.download')}
-                        </a>
+                        </button>
                       </div>
                     ))}
                   </div>
