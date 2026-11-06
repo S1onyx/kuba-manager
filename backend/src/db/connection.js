@@ -28,7 +28,10 @@ async function openDatabase() {
   const SQL = await loadSqlModule();
   const fileExists = fs.existsSync(dbPath);
   const db = fileExists ? new SQL.Database(fs.readFileSync(dbPath)) : new SQL.Database();
-  initializeSchema(db);
+  if (initializeSchema(db)) {
+    persistDatabase(db, SQL);
+    console.log('[db] Migration: Teams und Spieler sind jetzt pro Turnier gespeichert.');
+  }
   return { SQL, db };
 }
 

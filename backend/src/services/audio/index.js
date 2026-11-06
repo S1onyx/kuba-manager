@@ -241,17 +241,20 @@ export async function ensureScoreTriggerForTeam(teamId, teamName, tournamentId =
 async function ensureTeamScoreTriggers() {
   const { db } = await getConnection();
   const teamsStmt = db.prepare(`
-    SELECT t.id, t.name,
-      (SELECT MAX(tt.tournament_id) FROM tournament_teams tt WHERE tt.team_id = t.id) AS tournament_id
+    SELECT t.id, t.name, t.tournament_id
     FROM teams t
+    WHERE t.tournament_id IS NOT NULL
   `);
+  const teams = [];
   try {
     while (teamsStmt.step()) {
-      const row = teamsStmt.getAsObject();
-      await ensureScoreTriggerForTeam(row.id, row.name, row.tournament_id ?? null);
+      teams.push(teamsStmt.getAsObject());
     }
   } finally {
     teamsStmt.free();
+  }
+  for (const team of teams) {
+    await ensureScoreTriggerForTeam(team.id, team.name, team.tournament_id ?? null);
   }
 }
 

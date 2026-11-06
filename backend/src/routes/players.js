@@ -13,13 +13,13 @@ import {
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const { teamId } = req.query ?? {};
+  const { teamId, tournamentId } = req.query ?? {};
   try {
     if (teamId) {
       const players = await listPlayersByTeam(teamId);
       return res.json(players);
     }
-    const players = await listPlayers();
+    const players = await listPlayers({ tournamentId });
     res.json(players);
   } catch (error) {
     console.error('Players konnten nicht geladen werden:', error);
@@ -60,8 +60,12 @@ router.put('/:id', async (req, res) => {
 
     if (req.body?.teamId && Number(req.body.teamId) !== existing.team_id) {
       const targetTeam = await getTeam(req.body.teamId);
+      const currentTeam = await getTeam(existing.team_id);
       if (!targetTeam) {
         return res.status(404).json({ code: 'TARGET_TEAM_NOT_FOUND', message: 'Ziel-Team wurde nicht gefunden.' });
+      }
+      if (currentTeam && targetTeam.tournament_id !== currentTeam.tournament_id) {
+        return res.status(400).json({ code: 'TEAM_OTHER_TOURNAMENT', message: 'Spieler können nur innerhalb eines Turniers wechseln.' });
       }
       await movePlayer(id, targetTeam.id);
     }

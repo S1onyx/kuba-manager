@@ -3,6 +3,7 @@ import {
   createTeam,
   deleteTeam,
   getTeam,
+  getTournament,
   listTeams,
   updateTeam
 } from '../services/index.js';
@@ -10,9 +11,9 @@ import { getScoreboardState, setTeams } from '../scoreboard/index.js';
 
 const router = express.Router();
 
-router.get('/', async (_req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const teams = await listTeams();
+    const teams = await listTeams({ tournamentId: req.query?.tournamentId });
     res.json(teams);
   } catch (error) {
     console.error('Teams konnten nicht geladen werden:', error);
@@ -22,8 +23,11 @@ router.get('/', async (_req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { name } = req.body ?? {};
-    const team = await createTeam({ name });
+    const { name, tournamentId } = req.body ?? {};
+    if (!(await getTournament(tournamentId))) {
+      return res.status(400).json({ code: 'TOURNAMENT_REQUIRED', message: 'Bitte ein Turnier wählen.' });
+    }
+    const team = await createTeam({ name, tournamentId });
     res.status(201).json(team);
   } catch (error) {
     console.error('Team konnte nicht erstellt werden:', error);

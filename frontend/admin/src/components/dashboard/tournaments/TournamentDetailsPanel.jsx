@@ -10,8 +10,7 @@ import { TOURNAMENT_CLASSIFICATION_OPTIONS } from '../../../constants/dashboard.
 
 export default function TournamentDetailsPanel({
   tournament,
-  structureState,
-  teams
+  structureState
 }) {
   const { t } = useTranslation();
   const dateLocale = useDateLocale();
@@ -151,13 +150,11 @@ export default function TournamentDetailsPanel({
     slotInitialAssignments,
     structureSaving,
     hasTournamentChanges,
-    handleSlotNameChange,
-    handleSlotTeamSelect,
+    handleSlotSwap,
     handleSlotReset,
     handleResetAllSlots,
     handleTournamentAssignmentsSave,
-    handleTournamentStructureRefresh,
-    teamNameById
+    handleTournamentStructureRefresh
   } = structureState;
 
   const groups = useMemo(() => {
@@ -166,17 +163,6 @@ export default function TournamentDetailsPanel({
     }
     return activeStructure.groups;
   }, [activeStructure]);
-
-  const slotTeamOptions = useMemo(() => {
-    const allowed = new Set(
-      registrations.filter((reg) => reg.status === 'confirmed' && reg.teamId).map((reg) => String(reg.teamId))
-    );
-    if (allowed.size === 0) {
-      return teams;
-    }
-    Object.values(slotInitialAssignments).forEach((entry) => entry.teamId && allowed.add(entry.teamId));
-    return teams.filter((team) => allowed.has(String(team.id)));
-  }, [registrations, teams, slotInitialAssignments]);
 
   const qualifierSummary = activeStructure?.knockout?.entrants
     ? t('tournaments.details.qualifierPossible', { count: activeStructure.knockout.entrants })
@@ -455,14 +441,11 @@ export default function TournamentDetailsPanel({
             slotInitialAssignments={slotInitialAssignments}
             structureSaving={structureSaving}
             hasTournamentChanges={hasTournamentChanges}
-            handleSlotNameChange={handleSlotNameChange}
-            handleSlotTeamSelect={handleSlotTeamSelect}
+            handleSlotSwap={handleSlotSwap}
             handleSlotReset={handleSlotReset}
             handleResetAllSlots={handleResetAllSlots}
             handleTournamentAssignmentsSave={handleTournamentAssignmentsSave}
             handleTournamentStructureRefresh={handleTournamentStructureRefresh}
-            teams={slotTeamOptions}
-            teamNameById={teamNameById}
             qualifierSummary={qualifierSummary}
           />
         )}
@@ -479,24 +462,24 @@ export default function TournamentDetailsPanel({
         slotInitialAssignments={slotInitialAssignments}
         structureSaving={structureSaving}
         hasTournamentChanges={hasTournamentChanges}
-        handleSlotNameChange={handleSlotNameChange}
-        handleSlotTeamSelect={handleSlotTeamSelect}
+        handleSlotSwap={handleSlotSwap}
         handleSlotReset={handleSlotReset}
         handleResetAllSlots={handleResetAllSlots}
         handleTournamentAssignmentsSave={handleTournamentAssignmentsSave}
         handleTournamentStructureRefresh={handleTournamentStructureRefresh}
-        teams={slotTeamOptions}
-        teamNameById={teamNameById}
         qualifierSummary={qualifierSummary}
       />
     </PanelCard>
   );
 }
 
-function StructureContent({ groups, slotAssignments, slotInitialAssignments, structureSaving, hasTournamentChanges, handleSlotNameChange, handleSlotTeamSelect, handleSlotReset, handleResetAllSlots, handleTournamentAssignmentsSave, handleTournamentStructureRefresh, teams, teamNameById }) {
+function StructureContent({ groups, slotAssignments, slotInitialAssignments, structureSaving, hasTournamentChanges, handleSlotSwap, handleSlotReset, handleResetAllSlots, handleTournamentAssignmentsSave, handleTournamentStructureRefresh }) {
   const { t } = useTranslation();
+  const slotName = (slotNumber) =>
+    slotAssignments[String(slotNumber)]?.name || t('tournaments.details.teamFallback', { number: slotNumber });
   return (
     <div style={{ display: 'grid', gap: '1rem' }}>
+      <p style={{ margin: 0, opacity: 0.7, fontSize: '0.875rem' }}>{t('tournaments.details.swapHint')}</p>
       <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
         <button type="button" onClick={handleTournamentStructureRefresh}>{t('tournaments.details.reload')}</button>
         <button type="button" onClick={handleTournamentAssignmentsSave} disabled={!hasTournamentChanges || structureSaving}>
@@ -508,45 +491,47 @@ function StructureContent({ groups, slotAssignments, slotInitialAssignments, str
         <p style={{ margin: 0 }}>{t('tournaments.details.noGroups')}</p>
       ) : (
         <div style={{ display: 'grid', gap: '1.25rem' }}>
-          {groups.map((group) => (
-            <section key={group.label ?? group.id} style={{ borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(8,20,35,0.45)', padding: '1rem 1.2rem', display: 'grid', gap: '0.8rem' }}>
-              <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <strong>{group.label || t('tournaments.details.groupFallback', { id: group.id ?? '' })}</strong>
-                <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>{t('tournaments.details.slots', { count: group.slots?.length ?? 0 })}</span>
-              </header>
-              <div style={{ display: 'grid', gap: '0.75rem' }}>
+          {groups.map((group) => {
+            const otherSlots = groups
+              .filter((other) => other.label !== group.label)
+              .flatMap((other) => other.slots.map((slot) => ({ ...slot, groupLabel: other.label })));
+            return (
+              <section key={group.label ?? group.id} style={{ borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(8,20,35,0.45)', padding: '1rem 1.2rem', display: 'grid', gap: '0.6rem' }}>
+                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <strong>{group.label || t('tournaments.details.groupFallback', { id: group.id ?? '' })}</strong>
+                  <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>{t('tournaments.details.slots', { count: group.slots?.length ?? 0 })}</span>
+                </header>
                 {group.slots.map((slot) => {
                   const key = String(slot.slotNumber);
-                  const assignment = slotAssignments[key] ?? {
-                    name: t('tournaments.details.teamFallback', { number: slot.slotNumber }),
-                    placeholder: t('tournaments.details.teamFallback', { number: slot.slotNumber }),
-                    teamId: ''
-                  };
-                  const initial = slotInitialAssignments[key] ?? assignment;
-                  const hasChanges = (assignment.name ?? '').trim() !== (initial.name ?? '').trim() || (assignment.teamId ?? '') !== (initial.teamId ?? '');
+                  const current = slotAssignments[key];
+                  const initial = slotInitialAssignments[key];
+                  const hasChanges = Boolean(current && initial) && ((current.teamId ?? '') !== (initial.teamId ?? '') || (current.name ?? '') !== (initial.name ?? ''));
                   return (
-                    <div key={key} style={{ display: 'grid', gap: '0.65rem', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: hasChanges ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.08)', background: 'rgba(12,28,48,0.6)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontWeight: 600 }}>{t('tournaments.details.slot', { number: slot.slotNumber })}</span>
-                        <button type="button" onClick={() => handleSlotReset(slot.slotNumber)}>{t('tournaments.details.reset')}</button>
-                      </div>
-                      <label style={{ display: 'grid', gap: '0.3rem' }}>
-                        {t('tournaments.details.placeholderName')}
-                        <input value={assignment.name} onChange={(e) => handleSlotNameChange(slot.slotNumber, e.target.value)} placeholder={assignment.placeholder} />
-                      </label>
-                      <label style={{ display: 'grid', gap: '0.3rem' }}>
-                        {t('tournaments.details.assignTeam')}
-                        <select value={assignment.teamId ?? ''} onChange={(e) => handleSlotTeamSelect(slot.slotNumber, e.target.value)}>
-                          <option value="">{t('tournaments.details.noFixedTeam')}</option>
-                          {teams.map((team) => <option key={team.id} value={team.id}>{team.name}</option>)}
+                    <div key={key} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto auto', gap: '0.6rem', alignItems: 'center', padding: '0.55rem 0.75rem', borderRadius: 'var(--radius-sm)', border: hasChanges ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.08)', background: 'rgba(12,28,48,0.6)' }}>
+                      <span style={{ fontWeight: 600, overflowWrap: 'anywhere' }}>{slotName(slot.slotNumber)}</span>
+                      {otherSlots.length > 0 ? (
+                        <select
+                          value=""
+                          onChange={(event) => event.target.value && handleSlotSwap(slot.slotNumber, Number(event.target.value))}
+                          aria-label={t('tournaments.details.swapWith')}
+                        >
+                          <option value="">{t('tournaments.details.swapWith')}</option>
+                          {otherSlots.map((other) => (
+                            <option key={other.slotNumber} value={other.slotNumber}>
+                              {other.groupLabel}: {slotName(other.slotNumber)}
+                            </option>
+                          ))}
                         </select>
-                      </label>
+                      ) : null}
+                      {hasChanges ? (
+                        <button type="button" onClick={() => handleSlotReset(slot.slotNumber)}>{t('tournaments.details.reset')}</button>
+                      ) : null}
                     </div>
                   );
                 })}
-              </div>
-            </section>
-          ))}
+              </section>
+            );
+          })}
         </div>
       )}
     </div>

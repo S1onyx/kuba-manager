@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import { databasePaths, getConnection, persistDatabase } from '../../db/connection.js';
 import { getAudioStorageDirectory } from '../audio/index.js';
 import { normalizeLanguage } from '../mail/index.js';
+import { findOrCreateTournamentTeam } from '../teamsService.js';
 
 const REG_AUDIO_DIR = path.join(databasePaths.dataDir, 'registration-audio');
 fs.mkdirSync(REG_AUDIO_DIR, { recursive: true });
@@ -136,16 +137,6 @@ export async function getRegistration(id) {
   }
 }
 
-// Upserts a team by name, returns team id
-function upsertTeam(db, SQL, teamName) {
-  db.run(
-    `INSERT INTO teams (name) VALUES (?) ON CONFLICT(name) DO UPDATE SET name = excluded.name`,
-    [teamName]
-  );
-  const result = db.exec('SELECT id FROM teams WHERE name = ?', [teamName]);
-  return result[0]?.values[0][0] ?? null;
-}
-
 // Finds the next free slot in tournament_teams for this tournament
 function nextFreeSlot(db, tournamentId) {
   const result = db.exec(
@@ -162,7 +153,7 @@ export async function confirmRegistration(regId) {
   const { SQL, db } = await getConnection();
 
   // 1. Upsert team
-  const teamId = upsertTeam(db, SQL, reg.teamName);
+  const teamId = findOrCreateTournamentTeam(db, reg.tournamentId, reg.teamName);
 
   // 2. Insert players (delete old ones from this team first to avoid dupes)
   db.run('DELETE FROM team_players WHERE team_id = ?', [teamId]);

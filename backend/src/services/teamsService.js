@@ -3,21 +3,35 @@ import { getConnection, persistDatabase } from '../db/connection.js';
 function mapTeam(row) {
   return {
     id: row.id,
+    tournament_id: row.tournament_id ?? null,
     name: row.name,
     created_at: row.created_at
   };
 }
 
-export async function createTeam({ name }) {
+export function findOrCreateTournamentTeam(db, tournamentId, teamName) {
+  db.run('INSERT INTO teams (tournament_id, name) VALUES (?, ?) ON CONFLICT(tournament_id, name) DO NOTHING', [
+    tournamentId,
+    teamName
+  ]);
+  const result = db.exec('SELECT id FROM teams WHERE tournament_id = ? AND name = ?', [tournamentId, teamName]);
+  return result[0]?.values[0][0] ?? null;
+}
+
+export async function createTeam({ name, tournamentId }) {
   const trimmedName = String(name ?? '').trim();
   if (!trimmedName) {
     throw new Error('Team name required');
   }
+  const numericTournamentId = Number(tournamentId);
+  if (!Number.isInteger(numericTournamentId) || numericTournamentId <= 0) {
+    throw new Error('Tournament required');
+  }
 
   const { SQL, db } = await getConnection();
-  const stmt = db.prepare('INSERT INTO teams (name) VALUES (?)');
+  const stmt = db.prepare('INSERT INTO teams (tournament_id, name) VALUES (?, ?)');
   try {
-    stmt.run([trimmedName]);
+    stmt.run([numericTournamentId, trimmedName]);
   } catch (error) {
     stmt.free();
     if (String(error?.message || '').includes('UNIQUE')) {
@@ -32,12 +46,17 @@ export async function createTeam({ name }) {
   return (await getTeam(id)) ?? null;
 }
 
-export async function listTeams() {
+export async function listTeams({ tournamentId } = {}) {
+  const numericTournamentId = Number(tournamentId);
+  if (!Number.isInteger(numericTournamentId) || numericTournamentId <= 0) {
+    return [];
+  }
   const { db } = await getConnection();
-  const stmt = db.prepare('SELECT * FROM teams ORDER BY LOWER(name) ASC');
+  const stmt = db.prepare('SELECT * FROM teams WHERE tournament_id = ? ORDER BY LOWER(name) ASC');
   const rows = [];
 
   try {
+    stmt.bind([numericTournamentId]);
     while (stmt.step()) {
       rows.push(mapTeam(stmt.getAsObject()));
     }

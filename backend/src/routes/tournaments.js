@@ -7,6 +7,8 @@ import { sendRegistrationApproved, sendRegistrationRejected } from '../services/
 import {
   createTournament,
   deleteTournament,
+  findOrCreateTournamentTeam,
+  getTeam,
   getTournament,
   getTournamentSchedule,
   getTournamentStages,
@@ -367,13 +369,11 @@ router.post('/:id/activate', async (req, res) => {
         const slot = Number(t.slot_number);
         const teamName = String(t.name || '').trim();
         if (!slot || !teamName) continue;
-        let teamId = t.team_id ? Number(t.team_id) : null;
-        if (!teamId && teamName) {
-          // Upsert team by name
-          db.run('INSERT INTO teams (name) VALUES (?) ON CONFLICT(name) DO UPDATE SET name = excluded.name', [teamName]);
-          const r = db.exec('SELECT id FROM teams WHERE name = ?', [teamName]);
-          teamId = r[0]?.values[0][0] ?? null;
-        }
+        const requestedTeam = t.team_id ? await getTeam(Number(t.team_id)) : null;
+        const teamId =
+          requestedTeam && requestedTeam.tournament_id === id
+            ? requestedTeam.id
+            : findOrCreateTournamentTeam(db, id, teamName);
         db.run(
           'INSERT OR REPLACE INTO tournament_teams (tournament_id, slot_number, team_id, placeholder) VALUES (?, ?, ?, ?)',
           [id, slot, teamId, teamName]

@@ -52,7 +52,7 @@ function sanitizePlayerPayload(input = {}) {
   };
 }
 
-export async function listPlayers({ teamId } = {}) {
+export async function listPlayers({ teamId, tournamentId } = {}) {
   const { db } = await getConnection();
   let stmt;
   if (teamId) {
@@ -65,12 +65,18 @@ export async function listPlayers({ teamId } = {}) {
     );
     stmt.bind([numeric]);
   } else {
+    const numericTournamentId = Number(tournamentId);
+    if (!Number.isInteger(numericTournamentId) || numericTournamentId <= 0) {
+      return [];
+    }
     stmt = db.prepare(
       `SELECT p.*, t.name as team_name
        FROM team_players p
-       LEFT JOIN teams t ON t.id = p.team_id
+       JOIN teams t ON t.id = p.team_id
+       WHERE t.tournament_id = ?
        ORDER BY t.name, COALESCE(p.jersey_number, 9999), LOWER(p.name)`
     );
+    stmt.bind([numericTournamentId]);
   }
 
   const players = [];

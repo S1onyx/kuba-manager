@@ -177,6 +177,17 @@ export default function useTournamentStructure({
     });
   }, [teamNameById, t]);
 
+  const handleSlotSwap = useCallback((slotNumber, otherSlotNumber) => {
+    const key = String(slotNumber);
+    const otherKey = String(otherSlotNumber);
+    setSlotAssignments((prev) => {
+      if (!prev[key] || !prev[otherKey]) {
+        return prev;
+      }
+      return { ...prev, [key]: { ...prev[otherKey] }, [otherKey]: { ...prev[key] } };
+    });
+  }, []);
+
   const handleSlotReset = useCallback((slotNumber) => {
     const key = String(slotNumber);
     setSlotAssignments((prev) => {
@@ -296,6 +307,7 @@ export default function useTournamentStructure({
     loadTournamentStructure,
     handleSlotNameChange,
     handleSlotTeamSelect,
+    handleSlotSwap,
     handleSlotReset,
     handleResetAllSlots,
     handleTournamentStructureRefresh,

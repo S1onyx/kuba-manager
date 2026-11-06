@@ -8,7 +8,7 @@ import {
 } from '../utils/api.js';
 import { formatApiError } from '../utils/apiError.js';
 
-export default function usePlayerManager({ updateMessage, loadPlayersDependencies = [], refreshActiveTeams }) {
+export default function usePlayerManager({ updateMessage, loadPlayersDependencies = [], refreshActiveTeams, tournamentId }) {
   const { t } = useTranslation();
   const [players, setPlayers] = useState([]);
   const [playersLoading, setPlayersLoading] = useState(true);
@@ -17,10 +17,15 @@ export default function usePlayerManager({ updateMessage, loadPlayersDependencie
   const [playerEdits, setPlayerEdits] = useState({});
 
   const loadPlayers = useCallback((showLoader = false) => {
+    if (!tournamentId) {
+      setPlayers([]);
+      setPlayersLoading(false);
+      return;
+    }
     if (showLoader) {
       setPlayersLoading(true);
     }
-    fetchPlayers()
+    fetchPlayers({ tournamentId })
       .then((data) => {
         setPlayers(data);
         setPlayersError('');
@@ -33,11 +38,16 @@ export default function usePlayerManager({ updateMessage, loadPlayersDependencie
           setPlayersLoading(false);
         }
       });
-  }, [t]);
+  }, [t, tournamentId]);
 
   useEffect(() => {
     loadPlayers(true);
   }, [loadPlayers, ...loadPlayersDependencies]);
+
+  useEffect(() => {
+    setPlayerCreate((prev) => ({ ...prev, teamId: '' }));
+    setPlayerEdits({});
+  }, [tournamentId]);
 
   const handlePlayerCreateChange = useCallback((field, value) => {
     setPlayerCreate((prev) => ({ ...prev, [field]: value }));
