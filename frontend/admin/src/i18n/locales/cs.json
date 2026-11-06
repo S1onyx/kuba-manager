@@ -149,8 +149,7 @@
       "placeholderGroup": "např. Skupina A",
       "placeholderKnockout": "např. Čtvrtfinále",
       "placeholderPlacement": "např. Zápas o 3 / 4. místo",
-      "placeholderDefault": "např. Čtvrtfinále nebo zápas o 3 / 4. místo",
-      "advancedToggle": "Pokročilé: zápas mimo program (ruční kontext zápasu)"
+      "placeholderDefault": "např. Čtvrtfinále nebo zápas o 3 / 4. místo"
     },
     "scheduleIntegration": {
       "title": "Převzít zápas z rozlosování",

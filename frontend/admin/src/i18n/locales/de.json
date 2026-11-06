@@ -145,8 +145,7 @@
       "placeholderGroup": "z.B. Gruppe A",
       "placeholderKnockout": "z.B. Viertelfinale",
       "placeholderPlacement": "z.B. Spiel um Platz 3 / 4",
-      "placeholderDefault": "z.B. Viertelfinale oder Spiel um Platz 3 / 4",
-      "advancedToggle": "Erweitert: Spiel ohne Spielplan (Match-Kontext manuell setzen)"
+      "placeholderDefault": "z.B. Viertelfinale oder Spiel um Platz 3 / 4"
     },
     "scheduleIntegration": {
       "title": "Spielplan-Match übernehmen",

@@ -145,8 +145,7 @@
       "placeholderGroup": "p. ex. Groupe A",
       "placeholderKnockout": "p. ex. Quart de finale",
       "placeholderPlacement": "p. ex. Match pour la place 3 / 4",
-      "placeholderDefault": "p. ex. Quart de finale ou match pour la place 3 / 4",
-      "advancedToggle": "Avancé : match hors programme (définir le contexte manuellement)"
+      "placeholderDefault": "p. ex. Quart de finale ou match pour la place 3 / 4"
     },
     "scheduleIntegration": {
       "title": "Reprendre un match du calendrier",

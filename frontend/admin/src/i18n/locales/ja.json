@@ -143,8 +143,7 @@
       "placeholderGroup": "例: グループ A",
       "placeholderKnockout": "例: 準々決勝",
       "placeholderPlacement": "例: 3 / 4 位決定戦",
-      "placeholderDefault": "例: 準々決勝または 3 / 4 位決定戦",
-      "advancedToggle": "詳細：スケジュール外の試合（試合コンテキストを手動設定）"
+      "placeholderDefault": "例: 準々決勝または 3 / 4 位決定戦"
     },
     "scheduleIntegration": {
       "title": "日程から試合を取り込む",

@@ -145,8 +145,7 @@
       "placeholderGroup": "e.g. Group A",
       "placeholderKnockout": "e.g. Quarter-final",
       "placeholderPlacement": "e.g. Match for place 3 / 4",
-      "placeholderDefault": "e.g. Quarter-final or match for place 3 / 4",
-      "advancedToggle": "Advanced: game without schedule (set match context manually)"
+      "placeholderDefault": "e.g. Quarter-final or match for place 3 / 4"
     },
     "scheduleIntegration": {
       "title": "Apply Scheduled Match",
