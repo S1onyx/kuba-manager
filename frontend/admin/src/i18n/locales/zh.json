@@ -118,7 +118,8 @@
     "display": {
       "title": "投影显示",
       "description": "在投影仪上切换实时比分和淘汰赛对阵图。",
-      "bracketHint": "提示：要显示对阵图，必须在比赛上下文中设置锦标赛。",
+      "bracketHint": "请先为对阵图选择锦标赛：",
+      "chooseTournament": "选择锦标赛 …",
       "updating": "正在更新显示..."
     },
     "context": {
@@ -142,7 +143,8 @@
       "placeholderGroup": "例如 A 组",
       "placeholderKnockout": "例如 四分之一决赛",
       "placeholderPlacement": "例如 第 3 / 4 名排位赛",
-      "placeholderDefault": "例如 四分之一决赛或第 3 / 4 名排位赛"
+      "placeholderDefault": "例如 四分之一决赛或第 3 / 4 名排位赛",
+      "advancedToggle": "高级：赛程外比赛（手动设置比赛上下文）"
     },
     "scheduleIntegration": {
       "title": "导入日程比赛",

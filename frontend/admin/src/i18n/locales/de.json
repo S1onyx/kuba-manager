@@ -120,7 +120,8 @@
     "display": {
       "title": "Beameranzeige",
       "description": "Wechsle zwischen Live-Spielstand und Turnierbaum auf dem Beamer.",
-      "bracketHint": "Hinweis: Für den Turnierbaum muss im Match-Kontext ein Turnier gesetzt sein.",
+      "bracketHint": "Für den Turnierbaum zuerst das Turnier wählen:",
+      "chooseTournament": "Turnier wählen …",
       "updating": "Anzeige wird aktualisiert..."
     },
     "context": {
@@ -144,7 +145,8 @@
       "placeholderGroup": "z.B. Gruppe A",
       "placeholderKnockout": "z.B. Viertelfinale",
       "placeholderPlacement": "z.B. Spiel um Platz 3 / 4",
-      "placeholderDefault": "z.B. Viertelfinale oder Spiel um Platz 3 / 4"
+      "placeholderDefault": "z.B. Viertelfinale oder Spiel um Platz 3 / 4",
+      "advancedToggle": "Erweitert: Spiel ohne Spielplan (Match-Kontext manuell setzen)"
     },
     "scheduleIntegration": {
       "title": "Spielplan-Match übernehmen",

@@ -120,7 +120,8 @@
     "display": {
       "title": "Beameraazeig",
       "description": "Wächsel zwüschem Live-Spielstand und em Turnierboum uf em Beamer.",
-      "bracketHint": "Hiiwiis: Für de Turnierboum muess im Match-Kontext es Turnier gsetzt si.",
+      "bracketHint": "Für de Turnierbaum zerscht s'Turnier wähle:",
+      "chooseTournament": "Turnier wähle …",
       "updating": "Aazeig wird aktualisiert..."
     },
     "context": {
@@ -144,7 +145,8 @@
       "placeholderGroup": "z.B. Gruppä A",
       "placeholderKnockout": "z.B. Viertelfinal",
       "placeholderPlacement": "z.B. Spil um Platz 3 / 4",
-      "placeholderDefault": "z.B. Viertelfinal oder Spil um Platz 3 / 4"
+      "placeholderDefault": "z.B. Viertelfinal oder Spil um Platz 3 / 4",
+      "advancedToggle": "Erwiitert: Spiil ohni Spiilplan (Match-Kontext vo Hand setze)"
     },
     "scheduleIntegration": {
       "title": "Spielplan-Match überneh",
