@@ -11,7 +11,7 @@ import {
   normalizeLocalDateTimeToISO
 } from '../utils/formatters.js';
 import { createPenaltyForms } from '../utils/forms.js';
-import { countUnsavedDrafts, mergeScheduleDrafts } from '../utils/scheduleDrafts.js';
+import { countUnsavedDrafts, interleaveGroupSlots, mergeScheduleDrafts } from '../utils/scheduleDrafts.js';
 import { formatApiError } from '../utils/apiError.js';
 import { formatStageLabelI18n } from '../utils/stageLabels.js';
 import { useDateLocale } from '../i18n/index.js';
@@ -455,6 +455,20 @@ export default function useScheduleManager({
     [scheduleChronological, getDraftValue, updateMessage, t]
   );
 
+  const handleScheduleInterleaveGroups = useCallback(() => {
+    const games = (scheduleChronological ?? [])
+      .filter((entry) => entry.phase === 'group' && !entry.result?.hasResult && getDraftValue(entry))
+      .map((entry) => ({ id: String(entry.id), group: entry.metadata?.group ?? entry.stage_label, value: getDraftValue(entry) }));
+    if (new Set(games.map((game) => game.group)).size < 2) {
+      updateMessage('error', t('feedback.interleaveNotPossible'));
+      return false;
+    }
+    const assignments = interleaveGroupSlots(games);
+    setScheduleDrafts((prev) => ({ ...prev, ...assignments }));
+    updateMessage('info', t('feedback.interleaved', { count: games.length }));
+    return true;
+  }, [scheduleChronological, getDraftValue, updateMessage, t]);
+
   const handleScheduleBulkPersist = useCallback(
     async ({ phase = 'all' } = {}) => {
       if (!resolvedTournamentId) {
@@ -634,6 +648,7 @@ export default function useScheduleManager({
     handleScheduleMatchApply,
     handleScheduleApplyDate,
     handleScheduleAutoPlan,
+    handleScheduleInterleaveGroups,
     handleScheduleBulkPersist,
     describeScheduleMatch,
     bulkSaving,

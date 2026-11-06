@@ -26,3 +26,23 @@ test('Spiele, die es nicht mehr gibt, fallen weg; neue kommen mit Serverwert daz
 test('Zählt ungespeicherte Änderungen', () => {
   assert.equal(countUnsavedDrafts({ 1: 'a', 2: '', 3: 'c' }, { 1: 'a', 2: 'b', 3: '' }), 2);
 });
+
+test('Gruppenspiele abwechselnd auf dieselben Zeiten verteilen', async () => {
+  const { interleaveGroupSlots } = await import('../src/utils/scheduleDrafts.js');
+  const games = [
+    { id: 'a1', group: 'A', value: '13:00' }, { id: 'a2', group: 'A', value: '13:12' }, { id: 'a3', group: 'A', value: '13:24' },
+    { id: 'b1', group: 'B', value: '13:36' }, { id: 'b2', group: 'B', value: '13:48' }
+  ];
+  assert.deepEqual(interleaveGroupSlots(games), { a1: '13:00', b1: '13:12', a2: '13:24', b2: '13:36', a3: '13:48' });
+});
+
+test('Abwechselnd behält Reihenfolge innerhalb der Gruppe und nutzt nur vorhandene Zeiten', async () => {
+  const { interleaveGroupSlots } = await import('../src/utils/scheduleDrafts.js');
+  const games = [
+    { id: 'b1', group: 'B', value: '10:00' }, { id: 'a1', group: 'A', value: '10:10' }, { id: 'b2', group: 'B', value: '10:20' }
+  ];
+  const result = interleaveGroupSlots(games);
+  assert.deepEqual(Object.values(result).sort(), ['10:00', '10:10', '10:20']);
+  assert.equal(result.a1, '10:00');
+  assert.ok(result.b1 < result.b2);
+});
