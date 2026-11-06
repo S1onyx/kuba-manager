@@ -14,6 +14,7 @@ export default function ScheduleBulkActionsCard() {
       scheduleError,
       handleScheduleApplyDate,
       handleScheduleAutoPlan,
+      handleScheduleInterleaveGroups,
       handleScheduleBulkPersist,
       bulkSaving,
       unsavedScheduleCount
@@ -220,6 +221,16 @@ export default function ScheduleBulkActionsCard() {
               <button type="submit">{t('schedule.bulk.applyAutoPlan')}</button>
             </div>
           </form>
+        </section>
+
+        <section style={{ display: 'grid', gap: '0.75rem' }}>
+          <header>
+            <h3 style={{ margin: 0, fontSize: '1rem', letterSpacing: '0.04em' }}>{t('schedule.bulk.interleaveTitle')}</h3>
+            <p style={{ margin: 0, opacity: 0.75 }}>{t('schedule.bulk.interleaveDescription')}</p>
+          </header>
+          <div>
+            <button type="button" onClick={handleScheduleInterleaveGroups}>{t('schedule.bulk.interleave')}</button>
+          </div>
         </section>
 
         <section style={{ display: 'grid', gap: '0.75rem' }}>
