@@ -59,7 +59,15 @@ export default function SummaryContent() {
     return (
       <SchedulePreview
         schedule={tournamentSummary.schedule}
-        activeScheduleCode={currentCardData?.scheduleCode ?? scoreboard?.scheduleCode ?? null}
+        liveMatch={
+          scoreboard?.tournamentId === tournamentSummary.tournament?.id && scoreboard?.scheduleCode
+            ? {
+                code: scoreboard.scheduleCode,
+                durationSeconds: scoreboard.durationSeconds,
+                remainingSeconds: scoreboard.remainingSeconds
+              }
+            : null
+        }
       />
     );
   }

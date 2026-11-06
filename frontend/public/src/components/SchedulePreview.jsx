@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useDateLocale } from '../i18n/index.js';
 import BracketStageList from './BracketStageList.jsx';
 import { formatStageLabelI18n } from '../utils/stageLabels.js';
+import { computeScheduleProgress, SCHEDULE_DELAY_THRESHOLD_MINUTES } from '../utils/scheduleProgress.js';
 
 const containerStyle = {
   background: 'rgba(0,0,0,0.28)',
@@ -191,6 +192,35 @@ const responsiveStyles = `
   .schedule-timeline__now-hint {
     font-weight: 600;
     color: #ffeab4;
+  }
+
+  .schedule-timeline__next-hint {
+    font-weight: 600;
+    color: #b5d9ff;
+  }
+
+  .schedule-timeline__expected {
+    font-weight: 600;
+    color: #ffeab4;
+  }
+
+  .schedule-timeline__delay {
+    margin: 0;
+    padding: 0.65rem 0.9rem;
+    border-radius: 12px;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.05);
+  }
+
+  .schedule-timeline__delay--behind {
+    border-color: rgba(255,171,64,0.45);
+    background: rgba(255,171,64,0.12);
+  }
+
+  .schedule-timeline__delay--ahead {
+    border-color: rgba(86,160,255,0.45);
+    background: rgba(86,160,255,0.12);
   }
 
   @media (max-width: 768px) {
@@ -415,21 +445,19 @@ function buildTimelineEntries(schedule, t, dateLocale) {
     }));
 }
 
-function renderTimelineRow(entry, nextKey, nowTs, formatDateTime, activeKey, t) {
+function renderTimelineRow(entry, status, formatDateTime, formatTime, t) {
   const scheduledLabel = entry.timestamp !== null ? formatDateTime(entry.scheduledRaw) : null;
-  const isPast = entry.timestamp !== null && entry.timestamp < nowTs;
-  const isActive = Boolean(activeKey && entry.key === activeKey);
   const classNames = ['schedule-timeline__row', 'schedule-timeline__item'];
-  if (isPast && !isActive) {
+  if (status.isPlayed) {
     classNames.push('schedule-timeline__item--past');
   }
-  if (!activeKey && entry.key === nextKey) {
+  if (status.isNext) {
     classNames.push('schedule-timeline__item--next');
   }
   if (entry.timestamp === null) {
     classNames.push('schedule-timeline__item--unscheduled');
   }
-  if (isActive) {
+  if (status.isActive) {
     classNames.push('schedule-timeline__item--now');
   }
   const scoreLabel = entry.result?.hasResult
@@ -450,7 +478,12 @@ function renderTimelineRow(entry, nextKey, nowTs, formatDateTime, activeKey, t) 
     <div key={entry.key} className={classNames.join(' ')}>
       <div className="schedule-timeline__time">
         {scheduledLabel ? (
-          <span>{scheduledLabel}</span>
+          <>
+            <span style={status.expectedTimestamp ? { textDecoration: 'line-through', opacity: 0.6 } : undefined}>{scheduledLabel}</span>
+            {status.expectedTimestamp ? (
+              <small className="schedule-timeline__expected">{t('schedule.expected', { time: formatTime(status.expectedTimestamp) })}</small>
+            ) : null}
+          </>
         ) : (
           <>
             <span>{t('schedule.openDate')}</span>
@@ -480,68 +513,27 @@ function renderTimelineRow(entry, nextKey, nowTs, formatDateTime, activeKey, t) 
         {entry.metadata?.description ? (
           <span className="schedule-timeline__note">{entry.metadata.description}</span>
         ) : null}
-        {isActive ? (
-          <span className="schedule-timeline__now-hint">{t('schedule.nowHint')}</span>
-        ) : null}
+        {status.isActive ? <span className="schedule-timeline__now-hint">{t('schedule.liveNow')}</span> : null}
+        {status.isNext ? <span className="schedule-timeline__next-hint">{t('schedule.upNext')}</span> : null}
         {metaParts.length ? <span className="schedule-timeline__meta">{metaParts.join(' · ')}</span> : null}
       </div>
     </div>
   );
 }
 
-function TimelineSchedule({ entries, formatDateTime, activeScheduleCode, t }) {
-  const nowTs = Date.now();
-  const hasTimeInfo = entries.some((entry) => entry.timestamp !== null);
-  const nextEntry = entries.find((entry) => entry.timestamp !== null && entry.timestamp >= nowTs);
-  const nextKey = nextEntry?.key ?? null;
-  const normalizedActiveCode =
-    typeof activeScheduleCode === 'string' && activeScheduleCode.trim().length > 0
-      ? activeScheduleCode.trim().toLowerCase()
-      : null;
-  const activeEntry = normalizedActiveCode
-    ? entries.find((entry) => (entry.code ?? '').toLowerCase() === normalizedActiveCode)
-    : null;
-  const activeKey = activeEntry?.key ?? null;
-  const rows = [];
-
-  if (activeKey) {
-    entries.forEach((entry) => {
-      rows.push(renderTimelineRow(entry, nextKey, nowTs, formatDateTime, activeKey, t));
-    });
-  } else {
-    let nowInserted = !hasTimeInfo;
-
-    const renderNowRow = (suffix) => (
-      <div
-        key={`timeline-now-${suffix}`}
-        className="schedule-timeline__row schedule-timeline__item schedule-timeline__item--now"
-      >
-        <div className="schedule-timeline__time">
-          <strong>{t('schedule.now')}</strong>
-          <span style={{ fontSize: '0.85rem', opacity: 0.8 }}>{formatDateTime(new Date())}</span>
-        </div>
-        <div className="schedule-timeline__marker">
-          <span className="schedule-timeline__dot" />
-        </div>
-        <div className="schedule-timeline__details">
-          <span className="schedule-timeline__now-hint">{t('schedule.nowHint')}</span>
-          <span className="schedule-timeline__meta">{t('schedule.nowDescription')}</span>
-        </div>
-      </div>
-    );
-
-    entries.forEach((entry) => {
-      if (!nowInserted && entry.timestamp !== null && entry.timestamp >= nowTs) {
-        rows.push(renderNowRow(entry.key));
-        nowInserted = true;
-      }
-      rows.push(renderTimelineRow(entry, nextKey, nowTs, formatDateTime, null, t));
-    });
-
-    if (!nowInserted && hasTimeInfo) {
-      rows.push(renderNowRow('end'));
-    }
+function describeDelay(delayMinutes, t) {
+  if (delayMinutes >= SCHEDULE_DELAY_THRESHOLD_MINUTES) {
+    return { tone: 'behind', text: t('schedule.delayBehind', { minutes: delayMinutes }) };
   }
+  if (delayMinutes <= -SCHEDULE_DELAY_THRESHOLD_MINUTES) {
+    return { tone: 'ahead', text: t('schedule.delayAhead', { minutes: Math.abs(delayMinutes) }) };
+  }
+  return { tone: 'ontime', text: t('schedule.onTime') };
+}
+
+function TimelineSchedule({ entries, formatDateTime, formatTime, liveMatch, t }) {
+  const progress = computeScheduleProgress(entries, liveMatch, Date.now());
+  const delay = progress.hasStarted && progress.delayMinutes !== null ? describeDelay(progress.delayMinutes, t) : null;
 
   return (
     <section className="schedule-timeline">
@@ -549,16 +541,34 @@ function TimelineSchedule({ entries, formatDateTime, activeScheduleCode, t }) {
         <h3 style={{ fontSize: '1.2rem', letterSpacing: '0.05em' }}>{t('schedule.timelineTitle')}</h3>
         <p style={{ fontSize: '0.95rem', opacity: 0.75 }}>{t('schedule.timelineDescription')}</p>
       </header>
+      {delay ? (
+        <p className={`schedule-timeline__delay schedule-timeline__delay--${delay.tone}`}>{delay.text}</p>
+      ) : null}
       {entries.length === 0 ? (
         <p style={{ opacity: 0.75, fontSize: '0.95rem' }}>{t('schedule.timelineEmpty')}</p>
       ) : (
-        <div className="schedule-timeline__list">{rows}</div>
+        <div className="schedule-timeline__list">
+          {entries.map((entry) =>
+            renderTimelineRow(
+              entry,
+              {
+                isPlayed: Boolean(entry.result?.hasResult),
+                isActive: entry.key === progress.activeKey,
+                isNext: entry.key === progress.nextKey,
+                expectedTimestamp: progress.expectedTimestamp(entry)
+              },
+              formatDateTime,
+              formatTime,
+              t
+            )
+          )}
+        </div>
       )}
     </section>
   );
 }
 
-export default function SchedulePreview({ schedule, activeScheduleCode = null }) {
+export default function SchedulePreview({ schedule, liveMatch = null }) {
   const { t } = useTranslation();
   const dateLocale = useDateLocale();
   const [viewMode, setViewMode] = useState(scheduleViewModes[0]?.id ?? 'timeline');
@@ -619,7 +629,8 @@ export default function SchedulePreview({ schedule, activeScheduleCode = null })
             <TimelineSchedule
               entries={timelineEntries}
               formatDateTime={formatMatchDateTime}
-              activeScheduleCode={activeScheduleCode}
+              formatTime={(timestamp) => new Date(timestamp).toLocaleTimeString(dateLocale, { hour: '2-digit', minute: '2-digit' })}
+              liveMatch={liveMatch}
               t={t}
             />
           ) : (
