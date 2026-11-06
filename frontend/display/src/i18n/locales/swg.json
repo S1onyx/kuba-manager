@@ -71,7 +71,6 @@
     "placementTitle": "Platzierungsspiele",
     "stageFallback": "Phase",
     "round": "Runde {{round}}",
-    "matchcode": "Matchcode {{code}}",
     "timeValue": "{{time}} Uhr",
     "status": {
       "qualified": "qualifiziert",

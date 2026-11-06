@@ -71,7 +71,6 @@
     "placementTitle": "Placement matches",
     "stageFallback": "Stage",
     "round": "Round {{round}}",
-    "matchcode": "Match code {{code}}",
     "timeValue": "{{time}}",
     "status": {
       "qualified": "qualified",

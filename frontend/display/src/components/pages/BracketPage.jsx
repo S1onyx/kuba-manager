@@ -36,14 +36,13 @@ export default function BracketPage({
   } else {
     content = (
       <div style={{ width: '100%' }}>
-        <BracketView tournamentName={tournamentName} structure={structure} />
+        <BracketView structure={structure} />
       </div>
     );
   }
 
   const containerStyle = {
     width: '100%',
-    maxWidth: '1600px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: isCompact ? 'stretch' : 'center',
@@ -51,13 +50,13 @@ export default function BracketPage({
       ? '1.5rem clamp(0.75rem, 4vw, 1.5rem)'
       : isCompact
         ? '2rem clamp(1rem, 4vw, 2.25rem)'
-        : '2.5rem 3rem',
-    gap: isMobile ? '1.5rem' : '2.5rem',
+        : '1.5rem 2rem',
+    gap: isMobile ? '1.5rem' : '1.75rem',
     boxSizing: 'border-box',
     color: '#ffffff'
   };
 
-  const headingSize = isMobile ? '2.6rem' : isCompact ? '3.4rem' : '4.2rem';
+  const headingSize = isMobile ? '2.6rem' : isCompact ? '3rem' : '3.2rem';
   const subHeadingSize = isMobile ? '1.1rem' : '1.4rem';
 
   return (
@@ -68,10 +67,10 @@ export default function BracketPage({
             fontSize: headingSize,
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
-            marginBottom: '1rem'
+            marginBottom: '0.4rem'
           }}
         >
-          Kunstrad Basketball
+          {tournamentName || 'Kunstrad Basketball'}
         </h1>
         <p style={{ fontSize: subHeadingSize, opacity: 0.8, letterSpacing: '0.05em' }}>
           {t('bracket.title')}

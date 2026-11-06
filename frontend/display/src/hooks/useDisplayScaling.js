@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
+import { chooseContentWidth } from '../utils/fitWidth.js';
 
-export default function useDisplayScaling(dependencies = []) {
+export default function useDisplayScaling(dependencies = [], { fitWidth = false } = {}) {
   const rootRef = useRef(null);
   const contentRef = useRef(null);
   const [scale, setScale] = useState(1);
+  const [contentWidth, setContentWidth] = useState(null);
   const scaleRef = useRef(1);
+  const contentWidthRef = useRef(null);
   const pendingRef = useRef(null);
 
   useEffect(() => {
@@ -27,7 +30,26 @@ export default function useDisplayScaling(dependencies = []) {
         parseFloat(computed.paddingTop || '0') + parseFloat(computed.paddingBottom || '0');
       const availableWidth = Math.max(container.clientWidth - paddingX, 50);
       const availableHeight = Math.max(container.clientHeight - paddingY, 50);
-      const nextScale = Math.min(availableWidth / contentWidth, availableHeight / contentHeight);
+      let nextScale = Math.min(availableWidth / contentWidth, availableHeight / contentHeight);
+      if (fitWidth) {
+        const fitted = chooseContentWidth({
+          availableWidth,
+          availableHeight,
+          measureHeight: (width) => {
+            content.style.width = `${width}px`;
+            return content.offsetHeight;
+          }
+        });
+        content.style.width = `${fitted.width}px`;
+        nextScale = fitted.scale;
+        if (fitted.width !== contentWidthRef.current) {
+          contentWidthRef.current = fitted.width;
+          setContentWidth(fitted.width);
+        }
+      } else if (contentWidthRef.current !== null) {
+        contentWidthRef.current = null;
+        setContentWidth(null);
+      }
       // Minimum dynamisch: auf kleinen Screens (z.B. 375px Portrait) darf unter 0.45
       // skaliert werden, damit die Bühne immer komplett in Breite UND Höhe passt.
       // Auf großen Screens bleibt das bisherige Verhalten (Untergrenze 0.45) unverändert.
@@ -80,7 +102,7 @@ export default function useDisplayScaling(dependencies = []) {
         resizeObserver.disconnect();
       }
     };
-  }, dependencies); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [...dependencies, fitWidth]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return { rootRef, contentRef, scale };
+  return { rootRef, contentRef, scale, contentWidth };
 }

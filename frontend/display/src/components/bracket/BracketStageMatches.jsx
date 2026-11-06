@@ -153,9 +153,7 @@ export default function BracketStageMatches({ title, stages }) {
                 if (scheduledLabel) {
                   metaSegments.push(scheduledLabel);
                 }
-                if (match.code) {
-                  metaSegments.push(t('bracket.matchcode', { code: match.code }));
-                } else if (hasResult && match.result?.finishedAt) {
+                if (!scheduledLabel && hasResult && match.result?.finishedAt) {
                   const finishedAtLabel = new Date(match.result.finishedAt)
                     .toLocaleString(dateLocale, {
                       day: '2-digit',
