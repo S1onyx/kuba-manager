@@ -18,6 +18,7 @@ export function mapTournament(row) {
     is_public: Boolean(row.is_public),
     is_completed: Boolean(row.is_completed),
     team_count: row.team_count ?? 0,
+    group_games_per_team: row.group_games_per_team ?? null,
     classification_mode: classificationMode,
     created_at: row.created_at,
     status: row.status ?? 'active',
@@ -71,8 +72,8 @@ export async function insertTournament(payload) {
   const { SQL, db } = await getConnection();
 
   const stmt = db.prepare(`
-    INSERT INTO tournaments (name, group_count, knockout_rounds, is_public, team_count, classification_mode, status, planned_at, description, location, poster_file_id, schedule_info, travel_info, contact_email, registration_url, registration_deadline, links)
-    VALUES (:name, :group_count, :knockout_rounds, :is_public, :team_count, :classification_mode, :status, :planned_at, :description, :location, :poster_file_id, :schedule_info, :travel_info, :contact_email, :registration_url, :registration_deadline, :links)
+    INSERT INTO tournaments (name, group_count, knockout_rounds, is_public, team_count, group_games_per_team, classification_mode, status, planned_at, description, location, poster_file_id, schedule_info, travel_info, contact_email, registration_url, registration_deadline, links)
+    VALUES (:name, :group_count, :knockout_rounds, :is_public, :team_count, :group_games_per_team, :classification_mode, :status, :planned_at, :description, :location, :poster_file_id, :schedule_info, :travel_info, :contact_email, :registration_url, :registration_deadline, :links)
   `);
 
   let newId = null;
@@ -83,6 +84,7 @@ export async function insertTournament(payload) {
       ':knockout_rounds': normalized.knockoutRounds,
       ':is_public': normalized.isPublic ? 1 : 0,
       ':team_count': normalized.teamCount,
+      ':group_games_per_team': normalized.groupGamesPerTeam,
       ':classification_mode': normalized.classification,
       ':status': normalized.status,
       ':planned_at': normalized.plannedAt,
@@ -112,7 +114,7 @@ export async function updateTournamentRecord(id, patch = {}, defaults = {}) {
 
   db.run(
     `UPDATE tournaments
-     SET name = ?, group_count = ?, knockout_rounds = ?, is_public = ?, team_count = ?, classification_mode = ?,
+     SET name = ?, group_count = ?, knockout_rounds = ?, is_public = ?, team_count = ?, group_games_per_team = ?, classification_mode = ?,
          status = ?, planned_at = ?, description = ?, location = ?, poster_file_id = ?,
          schedule_info = ?, travel_info = ?, contact_email = ?, registration_url = ?, registration_deadline = ?, links = ?
      WHERE id = ?`,
@@ -122,6 +124,7 @@ export async function updateTournamentRecord(id, patch = {}, defaults = {}) {
       normalized.knockoutRounds,
       normalized.isPublic ? 1 : 0,
       normalized.teamCount,
+      normalized.groupGamesPerTeam,
       normalized.classification,
       normalized.status,
       normalized.plannedAt,

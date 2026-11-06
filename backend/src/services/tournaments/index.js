@@ -45,7 +45,7 @@ export async function createTournament(payload = {}) {
 export { listTournaments, getTournament, listPublicTournaments };
 export { setTournamentCompletionStatus };
 
-export async function updateTournament(id, patch = {}) {
+export async function updateTournament(id, patch = {}, { forceRegenerate = false } = {}) {
   const existing = await getTournament(id);
   if (!existing) {
     return null;
@@ -56,9 +56,11 @@ export async function updateTournament(id, patch = {}) {
 
   if (
     updated &&
-    (existing.group_count !== updated.group_count ||
+    (forceRegenerate ||
+      existing.group_count !== updated.group_count ||
       existing.knockout_rounds !== updated.knockout_rounds ||
       existing.team_count !== updated.team_count ||
+      existing.group_games_per_team !== updated.group_games_per_team ||
       (existing.classification_mode ?? 'top4') !== (updated.classification_mode ?? 'top4'))
   ) {
     await regenerateTournamentStructure(updated);

@@ -70,7 +70,7 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { name, group_count, knockout_rounds, is_public, team_count, classification_mode, status, planned_at, description, location, links } = req.body ?? {};
+  const { name, group_count, knockout_rounds, is_public, team_count, group_games_per_team, classification_mode, status, planned_at, description, location, links } = req.body ?? {};
   try {
     const tournament = await createTournament({
       name,
@@ -78,6 +78,7 @@ router.post('/', async (req, res) => {
       knockout_rounds,
       is_public,
       team_count,
+      group_games_per_team,
       classification_mode,
       status,
       planned_at,
@@ -98,7 +99,7 @@ router.put('/:id', async (req, res) => {
     return res.status(400).json({ code: 'INVALID_TOURNAMENT_ID', message: 'Ungültige Turnier-ID.' });
   }
 
-  const { name, group_count, knockout_rounds, is_public, team_count, classification_mode, status, planned_at, description, location, schedule_info, travel_info, contact_email, registration_url, registration_deadline, links } = req.body ?? {};
+  const { name, group_count, knockout_rounds, is_public, team_count, group_games_per_team, classification_mode, status, planned_at, description, location, schedule_info, travel_info, contact_email, registration_url, registration_deadline, links } = req.body ?? {};
   try {
     const updated = await updateTournament(id, {
       name,
@@ -106,6 +107,7 @@ router.put('/:id', async (req, res) => {
       knockout_rounds,
       is_public,
       team_count,
+      group_games_per_team,
       classification_mode,
       status,
       planned_at,
@@ -352,7 +354,7 @@ router.post('/:id/activate', async (req, res) => {
     if (!tournament) return res.status(404).json({ code: 'TOURNAMENT_NOT_FOUND', message: 'Turnier nicht gefunden.' });
     if (tournament.status !== 'planned') return res.status(400).json({ code: 'TOURNAMENT_NOT_PLANNED', message: 'Turnier ist nicht im Status "geplant".' });
 
-    const { group_count, knockout_rounds, teams: teamsPayload } = req.body ?? {};
+    const { group_count, knockout_rounds, group_games_per_team, teams: teamsPayload } = req.body ?? {};
     const conn = await import('../db/connection.js');
     const { SQL, db } = await conn.getConnection();
 
@@ -385,18 +387,23 @@ router.post('/:id/activate', async (req, res) => {
       return res.status(400).json({ code: 'TOURNAMENT_MIN_TEAMS_REQUIRED', message: `Mindestens 2 Teams nötig (aktuell: ${finalTeamCount}).` });
     }
 
-    const updated = await updateTournament(id, {
-      ...tournament,
-      status: 'active',
-      team_count: finalTeamCount,
-      group_count: group_count ? Number(group_count) : (tournament.group_count || 1),
-      knockout_rounds: knockout_rounds !== undefined ? Number(knockout_rounds) : (tournament.knockout_rounds || 0)
-    });
+    const updated = await updateTournament(
+      id,
+      {
+        ...tournament,
+        status: 'active',
+        team_count: finalTeamCount,
+        group_count: group_count ? Number(group_count) : (tournament.group_count || 1),
+        knockout_rounds: knockout_rounds !== undefined ? Number(knockout_rounds) : (tournament.knockout_rounds || 0),
+        ...(group_games_per_team !== undefined ? { group_games_per_team } : {})
+      },
+      { forceRegenerate: true }
+    );
 
     res.json(await withPosterUrl(updated));
   } catch (error) {
     console.error('Turnier konnte nicht aktiviert werden:', error);
-    res.status(500).json({ code: 'TOURNAMENT_ACTIVATION_FAILED', message: error.message || 'Turnier konnte nicht aktiviert werden.' });
+    res.status(500).json({ code: 'TOURNAMENT_ACTIVATION_FAILED', message: error.message || 'Turnier konnte nicht aktiviert werden.', detail: error.message });
   }
 });
 

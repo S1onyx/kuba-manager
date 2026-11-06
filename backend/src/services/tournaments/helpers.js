@@ -38,7 +38,18 @@ export function sanitizeTournamentBooleans(flag, fallback = false) {
   return Boolean(flag);
 }
 
-export function validateTournamentNumbers({ groupCount, knockoutRounds, teamCount }) {
+export function normalizeGroupGamesPerTeam(value) {
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+  const numeric = Number(value);
+  if (!Number.isInteger(numeric) || numeric < 0) {
+    throw new Error('Ungültige Anzahl Spiele pro Team.');
+  }
+  return numeric === 0 ? null : numeric;
+}
+
+export function validateTournamentNumbers({ groupCount, knockoutRounds, teamCount, groupGamesPerTeam = null }) {
   if (teamCount === 0 && groupCount === 0) {
     return;
   }
@@ -59,6 +70,12 @@ export function validateTournamentNumbers({ groupCount, knockoutRounds, teamCoun
   if (knockoutRounds > maxKnockoutRounds) {
     const label = maxKnockoutRounds === 1 ? '1 KO-Runde' : `${maxKnockoutRounds} KO-Runden`;
     throw new Error(`Für ${teamCount} Teams sind höchstens ${label} möglich.`);
+  }
+
+  if (groupGamesPerTeam) {
+    distributeSlotsAcrossGroups(teamCount, createGroupLabels(groupCount)).forEach((slots) => {
+      generateGroupFixtures(slots, groupGamesPerTeam);
+    });
   }
 }
 
@@ -81,8 +98,12 @@ export function normalizeTournamentPayload(payload = {}, defaults = {}) {
     payload.is_public !== undefined ? payload.is_public : defaults.is_public ?? false
   );
 
+  const groupGamesPerTeam = normalizeGroupGamesPerTeam(
+    payload.group_games_per_team !== undefined ? payload.group_games_per_team : defaults.group_games_per_team
+  );
+
   if (status !== 'planned') {
-    validateTournamentNumbers({ groupCount, knockoutRounds, teamCount });
+    validateTournamentNumbers({ groupCount, knockoutRounds, teamCount, groupGamesPerTeam });
   }
 
   const plannedAt = payload.planned_at !== undefined ? (payload.planned_at ?? null) : (defaults.planned_at ?? null);
@@ -110,6 +131,7 @@ export function normalizeTournamentPayload(payload = {}, defaults = {}) {
     groupCount,
     knockoutRounds,
     teamCount,
+    groupGamesPerTeam,
     classification,
     isPublic,
     plannedAt,
@@ -217,6 +239,20 @@ export function generateRoundRobinFixtures(slots) {
   }
 
   return fixtures;
+}
+
+export function generateGroupFixtures(slots, gamesPerTeam = null) {
+  const fixtures = generateRoundRobinFixtures(slots);
+  const limit = Number(gamesPerTeam) || 0;
+  if (limit <= 0 || limit >= slots.length - 1) {
+    return fixtures;
+  }
+  if (slots.length % 2 === 1) {
+    throw new Error(
+      `${limit} Spiele pro Team sind in einer Gruppe mit ${slots.length} Teams nicht möglich (nur bei gerader Teamzahl oder ab ${slots.length - 1} Spielen = jeder gegen jeden).`
+    );
+  }
+  return fixtures.slice(0, limit);
 }
 
 export function getRoundLabel(participantCount) {

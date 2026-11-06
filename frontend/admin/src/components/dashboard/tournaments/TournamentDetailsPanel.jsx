@@ -23,6 +23,7 @@ export default function TournamentDetailsPanel({
   const [showActivateForm, setShowActivateForm] = useState(false);
   const [activateGroupCount, setActivateGroupCount] = useState('1');
   const [activateKoRounds, setActivateKoRounds] = useState('0');
+  const [activateGamesPerTeam, setActivateGamesPerTeam] = useState('');
   const [activateTeams, setActivateTeams] = useState([]);
   const [statusChanging, setStatusChanging] = useState(null);
   const [statusError, setStatusError] = useState('');
@@ -72,8 +73,29 @@ export default function TournamentDetailsPanel({
     setActivateTeams(confirmed.length > 0 ? confirmed : [{ slot_number: 1, team_id: null, name: '' }]);
     setActivateGroupCount(String(tournament.group_count || 1));
     setActivateKoRounds(String(tournament.knockout_rounds || 0));
+    setActivateGamesPerTeam(tournament.group_games_per_team ? String(tournament.group_games_per_team) : '');
     setShowActivateForm(true);
   };
+
+  const activateGroupPreview = useMemo(() => {
+    const groupCount = Math.max(1, Number(activateGroupCount) || 1);
+    const teamCount = activateTeams.filter((team) => team.name.trim()).length;
+    const limit = Number(activateGamesPerTeam) || 0;
+    const base = Math.floor(teamCount / groupCount);
+    const remainder = teamCount % groupCount;
+    return Array.from({ length: groupCount }, (_, index) => {
+      const teams = base + (index < remainder ? 1 : 0);
+      const fullRoundRobin = Math.max(0, teams - 1);
+      const games = limit > 0 && limit < fullRoundRobin ? limit : fullRoundRobin;
+      return {
+        group: String.fromCharCode(65 + index),
+        teams,
+        games,
+        matches: (teams * games) / 2,
+        invalid: games < fullRoundRobin && teams % 2 === 1
+      };
+    });
+  }, [activateGroupCount, activateTeams, activateGamesPerTeam]);
 
   const addActivateTeamSlot = () => {
     setActivateTeams((prev) => [...prev, { slot_number: prev.length + 1, team_id: null, name: '' }]);
@@ -93,12 +115,14 @@ export default function TournamentDetailsPanel({
       await activateTournament(tournament.id, {
         group_count: Number(activateGroupCount),
         knockout_rounds: Number(activateKoRounds),
+        group_games_per_team: activateGamesPerTeam === '' ? null : Number(activateGamesPerTeam),
         teams: activateTeams.filter((t) => t.name.trim())
       });
       setShowActivateForm(false);
       loadTournaments();
     } catch (err) {
-      alert(formatApiError(err, t, 'tournaments.details.activationFailed'));
+      const message = formatApiError(err, t, 'tournaments.details.activationFailed');
+      alert(err?.detail ? `${message}\n${err.detail}` : message);
     } finally {
       setActivating(false);
     }
@@ -289,6 +313,22 @@ export default function TournamentDetailsPanel({
                     <input type="number" min="0" value={activateKoRounds} onChange={(e) => setActivateKoRounds(e.target.value)}
                       style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff' }} />
                   </label>
+                  <label style={{ display: 'grid', gap: '0.3rem', fontSize: '0.875rem' }}>
+                    {t('tournaments.details.groupGamesPerTeam')}
+                    <input type="number" min="1" value={activateGamesPerTeam} onChange={(e) => setActivateGamesPerTeam(e.target.value)}
+                      placeholder={t('tournaments.details.groupGamesPerTeamPlaceholder')}
+                      style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff' }} />
+                  </label>
+                </div>
+
+                <div style={{ display: 'grid', gap: '0.25rem', fontSize: '0.85rem' }}>
+                  {activateGroupPreview.map((group) => (
+                    <p key={group.group} style={{ margin: 0, color: group.invalid ? '#ffb0b0' : 'rgba(255,255,255,0.75)' }}>
+                      {group.invalid
+                        ? t('tournaments.details.groupPreviewInvalid', group)
+                        : t('tournaments.details.groupPreview', group)}
+                    </p>
+                  ))}
                 </div>
 
                 <div style={{ display: 'grid', gap: '0.5rem' }}>
