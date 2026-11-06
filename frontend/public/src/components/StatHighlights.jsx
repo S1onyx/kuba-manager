@@ -25,6 +25,13 @@ const valueStyle = {
   fontWeight: 700
 };
 
+const mutedValueStyle = {
+  fontSize: '1rem',
+  fontWeight: 600,
+  opacity: 0.65,
+  paddingTop: '0.45rem'
+};
+
 const responsiveStyles = `
   @media (max-width: 768px) {
     .stats-grid {
@@ -52,11 +59,18 @@ export default function StatHighlights({ totals }) {
     return null;
   }
 
+  const playedGames = totals.totalGames ?? 0;
+  const scheduledGames = Math.max(totals.scheduledGames ?? 0, playedGames);
+  const pending = playedGames === 0 ? t('stats.pending') : null;
   const items = [
     { label: t('stats.teams'), value: totals.totalTeams ?? 0 },
-    { label: t('stats.games'), value: totals.totalGames ?? 0 },
-    { label: t('stats.totalPoints'), value: totals.totalGoals ?? 0 },
-    { label: t('stats.penalties'), value: totals.totalPenalties ?? 0 }
+    { label: t('stats.players'), value: totals.totalPlayers ?? 0 },
+    {
+      label: t('stats.games'),
+      value: scheduledGames > 0 ? t('stats.gamesProgress', { played: playedGames, total: scheduledGames }) : playedGames
+    },
+    { label: t('stats.totalPoints'), value: pending ?? totals.totalGoals ?? 0, muted: Boolean(pending) },
+    { label: t('stats.penalties'), value: pending ?? totals.totalPenalties ?? 0, muted: Boolean(pending) }
   ];
 
   return (
@@ -68,7 +82,7 @@ export default function StatHighlights({ totals }) {
         {items.map((item) => (
           <article key={item.label} className="stats-grid__card" style={cardStyle}>
             <div style={labelStyle}>{item.label}</div>
-            <div className="stats-grid__value" style={valueStyle}>{item.value}</div>
+            <div className="stats-grid__value" style={item.muted ? mutedValueStyle : valueStyle}>{item.value}</div>
           </article>
         ))}
       </div>

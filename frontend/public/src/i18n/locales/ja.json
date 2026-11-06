@@ -188,6 +188,9 @@
   "stats": {
     "title": "トーナメント統計",
     "teams": "チーム",
+    "players": "選手",
+    "gamesProgress": "{{played}} / {{total}}",
+    "pending": "第1試合後に表示",
     "games": "試合",
     "totalPoints": "総得点",
     "penalties": "ペナルティ"

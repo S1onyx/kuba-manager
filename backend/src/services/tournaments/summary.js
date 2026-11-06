@@ -554,7 +554,9 @@ const topThreePointers = playerOverview
     tournament,
     totals: {
       ...totals,
-      totalTeams: overallStats.length
+      totalTeams: Math.max(participants.length, overallStats.length),
+      totalPlayers: playerOverview.length,
+      scheduledGames: scheduleEntries.length
     },
     overallStats,
     groupStandings: groups,

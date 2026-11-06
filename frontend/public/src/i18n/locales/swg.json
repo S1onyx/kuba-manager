@@ -188,6 +188,9 @@
   "stats": {
     "title": "Turnier-Statistika",
     "teams": "Teams",
+    "players": "Spieler",
+    "gamesProgress": "{{played}} von {{total}}",
+    "pending": "kommt ab em 1. Spiel",
     "games": "Schbiel",
     "totalPoints": "Gesamtbungd",
     "penalties": "Schtrafa"

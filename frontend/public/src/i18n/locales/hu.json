@@ -188,6 +188,9 @@
   "stats": {
     "title": "Tornastatisztikák",
     "teams": "Csapatok",
+    "players": "Játékosok",
+    "gamesProgress": "{{played}} / {{total}}",
+    "pending": "az 1. meccs után",
     "games": "Mérkőzések",
     "totalPoints": "Összes pont",
     "penalties": "Büntetések"
