@@ -6,6 +6,7 @@ import { fetchRegistrations, updateRegistrationStatus, activateTournament, setRe
 import { formatApiError } from '../../../utils/apiError.js';
 import { useDateLocale } from '../../../i18n/index.js';
 import { resolveMediaUrl } from '../../../config.js';
+import { TOURNAMENT_CLASSIFICATION_OPTIONS } from '../../../constants/dashboard.js';
 
 export default function TournamentDetailsPanel({
   tournament,
@@ -24,6 +25,7 @@ export default function TournamentDetailsPanel({
   const [activateGroupCount, setActivateGroupCount] = useState('1');
   const [activateKoRounds, setActivateKoRounds] = useState('0');
   const [activateGamesPerTeam, setActivateGamesPerTeam] = useState('');
+  const [activateClassification, setActivateClassification] = useState('top4');
   const [activateTeams, setActivateTeams] = useState([]);
   const [statusChanging, setStatusChanging] = useState(null);
   const [statusError, setStatusError] = useState('');
@@ -74,6 +76,7 @@ export default function TournamentDetailsPanel({
     setActivateGroupCount(String(tournament.group_count || 1));
     setActivateKoRounds(String(tournament.knockout_rounds || 0));
     setActivateGamesPerTeam(tournament.group_games_per_team ? String(tournament.group_games_per_team) : '');
+    setActivateClassification(tournament.classification_mode || 'top4');
     setShowActivateForm(true);
   };
 
@@ -116,6 +119,7 @@ export default function TournamentDetailsPanel({
         group_count: Number(activateGroupCount),
         knockout_rounds: Number(activateKoRounds),
         group_games_per_team: activateGamesPerTeam === '' ? null : Number(activateGamesPerTeam),
+        classification_mode: activateClassification,
         teams: activateTeams.filter((t) => t.name.trim())
       });
       setShowActivateForm(false);
@@ -329,6 +333,15 @@ export default function TournamentDetailsPanel({
                     <input type="number" min="1" value={activateGamesPerTeam} onChange={(e) => setActivateGamesPerTeam(e.target.value)}
                       placeholder={t('tournaments.details.groupGamesPerTeamPlaceholder')}
                       style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff' }} />
+                  </label>
+                  <label style={{ display: 'grid', gap: '0.3rem', fontSize: '0.875rem' }}>
+                    {t('tournaments.classificationMode')}
+                    <select value={activateClassification} onChange={(e) => setActivateClassification(e.target.value)}
+                      style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff' }}>
+                      {TOURNAMENT_CLASSIFICATION_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>{t(option.labelKey)}</option>
+                      ))}
+                    </select>
                   </label>
                 </div>
 

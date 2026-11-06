@@ -451,12 +451,12 @@ export function generateClassificationStages(sources, basePlacement, prefix) {
       : `Platzierungsrunde ${base}-${base + currentSources.length - 1}`;
 
     const matches = [];
-    for (let i = 0; i < currentSources.length; i += 2) {
-      const matchCode = `${prefix}_R${depth}_${branch || 'A'}${Math.floor(i / 2) + 1}`;
+    const pairCount = Math.floor(currentSources.length / 2);
+    for (let i = 0; i < pairCount; i += 1) {
       matches.push({
-        code: matchCode,
+        code: `${prefix}_R${depth}_${branch || 'A'}${i + 1}`,
         home_source: currentSources[i],
-        away_source: currentSources[i + 1]
+        away_source: currentSources[currentSources.length - 1 - i]
       });
     }
 
@@ -474,8 +474,8 @@ export function generateClassificationStages(sources, basePlacement, prefix) {
     const winners = matches.map((match) => createPreviousMatchSource(match.code, 'winner'));
     const losers = matches.map((match) => createPreviousMatchSource(match.code, 'loser'));
 
-    recurse(winners, base, depth + 1, `${branch || 'A'}W`);
     recurse(losers, base + winners.length, depth + 1, `${branch || 'A'}L`);
+    recurse(winners, base, depth + 1, `${branch || 'A'}W`);
   };
 
   recurse(sources, basePlacement, 1, '');
@@ -527,18 +527,22 @@ export function generateKnockoutStages({ initialParticipants, knockoutRounds, cl
     stageIndex += 1;
   }
 
+  const withRound = (stages, afterRound) => stages.map((stage) => ({ ...stage, afterRound }));
+
   if (classificationMode === 'top4') {
-    const semifinalInfo = roundInfo.find((info) => info.participantsCount === 4);
-    if (semifinalInfo) {
-      const losers = semifinalInfo.matches.map((match) => createPreviousMatchSource(match.code, 'loser'));
-      placementStages.push(...generateClassificationStages(losers, 3, 'PL-SF'));
+    const semifinalIndex = roundInfo.findIndex((info) => info.participantsCount === 4);
+    if (semifinalIndex >= 0) {
+      const losers = roundInfo[semifinalIndex].matches.map((match) => createPreviousMatchSource(match.code, 'loser'));
+      placementStages.push(...withRound(generateClassificationStages(losers, 3, 'PL-SF'), semifinalIndex));
     }
   } else if (classificationMode === 'all') {
-    roundInfo.forEach((info) => {
+    roundInfo.forEach((info, roundIndex) => {
       const basePlacement = info.participantsCount / 2 + 1;
       if (basePlacement >= 3) {
         const losers = info.matches.map((match) => createPreviousMatchSource(match.code, 'loser'));
-        placementStages.push(...generateClassificationStages(losers, basePlacement, `PL-${info.participantsCount}`));
+        placementStages.push(
+          ...withRound(generateClassificationStages(losers, basePlacement, `PL-${info.participantsCount}`), roundIndex)
+        );
       }
     });
   }
@@ -643,7 +647,7 @@ export function resolveParticipantDetails({
               isComplete: false
             };
       const standings = Array.isArray(wrapper.standings) ? wrapper.standings : [];
-      if (standings.length >= source.position) {
+      if (wrapper.isComplete && standings.length >= source.position) {
         const standingEntry = standings[source.position - 1];
         if (standingEntry?.team) {
           const record = lookupTeamRecordByName(teamsByName, standingEntry.team);

@@ -354,7 +354,7 @@ router.post('/:id/activate', async (req, res) => {
     if (!tournament) return res.status(404).json({ code: 'TOURNAMENT_NOT_FOUND', message: 'Turnier nicht gefunden.' });
     if (tournament.status !== 'planned') return res.status(400).json({ code: 'TOURNAMENT_NOT_PLANNED', message: 'Turnier ist nicht im Status "geplant".' });
 
-    const { group_count, knockout_rounds, group_games_per_team, teams: teamsPayload } = req.body ?? {};
+    const { group_count, knockout_rounds, group_games_per_team, classification_mode, teams: teamsPayload } = req.body ?? {};
     const conn = await import('../db/connection.js');
     const { SQL, db } = await conn.getConnection();
 
@@ -395,7 +395,8 @@ router.post('/:id/activate', async (req, res) => {
         team_count: finalTeamCount,
         group_count: group_count ? Number(group_count) : (tournament.group_count || 1),
         knockout_rounds: knockout_rounds !== undefined ? Number(knockout_rounds) : (tournament.knockout_rounds || 0),
-        ...(group_games_per_team !== undefined ? { group_games_per_team } : {})
+        ...(group_games_per_team !== undefined ? { group_games_per_team } : {}),
+        ...(classification_mode !== undefined ? { classification_mode } : {})
       },
       { forceRegenerate: true }
     );
