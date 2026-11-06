@@ -71,7 +71,6 @@
     "placementTitle": "Matchs de classement",
     "stageFallback": "Phase",
     "round": "Tour {{round}}",
-    "matchcode": "Code du match {{code}}",
     "timeValue": "{{time}}",
     "status": {
       "qualified": "qualifié",

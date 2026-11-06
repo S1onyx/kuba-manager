@@ -70,7 +70,6 @@
     "placementTitle": "順位決定戦",
     "stageFallback": "フェーズ",
     "round": "ラウンド {{round}}",
-    "matchcode": "マッチコード {{code}}",
     "timeValue": "{{time}} 時",
     "status": {
       "qualified": "突破",

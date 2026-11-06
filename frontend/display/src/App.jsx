@@ -107,7 +107,9 @@ export default function App() {
     ]
   );
 
-  const { rootRef, contentRef, scale } = useDisplayScaling(scaleDependencies);
+  const { rootRef, contentRef, scale, contentWidth } = useDisplayScaling(scaleDependencies, {
+    fitWidth: effectiveDisplayView === 'bracket'
+  });
 
   const searchParams =
     typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
@@ -187,7 +189,7 @@ export default function App() {
   return (
     <>
       <DocumentLanguageSync />
-      <DisplayLayout rootRef={rootRef} contentRef={contentRef} scale={scale} overlay={overlayControls}>
+      <DisplayLayout rootRef={rootRef} contentRef={contentRef} scale={scale} contentWidth={contentWidth} overlay={overlayControls}>
         {activeContent}
       </DisplayLayout>
     </>

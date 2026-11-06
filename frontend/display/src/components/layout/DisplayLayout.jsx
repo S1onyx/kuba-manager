@@ -33,7 +33,7 @@ const scaledContentBase = {
   boxSizing: 'border-box'
 };
 
-export default function DisplayLayout({ rootRef, contentRef, scale, children, overlay = null }) {
+export default function DisplayLayout({ rootRef, contentRef, scale, contentWidth = null, children, overlay = null }) {
   return (
     <div ref={rootRef} style={rootWrapperStyle}>
       <div style={scaledLayoutStyle}>
@@ -41,6 +41,7 @@ export default function DisplayLayout({ rootRef, contentRef, scale, children, ov
           ref={contentRef}
           style={{
             ...scaledContentBase,
+            ...(contentWidth ? { width: `${contentWidth}px`, flexShrink: 0 } : null),
             transform: `scale(${scale})`
           }}
         >

@@ -71,7 +71,6 @@
     "placementTitle": "Platzierigsspiu",
     "stageFallback": "Phase",
     "round": "Rundi {{round}}",
-    "matchcode": "Matchcode {{code}}",
     "timeValue": "{{time}} Uhr",
     "status": {
       "qualified": "qualifiziert",

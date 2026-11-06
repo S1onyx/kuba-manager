@@ -71,7 +71,6 @@
     "placementTitle": "Helyosztó mérkőzések",
     "stageFallback": "Szakasz",
     "round": "{{round}}. kör",
-    "matchcode": "Mérkőzéskód: {{code}}",
     "timeValue": "{{time}}",
     "status": {
       "qualified": "továbbjutott",

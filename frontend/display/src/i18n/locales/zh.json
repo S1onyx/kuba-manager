@@ -70,7 +70,6 @@
     "placementTitle": "排位赛",
     "stageFallback": "阶段",
     "round": "第 {{round}} 轮",
-    "matchcode": "比赛代码 {{code}}",
     "timeValue": "{{time}} 点",
     "status": {
       "qualified": "已晋级",

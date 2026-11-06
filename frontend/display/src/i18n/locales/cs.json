@@ -72,7 +72,6 @@
     "placementTitle": "Zápasy o umístění",
     "stageFallback": "Fáze",
     "round": "{{round}}. kolo",
-    "matchcode": "Kód zápasu {{code}}",
     "timeValue": "{{time}}",
     "status": {
       "qualified": "postoupil",
