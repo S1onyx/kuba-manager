@@ -125,7 +125,7 @@ services:
     volumes:
       - caddy_data:/data
       - caddy_config:/config
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy:/etc/caddy:ro
     networks:
       - app
 
