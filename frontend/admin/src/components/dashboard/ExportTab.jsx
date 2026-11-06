@@ -6,43 +6,14 @@ import { useDashboard } from '../../context/DashboardContext.jsx';
 import { fetchTournamentSummary } from '../../utils/api.js';
 import { formatApiError } from '../../utils/apiError.js';
 import { formatStageLabelI18n } from '../../utils/stageLabels.js';
-import { formatDateTime, formatMatchTime, formatShortDateTime } from '../../utils/formatters.js';
+import { formatDateTime, formatShortDateTime } from '../../utils/formatters.js';
 import { useDateLocale } from '../../i18n/index.js';
 import useMediaQuery from '../../hooks/useMediaQuery.js';
-
-function sortMatchesByTime(a, b) {
-  const ta = a.scheduled_at ? new Date(a.scheduled_at).getTime() : Infinity;
-  const tb = b.scheduled_at ? new Date(b.scheduled_at).getTime() : Infinity;
-  if (ta !== tb) return ta - tb;
-  return (a.match_order ?? 0) - (b.match_order ?? 0);
-}
-
-function getEarliestTime(stage) {
-  const matches = stage.rounds
-    ? stage.rounds.flatMap((r) => r.matches ?? [])
-    : (stage.matches ?? []);
-  return matches.reduce((min, m) => {
-    const t = m.scheduled_at ? new Date(m.scheduled_at).getTime() : Infinity;
-    return t < min ? t : min;
-  }, Infinity);
-}
-
-function getStageOrder(stage) {
-  const matches = stage.rounds ? stage.rounds.flatMap((r) => r.matches ?? []) : (stage.matches ?? []);
-  return Math.min(...matches.map((m) => m.stage_order ?? Infinity));
-}
-
-function sortStagesByTime(stages) {
-  return [...stages].sort((a, b) => {
-    const ta = getEarliestTime(a);
-    const tb = getEarliestTime(b);
-    if (ta !== tb) return ta - tb;
-    return getStageOrder(a) - getStageOrder(b);
-  });
-}
+import { PrintPhases, PrintTimeline } from './export/PrintSchedules.jsx';
 
 const EXPORT_SECTIONS = [
-  { id: 'schedule', labelKey: 'export.sectionSchedule', descKey: 'export.sectionScheduleDesc' },
+  { id: 'timeline', labelKey: 'export.sectionTimeline', descKey: 'export.sectionTimelineDesc' },
+  { id: 'phases', labelKey: 'export.sectionPhases', descKey: 'export.sectionPhasesDesc' },
   { id: 'standings', labelKey: 'export.sectionStandings', descKey: 'export.sectionStandingsDesc' },
   { id: 'results', labelKey: 'export.sectionResults', descKey: 'export.sectionResultsDesc' },
   { id: 'final', labelKey: 'export.sectionFinal', descKey: 'export.sectionFinalDesc' }
@@ -114,9 +85,6 @@ export default function ExportTab() {
     return () => window.removeEventListener('afterprint', handleAfterPrint);
   }, []);
 
-  const tournamentName = summary?.tournament?.name ?? '';
-  const tournamentLocation = summary?.tournament?.location ?? '';
-  const tournamentDate = summary?.tournament?.planned_at ?? '';
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [expandedSection, setExpandedSection] = useState(null);
 
@@ -230,16 +198,14 @@ export default function ExportTab() {
         summary={summary}
         t={t}
         dateLocale={dateLocale}
-        tournamentName={tournamentName}
-        tournamentLocation={tournamentLocation}
-        tournamentDate={tournamentDate}
       />
     </div>
   );
 }
 
 const PRINT_COMPONENTS = {
-  schedule: PrintSchedule,
+  timeline: PrintTimeline,
+  phases: PrintPhases,
   standings: PrintStandings,
   results: PrintResults,
   final: PrintFinal
@@ -253,180 +219,35 @@ function PrintContent({ mode, summary, t, dateLocale }) {
 
 function PrintPreview({ mode, summary, t, dateLocale }) {
   return (
-    <div className="export-preview">
+    <div className="export-paper paper">
+      <PrintHeader tournament={summary?.tournament} t={t} />
       <PrintContent mode={mode} summary={summary} t={t} dateLocale={dateLocale} />
     </div>
   );
 }
 
-function PrintOverlay({ mode, summary, t, dateLocale, tournamentName, tournamentLocation, tournamentDate }) {
+function PrintOverlay({ mode, summary, t, dateLocale }) {
   if (!mode || !summary) {
     return null;
   }
   return createPortal(
-    <div className="print-overlay">
-      <PrintHeader tournamentName={tournamentName} tournamentLocation={tournamentLocation} tournamentDate={tournamentDate} t={t} />
+    <div className="print-overlay paper">
+      <PrintHeader tournament={summary?.tournament} t={t} />
       <PrintContent mode={mode} summary={summary} t={t} dateLocale={dateLocale} />
     </div>,
     document.body
   );
 }
 
-function PrintHeader({ tournamentName, tournamentLocation, tournamentDate, t }) {
+function PrintHeader({ tournament, t }) {
   return (
     <header className="print-header">
-      <h1>{tournamentName}</h1>
+      <h1>{tournament?.name ?? ''}</h1>
       <p>
-        {[tournamentLocation, tournamentDate ? formatDateTime(tournamentDate) : null].filter(Boolean).join(' · ')}
+        {[tournament?.location, tournament?.planned_at ? formatDateTime(tournament.planned_at) : null].filter(Boolean).join(' · ')}
+        <span className="print-header__generated">{t('export.generatedAt', { time: formatDateTime(new Date().toISOString()) })}</span>
       </p>
-      <p className="print-header__generated">{t('export.generatedAt', { time: formatDateTime(new Date().toISOString()) })}</p>
     </header>
-  );
-}
-
-function PrintSchedule({ summary, t, dateLocale }) {
-  const schedule = summary?.schedule;
-  if (!schedule) {
-    return <p>{t('export.noData')}</p>;
-  }
-
-  const hasGroup = Array.isArray(schedule.group) && schedule.group.length > 0;
-  const hasKnockout = Array.isArray(schedule.knockout) && schedule.knockout.length > 0;
-  const hasPlacement = Array.isArray(schedule.placement) && schedule.placement.length > 0;
-
-  if (!hasGroup && !hasKnockout && !hasPlacement) {
-    return <p>{t('export.noData')}</p>;
-  }
-
-  const resolveLabel = (match, side) => {
-    const source = side === 'home' ? match.home_source : match.away_source;
-    const label = side === 'home' ? match.home_label : match.away_label;
-
-    if (source?.type === 'groupPosition' && !match[side]?.teamName) {
-      return `${source.position}. ${t('export.groupLabel', { group: source.group })}`;
-    }
-
-    if (source?.type === 'previousMatch') {
-      const detail = match[side];
-      if (!detail?.teamId) {
-        return detail?.placeholder || label || '';
-      }
-    }
-
-    return label || '';
-  };
-
-  const renderScoreCells = (match) => {
-    if (match.result?.hasResult) {
-      return (
-        <>
-          <td className="print-score print-score--filled">{match.result.scoreA ?? 0}</td>
-          <td className="print-score print-score--filled">{match.result.scoreB ?? 0}</td>
-        </>
-      );
-    }
-    return (
-      <>
-        <td className="print-score print-score--blank" />
-        <td className="print-score print-score--blank" />
-      </>
-    );
-  };
-
-  let gameCounter = 0;
-
-  const formatTimeOrNumber = (scheduledAt) => {
-    const timeStr = formatMatchTime(scheduledAt, dateLocale);
-    if (timeStr) return timeStr;
-    gameCounter += 1;
-    return `#${gameCounter}`;
-  };
-
-  const renderScheduleRows = (rounds, keyPrefix) => {
-    const rows = [];
-    const sortedRounds = [...rounds].sort((a, b) => {
-      const firstA = (a.matches ?? [])[0]?.scheduled_at;
-      const firstB = (b.matches ?? [])[0]?.scheduled_at;
-      if (firstA && firstB) return new Date(firstA).getTime() - new Date(firstB).getTime();
-      return (a.round ?? 0) - (b.round ?? 0);
-    });
-    sortedRounds.forEach((round) => {
-      const matches = [...(round.matches ?? [])].sort(sortMatchesByTime);
-      rows.push(
-        <tr key={`${keyPrefix}-round-${round.round}`} className="print-round-row">
-          <td colSpan={5} className="print-round-cell">{t('export.round', { round: round.round })}</td>
-        </tr>
-      );
-      matches.forEach((match) => {
-        rows.push(
-          <tr key={match.id ?? `${keyPrefix}-${round.round}-${match.match_order}`}>
-            <td className="print-time">{formatTimeOrNumber(match.scheduled_at)}</td>
-            <td className="print-team">{resolveLabel(match, 'home')}</td>
-            {renderScoreCells(match)}
-            <td className="print-team">{resolveLabel(match, 'away')}</td>
-          </tr>
-        );
-      });
-    });
-    return rows;
-  };
-
-  const renderStageTable = (stage, keyPrefix) => {
-    const sortedMatches = [...(stage.matches ?? [])].sort(sortMatchesByTime);
-    return (
-      <table className="print-schedule">
-        <thead>
-          <tr>
-            <th className="print-schedule__time">{t('export.colTime')}</th>
-            <th className="print-schedule__team">{t('export.colHome')}</th>
-            <th className="print-schedule__score" />
-            <th className="print-schedule__score" />
-            <th className="print-schedule__team">{t('export.colAway')}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {stage.rounds
-            ? renderScheduleRows(stage.rounds, keyPrefix)
-            : sortedMatches.map((match) => (
-                <tr key={match.id ?? `${keyPrefix}-${match.match_order}`}>
-                  <td className="print-time">{formatTimeOrNumber(match.scheduled_at)}</td>
-                  <td className="print-team">{resolveLabel(match, 'home')}</td>
-                  {renderScoreCells(match)}
-                  <td className="print-team">{resolveLabel(match, 'away')}</td>
-                </tr>
-              ))}
-        </tbody>
-      </table>
-    );
-  };
-
-  const renderPhase = (stages, titleKey) => {
-    const sorted = sortStagesByTime(stages);
-    return (
-      <div className="print-block">
-        <h3>{t(titleKey)}</h3>
-        {sorted.map((stage) => (
-          <div key={stage.stage_label} className="print-group">
-            <h4 className="print-group-title">{stage.stage_label}</h4>
-            {renderStageTable(stage, stage.stage_label)}
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  const koAndPlacement = [
-    ...(schedule.knockout ?? []),
-    ...(schedule.placement ?? [])
-  ];
-  const hasKoOrPlacement = koAndPlacement.length > 0;
-
-  return (
-    <section className="print-section">
-      <h2>{t('export.scheduleTitle')}</h2>
-      {hasGroup ? renderPhase(schedule.group, 'export.phaseGroup') : null}
-      {hasKoOrPlacement ? renderPhase(koAndPlacement, 'export.phaseKnockout') : null}
-    </section>
   );
 }
 
