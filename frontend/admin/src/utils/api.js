@@ -368,8 +368,8 @@ export function deleteTournament(id) {
   });
 }
 
-export function fetchTeams() {
-  return request('/teams');
+export function fetchTeams(tournamentId) {
+  return request(`/teams?tournamentId=${encodeURIComponent(tournamentId)}`);
 }
 
 export function createTeam(payload) {
@@ -392,8 +392,8 @@ export function deleteTeam(id) {
   });
 }
 
-export function fetchPlayers(teamId) {
-  const query = teamId ? `?teamId=${teamId}` : '';
+export function fetchPlayers({ teamId, tournamentId } = {}) {
+  const query = teamId ? `?teamId=${teamId}` : `?tournamentId=${encodeURIComponent(tournamentId)}`;
   return request(`/players${query}`);
 }
 

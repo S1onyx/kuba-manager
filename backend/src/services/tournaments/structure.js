@@ -391,6 +391,9 @@ export async function setTournamentTeams(tournamentId, assignments = []) {
     if (!team) {
       throw new Error(`Team mit ID ${teamId} existiert nicht.`);
     }
+    if (team.tournament_id !== id) {
+      throw new Error(`Team "${team.name}" gehört nicht zu diesem Turnier.`);
+    }
     teamById.set(teamId, team);
   }
 

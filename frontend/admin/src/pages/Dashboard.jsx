@@ -34,7 +34,6 @@ export default function Dashboard() {
     updateMessage: feedback.updateMessage,
     setScoreboard: scoreboardCtrl.setScoreboard
   });
-  const teamManager = useTeamManager({ updateMessage: feedback.updateMessage });
   const tournamentManager = useTournamentManager({
     scoreboard: scoreboardCtrl.scoreboard,
     updateMessage: feedback.updateMessage,
@@ -42,6 +41,10 @@ export default function Dashboard() {
     setContextForm: matchContext.setContextForm,
     setContextFormDirty: matchContext.setContextFormDirty
   });
+  const [teamScopeSelection, setTeamScopeSelection] = useState(null);
+  const teamScopeTournamentId =
+    teamScopeSelection ?? matchContext.resolvedTournamentId ?? tournamentManager.tournaments[0]?.id ?? null;
+  const teamManager = useTeamManager({ updateMessage: feedback.updateMessage, tournamentId: teamScopeTournamentId });
   const tournamentStructure = useTournamentStructure({
     expandedTournamentId: tournamentManager.expandedTournamentId,
     teams: teamManager.teams,
@@ -62,7 +65,8 @@ export default function Dashboard() {
   const historyManager = useHistoryManager({ updateMessage: feedback.updateMessage });
   const playerManager = usePlayerManager({
     updateMessage: feedback.updateMessage,
-    refreshActiveTeams: scoreboardCtrl.refreshActiveTeams
+    refreshActiveTeams: scoreboardCtrl.refreshActiveTeams,
+    tournamentId: teamScopeTournamentId
   });
   const audioManager = useAudioManager({ updateMessage: feedback.updateMessage });
 
@@ -129,6 +133,7 @@ export default function Dashboard() {
       matchContext,
       schedule: scheduleManager,
       teams: { ...teamManager },
+      teamScope: { tournamentId: teamScopeTournamentId, setTournamentId: setTeamScopeSelection },
       players: { ...playerManager },
       tournaments: { ...tournamentManager },
       tournamentStructure: { ...tournamentStructure },
@@ -142,6 +147,7 @@ export default function Dashboard() {
       matchContext,
       scheduleManager,
       teamManager,
+      teamScopeTournamentId,
       playerManager,
       tournamentManager,
       tournamentStructure,

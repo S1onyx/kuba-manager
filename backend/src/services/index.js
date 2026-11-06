@@ -12,7 +12,8 @@ export {
   listTeams,
   getTeam,
   updateTeam,
-  deleteTeam
+  deleteTeam,
+  findOrCreateTournamentTeam
 } from './teamsService.js';
 
 export {

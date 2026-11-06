@@ -1,3 +1,5 @@
+import { migrateTeamsToTournaments } from './migrations/tournamentTeams.js';
+
 export default function initializeSchema(db) {
   db.exec(`
     CREATE TABLE IF NOT EXISTS games (
@@ -164,8 +166,10 @@ export default function initializeSchema(db) {
   db.exec(`
     CREATE TABLE IF NOT EXISTS teams (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL UNIQUE,
-      created_at TEXT DEFAULT (datetime('now'))
+      tournament_id INTEGER,
+      name TEXT NOT NULL,
+      created_at TEXT DEFAULT (datetime('now')),
+      UNIQUE(tournament_id, name)
     );
   `);
 
@@ -285,4 +289,6 @@ export default function initializeSchema(db) {
       WHERE NOT EXISTS (SELECT 1 FROM app_settings WHERE key = '${key}');
     `);
   });
+
+  return migrateTeamsToTournaments(db);
 }

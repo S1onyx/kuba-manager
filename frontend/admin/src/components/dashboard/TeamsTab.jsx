@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import PanelCard from '../common/PanelCard.jsx';
+import TournamentScopeSelect from '../common/TournamentScopeSelect.jsx';
 import { useDashboard } from '../../context/DashboardContext.jsx';
 
 export default function TeamsTab() {
@@ -23,6 +24,7 @@ export default function TeamsTab() {
 
   return (
     <div className="tab-container">
+      <TournamentScopeSelect />
       <PanelCard
         title={t('teams.organizeTitle')}
         description={t('teams.organizeDescription')}

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { createTeam, deleteTeam, fetchTeams, updateTeam } from '../utils/api.js';
 import { formatApiError } from '../utils/apiError.js';
 
-export default function useTeamManager({ updateMessage }) {
+export default function useTeamManager({ updateMessage, tournamentId }) {
   const { t } = useTranslation();
   const [teams, setTeams] = useState([]);
   const [teamsLoading, setTeamsLoading] = useState(true);
@@ -12,10 +12,15 @@ export default function useTeamManager({ updateMessage }) {
   const [teamEdits, setTeamEdits] = useState({});
 
   const loadTeams = useCallback((showLoader = false) => {
+    if (!tournamentId) {
+      setTeams([]);
+      setTeamsLoading(false);
+      return;
+    }
     if (showLoader) {
       setTeamsLoading(true);
     }
-    fetchTeams()
+    fetchTeams(tournamentId)
       .then((data) => {
         setTeams(data);
         setTeamsError('');
@@ -28,7 +33,7 @@ export default function useTeamManager({ updateMessage }) {
           setTeamsLoading(false);
         }
       });
-  }, [t]);
+  }, [t, tournamentId]);
 
   useEffect(() => {
     loadTeams(true);
@@ -44,7 +49,7 @@ export default function useTeamManager({ updateMessage }) {
       }
 
       try {
-        await createTeam({ name: trimmed });
+        await createTeam({ name: trimmed, tournamentId });
         setTeamCreateName('');
         loadTeams();
         updateMessage('info', t('feedback.teamCreated'));
@@ -55,7 +60,7 @@ export default function useTeamManager({ updateMessage }) {
         return false;
       }
     },
-    [teamCreateName, loadTeams, updateMessage, t]
+    [teamCreateName, tournamentId, loadTeams, updateMessage, t]
   );
 
   const startTeamEdit = useCallback((team) => {

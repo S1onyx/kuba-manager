@@ -27,8 +27,7 @@ export default function TournamentsTab() {
       handleTournamentCompletionChange,
       tournamentCompletionSaving
     },
-    tournamentStructure,
-    teams
+    tournamentStructure
   } = useDashboard();
 
   const renderStatusOptions = (value, onChange) => (
@@ -559,7 +558,6 @@ export default function TournamentsTab() {
                     <TournamentDetailsPanel
                       tournament={tournament}
                       structureState={tournamentStructure}
-                      teams={teams.teams}
                     />
                   ) : null}
                 </div>
