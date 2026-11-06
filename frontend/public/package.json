@@ -5,7 +5,8 @@
     "dev": "vite",
     "build": "vite build",
     "i18n:check": "node scripts/check-i18n.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --test 'test/*.test.mjs'"
   },
   "dependencies": {
     "i18next": "26.3.6",
