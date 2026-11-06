@@ -1,6 +1,12 @@
 {
 }
 
+(frontend_cache) {
+  @frontend_html not path /assets/* /api/* /media/* /socket.io/*
+  header @frontend_html Cache-Control "no-cache"
+  header /assets/* Cache-Control "public, max-age=31536000, immutable"
+}
+
 http://kunstradbasketball.de, http://www.kunstradbasketball.de,
 http://display.kunstradbasketball.de, http://admin.kunstradbasketball.de,
 http://audio.kunstradbasketball.de, http://dashboard.kunstradbasketball.de {
@@ -29,6 +35,8 @@ kunstradbasketball.de, www.kunstradbasketball.de {
   handle /socket.io/* {
     reverse_proxy backend:3000
   }
+
+  import frontend_cache
 
   handle {
     reverse_proxy public-frontend:80
@@ -59,6 +67,8 @@ display.kunstradbasketball.de {
     reverse_proxy backend:3000
   }
 
+  import frontend_cache
+
   handle {
     reverse_proxy display-frontend:80
   }
@@ -87,6 +97,8 @@ admin.kunstradbasketball.de {
     reverse_proxy backend:3000
   }
 
+  import frontend_cache
+
   handle {
     reverse_proxy admin-frontend:80
   }
@@ -114,6 +126,8 @@ audio.kunstradbasketball.de {
   handle /media/* {
     reverse_proxy backend:3000
   }
+
+  import frontend_cache
 
   handle {
     reverse_proxy audio-frontend:80

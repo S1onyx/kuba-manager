@@ -149,3 +149,4 @@ jobs:
             docker image prune -f || true
             docker compose pull
             docker compose up -d --remove-orphans
+            docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
