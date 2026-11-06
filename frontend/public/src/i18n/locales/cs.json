@@ -188,6 +188,9 @@
   "stats": {
     "title": "Statistiky turnaje",
     "teams": "Týmy",
+    "players": "Hráči",
+    "gamesProgress": "{{played}} z {{total}}",
+    "pending": "po 1. zápase",
     "games": "Zápasy",
     "totalPoints": "Celkem bodů",
     "penalties": "Tresty"

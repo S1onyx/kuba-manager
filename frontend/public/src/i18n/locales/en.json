@@ -188,6 +188,9 @@
   "stats": {
     "title": "Tournament statistics",
     "teams": "Teams",
+    "players": "Players",
+    "gamesProgress": "{{played}} of {{total}}",
+    "pending": "after the first game",
     "games": "Games",
     "totalPoints": "Total points",
     "penalties": "Penalties"

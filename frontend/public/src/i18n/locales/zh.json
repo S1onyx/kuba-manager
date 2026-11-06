@@ -188,6 +188,9 @@
   "stats": {
     "title": "赛事统计",
     "teams": "球队",
+    "players": "球员",
+    "gamesProgress": "{{played}} / {{total}}",
+    "pending": "首场比赛后显示",
     "games": "比赛",
     "totalPoints": "总得分",
     "penalties": "犯规处罚"

@@ -188,6 +188,9 @@
   "stats": {
     "title": "Turnier-Statischtike",
     "teams": "Teams",
+    "players": "Spiiler",
+    "gamesProgress": "{{played}} vo {{total}}",
+    "pending": "chunnt ab em 1. Spiil",
     "games": "Spil",
     "totalPoints": "Gsamtpünkt",
     "penalties": "Strofe"
