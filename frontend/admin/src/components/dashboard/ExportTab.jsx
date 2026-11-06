@@ -27,8 +27,18 @@ function getEarliestTime(stage) {
   }, Infinity);
 }
 
+function getStageOrder(stage) {
+  const matches = stage.rounds ? stage.rounds.flatMap((r) => r.matches ?? []) : (stage.matches ?? []);
+  return Math.min(...matches.map((m) => m.stage_order ?? Infinity));
+}
+
 function sortStagesByTime(stages) {
-  return [...stages].sort((a, b) => getEarliestTime(a) - getEarliestTime(b));
+  return [...stages].sort((a, b) => {
+    const ta = getEarliestTime(a);
+    const tb = getEarliestTime(b);
+    if (ta !== tb) return ta - tb;
+    return getStageOrder(a) - getStageOrder(b);
+  });
 }
 
 const EXPORT_SECTIONS = [
@@ -288,19 +298,11 @@ function PrintSchedule({ summary, t, dateLocale }) {
     return <p>{t('export.noData')}</p>;
   }
 
-  const groupStandings = summary?.groupStandings ?? [];
-  const completedGroups = new Set();
-  groupStandings.forEach((g) => {
-    if (g.recordedGamesCount >= g.totalMatches && g.totalMatches > 0) {
-      completedGroups.add(g.label);
-    }
-  });
-
   const resolveLabel = (match, side) => {
     const source = side === 'home' ? match.home_source : match.away_source;
     const label = side === 'home' ? match.home_label : match.away_label;
 
-    if (source?.type === 'groupPosition' && !completedGroups.has(source.group)) {
+    if (source?.type === 'groupPosition' && !match[side]?.teamName) {
       return `${source.position}. ${t('export.groupLabel', { group: source.group })}`;
     }
 

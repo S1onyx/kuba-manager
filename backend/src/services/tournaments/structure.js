@@ -9,6 +9,7 @@ import {
   distributeSlotsAcrossGroups,
   canonicalGroupLabel,
   generateGroupFixtures,
+  findDuplicateSlotTeam,
   createSlotSource,
   createMatchCode,
   createGroupPositionSource,
@@ -192,67 +193,71 @@ export async function regenerateTournamentStructure(tournament) {
 
           if (classificationMode === 'all') {
             const leftoverSources = [];
-            groupLabels.forEach((label) => {
-              const slots = assignments.get(label) ?? [];
-              const qualifierCount = qualifiersByGroup.get(label)?.count ?? 0;
-              for (let pos = qualifierCount + 1; pos <= slots.length; pos += 1) {
-                leftoverSources.push(createGroupPositionSource(label, pos));
-              }
-            });
+            const largestGroup = Math.max(...groupLabels.map((label) => (assignments.get(label) ?? []).length));
+            for (let pos = 1; pos <= largestGroup; pos += 1) {
+              groupLabels.forEach((label) => {
+                const groupSize = (assignments.get(label) ?? []).length;
+                const qualifierCount = qualifiersByGroup.get(label)?.count ?? 0;
+                if (pos > qualifierCount && pos <= groupSize) {
+                  leftoverSources.push(createGroupPositionSource(label, pos));
+                }
+              });
+            }
 
+            if (leftoverSources.length % 2 === 1) {
+              leftoverSources.pop();
+            }
             if (leftoverSources.length >= 2) {
-              if (leftoverSources.length % 2 === 1) {
-                leftoverSources.pop();
-              }
-              if (leftoverSources.length >= 2) {
-                const basePlacement = Math.max(1, knockoutEntrants + 1);
-                const restStages = generateClassificationStages(
-                  leftoverSources,
-                  basePlacement,
-                  `PL-${basePlacement}`
-                );
-                placementStages.push(...restStages);
-              }
+              const basePlacement = Math.max(1, knockoutEntrants + 1);
+              const restStages = generateClassificationStages(leftoverSources, basePlacement, `PL-${basePlacement}`);
+              placementStages.unshift(...restStages.map((stage) => ({ ...stage, afterRound: -1 })));
             }
           }
 
-          const storeStages = (stages, phase) => {
-            stages.forEach((stage, stageIdx) => {
-              stageOrder += 1;
-              stage.matches.forEach((match, matchIndex) => {
-                const homeSource = match.home_source;
-                const awaySource = match.away_source;
-                const meta = {
-                  stage_key: stage.key
-                };
+          const orderedStages = [
+            ...placementStages.filter((stage) => stage.afterRound === -1).map((stage) => ({ stage, phase: 'placement' })),
+            ...mainStages.flatMap((stage, roundIndex) => [
+              { stage, phase: 'knockout' },
+              ...placementStages
+                .filter((placement) => placement.afterRound === roundIndex)
+                .map((placement) => ({ stage: placement, phase: 'placement' }))
+            ])
+          ];
 
-                insertScheduleStmt.bind({
-                  ':tournament_id': tournament.id,
-                  ':phase': phase,
-                  ':stage_label': stage.label,
-                  ':round_number': stageIdx + 1,
-                  ':match_order': matchIndex + 1,
-                  ':stage_order': stageOrder,
-                  ':code': match.code,
-                  ':home_slot': null,
-                  ':away_slot': null,
-                  ':home_source': JSON.stringify(homeSource),
-                  ':away_source': JSON.stringify(awaySource),
-                  ':metadata_json': JSON.stringify(meta)
-                });
-                insertScheduleStmt.step();
-                insertScheduleStmt.reset();
+          const roundCounters = { knockout: 0, placement: 0 };
+          orderedStages.forEach(({ stage, phase }) => {
+            roundCounters[phase] += 1;
+            stageOrder += 1;
+            stage.matches.forEach((match, matchIndex) => {
+              const homeSource = match.home_source;
+              const awaySource = match.away_source;
+              const meta = {
+                stage_key: stage.key
+              };
 
-                matchLabelLookup.set(match.code, {
-                  stage_label: stage.label,
-                  match_order: matchIndex + 1
-                });
+              insertScheduleStmt.bind({
+                ':tournament_id': tournament.id,
+                ':phase': phase,
+                ':stage_label': stage.label,
+                ':round_number': roundCounters[phase],
+                ':match_order': matchIndex + 1,
+                ':stage_order': stageOrder,
+                ':code': match.code,
+                ':home_slot': null,
+                ':away_slot': null,
+                ':home_source': JSON.stringify(homeSource),
+                ':away_source': JSON.stringify(awaySource),
+                ':metadata_json': JSON.stringify(meta)
+              });
+              insertScheduleStmt.step();
+              insertScheduleStmt.reset();
+
+              matchLabelLookup.set(match.code, {
+                stage_label: stage.label,
+                match_order: matchIndex + 1
               });
             });
-          };
-
-          storeStages(mainStages, 'knockout');
-          storeStages(placementStages, 'placement');
+          });
         }
       }
 
@@ -368,6 +373,13 @@ export async function setTournamentTeams(tournamentId, assignments = []) {
       throw new Error(`Slot ${assignment.slotNumber} gehört nicht zu diesem Turnier.`);
     }
   });
+
+  const duplicate = findDuplicateSlotTeam(currentSlots, normalizedAssignments);
+  if (duplicate) {
+    throw new Error(
+      `Team mit ID ${duplicate.teamId} ist mehreren Slots zugewiesen (Slot ${duplicate.slots.join(' und ')}).`
+    );
+  }
 
   const uniqueTeamIds = Array.from(
     new Set(normalizedAssignments.map((assignment) => assignment.teamId).filter((value) => value !== null))
@@ -496,25 +508,26 @@ function mapScheduleRow(row, teamsMap, teamsByName, matchLabelLookup, resultsByC
   const metadata = safeParse(row.metadata_json, {});
   const homeSource = safeParse(row.home_source, null);
   const awaySource = safeParse(row.away_source, null);
+  const resultRecord = row.code ? resultsByCode.get(row.code) : null;
 
-  const homeDetails = resolveParticipantDetails({
-    slot: row.home_slot,
-    source: homeSource,
-    teamsMap,
-    teamsByName,
-    matchLabelLookup,
-    resultsByCode,
-    groupStandingsMap
-  });
-  const awayDetails = resolveParticipantDetails({
-    slot: row.away_slot,
-    source: awaySource,
-    teamsMap,
-    teamsByName,
-    matchLabelLookup,
-    resultsByCode,
-    groupStandingsMap
-  });
+  const resolveSide = (slot, source, playedName, playedId) => {
+    const details = resolveParticipantDetails({
+      slot,
+      source,
+      teamsMap,
+      teamsByName,
+      matchLabelLookup,
+      resultsByCode,
+      groupStandingsMap
+    });
+    if (slot || !resultRecord?.id || !playedName) {
+      return details;
+    }
+    return { ...details, label: playedName, teamName: playedName, teamId: playedId ?? details.teamId };
+  };
+
+  const homeDetails = resolveSide(row.home_slot, homeSource, resultRecord?.team_a, resultRecord?.team_a_id);
+  const awayDetails = resolveSide(row.away_slot, awaySource, resultRecord?.team_b, resultRecord?.team_b_id);
 
   const homeLabel = homeDetails.label;
   const awayLabel = awayDetails.label;
@@ -522,7 +535,6 @@ function mapScheduleRow(row, teamsMap, teamsByName, matchLabelLookup, resultsByC
   const homeRecord = row.home_slot ? teamsMap.get(row.home_slot) : null;
   const awayRecord = row.away_slot ? teamsMap.get(row.away_slot) : null;
 
-  const resultRecord = row.code ? resultsByCode.get(row.code) : null;
   const result =
     resultRecord !== undefined
       ? resultRecord && resultRecord.id
@@ -707,7 +719,8 @@ export async function getTournamentSchedule(tournamentId) {
         const recordedGamesCount = standingsResult?.recordedGamesCount ?? 0;
         const totalMatches = totals.total ?? 0;
         const completedMatches = totals.completed ?? 0;
-        const isComplete = totalMatches > 0 && completedMatches >= totalMatches;
+        const isComplete =
+          totalMatches > 0 && (completedMatches >= totalMatches || recordedGamesCount >= totalMatches);
 
         groupStandingsMap.set(label, {
           standings,

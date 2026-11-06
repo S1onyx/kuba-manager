@@ -378,6 +378,16 @@ export default function TournamentsTab() {
                               onChange={(event) => handleTournamentEditChange(tournament.id, 'knockout_rounds', event.target.value)}
                             />
                           </label>
+                          <label>
+                            {t('tournaments.details.groupGamesPerTeam')}
+                            <input
+                              type="number"
+                              min="1"
+                              value={edit.group_games_per_team ?? ''}
+                              placeholder={t('tournaments.details.groupGamesPerTeamPlaceholder')}
+                              onChange={(event) => handleTournamentEditChange(tournament.id, 'group_games_per_team', event.target.value)}
+                            />
+                          </label>
                         </div>
                       )}
                       {edit.status !== 'planned' && (

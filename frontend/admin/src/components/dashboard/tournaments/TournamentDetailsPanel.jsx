@@ -6,6 +6,7 @@ import { fetchRegistrations, updateRegistrationStatus, activateTournament, setRe
 import { formatApiError } from '../../../utils/apiError.js';
 import { useDateLocale } from '../../../i18n/index.js';
 import { resolveMediaUrl } from '../../../config.js';
+import { TOURNAMENT_CLASSIFICATION_OPTIONS } from '../../../constants/dashboard.js';
 
 export default function TournamentDetailsPanel({
   tournament,
@@ -24,6 +25,7 @@ export default function TournamentDetailsPanel({
   const [activateGroupCount, setActivateGroupCount] = useState('1');
   const [activateKoRounds, setActivateKoRounds] = useState('0');
   const [activateGamesPerTeam, setActivateGamesPerTeam] = useState('');
+  const [activateClassification, setActivateClassification] = useState('top4');
   const [activateTeams, setActivateTeams] = useState([]);
   const [statusChanging, setStatusChanging] = useState(null);
   const [statusError, setStatusError] = useState('');
@@ -38,7 +40,7 @@ export default function TournamentDetailsPanel({
   }, [tournament.id]);
 
   useEffect(() => {
-    if (tournament.status === 'planned') loadRegistrations();
+    if (tournament.status === 'planned' || tournament.status === 'active') loadRegistrations();
   }, [tournament.id, tournament.status, loadRegistrations]);
 
   const handleStatusChange = async (regId, status) => {
@@ -74,6 +76,7 @@ export default function TournamentDetailsPanel({
     setActivateGroupCount(String(tournament.group_count || 1));
     setActivateKoRounds(String(tournament.knockout_rounds || 0));
     setActivateGamesPerTeam(tournament.group_games_per_team ? String(tournament.group_games_per_team) : '');
+    setActivateClassification(tournament.classification_mode || 'top4');
     setShowActivateForm(true);
   };
 
@@ -106,7 +109,7 @@ export default function TournamentDetailsPanel({
   };
 
   const updateActivateTeam = (idx, field, value) => {
-    setActivateTeams((prev) => prev.map((t, i) => i === idx ? { ...t, [field]: value } : t));
+    setActivateTeams((prev) => prev.map((t, i) => i === idx ? { ...t, [field]: value, ...(field === 'name' ? { team_id: null } : {}) } : t));
   };
 
   const handleActivate = async () => {
@@ -116,6 +119,7 @@ export default function TournamentDetailsPanel({
         group_count: Number(activateGroupCount),
         knockout_rounds: Number(activateKoRounds),
         group_games_per_team: activateGamesPerTeam === '' ? null : Number(activateGamesPerTeam),
+        classification_mode: activateClassification,
         teams: activateTeams.filter((t) => t.name.trim())
       });
       setShowActivateForm(false);
@@ -162,6 +166,17 @@ export default function TournamentDetailsPanel({
     }
     return activeStructure.groups;
   }, [activeStructure]);
+
+  const slotTeamOptions = useMemo(() => {
+    const allowed = new Set(
+      registrations.filter((reg) => reg.status === 'confirmed' && reg.teamId).map((reg) => String(reg.teamId))
+    );
+    if (allowed.size === 0) {
+      return teams;
+    }
+    Object.values(slotInitialAssignments).forEach((entry) => entry.teamId && allowed.add(entry.teamId));
+    return teams.filter((team) => allowed.has(String(team.id)));
+  }, [registrations, teams, slotInitialAssignments]);
 
   const qualifierSummary = activeStructure?.knockout?.entrants
     ? t('tournaments.details.qualifierPossible', { count: activeStructure.knockout.entrants })
@@ -319,6 +334,15 @@ export default function TournamentDetailsPanel({
                       placeholder={t('tournaments.details.groupGamesPerTeamPlaceholder')}
                       style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff' }} />
                   </label>
+                  <label style={{ display: 'grid', gap: '0.3rem', fontSize: '0.875rem' }}>
+                    {t('tournaments.classificationMode')}
+                    <select value={activateClassification} onChange={(e) => setActivateClassification(e.target.value)}
+                      style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: '#fff' }}>
+                      {TOURNAMENT_CLASSIFICATION_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>{t(option.labelKey)}</option>
+                      ))}
+                    </select>
+                  </label>
                 </div>
 
                 <div style={{ display: 'grid', gap: '0.25rem', fontSize: '0.85rem' }}>
@@ -436,7 +460,7 @@ export default function TournamentDetailsPanel({
             handleResetAllSlots={handleResetAllSlots}
             handleTournamentAssignmentsSave={handleTournamentAssignmentsSave}
             handleTournamentStructureRefresh={handleTournamentStructureRefresh}
-            teams={teams}
+            teams={slotTeamOptions}
             teamNameById={teamNameById}
             qualifierSummary={qualifierSummary}
           />
@@ -460,7 +484,7 @@ export default function TournamentDetailsPanel({
         handleResetAllSlots={handleResetAllSlots}
         handleTournamentAssignmentsSave={handleTournamentAssignmentsSave}
         handleTournamentStructureRefresh={handleTournamentStructureRefresh}
-        teams={teams}
+        teams={slotTeamOptions}
         teamNameById={teamNameById}
         qualifierSummary={qualifierSummary}
       />

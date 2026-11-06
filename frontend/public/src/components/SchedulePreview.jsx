@@ -352,7 +352,8 @@ function buildTimelineEntries(schedule, t, dateLocale) {
       stageLabelI18n: meta.stageLabelI18n ?? match.stage_label_i18n ?? null,
       roundLabel: meta.roundLabel ?? null,
       metadata: match.metadata ?? {},
-      matchOrder: match.match_order ?? meta.matchOrder ?? 0
+      matchOrder: match.match_order ?? meta.matchOrder ?? 0,
+      stageOrder: match.stage_order ?? null
     };
     entries.push(entry);
   };
@@ -395,6 +396,9 @@ function buildTimelineEntries(schedule, t, dateLocale) {
       }
       if (a.timestamp === null && b.timestamp !== null) {
         return 1;
+      }
+      if (a.stageOrder !== null && b.stageOrder !== null && a.stageOrder !== b.stageOrder) {
+        return a.stageOrder - b.stageOrder;
       }
       if (a.phase !== b.phase) {
         return (phaseSortOrder[a.phase] ?? 10) - (phaseSortOrder[b.phase] ?? 10);
