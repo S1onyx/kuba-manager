@@ -145,8 +145,7 @@
       "placeholderGroup": "z.B. Gruppä A",
       "placeholderKnockout": "z.B. Viertelfinal",
       "placeholderPlacement": "z.B. Spil um Platz 3 / 4",
-      "placeholderDefault": "z.B. Viertelfinal oder Spil um Platz 3 / 4",
-      "advancedToggle": "Erwiitert: Spiil ohni Spiilplan (Match-Kontext vo Hand setze)"
+      "placeholderDefault": "z.B. Viertelfinal oder Spil um Platz 3 / 4"
     },
     "scheduleIntegration": {
       "title": "Spielplan-Match überneh",

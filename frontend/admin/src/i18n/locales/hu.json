@@ -145,8 +145,7 @@
       "placeholderGroup": "pl. A csoport",
       "placeholderKnockout": "pl. Negyeddöntő",
       "placeholderPlacement": "pl. Mérkőzés a 3 / 4. helyért",
-      "placeholderDefault": "pl. Negyeddöntő vagy mérkőzés a 3 / 4. helyért",
-      "advancedToggle": "Haladó: mérkőzés program nélkül (kontextus kézi beállítása)"
+      "placeholderDefault": "pl. Negyeddöntő vagy mérkőzés a 3 / 4. helyért"
     },
     "scheduleIntegration": {
       "title": "Menetrend-mérkőzés átvétele",

@@ -143,8 +143,7 @@
       "placeholderGroup": "例如 A 组",
       "placeholderKnockout": "例如 四分之一决赛",
       "placeholderPlacement": "例如 第 3 / 4 名排位赛",
-      "placeholderDefault": "例如 四分之一决赛或第 3 / 4 名排位赛",
-      "advancedToggle": "高级：赛程外比赛（手动设置比赛上下文）"
+      "placeholderDefault": "例如 四分之一决赛或第 3 / 4 名排位赛"
     },
     "scheduleIntegration": {
       "title": "导入日程比赛",
