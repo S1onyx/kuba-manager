@@ -8,7 +8,7 @@ import {
   createGroupLabels,
   distributeSlotsAcrossGroups,
   canonicalGroupLabel,
-  generateRoundRobinFixtures,
+  generateGroupFixtures,
   createSlotSource,
   createMatchCode,
   createGroupPositionSource,
@@ -48,6 +48,15 @@ export async function regenerateTournamentStructure(tournament) {
   };
 
   try {
+    const existingSlots = new Map();
+    const existingRows = db.exec(
+      'SELECT slot_number, team_id, placeholder FROM tournament_teams WHERE tournament_id = ?',
+      [tournament.id]
+    );
+    (existingRows[0]?.values ?? []).forEach(([slotNumber, teamId, placeholder]) => {
+      existingSlots.set(slotNumber, { teamId: teamId ?? null, placeholder });
+    });
+
     db.run('DELETE FROM tournament_teams WHERE tournament_id = ?', [tournament.id]);
     db.run('DELETE FROM tournament_schedule WHERE tournament_id = ?', [tournament.id]);
 
@@ -63,10 +72,16 @@ export async function regenerateTournamentStructure(tournament) {
 
     if (teamsTotal > 0) {
       insertTeamStmt = db.prepare(
-        'INSERT INTO tournament_teams (tournament_id, slot_number, team_id, placeholder) VALUES (?, ?, NULL, ?)'
+        'INSERT INTO tournament_teams (tournament_id, slot_number, team_id, placeholder) VALUES (?, ?, ?, ?)'
       );
       for (let slot = 1; slot <= teamsTotal; slot += 1) {
-        insertTeamStmt.bind([tournament.id, slot, `Team ${slot}`]);
+        const previous = existingSlots.get(slot);
+        insertTeamStmt.bind([
+          tournament.id,
+          slot,
+          previous?.teamId ?? null,
+          previous?.placeholder || defaultSlotPlaceholder(slot)
+        ]);
         insertTeamStmt.step();
         insertTeamStmt.reset();
       }
@@ -110,7 +125,7 @@ export async function regenerateTournamentStructure(tournament) {
       );
 
       assignments.forEach((slots, groupLabel) => {
-        const fixtures = generateRoundRobinFixtures(slots);
+        const fixtures = generateGroupFixtures(slots, tournament.group_games_per_team);
         fixtures.forEach((matches, roundIndex) => {
           const stageLabel = `Gruppe ${groupLabel}`;
           stageOrder += 1;
@@ -990,6 +1005,15 @@ export async function getTournamentStructureDetails(tournamentId) {
   const standingsPromises = groupLabels.map((label) => computeGroupStandings(id, label, {}));
   const standingsResults = await Promise.all(standingsPromises);
 
+  const scheduleEntries = await getTournamentSchedule(id);
+  const groupMatchCounts = new Map();
+  scheduleEntries
+    .filter((entry) => entry.phase === 'group')
+    .forEach((entry) => {
+      const canonical = canonicalGroupLabel(entry.metadata?.group ?? entry.stage_label);
+      groupMatchCounts.set(canonical, (groupMatchCounts.get(canonical) ?? 0) + 1);
+    });
+
   const groups = groupLabels.map((label, index) => {
     const slots = assignments.get(label) ?? [];
     const slotEntries = slots.map((slotNumber) => {
@@ -1006,7 +1030,8 @@ export async function getTournamentStructureDetails(tournamentId) {
     });
 
     const standingsResult = standingsResults[index] ?? { standings: [], recordedGamesCount: 0 };
-    const totalMatches = slots.length <= 1 ? 0 : (slots.length * (slots.length - 1)) / 2;
+    const totalMatches =
+      groupMatchCounts.get(label) ?? (slots.length <= 1 ? 0 : (slots.length * (slots.length - 1)) / 2);
     const qualifiers = qualifiersByGroup.get(label) ?? { count: 0, positions: [] };
     const recordedGamesCount = standingsResult.recordedGamesCount ?? 0;
     const isComplete = totalMatches > 0 && recordedGamesCount >= totalMatches;
@@ -1061,7 +1086,6 @@ export async function getTournamentStructureDetails(tournamentId) {
     };
   });
 
-  const scheduleEntries = await getTournamentSchedule(id);
   const groupedSchedule = groupScheduleByPhase(scheduleEntries);
 
   return {
