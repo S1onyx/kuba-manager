@@ -7,7 +7,9 @@ export default function DisplaySettingsCard() {
   const { t } = useTranslation();
   const {
     scoreboard: { scoreboard, displayViewPending },
-    scoreboardActions: { handleDisplayViewChange }
+    scoreboardActions: { handleDisplayViewChange },
+    matchContext: { handleContextTournamentSet },
+    tournaments: { tournaments }
   } = useDashboard();
 
   const displayView = scoreboard?.displayView ?? 'scoreboard';
@@ -42,9 +44,17 @@ export default function DisplaySettingsCard() {
         })}
       </div>
       {displayView === 'bracket' && !scoreboard?.tournamentId ? (
-        <p style={{ margin: 0, color: 'var(--warning)', fontSize: '0.9rem' }}>
+        <label style={{ display: 'grid', gap: '0.35rem', color: 'var(--warning)', fontSize: '0.9rem' }}>
           {t('control.display.bracketHint')}
-        </p>
+          <select value="" onChange={(event) => event.target.value && handleContextTournamentSet(event.target.value)}>
+            <option value="">{t('control.display.chooseTournament')}</option>
+            {tournaments.map((tournament) => (
+              <option key={tournament.id} value={tournament.id}>
+                {tournament.name}
+              </option>
+            ))}
+          </select>
+        </label>
       ) : null}
       {displayViewPending ? (
         <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.88rem' }}>

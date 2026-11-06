@@ -120,7 +120,8 @@
     "display": {
       "title": "Projector Display",
       "description": "Switch between live score and bracket on the projector.",
-      "bracketHint": "Note: a tournament must be set in the match context for the bracket.",
+      "bracketHint": "Choose the tournament for the bracket first:",
+      "chooseTournament": "Choose tournament …",
       "updating": "Updating display..."
     },
     "context": {
@@ -144,7 +145,8 @@
       "placeholderGroup": "e.g. Group A",
       "placeholderKnockout": "e.g. Quarter-final",
       "placeholderPlacement": "e.g. Match for place 3 / 4",
-      "placeholderDefault": "e.g. Quarter-final or match for place 3 / 4"
+      "placeholderDefault": "e.g. Quarter-final or match for place 3 / 4",
+      "advancedToggle": "Advanced: game without schedule (set match context manually)"
     },
     "scheduleIntegration": {
       "title": "Apply Scheduled Match",

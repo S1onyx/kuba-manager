@@ -124,7 +124,8 @@
     "display": {
       "title": "Zobrazení na projektoru",
       "description": "Přepínejte mezi živým stavem a turnajovým stromem na projektoru.",
-      "bracketHint": "Poznámka: pro turnajový strom musí být v kontextu zápasu nastaven turnaj.",
+      "bracketHint": "Pro pavouka nejprve vyberte turnaj:",
+      "chooseTournament": "Vybrat turnaj …",
       "updating": "Aktualizuji zobrazení..."
     },
     "context": {
@@ -148,7 +149,8 @@
       "placeholderGroup": "např. Skupina A",
       "placeholderKnockout": "např. Čtvrtfinále",
       "placeholderPlacement": "např. Zápas o 3 / 4. místo",
-      "placeholderDefault": "např. Čtvrtfinále nebo zápas o 3 / 4. místo"
+      "placeholderDefault": "např. Čtvrtfinále nebo zápas o 3 / 4. místo",
+      "advancedToggle": "Pokročilé: zápas mimo program (ruční kontext zápasu)"
     },
     "scheduleIntegration": {
       "title": "Převzít zápas z rozlosování",

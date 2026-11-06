@@ -120,7 +120,8 @@
     "display": {
       "title": "Affichage vidéoprojecteur",
       "description": "Basculez entre le score en direct et le tableau du tournoi sur le vidéoprojecteur.",
-      "bracketHint": "Remarque : un tournoi doit être défini dans le contexte du match pour afficher le tableau.",
+      "bracketHint": "Choisissez d'abord le tournoi pour le tableau :",
+      "chooseTournament": "Choisir un tournoi …",
       "updating": "Mise à jour de l'affichage..."
     },
     "context": {
@@ -144,7 +145,8 @@
       "placeholderGroup": "p. ex. Groupe A",
       "placeholderKnockout": "p. ex. Quart de finale",
       "placeholderPlacement": "p. ex. Match pour la place 3 / 4",
-      "placeholderDefault": "p. ex. Quart de finale ou match pour la place 3 / 4"
+      "placeholderDefault": "p. ex. Quart de finale ou match pour la place 3 / 4",
+      "advancedToggle": "Avancé : match hors programme (définir le contexte manuellement)"
     },
     "scheduleIntegration": {
       "title": "Reprendre un match du calendrier",

@@ -217,6 +217,24 @@ export default function useMatchContext({ scoreboard, updateMessage, setScoreboa
     [contextForm, setScoreboard, updateMessage, t]
   );
 
+  const handleContextTournamentSet = useCallback(
+    async (tournamentId) => {
+      try {
+        const updated = await updateMatchContext({ tournamentId: Number(tournamentId), stageType: null, stageLabel: '' });
+        setScoreboard(updated);
+        setContextForm((prev) => ({ ...prev, tournamentId: String(tournamentId), stageType: '', stageLabel: '' }));
+        setContextFormDirty(false);
+        updateMessage('info', t('feedback.contextUpdated'));
+        return true;
+      } catch (err) {
+        console.error(err);
+        updateMessage('error', formatApiError(err, t, 'feedback.contextUpdateFailed'));
+        return false;
+      }
+    },
+    [setScoreboard, updateMessage, t]
+  );
+
   const stageListId = stageSuggestionEntries.length > 0 ? 'stage-options-all' : undefined;
   const stageHintLines = useMemo(() => {
     const labels = {
@@ -254,6 +272,7 @@ export default function useMatchContext({ scoreboard, updateMessage, setScoreboa
     setContextForm,
     setContextFormDirty,
     handleContextFormChange,
-    handleContextSubmit
+    handleContextSubmit,
+    handleContextTournamentSet
   };
 }
