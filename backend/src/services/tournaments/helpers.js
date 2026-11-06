@@ -255,6 +255,20 @@ export function generateGroupFixtures(slots, gamesPerTeam = null) {
   return fixtures.slice(0, limit);
 }
 
+export function findDuplicateSlotTeam(currentSlots, assignments) {
+  const finalTeams = new Map(currentSlots.map((slot) => [slot.slot_number, slot.team_id ?? null]));
+  assignments.forEach((assignment) => finalTeams.set(assignment.slotNumber, assignment.teamId));
+  const seen = new Map();
+  for (const [slotNumber, teamId] of finalTeams) {
+    if (teamId === null) continue;
+    if (seen.has(teamId)) {
+      return { teamId, slots: [seen.get(teamId), slotNumber] };
+    }
+    seen.set(teamId, slotNumber);
+  }
+  return null;
+}
+
 export function getRoundLabel(participantCount) {
   const labels = new Map([
     [2, 'Finale'],

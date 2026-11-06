@@ -9,6 +9,7 @@ import {
   distributeSlotsAcrossGroups,
   canonicalGroupLabel,
   generateGroupFixtures,
+  findDuplicateSlotTeam,
   createSlotSource,
   createMatchCode,
   createGroupPositionSource,
@@ -368,6 +369,13 @@ export async function setTournamentTeams(tournamentId, assignments = []) {
       throw new Error(`Slot ${assignment.slotNumber} gehört nicht zu diesem Turnier.`);
     }
   });
+
+  const duplicate = findDuplicateSlotTeam(currentSlots, normalizedAssignments);
+  if (duplicate) {
+    throw new Error(
+      `Team mit ID ${duplicate.teamId} ist mehreren Slots zugewiesen (Slot ${duplicate.slots.join(' und ')}).`
+    );
+  }
 
   const uniqueTeamIds = Array.from(
     new Set(normalizedAssignments.map((assignment) => assignment.teamId).filter((value) => value !== null))

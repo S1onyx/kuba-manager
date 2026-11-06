@@ -38,7 +38,7 @@ export default function TournamentDetailsPanel({
   }, [tournament.id]);
 
   useEffect(() => {
-    if (tournament.status === 'planned') loadRegistrations();
+    if (tournament.status === 'planned' || tournament.status === 'active') loadRegistrations();
   }, [tournament.id, tournament.status, loadRegistrations]);
 
   const handleStatusChange = async (regId, status) => {
@@ -106,7 +106,7 @@ export default function TournamentDetailsPanel({
   };
 
   const updateActivateTeam = (idx, field, value) => {
-    setActivateTeams((prev) => prev.map((t, i) => i === idx ? { ...t, [field]: value } : t));
+    setActivateTeams((prev) => prev.map((t, i) => i === idx ? { ...t, [field]: value, ...(field === 'name' ? { team_id: null } : {}) } : t));
   };
 
   const handleActivate = async () => {
@@ -162,6 +162,17 @@ export default function TournamentDetailsPanel({
     }
     return activeStructure.groups;
   }, [activeStructure]);
+
+  const slotTeamOptions = useMemo(() => {
+    const allowed = new Set(
+      registrations.filter((reg) => reg.status === 'confirmed' && reg.teamId).map((reg) => String(reg.teamId))
+    );
+    if (allowed.size === 0) {
+      return teams;
+    }
+    Object.values(slotInitialAssignments).forEach((entry) => entry.teamId && allowed.add(entry.teamId));
+    return teams.filter((team) => allowed.has(String(team.id)));
+  }, [registrations, teams, slotInitialAssignments]);
 
   const qualifierSummary = activeStructure?.knockout?.entrants
     ? t('tournaments.details.qualifierPossible', { count: activeStructure.knockout.entrants })
@@ -436,7 +447,7 @@ export default function TournamentDetailsPanel({
             handleResetAllSlots={handleResetAllSlots}
             handleTournamentAssignmentsSave={handleTournamentAssignmentsSave}
             handleTournamentStructureRefresh={handleTournamentStructureRefresh}
-            teams={teams}
+            teams={slotTeamOptions}
             teamNameById={teamNameById}
             qualifierSummary={qualifierSummary}
           />
@@ -460,7 +471,7 @@ export default function TournamentDetailsPanel({
         handleResetAllSlots={handleResetAllSlots}
         handleTournamentAssignmentsSave={handleTournamentAssignmentsSave}
         handleTournamentStructureRefresh={handleTournamentStructureRefresh}
-        teams={teams}
+        teams={slotTeamOptions}
         teamNameById={teamNameById}
         qualifierSummary={qualifierSummary}
       />

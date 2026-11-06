@@ -154,6 +154,10 @@ export default function useTournamentStructure({
       const next = { ...prev };
       const previous = prev[key] ?? { name: '', placeholder: '', teamId: '' };
       if (normalized) {
+        const otherKey = Object.keys(prev).find((slotKey) => slotKey !== key && prev[slotKey]?.teamId === normalized);
+        if (otherKey) {
+          next[otherKey] = { ...previous };
+        }
         const selectedName = teamNameById.get(normalized) ?? '';
         next[key] = {
           ...previous,
