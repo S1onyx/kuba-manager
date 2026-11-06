@@ -17,7 +17,8 @@ export default function ScheduleIntegrationCard() {
       handleScheduleMatchApply,
       describeScheduleMatch
     },
-    matchContext: { resolvedTournamentId }
+    matchContext: { resolvedTournamentId, handleContextTournamentSet },
+    tournaments: { tournaments }
   } = useDashboard();
 
   return (
@@ -25,6 +26,20 @@ export default function ScheduleIntegrationCard() {
       title={t('control.scheduleIntegration.title')}
       description={t('control.scheduleIntegration.description')}
     >
+      <label style={{ display: 'grid', gap: '0.3rem' }}>
+        {t('control.context.tournament')}
+        <select
+          value={resolvedTournamentId ?? ''}
+          onChange={(event) => event.target.value && handleContextTournamentSet(event.target.value)}
+        >
+          <option value="" disabled>{t('control.display.chooseTournament')}</option>
+          {tournaments.map((tournament) => (
+            <option key={tournament.id} value={tournament.id}>
+              {tournament.name}
+            </option>
+          ))}
+        </select>
+      </label>
       {!resolvedTournamentId ? (
         <p style={{ margin: 0, color: 'var(--text-muted)' }}>{t('control.scheduleIntegration.selectTournamentFirst')}</p>
       ) : scheduleLoading ? (
