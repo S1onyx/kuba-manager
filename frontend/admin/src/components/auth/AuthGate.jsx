@@ -1,36 +1,34 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ADMIN_AUTH, ADMIN_SESSION_KEY } from '../../config.js';
-
-const toToken = (username, password) => {
-  const value = `${username}:${password}`;
-  if (typeof window !== 'undefined' && typeof window.btoa === 'function') {
-    return window.btoa(value);
-  }
-  return value;
-};
+import { AUTH_EXPIRED_EVENT, checkSession, getSessionToken, login } from '../../utils/api.js';
+import { formatApiError } from '../../utils/apiError.js';
 
 export default function AuthGate({ children }) {
   const { t } = useTranslation();
   const [authorized, setAuthorized] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
+    if (!getSessionToken()) {
       setChecking(false);
       return;
     }
-    const expectedToken = toToken(ADMIN_AUTH.username, ADMIN_AUTH.password);
-    const storedToken = window.localStorage.getItem(ADMIN_SESSION_KEY);
-    if (storedToken && storedToken === expectedToken) {
-      setAuthorized(true);
-    }
-    setChecking(false);
+    checkSession()
+      .then(() => setAuthorized(true))
+      .catch(() => setAuthorized(false))
+      .finally(() => setChecking(false));
   }, []);
 
-  const handleSubmit = (event) => {
+  useEffect(() => {
+    const handleExpired = () => setAuthorized(false);
+    window.addEventListener(AUTH_EXPIRED_EVENT, handleExpired);
+    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, handleExpired);
+  }, []);
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
 
@@ -38,13 +36,14 @@ export default function AuthGate({ children }) {
     const username = (formData.get('username') || '').trim();
     const password = formData.get('password') || '';
 
-    if (username === ADMIN_AUTH.username && password === ADMIN_AUTH.password) {
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(ADMIN_SESSION_KEY, toToken(username, password));
-      }
+    setSubmitting(true);
+    try {
+      await login(username, password);
       setAuthorized(true);
-    } else {
-      setError(t('auth.invalidCredentials'));
+    } catch (err) {
+      setError(formatApiError(err, t, 'auth.invalidCredentials'));
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -96,7 +95,7 @@ export default function AuthGate({ children }) {
             </div>
           </label>
           <div className="auth-card__actions">
-            <button type="submit">{t('auth.submit')}</button>
+            <button type="submit" disabled={submitting}>{t('auth.submit')}</button>
           </div>
         </form>
       </div>
