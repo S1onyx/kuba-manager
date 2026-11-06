@@ -426,6 +426,11 @@ export function descriptorLabelFromSource(source, matchLabelLookup) {
     return `Verlierer ${stageLabel}${matchNumber ? ` – Spiel ${matchNumber}` : ''}`;
   }
 
+  if (source.type === 'rankedLoser') {
+    const stageLabel = matchLabelLookup.get(source.codes?.[0])?.stage_label ?? 'KO-Runde';
+    return `${source.rank}. bester Verlierer ${stageLabel}`;
+  }
+
   if (source.type === 'placeholder') {
     return source.label ?? '';
   }
@@ -480,6 +485,72 @@ export function generateClassificationStages(sources, basePlacement, prefix) {
 
   recurse(sources, basePlacement, 1, '');
   return stages;
+}
+
+export function createRankedLoserSource(codes, rank) {
+  return {
+    type: 'rankedLoser',
+    codes,
+    rank
+  };
+}
+
+function generateRankedLoserStages(matches, basePlacement, prefix) {
+  const codes = matches.map((match) => match.code);
+  const stages = [];
+  for (let rank = 1; rank < matches.length; rank += 2) {
+    const placement = basePlacement + rank - 1;
+    const label = `Spiel um Platz ${placement} / ${placement + 1}`;
+    stages.unshift({
+      key: `${prefix}-ranked-${placement}`,
+      label,
+      label_i18n: describeStageLabel('placement', label, { round: 1 }),
+      matches: [
+        {
+          code: `${prefix}_P${placement}`,
+          home_source: createRankedLoserSource(codes, rank),
+          away_source: createRankedLoserSource(codes, rank + 1)
+        }
+      ]
+    });
+  }
+  return stages;
+}
+
+function compareLosers(a, b) {
+  return (
+    a.position - b.position ||
+    b.points - a.points ||
+    b.goalDiff - a.goalDiff ||
+    b.goalsFor - a.goalsFor ||
+    a.team.localeCompare(b.team, 'de', { sensitivity: 'base' })
+  );
+}
+
+function rankKnockoutLosers(codes, resultsByCode, groupStandingsMap) {
+  const losers = [];
+  for (const code of codes) {
+    const result = resultsByCode?.get(code);
+    const scoreA = Number(result?.score_a ?? 0);
+    const scoreB = Number(result?.score_b ?? 0);
+    if (!result?.id || scoreA === scoreB) {
+      return null;
+    }
+    losers.push(scoreA < scoreB ? result.team_a : result.team_b);
+  }
+
+  const groups = Array.from(groupStandingsMap?.values() ?? []);
+  const ranked = losers.map((team) => {
+    for (const group of groups) {
+      const index = (group?.standings ?? []).findIndex((entry) => entry.team === team);
+      if (index >= 0) {
+        const entry = group.standings[index];
+        return { team, position: index + 1, points: entry.points ?? 0, goalDiff: entry.goalDiff ?? 0, goalsFor: entry.goalsFor ?? 0 };
+      }
+    }
+    return { team, position: Number.MAX_SAFE_INTEGER, points: 0, goalDiff: 0, goalsFor: 0 };
+  });
+  return ranked.sort(compareLosers).map((entry) => entry.team);
 }
 
 export function generateKnockoutStages({ initialParticipants, knockoutRounds, classificationMode }) {
@@ -538,12 +609,16 @@ export function generateKnockoutStages({ initialParticipants, knockoutRounds, cl
   } else if (classificationMode === 'all') {
     roundInfo.forEach((info, roundIndex) => {
       const basePlacement = info.participantsCount / 2 + 1;
-      if (basePlacement >= 3) {
-        const losers = info.matches.map((match) => createPreviousMatchSource(match.code, 'loser'));
-        placementStages.push(
-          ...withRound(generateClassificationStages(losers, basePlacement, `PL-${info.participantsCount}`), roundIndex)
-        );
+      if (basePlacement < 3) {
+        return;
       }
+      const prefix = `PL-${info.participantsCount}`;
+      if (info.matches.length >= 4) {
+        placementStages.push(...withRound(generateRankedLoserStages(info.matches, basePlacement, prefix), roundIndex));
+        return;
+      }
+      const losers = info.matches.map((match) => createPreviousMatchSource(match.code, 'loser'));
+      placementStages.push(...withRound(generateClassificationStages(losers, basePlacement, prefix), roundIndex));
     });
   }
 
@@ -632,6 +707,19 @@ export function resolveParticipantDetails({
           return wrapTeamDetails({ label: descriptor, teamId: resolved.id, teamName: descriptor });
         }
       }
+    }
+  }
+
+  if (source.type === 'rankedLoser') {
+    const team = rankKnockoutLosers(source.codes ?? [], resultsByCode, groupStandingsMap)?.[source.rank - 1];
+    if (team) {
+      const record = lookupTeamRecordByName(teamsByName, team);
+      return wrapTeamDetails({
+        label: team,
+        teamId: record?.team_id ?? null,
+        teamName: team,
+        placeholder: record?.placeholder ?? team
+      });
     }
   }
 
