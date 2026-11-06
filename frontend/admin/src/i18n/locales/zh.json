@@ -243,7 +243,7 @@
       "phase": "阶段",
       "applyDate": "应用日期",
       "autoPlanTitle": "自动排程器",
-      "autoPlanDescription": "自动分配开始时间 — 非常适合固定间隔（例如每 12 分钟）。",
+      "autoPlanDescription": "自动分配开始时间 — 非常适合固定间隔（例如每 12 分钟）。然后点击“保存所有更改”。",
       "start": "开始时间",
       "interval": "间隔（分钟）",
       "breakAfter": "每 X 场后休息",
@@ -254,7 +254,8 @@
       "applyAutoPlan": "应用自动排程",
       "saveTitle": "保存更改",
       "saveDescription": "将所有更改的日程一次性保存到数据库。",
-      "saveAll": "保存所有更改"
+      "saveAll": "保存所有更改",
+      "unsaved": "尚未保存：{{count}}"
     },
     "planner": {
       "title": "安排比赛日程",
@@ -264,6 +265,7 @@
       "noMatches": "日程中暂无比赛。",
       "scheduledAt": "已安排：{{time}}",
       "notScheduled": "尚未设置时间",
+      "unsaved": "未保存",
       "clear": "删除"
     }
   },

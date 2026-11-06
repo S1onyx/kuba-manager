@@ -246,7 +246,7 @@
       "phase": "Phase",
       "applyDate": "Appliquer la date",
       "autoPlanTitle": "Planificateur automatique",
-      "autoPlanDescription": "Attribue les heures de début automatiquement – parfait pour des intervalles fixes (p. ex. toutes les 12 minutes).",
+      "autoPlanDescription": "Attribue les heures de début automatiquement – parfait pour des intervalles fixes (p. ex. toutes les 12 minutes). Cliquez ensuite sur « Enregistrer toutes les modifications ».",
       "start": "Heure de début",
       "interval": "Intervalle (minutes)",
       "breakAfter": "Pause après X matchs",
@@ -257,7 +257,8 @@
       "applyAutoPlan": "Appliquer la planification automatique",
       "saveTitle": "Enregistrer les modifications",
       "saveDescription": "Enregistre toutes les dates modifiées en une fois dans la base de données.",
-      "saveAll": "Enregistrer toutes les modifications"
+      "saveAll": "Enregistrer toutes les modifications",
+      "unsaved": "Pas encore enregistré : {{count}}"
     },
     "planner": {
       "title": "Planifier les matchs",
@@ -267,6 +268,7 @@
       "noMatches": "Aucun match dans le calendrier pour le moment.",
       "scheduledAt": "Planifié : {{time}}",
       "notScheduled": "Aucun horaire défini",
+      "unsaved": "Non enregistré",
       "clear": "Supprimer"
     }
   },

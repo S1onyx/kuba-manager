@@ -246,7 +246,7 @@
       "phase": "Szakasz",
       "applyDate": "Dátum alkalmazása",
       "autoPlanTitle": "Automatikus ütemező",
-      "autoPlanDescription": "Automatikusan osztja ki a kezdési időpontokat – tökéletes fix időközhöz (pl. 12 percenként).",
+      "autoPlanDescription": "Automatikusan osztja ki a kezdési időpontokat – tökéletes fix időközhöz (pl. 12 percenként). Ezután kattints az „Összes módosítás mentése” gombra.",
       "start": "Kezdési időpont",
       "interval": "Időköz (perc)",
       "breakAfter": "Szünet X mérkőzés után",
@@ -257,7 +257,8 @@
       "applyAutoPlan": "Automatikus terv alkalmazása",
       "saveTitle": "Módosítások mentése",
       "saveDescription": "Az összes módosított időpont egyszerre mentése az adatbázisba.",
-      "saveAll": "Összes módosítás mentése"
+      "saveAll": "Összes módosítás mentése",
+      "unsaved": "Még nincs mentve: {{count}}"
     },
     "planner": {
       "title": "Mérkőzések ütemezése",
@@ -267,6 +268,7 @@
       "noMatches": "Még nincs mérkőzés a menetrendben.",
       "scheduledAt": "Ütemezve: {{time}}",
       "notScheduled": "Még nincs időpont beállítva",
+      "unsaved": "Nincs mentve",
       "clear": "Törlés"
     }
   },

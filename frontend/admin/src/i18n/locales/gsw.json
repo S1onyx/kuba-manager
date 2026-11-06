@@ -246,7 +246,7 @@
       "phase": "Phase",
       "applyDate": "Datum aawände",
       "autoPlanTitle": "Auto-Planer",
-      "autoPlanDescription": "Vergebt Startzyte automatisch – perfekt für feschti Intervall (z. B. alli 12 Minute).",
+      "autoPlanDescription": "Vergebt Startzyte automatisch – perfekt für feschti Intervall (z. B. alli 12 Minute). Dänn „Alli Änderige spichere“ drücke.",
       "start": "Startzytpunkt",
       "interval": "Intervall (Minute)",
       "breakAfter": "Pausä nach X Spil",
@@ -257,7 +257,8 @@
       "applyAutoPlan": "Auto-Plan aawände",
       "saveTitle": "Änderige speichere",
       "saveDescription": "Speicheret alli gänderete Termine uf eimol i de Datenbank.",
-      "saveAll": "Alli Änderige speichere"
+      "saveAll": "Alli Änderige speichere",
+      "unsaved": "Nonig gspicheret: {{count}}"
     },
     "planner": {
       "title": "Spieltermine plane",
@@ -267,6 +268,7 @@
       "noMatches": "Nonig kei Partiene im Spielplan vorhande.",
       "scheduledAt": "Plant: {{time}}",
       "notScheduled": "Nonig kei Zytpunkt gsetzt",
+      "unsaved": "Nöd gspicheret",
       "clear": "Lösche"
     }
   },

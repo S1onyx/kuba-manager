@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   fetchTournamentSchedule,
@@ -11,6 +11,7 @@ import {
   normalizeLocalDateTimeToISO
 } from '../utils/formatters.js';
 import { createPenaltyForms } from '../utils/forms.js';
+import { countUnsavedDrafts, mergeScheduleDrafts } from '../utils/scheduleDrafts.js';
 import { formatApiError } from '../utils/apiError.js';
 import { formatStageLabelI18n } from '../utils/stageLabels.js';
 import { useDateLocale } from '../i18n/index.js';
@@ -68,7 +69,6 @@ export default function useScheduleManager({
       return true;
     } catch (err) {
       console.error(err);
-      setScheduleData(null);
       setScheduleError(formatApiError(err, t, 'feedback.scheduleLoadFailed'));
       return false;
     } finally {
@@ -88,19 +88,37 @@ export default function useScheduleManager({
     }
   }, [scoreboard?.scheduleCode]);
 
-  useEffect(() => {
-    if (!scheduleData?.raw || !Array.isArray(scheduleData.raw)) {
-      setScheduleDrafts({});
-      return;
-    }
-
-    const nextDrafts = {};
-    scheduleData.raw.forEach((entry) => {
-      const key = String(entry.id);
-      nextDrafts[key] = entry.scheduled_at ? formatDateTimeLocalInput(entry.scheduled_at) : '';
+  const serverScheduleValues = useMemo(() => {
+    const values = {};
+    (Array.isArray(scheduleData?.raw) ? scheduleData.raw : []).forEach((entry) => {
+      values[String(entry.id)] = entry.scheduled_at ? formatDateTimeLocalInput(entry.scheduled_at) : '';
     });
-    setScheduleDrafts(nextDrafts);
+    return values;
   }, [scheduleData?.raw]);
+  const previousServerValuesRef = useRef({});
+
+  useEffect(() => {
+    const previousServerValues = previousServerValuesRef.current;
+    previousServerValuesRef.current = serverScheduleValues;
+    setScheduleDrafts((prev) => mergeScheduleDrafts(prev, previousServerValues, serverScheduleValues));
+  }, [serverScheduleValues]);
+
+  const unsavedScheduleCount = useMemo(
+    () => countUnsavedDrafts(scheduleDrafts, serverScheduleValues),
+    [scheduleDrafts, serverScheduleValues]
+  );
+
+  useEffect(() => {
+    if (unsavedScheduleCount === 0) {
+      return undefined;
+    }
+    const warnBeforeLeave = (event) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', warnBeforeLeave);
+    return () => window.removeEventListener('beforeunload', warnBeforeLeave);
+  }, [unsavedScheduleCount]);
 
   const scheduleOptionData = useMemo(() => {
     const options = [];
@@ -192,9 +210,14 @@ export default function useScheduleManager({
       return [];
     }
 
+    const plannedTime = (entry) => {
+      const value = scheduleDrafts[String(entry?.id)] ?? serverScheduleValues[String(entry?.id)] ?? '';
+      return value ? Date.parse(value) : null;
+    };
+
     return scheduleData.raw.slice().sort((a, b) => {
-      const timeA = a?.scheduled_at ? Date.parse(a.scheduled_at) : null;
-      const timeB = b?.scheduled_at ? Date.parse(b.scheduled_at) : null;
+      const timeA = plannedTime(a);
+      const timeB = plannedTime(b);
       const validA = Number.isFinite(timeA);
       const validB = Number.isFinite(timeB);
       if (validA && validB && timeA !== timeB) {
@@ -217,7 +240,7 @@ export default function useScheduleManager({
       }
       return (a.id ?? 0) - (b.id ?? 0);
     });
-  }, [scheduleData?.raw]);
+  }, [scheduleData?.raw, scheduleDrafts, serverScheduleValues]);
 
   const getDraftValue = useCallback(
     (entry, draftsOverride = scheduleDrafts) => {
@@ -613,6 +636,7 @@ export default function useScheduleManager({
     handleScheduleAutoPlan,
     handleScheduleBulkPersist,
     describeScheduleMatch,
-    bulkSaving
+    bulkSaving,
+    unsavedScheduleCount
   };
 }

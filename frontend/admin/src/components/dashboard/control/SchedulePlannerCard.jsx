@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import PanelCard from '../../common/PanelCard.jsx';
 import { useDashboard } from '../../../context/DashboardContext.jsx';
-import { formatDateTime } from '../../../utils/formatters.js';
+import { formatDateTime, formatDateTimeLocalInput } from '../../../utils/formatters.js';
 import { useDateLocale } from '../../../i18n/index.js';
 import { useFormatStageLabel } from '../../../utils/stageLabels.js';
 
@@ -41,6 +41,7 @@ export default function SchedulePlannerCard() {
           {scheduleChronological.map((entry) => {
             const key = String(entry.id);
             const baseValue = entry.scheduled_at ? scheduleDrafts[key] ?? entry.scheduled_at : scheduleDrafts[key] ?? '';
+            const isUnsaved = key in scheduleDrafts && scheduleDrafts[key] !== formatDateTimeLocalInput(entry.scheduled_at);
             const saving = Boolean(scheduleSaving[key]);
             const hasScheduled = Boolean(entry.scheduled_at);
             const stageName = formatStageLabel(
@@ -59,7 +60,7 @@ export default function SchedulePlannerCard() {
               <article
                 key={entry.id}
                 style={{
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  border: isUnsaved ? '1px solid rgba(255,171,64,0.6)' : '1px solid rgba(255,255,255,0.08)',
                   borderRadius: 'var(--radius-md)',
                   padding: '1rem',
                   background: 'rgba(8, 20, 35, 0.55)',
@@ -95,6 +96,9 @@ export default function SchedulePlannerCard() {
                     {t('schedule.planner.clear')}
                   </button>
                   <span style={{ fontSize: '0.85rem', opacity: 0.75 }}>{statusLabel}</span>
+                  {isUnsaved ? (
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#ffd59a' }}>{t('schedule.planner.unsaved')}</span>
+                  ) : null}
                 </div>
               </article>
             );
