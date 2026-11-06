@@ -252,7 +252,7 @@
       "phase": "Fáze",
       "applyDate": "Použít datum",
       "autoPlanTitle": "Automatický plánovač",
-      "autoPlanDescription": "Automaticky přiřadí časy začátků – ideální pro pevné intervaly (např. každých 12 minut).",
+      "autoPlanDescription": "Automaticky přiřadí časy začátků – ideální pro pevné intervaly (např. každých 12 minut). Poté klikněte na „Uložit všechny změny“.",
       "start": "Čas začátku",
       "interval": "Interval (minuty)",
       "breakAfter": "Pauza po X zápasech",
@@ -263,7 +263,8 @@
       "applyAutoPlan": "Použít automatický plán",
       "saveTitle": "Uložit změny",
       "saveDescription": "Uloží všechny změněné termíny najednou do databáze.",
-      "saveAll": "Uložit všechny změny"
+      "saveAll": "Uložit všechny změny",
+      "unsaved": "Zatím neuloženo: {{count}}"
     },
     "planner": {
       "title": "Plánování zápasů",
@@ -273,6 +274,7 @@
       "noMatches": "V rozlosování zatím nejsou žádné zápasy.",
       "scheduledAt": "Naplánováno: {{time}}",
       "notScheduled": "Zatím není nastaven čas",
+      "unsaved": "Neuloženo",
       "clear": "Smazat"
     }
   },

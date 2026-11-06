@@ -243,7 +243,7 @@
       "phase": "フェーズ",
       "applyDate": "日付を適用",
       "autoPlanTitle": "自動プランナー",
-      "autoPlanDescription": "開始時刻を自動で割り当てます — 固定間隔（例: 12 分ごと）に最適です。",
+      "autoPlanDescription": "開始時刻を自動で割り当てます — 固定間隔（例: 12 分ごと）に最適です。その後「すべての変更を保存」をクリックしてください。",
       "start": "開始時刻",
       "interval": "間隔（分）",
       "breakAfter": "X 試合ごとに休憩",
@@ -254,7 +254,8 @@
       "applyAutoPlan": "自動プランを適用",
       "saveTitle": "変更を保存",
       "saveDescription": "変更されたすべての日程をデータベースに一括保存します。",
-      "saveAll": "すべての変更を保存"
+      "saveAll": "すべての変更を保存",
+      "unsaved": "未保存：{{count}}"
     },
     "planner": {
       "title": "試合日程を計画",
@@ -264,6 +265,7 @@
       "noMatches": "日程に試合がまだありません。",
       "scheduledAt": "予定: {{time}}",
       "notScheduled": "日時がまだ設定されていません",
+      "unsaved": "未保存",
       "clear": "削除"
     }
   },

@@ -246,7 +246,7 @@
       "phase": "Phase",
       "applyDate": "Datum anwenden",
       "autoPlanTitle": "Auto-Planer",
-      "autoPlanDescription": "Vergibt Startzeiten automatisch – perfekt für feste Intervalle (z. B. alle 12 Minuten).",
+      "autoPlanDescription": "Vergibt Startzeiten automatisch – perfekt für feste Intervalle (z. B. alle 12 Minuten). Danach „Alle Änderungen speichern“ klicken.",
       "start": "Startzeitpunkt",
       "interval": "Intervall (Minuten)",
       "breakAfter": "Pause nach X Spielen",
@@ -257,7 +257,8 @@
       "applyAutoPlan": "Auto-Plan anwenden",
       "saveTitle": "Änderungen speichern",
       "saveDescription": "Speichert alle geänderten Termine auf einmal in der Datenbank.",
-      "saveAll": "Alle Änderungen speichern"
+      "saveAll": "Alle Änderungen speichern",
+      "unsaved": "Noch nicht gespeichert: {{count}}"
     },
     "planner": {
       "title": "Spieltermine planen",
@@ -267,6 +268,7 @@
       "noMatches": "Noch keine Partien im Spielplan vorhanden.",
       "scheduledAt": "Geplant: {{time}}",
       "notScheduled": "Noch kein Zeitpunkt gesetzt",
+      "unsaved": "Nicht gespeichert",
       "clear": "Löschen"
     }
   },

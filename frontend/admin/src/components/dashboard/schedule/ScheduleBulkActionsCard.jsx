@@ -15,7 +15,8 @@ export default function ScheduleBulkActionsCard() {
       handleScheduleApplyDate,
       handleScheduleAutoPlan,
       handleScheduleBulkPersist,
-      bulkSaving
+      bulkSaving,
+      unsavedScheduleCount
     }
   } = useDashboard();
 
@@ -246,6 +247,11 @@ export default function ScheduleBulkActionsCard() {
             >
               {bulkSaving ? t('common.saving') : t('schedule.bulk.saveAll')}
             </button>
+            {unsavedScheduleCount > 0 ? (
+              <span style={{ padding: '0.35rem 0.75rem', borderRadius: '999px', background: 'rgba(255,171,64,0.18)', border: '1px solid rgba(255,171,64,0.45)', color: '#ffd59a', fontWeight: 600, fontSize: '0.85rem' }}>
+                {t('schedule.bulk.unsaved', { count: unsavedScheduleCount })}
+              </span>
+            ) : null}
           </div>
         </section>
       </div>

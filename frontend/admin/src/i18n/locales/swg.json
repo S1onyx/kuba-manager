@@ -246,7 +246,7 @@
       "phase": "Phase",
       "applyDate": "Datum anwenda",
       "autoPlanTitle": "Auto-Planer",
-      "autoPlanDescription": "Vergibt Startzeite automatisch – perfekt für festi Intervalle (z. B. alla 12 Minute).",
+      "autoPlanDescription": "Vergibt Startzeite automatisch – perfekt für festi Intervalle (z. B. alla 12 Minute). Drnoch „Älle Änderunga speichra“ drucka.",
       "start": "Startzeitpunkt",
       "interval": "Intervall (Minute)",
       "breakAfter": "Pause noh X Spiele",
@@ -257,7 +257,8 @@
       "applyAutoPlan": "Auto-Plan anwenda",
       "saveTitle": "Änderonge speichera",
       "saveDescription": "Speichert alli gänderte Termine uff oimal in dr Datenbank.",
-      "saveAll": "Alli Änderonge speichera"
+      "saveAll": "Alli Änderonge speichera",
+      "unsaved": "No ned gspeichert: {{count}}"
     },
     "planner": {
       "title": "Spieltermine plana",
@@ -267,6 +268,7 @@
       "noMatches": "Noch koi Partie im Spielplan vorhandä.",
       "scheduledAt": "Plant: {{time}}",
       "notScheduled": "Noch koi Zeitpunkt gsetzt",
+      "unsaved": "Ned gspeichert",
       "clear": "Löscha"
     }
   },

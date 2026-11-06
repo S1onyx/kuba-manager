@@ -246,7 +246,7 @@
       "phase": "Phase",
       "applyDate": "Apply date",
       "autoPlanTitle": "Auto Planner",
-      "autoPlanDescription": "Assigns start times automatically – perfect for fixed intervals (e.g. every 12 minutes).",
+      "autoPlanDescription": "Assigns start times automatically – perfect for fixed intervals (e.g. every 12 minutes). Then click “Save all changes”.",
       "start": "Start time",
       "interval": "Interval (minutes)",
       "breakAfter": "Break after X matches",
@@ -257,7 +257,8 @@
       "applyAutoPlan": "Apply auto plan",
       "saveTitle": "Save changes",
       "saveDescription": "Saves all changed dates to the database at once.",
-      "saveAll": "Save all changes"
+      "saveAll": "Save all changes",
+      "unsaved": "Not saved yet: {{count}}"
     },
     "planner": {
       "title": "Schedule Matches",
@@ -267,6 +268,7 @@
       "noMatches": "No matches in the schedule yet.",
       "scheduledAt": "Scheduled: {{time}}",
       "notScheduled": "No time set yet",
+      "unsaved": "Not saved",
       "clear": "Clear"
     }
   },
