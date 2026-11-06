@@ -672,21 +672,8 @@ a {
   -webkit-overflow-scrolling: touch;
 }
 
-.export-preview {
-  font-size: 0.85rem;
-  opacity: 0.85;
-  border-left: 2px solid var(--border-color);
-  padding-left: 1rem;
-  min-width: 0;
-}
 
 @media (max-width: 768px) {
-  .export-preview {
-    font-size: 0.78rem;
-    border-left: none;
-    padding-left: 0;
-  }
-
   .export-print-btn {
     min-height: 48px;
     width: 100%;
@@ -711,270 +698,361 @@ a {
   display: none;
 }
 
+.export-paper {
+  background: #fff;
+  border-radius: 6px;
+  padding: 10mm;
+  max-width: 210mm;
+  min-width: 170mm;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.paper {
+  color: #111;
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 9pt;
+  line-height: 1.3;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.paper h1, .paper h2, .paper h3, .paper h4, .paper p {
+  color: #111;
+}
+
+.paper .print-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 4mm;
+  flex-wrap: wrap;
+  border-bottom: 1.5px solid #000;
+  padding-bottom: 2mm;
+  margin-bottom: 4mm;
+}
+
+.paper .print-header h1 {
+  font-size: 15pt;
+  margin: 0;
+}
+
+.paper .print-header p {
+  margin: 0;
+  font-size: 8.5pt;
+  display: flex;
+  gap: 3mm;
+  flex-wrap: wrap;
+}
+
+.paper .print-header__generated {
+  color: #666;
+}
+
+.paper .sheet-title,
+.paper .print-section h2 {
+  font-size: 12pt;
+  margin: 0 0 3mm;
+}
+
+.paper .sheet-subtitle,
+.paper .print-section h3 {
+  font-size: 10.5pt;
+  margin: 5mm 0 2.5mm;
+}
+
+.paper .print-section h4 {
+  font-size: 9.5pt;
+  margin: 3mm 0 1.5mm;
+}
+
+.paper .sheet-table,
+.paper .print-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9pt;
+}
+
+.paper .sheet-table {
+  table-layout: fixed;
+}
+
+.paper .sheet-table th,
+.paper .print-table th {
+  text-align: left;
+  font-size: 7pt;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  border-bottom: 1.5px solid #000;
+  padding: 1mm 1.5mm;
+  color: #111;
+  background: none;
+}
+
+.paper .sheet-table td,
+.paper .print-table td {
+  border-bottom: 0.5px solid #c8c8c8;
+  padding: 0.5mm 1.5mm;
+  height: 6.3mm;
+  vertical-align: middle;
+}
+
+.paper .sheet-table tbody tr:nth-child(even) td,
+.paper .print-table tbody tr:nth-child(even) td {
+  background: #f4f4f4;
+}
+
+.paper .sheet-num {
+  width: 6mm;
+  color: #777;
+  text-align: right;
+}
+
+.paper .sheet-time {
+  width: 13mm;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.paper .sheet-stage {
+  width: 32mm;
+  font-size: 8pt;
+  color: #444;
+  white-space: nowrap;
+}
+
+.paper .sheet-team {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.paper .sheet-team--home {
+  text-align: right;
+}
+
+.paper .sheet-result {
+  width: 22mm;
+  text-align: center;
+}
+
+.paper .sheet-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 1mm;
+}
+
+.paper .sheet-score__box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 7.5mm;
+  height: 4.6mm;
+  border: 1px solid #555;
+  background: #fff;
+  font-weight: 700;
+}
+
+.paper .sheet-divider td {
+  background: #e4e4e4 !important;
+  font-weight: 700;
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  height: auto;
+  padding: 1mm 1.5mm;
+}
+
+.paper .sheet-groups {
+  display: grid;
+  gap: 3mm;
+}
+
+.paper .sheet-group-body {
+  display: grid;
+  gap: 2mm;
+}
+
+.paper .sheet-col-time {
+  width: 12mm;
+}
+
+.paper .sheet-col-result {
+  width: 22mm;
+}
+
+.paper .sheet-card {
+  border: 0.5px solid #999;
+  border-radius: 2mm;
+  padding: 2.5mm;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.paper .sheet-card h3 {
+  font-size: 10pt;
+  margin: 0 0 1.5mm;
+}
+
+.paper .sheet-table--compact td {
+  height: 4.8mm;
+  padding-top: 0.3mm;
+  padding-bottom: 0.3mm;
+  font-size: 8.5pt;
+}
+
+.paper .sheet-subtitle {
+  break-after: avoid;
+}
+
+@media print {
+  .paper .sheet-subtitle--new-page {
+    break-before: page;
+    margin-top: 0;
+  }
+}
+
+.paper .sheet-standings {
+  width: 140mm;
+}
+
+.paper .sheet-standings th,
+.paper .sheet-standings td {
+  text-align: center;
+  height: 4.6mm;
+  font-size: 8pt;
+  padding: 0.3mm 0.8mm;
+}
+
+.paper .sheet-standings .sheet-col-pos {
+  width: 8mm;
+}
+
+.paper .sheet-standings .sheet-col-team {
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.paper .sheet-standings .sheet-col-num {
+  width: 6mm;
+}
+
+.paper .sheet-standings .sheet-col-goals {
+  width: 11mm;
+}
+
+.paper .print-block {
+  margin-bottom: 4mm;
+  break-inside: avoid;
+}
+
+.paper .print-group {
+  margin-bottom: 3mm;
+  break-inside: avoid;
+}
+
+.paper .print-round__label {
+  font-size: 7.5pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin: 0 0 1mm;
+  color: #444;
+}
+
+.paper .print-table th,
+.paper .print-table td {
+  text-align: center;
+}
+
+.paper .print-table__team {
+  text-align: left !important;
+  font-weight: 600;
+}
+
+.paper .print-table__score,
+.paper .print-table__points {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.paper .print-champion {
+  text-align: center;
+  border: 1.5px solid #000;
+  padding: 4mm;
+  margin-bottom: 4mm;
+}
+
+.paper .print-champion__label {
+  font-size: 7.5pt;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin: 0;
+  color: #444;
+}
+
+.paper .print-champion__name {
+  font-size: 16pt;
+  margin: 1mm 0;
+}
+
+.paper .print-leaders__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3mm;
+}
+
+.paper .print-leader-card {
+  border: 0.5px solid #999;
+  padding: 2.5mm;
+  text-align: center;
+}
+
+.paper .print-leader-card__title {
+  font-size: 7pt;
+  text-transform: uppercase;
+  margin: 0;
+  color: #555;
+}
+
+.paper .print-leader-card__name {
+  font-size: 10pt;
+  font-weight: 700;
+  margin: 1mm 0 0;
+}
+
+.paper .print-leader-card__team {
+  font-size: 8pt;
+  margin: 0;
+  color: #666;
+}
+
+.paper .print-leader-card__value {
+  font-size: 10pt;
+  font-weight: 700;
+  margin: 1mm 0 0;
+}
+
 @media print {
   #root {
     display: none !important;
   }
 
+  html,
+  body {
+    background: #fff !important;
+  }
+
   .print-overlay {
     display: block;
     background: #fff;
-    color: #000;
-    font-family: 'Inter', -apple-system, sans-serif;
-    padding: 0;
-    margin: 0;
   }
 
   @page {
     size: A4;
-    margin: 15mm 14mm;
-  }
-
-  .print-header {
-    text-align: center;
-    border-bottom: 2px solid #000;
-    padding-bottom: 0.8rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .print-header h1 {
-    font-size: 1.6rem;
-    margin: 0 0 0.3rem;
-    letter-spacing: 0.03em;
-  }
-
-  .print-header p {
-    margin: 0.15rem 0;
-    font-size: 0.9rem;
-  }
-
-  .print-header__generated {
-    font-size: 0.75rem !important;
-    color: #555;
-  }
-
-  .print-section h2 {
-    font-size: 1.3rem;
-    margin: 0 0 1rem;
-    border-bottom: 1px solid #999;
-    padding-bottom: 0.3rem;
-  }
-
-  .print-section h3 {
-    font-size: 1.05rem;
-    margin: 1.2rem 0 0.5rem;
-  }
-
-  .print-section h4 {
-    font-size: 0.95rem;
-    margin: 0.8rem 0 0.3rem;
-  }
-
-  .print-block {
-    margin-bottom: 1.2rem;
-    page-break-inside: avoid;
-  }
-
-  .print-group {
-    margin-bottom: 1rem;
-    page-break-inside: avoid;
-  }
-
-  .print-round {
-    margin-bottom: 0.6rem;
-    page-break-inside: avoid;
-  }
-
-  .print-round__label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin: 0 0 0.3rem;
-    color: #333;
-  }
-
-  .print-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.82rem;
-  }
-
-  .print-table th,
-  .print-table td {
-    border: 1px solid #bbb;
-    padding: 0.35rem 0.5rem;
-    text-align: center;
-  }
-
-  .print-table th {
-    background: #e8e8e8;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.72rem;
-    letter-spacing: 0.03em;
-  }
-
-  .print-table tbody tr:nth-child(even) {
-    background: #f5f5f5;
-  }
-
-  .print-table__team {
-    text-align: left;
-    font-weight: 600;
-  }
-
-  .print-table__score {
-    font-weight: 700;
-    white-space: nowrap;
-  }
-
-  .print-table__points {
-    font-weight: 700;
-  }
-
-  .print-table--standings th,
-  .print-table--standings td {
-    font-size: 0.78rem;
-    padding: 0.3rem 0.4rem;
-  }
-
-  /* ── Spielplan-Tabelle ── */
-
-  .print-schedule {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9rem;
-    margin-bottom: 0.8rem;
-  }
-
-  .print-schedule th {
-    border-bottom: 2px solid #000;
-    padding: 0.4rem 0.5rem;
-    text-align: left;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    font-weight: 600;
-  }
-
-  .print-schedule th.print-schedule__score,
-  .print-schedule td.print-score {
-    width: 7%;
-    text-align: center;
-    font-weight: 700;
-  }
-
-  .print-schedule th.print-schedule__time,
-  .print-schedule td.print-time {
-    width: 14%;
-    white-space: nowrap;
-    font-size: 0.82rem;
-  }
-
-  .print-schedule th.print-schedule__team,
-  .print-schedule td.print-team {
-    width: 36%;
-  }
-
-  .print-schedule td {
-    border-bottom: 1px solid #ccc;
-    padding: 0.45rem 0.5rem;
-    height: 2.4rem;
-    vertical-align: middle;
-  }
-
-  .print-schedule td.print-team {
-    font-weight: 600;
-  }
-
-  .print-schedule td.print-score--blank {
-    border: 1px solid #999;
-    background: #fff;
-  }
-
-  .print-schedule td.print-score--filled {
-    font-size: 1rem;
-    border: 1px solid #000;
-  }
-
-  .print-round-row {
-    page-break-inside: avoid;
-  }
-
-  .print-round-cell {
-    background: #e0e0e0;
-    font-weight: 700;
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding: 0.3rem 0.5rem !important;
-    border-bottom: 1px solid #999 !important;
-    height: auto !important;
-  }
-
-  .print-group-title {
-    margin: 0.6rem 0 0.3rem;
-    font-size: 1rem;
-    border-left: 4px solid #000;
-    padding-left: 0.5rem;
-  }
-
-  .print-champion {
-    text-align: center;
-    border: 2px solid #000;
-    padding: 1.2rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .print-champion__label {
-    font-size: 0.8rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin: 0;
-    color: #333;
-  }
-
-  .print-champion__name {
-    font-size: 1.8rem;
-    margin: 0.3rem 0;
-  }
-
-  .print-leaders__grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.8rem;
-  }
-
-  .print-leader-card {
-    border: 1px solid #999;
-    padding: 0.7rem;
-    text-align: center;
-  }
-
-  .print-leader-card__title {
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin: 0;
-    color: #555;
-  }
-
-  .print-leader-card__name {
-    font-size: 1.05rem;
-    font-weight: 700;
-    margin: 0.3rem 0 0;
-  }
-
-  .print-leader-card__team {
-    font-size: 0.8rem;
-    margin: 0;
-    color: #666;
-  }
-
-  .print-leader-card__value {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin: 0.3rem 0 0;
+    margin: 10mm;
   }
 }
