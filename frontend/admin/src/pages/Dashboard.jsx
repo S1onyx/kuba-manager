@@ -48,7 +48,8 @@ export default function Dashboard() {
   const tournamentStructure = useTournamentStructure({
     expandedTournamentId: tournamentManager.expandedTournamentId,
     teams: teamManager.teams,
-    updateMessage: feedback.updateMessage
+    updateMessage: feedback.updateMessage,
+    reloadDependencies: [teamManager.teamDataVersion]
   });
   const scheduleManager = useScheduleManager({
     resolvedTournamentId: matchContext.resolvedTournamentId,
@@ -60,15 +61,16 @@ export default function Dashboard() {
     setContextForm: matchContext.setContextForm,
     setContextFormDirty: matchContext.setContextFormDirty,
     updateMessage: feedback.updateMessage,
-    refreshScheduleDependencies: [scoreboardCtrl.scoreboard?.scheduleVersion ?? 0]
+    refreshScheduleDependencies: [scoreboardCtrl.scoreboard?.scheduleVersion ?? 0, teamManager.teamDataVersion]
   });
-  const historyManager = useHistoryManager({ updateMessage: feedback.updateMessage });
+  const historyManager = useHistoryManager({ updateMessage: feedback.updateMessage, reloadDependencies: [teamManager.teamDataVersion] });
   const playerManager = usePlayerManager({
     updateMessage: feedback.updateMessage,
     refreshActiveTeams: scoreboardCtrl.refreshActiveTeams,
-    tournamentId: teamScopeTournamentId
+    tournamentId: teamScopeTournamentId,
+    loadPlayersDependencies: [teamManager.teamDataVersion]
   });
-  const audioManager = useAudioManager({ updateMessage: feedback.updateMessage });
+  const audioManager = useAudioManager({ updateMessage: feedback.updateMessage, reloadDependencies: [teamManager.teamDataVersion] });
 
   const contextValue = useMemo(
     () => ({

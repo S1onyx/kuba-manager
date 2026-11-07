@@ -14,7 +14,7 @@ export default function TournamentDetailsPanel({
 }) {
   const { t } = useTranslation();
   const dateLocale = useDateLocale();
-  const { tournaments: { handlePosterUpload, loadTournaments } } = useDashboard();
+  const { tournaments: { handlePosterUpload, loadTournaments }, teams: { teamDataVersion } } = useDashboard();
   const [posterFile, setPosterFile] = useState(null);
   const [registrations, setRegistrations] = useState([]);
   const [regLoading, setRegLoading] = useState(false);
@@ -40,7 +40,7 @@ export default function TournamentDetailsPanel({
 
   useEffect(() => {
     if (tournament.status === 'planned' || tournament.status === 'active') loadRegistrations();
-  }, [tournament.id, tournament.status, loadRegistrations]);
+  }, [tournament.id, tournament.status, loadRegistrations, teamDataVersion]);
 
   const handleStatusChange = async (regId, status) => {
     setStatusChanging(regId);

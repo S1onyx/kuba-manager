@@ -9,7 +9,8 @@ import { formatApiError } from '../utils/apiError.js';
 export default function useTournamentStructure({
   expandedTournamentId,
   teams,
-  updateMessage
+  updateMessage,
+  reloadDependencies = []
 }) {
   const { t } = useTranslation();
   const [tournamentStructure, setTournamentStructure] = useState(null);
@@ -121,7 +122,7 @@ export default function useTournamentStructure({
       return;
     }
     loadTournamentStructure(expandedTournamentId, { showLoader: true, reset: true });
-  }, [expandedTournamentId, loadTournamentStructure]);
+  }, [expandedTournamentId, loadTournamentStructure, ...reloadDependencies]);
 
   const handleSlotNameChange = useCallback((slotNumber, value) => {
     const key = String(slotNumber);
