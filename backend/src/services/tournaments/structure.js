@@ -12,9 +12,7 @@ import {
   findDuplicateSlotTeam,
   createSlotSource,
   createMatchCode,
-  createGroupPositionSource,
-  generateKnockoutStages,
-  generateClassificationStages,
+  planKnockoutStages,
   calculateQualifierDistribution,
   resolveParticipantDetails,
   normalizeClassificationMode,
@@ -165,100 +163,55 @@ export async function regenerateTournamentStructure(tournament) {
         });
       });
 
-      const { knockoutEntrants, qualifiersByGroup } = calculateQualifierDistribution(
-        tournament,
-        groupLabels,
-        assignments
-      );
+      const knockoutPlan = planKnockoutStages(tournament, groupLabels, assignments, knockoutRounds, classificationMode);
 
-      if (knockoutEntrants >= 2) {
-        const initialParticipants = [];
-        groupLabels.forEach((label) => {
-          const qualifierInfo = qualifiersByGroup.get(label);
-          const qualifierCount = qualifierInfo?.count ?? 0;
-          for (let pos = 1; pos <= qualifierCount; pos += 1) {
-            initialParticipants.push({
-              source: createGroupPositionSource(label, pos),
-              label: `Platz ${pos} Gruppe ${label}`
+      if (knockoutPlan) {
+        const { mainStages, placementStages } = knockoutPlan;
+
+        const orderedStages = [
+          ...placementStages.filter((stage) => stage.afterRound === -1).map((stage) => ({ stage, phase: 'placement' })),
+          ...mainStages.flatMap((stage, roundIndex) => [
+            { stage, phase: 'knockout' },
+            ...placementStages
+              .filter((placement) => placement.afterRound === roundIndex)
+              .map((placement) => ({ stage: placement, phase: 'placement' }))
+          ])
+        ];
+
+        const roundCounters = { knockout: 0, placement: 0 };
+        orderedStages.forEach(({ stage, phase }) => {
+          roundCounters[phase] += 1;
+          stageOrder += 1;
+          stage.matches.forEach((match, matchIndex) => {
+            const homeSource = match.home_source;
+            const awaySource = match.away_source;
+            const meta = {
+              stage_key: stage.key
+            };
+
+            insertScheduleStmt.bind({
+              ':tournament_id': tournament.id,
+              ':phase': phase,
+              ':stage_label': stage.label,
+              ':round_number': roundCounters[phase],
+              ':match_order': matchIndex + 1,
+              ':stage_order': stageOrder,
+              ':code': match.code,
+              ':home_slot': null,
+              ':away_slot': null,
+              ':home_source': JSON.stringify(homeSource),
+              ':away_source': JSON.stringify(awaySource),
+              ':metadata_json': JSON.stringify(meta)
             });
-          }
+            insertScheduleStmt.step();
+            insertScheduleStmt.reset();
+
+            matchLabelLookup.set(match.code, {
+              stage_label: stage.label,
+              match_order: matchIndex + 1
+            });
+          });
         });
-
-        if (initialParticipants.length >= 2) {
-          const { mainStages, placementStages } = generateKnockoutStages({
-            initialParticipants,
-            knockoutRounds,
-            classificationMode
-          });
-
-          if (classificationMode === 'all') {
-            const leftoverSources = [];
-            const largestGroup = Math.max(...groupLabels.map((label) => (assignments.get(label) ?? []).length));
-            for (let pos = 1; pos <= largestGroup; pos += 1) {
-              groupLabels.forEach((label) => {
-                const groupSize = (assignments.get(label) ?? []).length;
-                const qualifierCount = qualifiersByGroup.get(label)?.count ?? 0;
-                if (pos > qualifierCount && pos <= groupSize) {
-                  leftoverSources.push(createGroupPositionSource(label, pos));
-                }
-              });
-            }
-
-            if (leftoverSources.length % 2 === 1) {
-              leftoverSources.pop();
-            }
-            if (leftoverSources.length >= 2) {
-              const basePlacement = Math.max(1, knockoutEntrants + 1);
-              const restStages = generateClassificationStages(leftoverSources, basePlacement, `PL-${basePlacement}`);
-              placementStages.unshift(...restStages.map((stage) => ({ ...stage, afterRound: -1 })));
-            }
-          }
-
-          const orderedStages = [
-            ...placementStages.filter((stage) => stage.afterRound === -1).map((stage) => ({ stage, phase: 'placement' })),
-            ...mainStages.flatMap((stage, roundIndex) => [
-              { stage, phase: 'knockout' },
-              ...placementStages
-                .filter((placement) => placement.afterRound === roundIndex)
-                .map((placement) => ({ stage: placement, phase: 'placement' }))
-            ])
-          ];
-
-          const roundCounters = { knockout: 0, placement: 0 };
-          orderedStages.forEach(({ stage, phase }) => {
-            roundCounters[phase] += 1;
-            stageOrder += 1;
-            stage.matches.forEach((match, matchIndex) => {
-              const homeSource = match.home_source;
-              const awaySource = match.away_source;
-              const meta = {
-                stage_key: stage.key
-              };
-
-              insertScheduleStmt.bind({
-                ':tournament_id': tournament.id,
-                ':phase': phase,
-                ':stage_label': stage.label,
-                ':round_number': roundCounters[phase],
-                ':match_order': matchIndex + 1,
-                ':stage_order': stageOrder,
-                ':code': match.code,
-                ':home_slot': null,
-                ':away_slot': null,
-                ':home_source': JSON.stringify(homeSource),
-                ':away_source': JSON.stringify(awaySource),
-                ':metadata_json': JSON.stringify(meta)
-              });
-              insertScheduleStmt.step();
-              insertScheduleStmt.reset();
-
-              matchLabelLookup.set(match.code, {
-                stage_label: stage.label,
-                match_order: matchIndex + 1
-              });
-            });
-          });
-        }
       }
 
       insertScheduleStmt.free();

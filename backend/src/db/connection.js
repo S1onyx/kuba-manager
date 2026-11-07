@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import initSqlJs from 'sql.js';
 import initializeSchema from './schema.js';
+import { syncKnockoutSources } from './migrations/knockoutSources.js';
 
 const __dirname = import.meta.dirname;
 
@@ -31,6 +32,9 @@ async function openDatabase() {
   if (initializeSchema(db)) {
     persistDatabase(db, SQL);
     console.log('[db] Migration: Teams und Spieler sind jetzt pro Turnier gespeichert.');
+  }
+  if (syncKnockoutSources(db) > 0) {
+    persistDatabase(db, SQL);
   }
   return { SQL, db };
 }
