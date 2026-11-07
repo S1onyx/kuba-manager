@@ -9,7 +9,7 @@ import { formatDateTime, formatTime, parseTimerInput } from '../utils/formatters
 import { formatApiError } from '../utils/apiError.js';
 import { useDateLocale } from '../i18n/index.js';
 
-export default function useHistoryManager({ updateMessage }) {
+export default function useHistoryManager({ updateMessage, reloadDependencies = [] }) {
   const { t } = useTranslation();
   const dateLocale = useDateLocale();
   const [history, setHistory] = useState([]);
@@ -39,7 +39,7 @@ export default function useHistoryManager({ updateMessage }) {
 
   useEffect(() => {
     loadHistory(true);
-  }, [loadHistory]);
+  }, [loadHistory, ...reloadDependencies]);
 
   const startHistoryEdit = useCallback((game) => {
     setEditingGameId(game.id);

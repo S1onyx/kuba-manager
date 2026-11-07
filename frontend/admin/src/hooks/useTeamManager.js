@@ -10,6 +10,8 @@ export default function useTeamManager({ updateMessage, tournamentId }) {
   const [teamsError, setTeamsError] = useState('');
   const [teamCreateName, setTeamCreateName] = useState('');
   const [teamEdits, setTeamEdits] = useState({});
+  const [teamDataVersion, setTeamDataVersion] = useState(0);
+  const markTeamsChanged = useCallback(() => setTeamDataVersion((version) => version + 1), []);
 
   const loadTeams = useCallback((showLoader = false) => {
     if (!tournamentId) {
@@ -52,6 +54,7 @@ export default function useTeamManager({ updateMessage, tournamentId }) {
         await createTeam({ name: trimmed, tournamentId });
         setTeamCreateName('');
         loadTeams();
+        markTeamsChanged();
         updateMessage('info', t('feedback.teamCreated'));
         return true;
       } catch (err) {
@@ -60,7 +63,7 @@ export default function useTeamManager({ updateMessage, tournamentId }) {
         return false;
       }
     },
-    [teamCreateName, tournamentId, loadTeams, updateMessage, t]
+    [teamCreateName, tournamentId, loadTeams, markTeamsChanged, updateMessage, t]
   );
 
   const startTeamEdit = useCallback((team) => {
@@ -97,6 +100,7 @@ export default function useTeamManager({ updateMessage, tournamentId }) {
         await updateTeam(id, { name: draft.name });
         cancelTeamEdit(id);
         loadTeams();
+        markTeamsChanged();
         updateMessage('info', t('feedback.teamUpdated'));
         return true;
       } catch (err) {
@@ -105,7 +109,7 @@ export default function useTeamManager({ updateMessage, tournamentId }) {
         return false;
       }
     },
-    [teamEdits, cancelTeamEdit, loadTeams, updateMessage, t]
+    [teamEdits, cancelTeamEdit, loadTeams, markTeamsChanged, updateMessage, t]
   );
 
   const handleTeamDelete = useCallback(
@@ -118,6 +122,7 @@ export default function useTeamManager({ updateMessage, tournamentId }) {
         await deleteTeam(id);
         cancelTeamEdit(id);
         loadTeams();
+        markTeamsChanged();
         updateMessage('info', t('feedback.teamDeleted'));
         return true;
       } catch (err) {
@@ -126,11 +131,12 @@ export default function useTeamManager({ updateMessage, tournamentId }) {
         return false;
       }
     },
-    [cancelTeamEdit, loadTeams, updateMessage, t]
+    [cancelTeamEdit, loadTeams, markTeamsChanged, updateMessage, t]
   );
 
   return {
     teams,
+    teamDataVersion,
     teamsLoading,
     teamsError,
     teamCreateName,

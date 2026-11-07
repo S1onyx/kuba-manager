@@ -15,7 +15,7 @@ import {
 } from '../utils/api.js';
 import { formatApiError } from '../utils/apiError.js';
 
-export default function useAudioManager({ updateMessage }) {
+export default function useAudioManager({ updateMessage, reloadDependencies = [] }) {
   const { t } = useTranslation();
   const [audioTriggers, setAudioTriggers] = useState([]);
   const [audioLibrary, setAudioLibrary] = useState([]);
@@ -58,7 +58,7 @@ export default function useAudioManager({ updateMessage }) {
 
   useEffect(() => {
     loadAudioData(true);
-  }, [loadAudioData]);
+  }, [loadAudioData, ...reloadDependencies]);
 
   const handleAudioTriggerLabelChange = useCallback((key, value) => {
     setAudioTriggerLabels((prev) => ({

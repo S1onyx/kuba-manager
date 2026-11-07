@@ -22,7 +22,7 @@ const EXPORT_SECTIONS = [
 export default function ExportTab() {
   const { t } = useTranslation();
   const dateLocale = useDateLocale();
-  const { matchContext, tournaments } = useDashboard();
+  const { matchContext, tournaments, teams } = useDashboard();
   const resolvedTournamentId = matchContext?.resolvedTournamentId ?? null;
   const tournamentList = tournaments?.tournaments ?? [];
 
@@ -68,7 +68,7 @@ export default function ExportTab() {
 
   useEffect(() => {
     loadSummary(activeTournamentId);
-  }, [activeTournamentId, loadSummary]);
+  }, [activeTournamentId, loadSummary, teams.teamDataVersion]);
 
   const handlePrint = useCallback((mode) => {
     setPrintMode(mode);

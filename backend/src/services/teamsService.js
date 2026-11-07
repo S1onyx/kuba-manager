@@ -108,6 +108,8 @@ export async function updateTeam(id, { name }) {
 
   db.run('UPDATE games SET team_a = ? WHERE team_a_id = ?', [trimmedName, existing.id]);
   db.run('UPDATE games SET team_b = ? WHERE team_b_id = ?', [trimmedName, existing.id]);
+  db.run("UPDATE games SET snapshot_json = json_set(snapshot_json, '$.teamAName', ?) WHERE team_a_id = ? AND json_valid(snapshot_json)", [trimmedName, existing.id]);
+  db.run("UPDATE games SET snapshot_json = json_set(snapshot_json, '$.teamBName', ?) WHERE team_b_id = ? AND json_valid(snapshot_json)", [trimmedName, existing.id]);
 
   // Text-Kopien des Teamnamens syncen (Platzhalter nur überschreiben, wenn
   // er noch dem alten Teamnamen entspricht, nicht bei manuellen Slot-Namen)
