@@ -560,7 +560,12 @@ export function generateKnockoutStages({ initialParticipants, knockoutRounds, cl
     return { mainStages, placementStages };
   }
 
-  let participants = initialParticipants.map((descriptor) => ({ ...descriptor }));
+  const groupOrder = [...new Set(initialParticipants.map((descriptor) => descriptor.source?.group).filter(Boolean))].sort();
+  const seedOf = (descriptor, index) =>
+    descriptor.source?.type === 'groupPosition'
+      ? (descriptor.source.position - 1) * initialParticipants.length + groupOrder.indexOf(descriptor.source.group)
+      : index;
+  let participants = initialParticipants.map((descriptor, index) => ({ ...descriptor, seed: seedOf(descriptor, index) }));
   let teamsInRound = participants.length;
   let stageIndex = 0;
   const roundInfo = [];
@@ -568,6 +573,7 @@ export function generateKnockoutStages({ initialParticipants, knockoutRounds, cl
   while (participants.length >= 2 && stageIndex < knockoutRounds) {
     const stageLabel = getRoundLabel(teamsInRound);
     const matches = [];
+    const matchSeeds = [];
     const pairCount = Math.floor(participants.length / 2);
 
     for (let i = 0; i < pairCount; i += 1) {
@@ -578,6 +584,7 @@ export function generateKnockoutStages({ initialParticipants, knockoutRounds, cl
         home_source: home.source,
         away_source: away.source
       });
+      matchSeeds.push(Math.min(home.seed, away.seed));
     }
 
     mainStages.push({
@@ -590,9 +597,12 @@ export function generateKnockoutStages({ initialParticipants, knockoutRounds, cl
 
     roundInfo.push({ matches, participantsCount: teamsInRound });
 
-    participants = matches.map((match) => ({
-      source: createPreviousMatchSource(match.code, 'winner')
-    }));
+    participants = matches
+      .map((match, index) => ({
+        source: createPreviousMatchSource(match.code, 'winner'),
+        seed: matchSeeds[index]
+      }))
+      .sort((a, b) => a.seed - b.seed);
 
     teamsInRound = participants.length;
     stageIndex += 1;
@@ -806,4 +816,75 @@ export function calculateQualifierDistribution(tournament, groupLabels, assignme
     qualifiersByGroup,
     knockoutEntrants
   };
+}
+
+export function planKnockoutStages(tournament, groupLabels, assignments, knockoutRounds, classificationMode) {
+  const { knockoutEntrants, qualifiersByGroup } = calculateQualifierDistribution(tournament, groupLabels, assignments);
+  if (knockoutEntrants < 2) {
+    return null;
+  }
+  const initialParticipants = [];
+  groupLabels.forEach((label) => {
+    const qualifierCount = qualifiersByGroup.get(label)?.count ?? 0;
+    for (let pos = 1; pos <= qualifierCount; pos += 1) {
+      initialParticipants.push({
+        source: createGroupPositionSource(label, pos),
+        label: `Platz ${pos} Gruppe ${label}`
+      });
+    }
+  });
+  if (initialParticipants.length < 2) {
+    return null;
+  }
+
+  const { mainStages, placementStages } = generateKnockoutStages({
+    initialParticipants,
+    knockoutRounds,
+    classificationMode
+  });
+
+  if (classificationMode === 'all') {
+    const leftoverSources = [];
+    const largestGroup = Math.max(...groupLabels.map((label) => (assignments.get(label) ?? []).length));
+    for (let pos = 1; pos <= largestGroup; pos += 1) {
+      groupLabels.forEach((label) => {
+        const groupSize = (assignments.get(label) ?? []).length;
+        const qualifierCount = qualifiersByGroup.get(label)?.count ?? 0;
+        if (pos > qualifierCount && pos <= groupSize) {
+          leftoverSources.push(createGroupPositionSource(label, pos));
+        }
+      });
+    }
+
+    if (leftoverSources.length % 2 === 1) {
+      leftoverSources.pop();
+    }
+    if (leftoverSources.length >= 2) {
+      const basePlacement = Math.max(1, knockoutEntrants + 1);
+      const restStages = generateClassificationStages(leftoverSources, basePlacement, `PL-${basePlacement}`);
+      placementStages.unshift(...restStages.map((stage) => ({ ...stage, afterRound: -1 })));
+    }
+  }
+
+  return { mainStages, placementStages };
+}
+
+export function expectedKnockoutSources(tournament) {
+  const teamsTotal = Math.max(0, Number(tournament.team_count) || 0);
+  const groupCount = Math.max(1, Number(tournament.group_count) || 0);
+  const knockoutRounds = Math.max(0, Number(tournament.knockout_rounds) || 0);
+  let classificationMode = 'top4';
+  try {
+    classificationMode = normalizeClassificationMode(tournament.classification_mode ?? 'top4');
+  } catch {
+    classificationMode = 'top4';
+  }
+  const groupLabels = createGroupLabels(groupCount);
+  const assignments = distributeSlotsAcrossGroups(teamsTotal, groupLabels);
+  const plan = teamsTotal > 0 ? planKnockoutStages(tournament, groupLabels, assignments, knockoutRounds, classificationMode) : null;
+  const sources = new Map();
+  [...(plan?.mainStages ?? []), ...(plan?.placementStages ?? [])].forEach((stage) =>
+    stage.matches.forEach((match) => sources.set(match.code, { home: match.home_source, away: match.away_source }))
+  );
+  return sources;
 }
