@@ -59,11 +59,30 @@ const responsiveStyles = `
   }
 `;
 
-export default function RecentResults({ games = [] }) {
+export default function RecentResults({ games = [], nextMatch = null }) {
   const { t } = useTranslation();
   const dateLocale = useDateLocale();
   if (!games || games.length === 0) {
-    return null;
+    return (
+      <section className="recent-results" style={{ display: 'grid', gap: '0.75rem' }}>
+        <h3 style={{ fontSize: '1.2rem', letterSpacing: '0.05em' }}>{t('recentResults.title')}</h3>
+        <div style={{ ...itemStyle, display: 'grid', gap: '0.45rem' }}>
+          <strong>{t('recentResults.emptyTitle')}</strong>
+          <span style={{ opacity: 0.8, fontSize: '0.92rem' }}>{t('recentResults.emptyText')}</span>
+          {nextMatch ? (
+            <span style={{ fontSize: '0.92rem' }}>
+              {t('recentResults.firstMatch', {
+                time: nextMatch.timestamp
+                  ? new Date(nextMatch.timestamp).toLocaleString(dateLocale, { weekday: 'short', hour: '2-digit', minute: '2-digit' })
+                  : t('schedule.openDate'),
+                home: nextMatch.home || t('schedule.openTeam'),
+                away: nextMatch.away || t('schedule.openTeam')
+              })}
+            </span>
+          ) : null}
+        </div>
+      </section>
+    );
   }
 
   return (

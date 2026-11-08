@@ -176,7 +176,10 @@
   "recentResults": {
     "title": "Poslední výsledky",
     "group": "Skupina {{label}}",
-    "knockoutGame": "Vyřazovací zápas"
+    "knockoutGame": "Vyřazovací zápas",
+    "emptyTitle": "Zatím žádné výsledky",
+    "emptyText": "Jakmile bude uložen první zápas, zobrazí se zde všechny výsledky – nejnovější první.",
+    "firstMatch": "První zápas: {{time}} · {{home}} vs {{away}}"
   },
   "schedule": {
     "title": "Program",

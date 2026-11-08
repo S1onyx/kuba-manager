@@ -176,7 +176,10 @@
   "recentResults": {
     "title": "最新の試合結果",
     "group": "グループ{{label}}",
-    "knockoutGame": "ノックアウト戦"
+    "knockoutGame": "ノックアウト戦",
+    "emptyTitle": "まだ結果はありません",
+    "emptyText": "最初の試合が保存されると、ここにすべての結果が新しい順に表示されます。",
+    "firstMatch": "最初の試合：{{time}} · {{home}} vs {{away}}"
   },
   "schedule": {
     "title": "試合日程",
