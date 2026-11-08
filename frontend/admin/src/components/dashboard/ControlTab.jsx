@@ -1,4 +1,5 @@
 import DisplaySettingsCard from './control/DisplaySettingsCard.jsx';
+import GameSaveBanner from './control/GameSaveBanner.jsx';
 import ScheduleIntegrationCard from './control/ScheduleIntegrationCard.jsx';
 import TeamSelectionCard from './control/TeamSelectionCard.jsx';
 import ScoreControlCard from './control/ScoreControlCard.jsx';
@@ -9,6 +10,7 @@ import PenaltyManagerCard from './control/PenaltyManagerCard.jsx';
 export default function ControlTab() {
   return (
     <div className="tab-container">
+      <GameSaveBanner />
       <ShootoutCard />
       <DisplaySettingsCard />
       <ScheduleIntegrationCard />

@@ -1,5 +1,8 @@
 import {
   snapshotState,
+  markGameSaved,
+  getState,
+  notifySubscribers,
   normalizeGroupStageLabel,
   bumpScheduleVersion,
   setTournamentCompleted
@@ -23,6 +26,11 @@ import { startShootout, recordShootoutAttempt, undoShootoutAttempt, cancelShooto
 
 export function getScoreboardState() {
   return snapshotState();
+}
+
+export function markGameFinished() {
+  getState().isFinished = true;
+  notifySubscribers();
 }
 
 export {
@@ -49,6 +57,7 @@ export {
   undoShootoutAttempt,
   cancelShootout,
   ShootoutError,
+  markGameSaved,
   normalizeGroupStageLabel,
   setDisplayView,
   bumpScheduleVersion,
