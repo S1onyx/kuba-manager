@@ -38,7 +38,18 @@ const teamsWrapperStyle = {
   width: '100%'
 };
 
+const UPPERCASE_CHAR_WIDTH_EM = 0.8;
+
+function fittedNameStyle(name) {
+  const longestWord = Math.max(4, ...String(name ?? '').split(/\s+/).map((word) => word.length));
+  return {
+    ...teamNameStyle,
+    fontSize: `max(0.85rem, min(clamp(1.05rem, 4.5vw, 2.05rem), calc(100cqi / ${(longestWord * UPPERCASE_CHAR_WIDTH_EM).toFixed(2)})))`
+  };
+}
+
 const teamColumnStyle = {
+  containerType: 'inline-size',
   display: 'grid',
   gap: '0.4rem',
   justifyItems: 'start',
@@ -58,8 +69,9 @@ const teamNameStyle = {
   textTransform: 'uppercase',
   letterSpacing: '0.06em',
   lineHeight: 1.15,
-  wordBreak: 'break-word',
-  whiteSpace: 'normal'
+  overflowWrap: 'break-word',
+  whiteSpace: 'normal',
+  width: '100%'
 };
 
 const scoreStyle = {
@@ -118,16 +130,21 @@ const responsiveStyles = `
       gap: 0.35rem;
     }
   }
-  @media (max-width: 380px) {
+  @media (max-width: 560px) {
     .current-card__teams {
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr !important;
       text-align: center;
-      gap: 0.5rem;
+      gap: 0.5rem !important;
     }
     .current-card__team {
       justify-items: center !important;
       text-align: center !important;
     }
+    .current-card__team-name {
+      text-align: center;
+    }
+  }
+  @media (max-width: 380px) {
     .current-card__status {
       width: 100%;
     }
@@ -205,7 +222,7 @@ export default function CurrentMatchCard({ scoreboard }) {
 
             <div className="current-card__teams" style={teamsWrapperStyle}>
               <div className="current-card__team current-card__team--left" style={leftTeamColumnStyle}>
-                <div className="current-card__team-name" style={teamNameStyle}>{scoreboard.teamAName || t('currentMatch.teamA')}</div>
+                <div className="current-card__team-name" style={fittedNameStyle(scoreboard.teamAName || t('currentMatch.teamA'))}>{scoreboard.teamAName || t('currentMatch.teamA')}</div>
                 <div style={{ fontSize: '0.85rem', opacity: 0.75 }}>{t('currentMatch.penalties', { count: penaltiesA })}</div>
               </div>
 
@@ -214,7 +231,7 @@ export default function CurrentMatchCard({ scoreboard }) {
               </div>
 
               <div className="current-card__team current-card__team--right" style={teamColumnStyle}>
-                <div className="current-card__team-name" style={teamNameStyle}>{scoreboard.teamBName || t('currentMatch.teamB')}</div>
+                <div className="current-card__team-name" style={fittedNameStyle(scoreboard.teamBName || t('currentMatch.teamB'))}>{scoreboard.teamBName || t('currentMatch.teamB')}</div>
                 <div style={{ fontSize: '0.85rem', opacity: 0.75 }}>{t('currentMatch.penalties', { count: penaltiesB })}</div>
               </div>
             </div>
