@@ -4,7 +4,12 @@
     "suddenDeath": "Sudden Death",
     "winner": "Sieger: {{team}}",
     "regular": "nach de reguläre Spiilziit {{a}}:{{b}}",
-    "short": "n.F."
+    "short": "n.F.",
+    "next": "Als Nächschts wirft: {{team}}",
+    "throwing": "wirft",
+    "lastThrow": "Letschte Wurf: {{player}} – {{result}}",
+    "hit": "Träffer",
+    "miss": "dernäbe"
   },
   "header": {
     "subtitle": "Live-Spilstand, Tabälle und Statischtike vom grad usgwählte Turnier.",

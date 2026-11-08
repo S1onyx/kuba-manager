@@ -4,7 +4,12 @@
     "suddenDeath": "Hirtelen halál",
     "winner": "Győztes: {{team}}",
     "regular": "a rendes játékidő után {{a}}:{{b}}",
-    "short": "bünt. után"
+    "short": "bünt. után",
+    "next": "Következő dobó: {{team}}",
+    "throwing": "dob",
+    "lastThrow": "Utolsó dobás: {{player}} – {{result}}",
+    "hit": "találat",
+    "miss": "mellé"
   },
   "header": {
     "subtitle": "Élő állás, tabellák és statisztikák az aktuálisan kiválasztott tornához.",

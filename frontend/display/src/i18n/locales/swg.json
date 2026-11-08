@@ -4,7 +4,12 @@
     "suddenDeath": "Sudden Death",
     "winner": "Sieger: {{team}}",
     "regular": "noch dr reguläre Spielzeit {{a}}:{{b}}",
-    "short": "n.F."
+    "short": "n.F.",
+    "next": "Als Nächsts wirft: {{team}}",
+    "throwing": "wirft",
+    "lastThrow": "Letzter Wurf: {{player}} – {{result}}",
+    "hit": "Treffer",
+    "miss": "danebe"
   },
   "app": {
     "mirrorStandard": "Display 1 (Standard)",

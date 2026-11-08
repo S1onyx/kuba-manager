@@ -4,7 +4,12 @@
     "suddenDeath": "Sudden death",
     "winner": "Winner: {{team}}",
     "regular": "after regular time {{a}}:{{b}}",
-    "short": "a.s."
+    "short": "a.s.",
+    "next": "Next to throw: {{team}}",
+    "throwing": "throwing",
+    "lastThrow": "Last throw: {{player}} – {{result}}",
+    "hit": "hit",
+    "miss": "miss"
   },
   "header": {
     "subtitle": "Live score, standings and statistics for the currently selected tournament.",

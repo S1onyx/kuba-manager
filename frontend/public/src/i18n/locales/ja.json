@@ -4,7 +4,12 @@
     "suddenDeath": "サドンデス",
     "winner": "勝者：{{team}}",
     "regular": "規定時間終了時 {{a}}:{{b}}",
-    "short": "FT戦"
+    "short": "FT戦",
+    "next": "次に投げる：{{team}}",
+    "throwing": "投球中",
+    "lastThrow": "最後の1本：{{player}} – {{result}}",
+    "hit": "成功",
+    "miss": "失敗"
   },
   "header": {
     "subtitle": "現在選択されているトーナメントのライブスコア、順位表、統計情報です。",
