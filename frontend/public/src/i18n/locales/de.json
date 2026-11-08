@@ -31,13 +31,24 @@
     "finishedTitle": "Das Turnier ist beendet",
     "finishedHint": "Alle Platzierungen und Statistiken findest du in der Gesamtübersicht."
   },
+  "teamOverview": {
+    "title": "Teams & Kader",
+    "description": "Alle Teams mit Gruppe und Spielern. Die Statistik erscheint ab dem ersten Spiel.",
+    "descriptionPlayed": "Alle Teams mit Gruppe, Bilanz und Spielern.",
+    "points": "{{count}} Pkt.",
+    "record": "S-U-N {{wins}}-{{draws}}-{{losses}}",
+    "baskets": "Körbe {{scored}}:{{conceded}}",
+    "playerPoints": "{{count}} Pkt.",
+    "noRoster": "Kader folgt",
+    "empty": "Noch keine Teams angemeldet."
+  },
   "tabs": {
     "live": "Live",
     "results": "Letzte Ergebnisse",
     "schedule": "Spielplan",
     "groups": "Gruppen",
     "tournament": "Turnierstatistik",
-    "teams": "Team-Stats",
+    "teams": "Teams",
     "players": "Player-Stats",
     "final": "Gesamtübersicht"
   },

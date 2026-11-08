@@ -31,13 +31,24 @@
     "finishedTitle": "锦标赛已结束",
     "finishedHint": "所有名次和统计数据请查看总览。"
   },
+  "teamOverview": {
+    "title": "队伍与名单",
+    "description": "所有队伍及其小组和球员。统计数据将在首场比赛后显示。",
+    "descriptionPlayed": "所有队伍及其小组、战绩和球员。",
+    "points": "{{count}} 分",
+    "record": "胜-平-负 {{wins}}-{{draws}}-{{losses}}",
+    "baskets": "进球 {{scored}}:{{conceded}}",
+    "playerPoints": "{{count}} 分",
+    "noRoster": "名单待定",
+    "empty": "尚无报名队伍。"
+  },
   "tabs": {
     "live": "直播",
     "results": "最新赛果",
     "schedule": "赛程",
     "groups": "小组",
     "tournament": "赛事统计",
-    "teams": "球队数据",
+    "teams": "队伍",
     "players": "球员数据",
     "final": "总览"
   },

@@ -1,5 +1,6 @@
 const MINUTE_MS = 60 * 1000;
 export const SCHEDULE_DELAY_THRESHOLD_MINUTES = 3;
+const MAX_PLAUSIBLE_DELAY_MINUTES = 12 * 60;
 
 function elapsedGameMs(liveMatch) {
   const duration = Number(liveMatch?.durationSeconds ?? 0);
@@ -7,7 +8,10 @@ function elapsedGameMs(liveMatch) {
   return Math.max(0, duration - remaining) * 1000;
 }
 
-export function computeScheduleProgress(entries, liveMatch, nowTs) {
+export function computeScheduleProgress(entries, liveMatch, nowTs, { completed = false } = {}) {
+  if (completed) {
+    return { activeKey: null, nextKey: null, hasStarted: true, delayMinutes: null, expectedTimestamp: () => null };
+  }
   const liveCode = String(liveMatch?.code ?? '').trim().toLowerCase();
   const activeIndex = liveCode
     ? entries.findIndex((entry) => !entry.result?.hasResult && (entry.code ?? '').toLowerCase() === liveCode)
@@ -22,6 +26,10 @@ export function computeScheduleProgress(entries, liveMatch, nowTs) {
     delayMinutes = Math.round((nowTs - activeEntry.timestamp - elapsedGameMs(liveMatch)) / MINUTE_MS);
   } else if (hasStarted && nextEntry?.timestamp != null) {
     delayMinutes = Math.max(0, Math.round((nowTs - nextEntry.timestamp) / MINUTE_MS));
+  }
+
+  if (delayMinutes !== null && Math.abs(delayMinutes) > MAX_PLAUSIBLE_DELAY_MINUTES) {
+    delayMinutes = null;
   }
 
   const shift = delayMinutes !== null && Math.abs(delayMinutes) >= SCHEDULE_DELAY_THRESHOLD_MINUTES ? delayMinutes : 0;

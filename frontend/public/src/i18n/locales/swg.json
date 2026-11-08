@@ -31,13 +31,24 @@
     "finishedTitle": "S'Turnier isch rom",
     "finishedHint": "Älle Platzierunga ond Statistika findsch en dr Gesamtübersicht."
   },
+  "teamOverview": {
+    "title": "Teams & Kader",
+    "description": "Älle Teams mit Grupp ond Spieler. D'Statistik kommt ab em erschta Spiel.",
+    "descriptionPlayed": "Älle Teams mit Grupp, Bilanz ond Spieler.",
+    "points": "{{count}} Pkt.",
+    "record": "S-U-N {{wins}}-{{draws}}-{{losses}}",
+    "baskets": "Körb {{scored}}:{{conceded}}",
+    "playerPoints": "{{count}} Pkt.",
+    "noRoster": "Kader kommt no",
+    "empty": "No koine Teams agmeldet."
+  },
   "tabs": {
     "live": "Live",
     "results": "Letzde Ergebniss",
     "schedule": "Schbielblan",
     "groups": "Gruppa",
     "tournament": "Turnierstatistik",
-    "teams": "Team-Stats",
+    "teams": "Teams",
     "players": "Player-Stats",
     "final": "Gesamtdübersicht"
   },

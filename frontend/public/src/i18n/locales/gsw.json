@@ -31,13 +31,24 @@
     "finishedTitle": "S'Turnier isch fertig",
     "finishedHint": "Alli Platzierige und Statistike findsch i de Gsamtübersicht."
   },
+  "teamOverview": {
+    "title": "Teams & Kader",
+    "description": "Alli Teams mit Gruppe und Spiiler. D'Statistik chunnt ab em erschte Spiil.",
+    "descriptionPlayed": "Alli Teams mit Gruppe, Bilanz und Spiiler.",
+    "points": "{{count}} Pkt.",
+    "record": "S-U-N {{wins}}-{{draws}}-{{losses}}",
+    "baskets": "Körb {{scored}}:{{conceded}}",
+    "playerPoints": "{{count}} Pkt.",
+    "noRoster": "Kader folgt",
+    "empty": "No kei Teams aagmäldet."
+  },
   "tabs": {
     "live": "Live",
     "results": "Letschti Ergebnis",
     "schedule": "Spilplan",
     "groups": "Gruppe",
     "tournament": "Turnierstatischtik",
-    "teams": "Team-Stats",
+    "teams": "Teams",
     "players": "Player-Stats",
     "final": "Gsamtübersicht"
   },

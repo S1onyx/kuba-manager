@@ -240,8 +240,8 @@ const responsiveStyles = `
 `;
 
 const scheduleViewModes = [
-  { id: 'timeline', labelKey: 'schedule.viewTimeline' },
-  { id: 'phases', labelKey: 'schedule.viewPhases' }
+  { id: 'phases', labelKey: 'schedule.viewPhases' },
+  { id: 'timeline', labelKey: 'schedule.viewTimeline' }
 ];
 
 const phaseLabelKeys = {
@@ -531,8 +531,8 @@ function describeDelay(delayMinutes, t) {
   return { tone: 'ontime', text: t('schedule.onTime') };
 }
 
-function TimelineSchedule({ entries, formatDateTime, formatTime, liveMatch, t }) {
-  const progress = computeScheduleProgress(entries, liveMatch, Date.now());
+function TimelineSchedule({ entries, formatDateTime, formatTime, liveMatch, completed, t }) {
+  const progress = computeScheduleProgress(entries, liveMatch, Date.now(), { completed });
   const delay = progress.hasStarted && progress.delayMinutes !== null ? describeDelay(progress.delayMinutes, t) : null;
 
   return (
@@ -568,10 +568,10 @@ function TimelineSchedule({ entries, formatDateTime, formatTime, liveMatch, t })
   );
 }
 
-export default function SchedulePreview({ schedule, liveMatch = null }) {
+export default function SchedulePreview({ schedule, liveMatch = null, tournamentCompleted = false }) {
   const { t } = useTranslation();
   const dateLocale = useDateLocale();
-  const [viewMode, setViewMode] = useState(scheduleViewModes[0]?.id ?? 'timeline');
+  const [viewMode, setViewMode] = useState(scheduleViewModes[0]?.id ?? 'phases');
   const formatMatchDateTime = useMemo(
     () => createMatchDateTimeFormatter(dateLocale, t),
     [dateLocale, t]
@@ -631,6 +631,7 @@ export default function SchedulePreview({ schedule, liveMatch = null }) {
               formatDateTime={formatMatchDateTime}
               formatTime={(timestamp) => new Date(timestamp).toLocaleTimeString(dateLocale, { hour: '2-digit', minute: '2-digit' })}
               liveMatch={liveMatch}
+              completed={tournamentCompleted}
               t={t}
             />
           ) : (
