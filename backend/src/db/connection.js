@@ -6,7 +6,9 @@ import { syncKnockoutSources } from './migrations/knockoutSources.js';
 
 const __dirname = import.meta.dirname;
 
-const dataDir = path.resolve(__dirname, '..', '..', 'data');
+const dataDir = process.env.KUBA_DATA_DIR
+  ? path.resolve(process.env.KUBA_DATA_DIR)
+  : path.resolve(__dirname, '..', '..', 'data');
 fs.mkdirSync(dataDir, { recursive: true });
 
 const dbPath = path.join(dataDir, 'scoreboard.sqlite');

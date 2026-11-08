@@ -231,6 +231,7 @@ export function applyScheduleMatchSelection({
 
   state.scoreA = 0;
   state.scoreB = 0;
+  state.shootout = null;
   state.remainingSeconds = state.durationSeconds;
   state.isRunning = false;
   state.currentHalf = 1;

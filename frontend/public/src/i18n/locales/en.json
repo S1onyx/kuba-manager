@@ -1,4 +1,11 @@
 {
+  "shootout": {
+    "title": "Free-throw shootout",
+    "suddenDeath": "Sudden death",
+    "winner": "Winner: {{team}}",
+    "regular": "after regular time {{a}}:{{b}}",
+    "short": "a.s."
+  },
   "header": {
     "subtitle": "Live score, standings and statistics for the currently selected tournament.",
     "navSchedule": "Schedule",

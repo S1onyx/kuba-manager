@@ -1,4 +1,11 @@
 {
+  "shootout": {
+    "title": "Büntetődobás-párbaj",
+    "suddenDeath": "Hirtelen halál",
+    "winner": "Győztes: {{team}}",
+    "regular": "a rendes játékidő után {{a}}:{{b}}",
+    "short": "bünt. után"
+  },
   "app": {
     "mirrorStandard": "1. kijelző (normál)",
     "mirrorInverted": "2. kijelző (invertált)"

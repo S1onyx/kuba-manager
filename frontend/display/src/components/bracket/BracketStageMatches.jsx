@@ -145,7 +145,7 @@ export default function BracketStageMatches({ title, stages }) {
                 const awayName = resolveParticipantName(match.away, match.away_label);
                 const hasResult = match.result?.hasResult;
                 const scoreDisplay = hasResult
-                  ? `${match.result.scoreA ?? 0}:${match.result.scoreB ?? 0}`
+                  ? `${match.result.scoreA ?? 0}:${match.result.scoreB ?? 0}${match.result.shootout ? ` ${t('shootout.short')}` : ''}`
                   : 'vs';
 
                 const scheduledLabel = formatMatchDateTime(match.scheduled_at, scheduleFormatter, t);

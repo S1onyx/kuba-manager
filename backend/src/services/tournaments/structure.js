@@ -1,5 +1,6 @@
 import { getConnection, persistDatabase } from '../../db/connection.js';
 import { safeParse } from '../shared/json.js';
+import { shootoutSummary } from '../shared/shootout.js';
 import { getTeam } from '../teamsService.js';
 import { getTournament } from './base.js';
 import { computeGroupStandings } from './standings.js';
@@ -512,7 +513,8 @@ function mapScheduleRow(row, teamsMap, teamsByName, matchLabelLookup, resultsByC
             teamBId: resultRecord.team_b_id,
             scoreA: resultRecord.score_a,
             scoreB: resultRecord.score_b,
-            finishedAt: resultRecord.created_at
+            finishedAt: resultRecord.created_at,
+            shootout: shootoutSummary({ shootout: safeParse(resultRecord.shootout_json, null) })
           }
         : null
       : null;
@@ -587,7 +589,8 @@ export async function getTournamentSchedule(tournamentId) {
   const resultLookup = new Map();
 
   const resultsStmt = db.prepare(
-    `SELECT schedule_code, id, team_a, team_b, team_a_id, team_b_id, score_a, score_b, created_at
+    `SELECT schedule_code, id, team_a, team_b, team_a_id, team_b_id, score_a, score_b, created_at,
+       CASE WHEN json_valid(snapshot_json) THEN json_extract(snapshot_json, '$.shootout') END AS shootout_json
      FROM games
      WHERE tournament_id = ? AND schedule_code IS NOT NULL
      ORDER BY datetime(created_at) ASC, id ASC`

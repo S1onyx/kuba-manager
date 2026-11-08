@@ -1,4 +1,11 @@
 {
+  "shootout": {
+    "title": "Rozstřel",
+    "suddenDeath": "Náhlá smrt",
+    "winner": "Vítěz: {{team}}",
+    "regular": "po řádné hrací době {{a}}:{{b}}",
+    "short": "po rozstř."
+  },
   "app": {
     "mirrorStandard": "Displej 1 (standardní)",
     "mirrorInverted": "Displej 2 (invertovaný)"

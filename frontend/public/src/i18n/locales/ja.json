@@ -1,4 +1,11 @@
 {
+  "shootout": {
+    "title": "フリースロー戦",
+    "suddenDeath": "サドンデス",
+    "winner": "勝者：{{team}}",
+    "regular": "規定時間終了時 {{a}}:{{b}}",
+    "short": "FT戦"
+  },
   "header": {
     "subtitle": "現在選択されているトーナメントのライブスコア、順位表、統計情報です。",
     "navSchedule": "試合日程",

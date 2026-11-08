@@ -1,4 +1,11 @@
 {
+  "shootout": {
+    "title": "Free-throw shootout",
+    "suddenDeath": "Sudden death",
+    "winner": "Winner: {{team}}",
+    "regular": "after regular time {{a}}:{{b}}",
+    "short": "a.s."
+  },
   "app": {
     "mirrorStandard": "Display 1 (standard)",
     "mirrorInverted": "Display 2 (inverted)"

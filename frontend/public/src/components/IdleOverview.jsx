@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { formatResultScore } from '../utils/shootout.js';
 import { useDateLocale } from '../i18n/index.js';
 import { formatStageLabelI18n } from '../utils/stageLabels.js';
 import { computeScheduleProgress, SCHEDULE_DELAY_THRESHOLD_MINUTES } from '../utils/scheduleProgress.js';
@@ -94,7 +95,7 @@ export default function IdleOverview({ entries, recentGames, tournamentCompleted
           <h3 style={{ margin: 0, fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '0.08em', opacity: 0.85 }}>{t('idle.lastResult')}</h3>
           <div style={{ ...rowStyle, gridTemplateColumns: 'minmax(0, 1fr) auto minmax(0, 1fr)' }}>
             <span style={{ ...teamStyle, textAlign: 'right' }}>{lastGame.teamA}</span>
-            <strong style={{ fontSize: '1.25rem' }}>{lastGame.scoreA} : {lastGame.scoreB}</strong>
+            <strong style={{ fontSize: '1.25rem' }}>{formatResultScore(lastGame.scoreA, lastGame.scoreB, lastGame.shootout)}</strong>
             <span style={teamStyle}>{lastGame.teamB}</span>
           </div>
         </div>

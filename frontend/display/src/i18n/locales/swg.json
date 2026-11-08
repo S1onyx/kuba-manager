@@ -1,4 +1,11 @@
 {
+  "shootout": {
+    "title": "Freiwurf-Stecha",
+    "suddenDeath": "Sudden Death",
+    "winner": "Sieger: {{team}}",
+    "regular": "noch dr reguläre Spielzeit {{a}}:{{b}}",
+    "short": "n.F."
+  },
   "app": {
     "mirrorStandard": "Display 1 (Standard)",
     "mirrorInverted": "Display 2 (umgkehrt)"

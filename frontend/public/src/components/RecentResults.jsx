@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { formatResultScore } from '../utils/shootout.js';
 import { useDateLocale } from '../i18n/index.js';
 import { formatStageLabelI18n } from '../utils/stageLabels.js';
 
@@ -76,7 +77,7 @@ export default function RecentResults({ games = [] }) {
             <div className="recent-results__row" style={rowStyle}>
               <strong style={{ ...teamStyle, textAlign: 'left' }}>{game.teamA}</strong>
               <span className="recent-results__score" style={scoreStyle}>
-                {game.scoreA} : {game.scoreB}
+                {formatResultScore(game.scoreA, game.scoreB, game.shootout)}
               </span>
               <strong style={{ ...teamStyle, textAlign: 'right' }}>{game.teamB}</strong>
             </div>
