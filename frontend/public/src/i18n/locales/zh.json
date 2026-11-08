@@ -176,7 +176,10 @@
   "recentResults": {
     "title": "最新赛果",
     "group": "{{label}} 组",
-    "knockoutGame": "淘汰赛"
+    "knockoutGame": "淘汰赛",
+    "emptyTitle": "暂无结果",
+    "emptyText": "第一场比赛保存后，所有结果将显示在这里——最新的在前。",
+    "firstMatch": "第一场比赛：{{time}} · {{home}} vs {{away}}"
   },
   "schedule": {
     "title": "赛程",

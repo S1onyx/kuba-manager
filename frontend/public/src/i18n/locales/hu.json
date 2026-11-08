@@ -176,7 +176,10 @@
   "recentResults": {
     "title": "Legutóbbi eredmények",
     "group": "{{label}} csoport",
-    "knockoutGame": "Kieséses mérkőzés"
+    "knockoutGame": "Kieséses mérkőzés",
+    "emptyTitle": "Még nincs eredmény",
+    "emptyText": "Amint az első mérkőzést mentik, itt jelenik meg minden eredmény – a legújabb elöl.",
+    "firstMatch": "Első mérkőzés: {{time}} · {{home}} vs {{away}}"
   },
   "schedule": {
     "title": "Program",

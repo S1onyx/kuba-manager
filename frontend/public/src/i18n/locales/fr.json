@@ -176,7 +176,10 @@
   "recentResults": {
     "title": "Derniers résultats",
     "group": "Groupe {{label}}",
-    "knockoutGame": "Match à élimination"
+    "knockoutGame": "Match à élimination",
+    "emptyTitle": "Pas encore de résultats",
+    "emptyText": "Dès que le premier match est enregistré, tous les résultats apparaissent ici – le plus récent en premier.",
+    "firstMatch": "Premier match : {{time}} · {{home}} vs {{away}}"
   },
   "schedule": {
     "title": "Programme",

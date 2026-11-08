@@ -67,7 +67,9 @@ export default function SummaryContent() {
   }
 
   if (activeTab === 'results') {
-    return <RecentResults games={tournamentSummary.recentGames} />;
+    const entries = buildTimelineEntries(tournamentSummary.schedule, t, dateLocale);
+    const nextMatch = entries.find((entry) => !entry.result?.hasResult) ?? null;
+    return <RecentResults games={tournamentSummary.recentGames} nextMatch={nextMatch} />;
   }
 
   if (activeTab === 'schedule') {

@@ -176,7 +176,10 @@
   "recentResults": {
     "title": "Letzte Ergebnisse",
     "group": "Gruppe {{label}}",
-    "knockoutGame": "KO-Spiel"
+    "knockoutGame": "KO-Spiel",
+    "emptyTitle": "Noch keine Ergebnisse",
+    "emptyText": "Sobald das erste Spiel gespeichert ist, erscheinen hier alle Ergebnisse – das neueste zuerst.",
+    "firstMatch": "Erstes Spiel: {{time}} · {{home}} vs {{away}}"
   },
   "schedule": {
     "title": "Spielplan",

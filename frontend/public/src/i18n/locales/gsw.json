@@ -176,7 +176,10 @@
   "recentResults": {
     "title": "Letschti Ergebnis",
     "group": "Grupp {{label}}",
-    "knockoutGame": "KO-Spil"
+    "knockoutGame": "KO-Spil",
+    "emptyTitle": "No kei Resultat",
+    "emptyText": "Sobald s'erschte Spiil gspicheret isch, chömed da alli Resultat – s'neuschte zerscht.",
+    "firstMatch": "Erschts Spiil: {{time}} · {{home}} vs {{away}}"
   },
   "schedule": {
     "title": "Spilplan",

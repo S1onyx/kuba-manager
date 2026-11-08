@@ -176,7 +176,10 @@
   "recentResults": {
     "title": "Letzde Ergebniss",
     "group": "Grupp {{label}}",
-    "knockoutGame": "KO-Schbiel"
+    "knockoutGame": "KO-Schbiel",
+    "emptyTitle": "No koine Ergebnis",
+    "emptyText": "Sobald s'erschte Spiel gspeichert isch, kommet do älle Ergebnis – s'neuschte zerscht.",
+    "firstMatch": "Erschts Spiel: {{time}} · {{home}} vs {{away}}"
   },
   "schedule": {
     "title": "Schbielblan",

@@ -176,7 +176,10 @@
   "recentResults": {
     "title": "Recent results",
     "group": "Group {{label}}",
-    "knockoutGame": "Knockout game"
+    "knockoutGame": "Knockout game",
+    "emptyTitle": "No results yet",
+    "emptyText": "As soon as the first game is saved, all results appear here – newest first.",
+    "firstMatch": "First game: {{time}} · {{home}} vs {{away}}"
   },
   "schedule": {
     "title": "Schedule",
