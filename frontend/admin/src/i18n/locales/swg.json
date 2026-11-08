@@ -723,6 +723,7 @@
     "AUTH_INVALID_INPUT": "Bitte Benutzername ond Passwort eigeba.",
     "AUTH_REQUIRED": "Sitzung abgloffa. Bitte nomol amelda.",
     "TOURNAMENT_REQUIRED": "Bitte zerscht a Turnier wähla.",
+    "GROUP_RESULTS_EXIST": "En dr Gruppaphas gibts scho Ergebnis – Teams könnet nemme tauscht werra.",
     "TEAM_OTHER_TOURNAMENT": "Spieler könnet bloß innerhalb von oim Turnier s'Team wechsla.",
     "TOURNAMENT_CREATE_FAILED": "Des Turnier hot net erstellt werda könna.",
     "TOURNAMENT_DELETE_FAILED": "Des Turnier hot net glöscht werda könna.",

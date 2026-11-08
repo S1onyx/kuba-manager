@@ -714,6 +714,7 @@
     "AUTH_INVALID_INPUT": "ユーザー名とパスワードを入力してください。",
     "AUTH_REQUIRED": "セッションの有効期限が切れました。再度ログインしてください。",
     "TOURNAMENT_REQUIRED": "先に大会を選択してください。",
+    "GROUP_RESULTS_EXIST": "グループステージにはすでに結果があるため、チームを入れ替えられません。",
     "TEAM_OTHER_TOURNAMENT": "選手は同じ大会内でのみチームを移動できます。",
     "TOURNAMENT_CREATE_FAILED": "大会を作成できませんでした。",
     "TOURNAMENT_DELETE_FAILED": "大会を削除できませんでした。",

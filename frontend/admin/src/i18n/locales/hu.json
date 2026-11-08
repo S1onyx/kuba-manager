@@ -723,6 +723,7 @@
     "AUTH_INVALID_INPUT": "Adja meg a felhasználónevet és a jelszót.",
     "AUTH_REQUIRED": "A munkamenet lejárt. Jelentkezzen be újra.",
     "TOURNAMENT_REQUIRED": "Először válassz tornát.",
+    "GROUP_RESULTS_EXIST": "A csoportkörben már vannak eredmények – a csapatok már nem cserélhetők.",
     "TEAM_OTHER_TOURNAMENT": "Játékos csak ugyanazon a tornán belül válthat csapatot.",
     "TOURNAMENT_CREATE_FAILED": "A torna létrehozása nem sikerült.",
     "TOURNAMENT_DELETE_FAILED": "A torna törlése nem sikerült.",

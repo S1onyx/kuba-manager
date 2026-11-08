@@ -723,6 +723,7 @@
     "AUTH_INVALID_INPUT": "Veuillez saisir le nom d'utilisateur et le mot de passe.",
     "AUTH_REQUIRED": "Session expirée. Veuillez vous reconnecter.",
     "TOURNAMENT_REQUIRED": "Veuillez d'abord choisir un tournoi.",
+    "GROUP_RESULTS_EXIST": "La phase de groupes a déjà des résultats – les équipes ne peuvent plus être échangées.",
     "TEAM_OTHER_TOURNAMENT": "Un joueur ne peut changer d'équipe qu'au sein du même tournoi.",
     "TOURNAMENT_CREATE_FAILED": "Le tournoi n'a pas pu être créé.",
     "TOURNAMENT_DELETE_FAILED": "Le tournoi n'a pas pu être supprimé.",

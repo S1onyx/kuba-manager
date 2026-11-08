@@ -714,6 +714,7 @@
     "AUTH_INVALID_INPUT": "请输入用户名和密码。",
     "AUTH_REQUIRED": "会话已过期，请重新登录。",
     "TOURNAMENT_REQUIRED": "请先选择锦标赛。",
+    "GROUP_RESULTS_EXIST": "小组赛已有比赛结果——无法再交换队伍。",
     "TEAM_OTHER_TOURNAMENT": "球员只能在同一锦标赛内更换队伍。",
     "TOURNAMENT_CREATE_FAILED": "无法创建锦标赛。",
     "TOURNAMENT_DELETE_FAILED": "无法删除锦标赛。",

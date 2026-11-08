@@ -723,6 +723,7 @@
     "AUTH_INVALID_INPUT": "Bitte Benutzername und Passwort eingeben.",
     "AUTH_REQUIRED": "Sitzung abgelaufen. Bitte erneut anmelden.",
     "TOURNAMENT_REQUIRED": "Bitte zuerst ein Turnier wählen.",
+    "GROUP_RESULTS_EXIST": "In der Gruppenphase gibt es schon Ergebnisse – Teams können nicht mehr getauscht werden.",
     "TEAM_OTHER_TOURNAMENT": "Spieler können nur innerhalb eines Turniers das Team wechseln.",
     "TOURNAMENT_CREATE_FAILED": "Das Turnier konnte nicht erstellt werden.",
     "TOURNAMENT_DELETE_FAILED": "Das Turnier konnte nicht gelöscht werden.",
