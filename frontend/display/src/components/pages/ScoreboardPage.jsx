@@ -101,7 +101,7 @@ export default function ScoreboardPage({
           textShadow: '0 2px 12px rgba(0,0,0,0.7)'
         }}
       >
-        {t('scoreboard.halfBadge', { half: currentHalf })}
+        {scoreboard?.shootout ? t('shootout.title') : t('scoreboard.halfBadge', { half: currentHalf })}
       </div>
 
       {hasHeader ? (

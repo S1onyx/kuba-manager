@@ -64,7 +64,9 @@ function sanitizeScoreboardState(state) {
     players: state.players,
     playerStats: state.playerStats,
     scoringLog: state.scoringLog,
-    penaltyLog: state.penaltyLog
+    penaltyLog: state.penaltyLog,
+    shootout: state.shootout ?? null,
+    isFinished: Boolean(state.isFinished)
   };
 }
 

@@ -4,7 +4,12 @@
     "suddenDeath": "Mort subite",
     "winner": "Vainqueur : {{team}}",
     "regular": "après le temps réglementaire {{a}}:{{b}}",
-    "short": "a.l.f."
+    "short": "a.l.f.",
+    "next": "Prochain tireur : {{team}}",
+    "throwing": "tire",
+    "lastThrow": "Dernier tir : {{player}} – {{result}}",
+    "hit": "réussi",
+    "miss": "manqué"
   },
   "app": {
     "mirrorStandard": "Écran 1 (standard)",

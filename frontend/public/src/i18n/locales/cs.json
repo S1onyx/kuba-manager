@@ -4,7 +4,12 @@
     "suddenDeath": "Náhlá smrt",
     "winner": "Vítěz: {{team}}",
     "regular": "po řádné hrací době {{a}}:{{b}}",
-    "short": "po rozstř."
+    "short": "po rozstř.",
+    "next": "Další hází: {{team}}",
+    "throwing": "hází",
+    "lastThrow": "Poslední hod: {{player}} – {{result}}",
+    "hit": "zásah",
+    "miss": "vedle"
   },
   "header": {
     "subtitle": "Živé skóre, tabulky a statistiky aktuálně vybraného turnaje.",

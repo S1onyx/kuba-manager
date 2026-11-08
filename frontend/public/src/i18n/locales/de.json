@@ -4,7 +4,12 @@
     "suddenDeath": "Sudden Death",
     "winner": "Sieger: {{team}}",
     "regular": "nach regulärer Spielzeit {{a}}:{{b}}",
-    "short": "n.F."
+    "short": "n.F.",
+    "next": "Als Nächstes wirft: {{team}}",
+    "throwing": "wirft",
+    "lastThrow": "Letzter Wurf: {{player}} – {{result}}",
+    "hit": "Treffer",
+    "miss": "daneben"
   },
   "header": {
     "subtitle": "Live-Spielstand, Tabellen und Statistiken zum aktuell ausgewählten Turnier.",
