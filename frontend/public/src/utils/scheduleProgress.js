@@ -42,3 +42,20 @@ export function computeScheduleProgress(entries, liveMatch, nowTs) {
     }
   };
 }
+
+export function isMatchLive(scoreboard, entries, tournamentId) {
+  if (!scoreboard || scoreboard.tournamentId !== tournamentId || scoreboard.tournamentCompleted) {
+    return false;
+  }
+  const code = String(scoreboard.scheduleCode ?? '').trim().toLowerCase();
+  if (code) {
+    const entry = entries.find((candidate) => (candidate.code ?? '').toLowerCase() === code);
+    return !entry?.result?.hasResult;
+  }
+  const hasTeams = Boolean(scoreboard.teamAId || scoreboard.teamBId);
+  const hasProgress =
+    Boolean(scoreboard.isRunning) ||
+    (scoreboard.scoreA ?? 0) + (scoreboard.scoreB ?? 0) > 0 ||
+    (scoreboard.remainingSeconds ?? 0) < (scoreboard.durationSeconds ?? 0);
+  return hasTeams && hasProgress;
+}

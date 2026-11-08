@@ -22,6 +22,15 @@
   "footer": {
     "impressum": "Impressum"
   },
+  "idle": {
+    "title": "Grad lauft koi Spiel",
+    "hint": "Glei gohts weiter – do siehsch die nächste Spiel.",
+    "startsAt": "S'Turnier fangt um {{time}} Uhr a.",
+    "nextUp": "Als Nächsts",
+    "lastResult": "Zletzt gspielt",
+    "finishedTitle": "S'Turnier isch rom",
+    "finishedHint": "Älle Platzierunga ond Statistika findsch en dr Gesamtübersicht."
+  },
   "tabs": {
     "live": "Live",
     "results": "Letzde Ergebniss",

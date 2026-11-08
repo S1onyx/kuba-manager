@@ -22,6 +22,15 @@
   "footer": {
     "impressum": "法律声明"
   },
+  "idle": {
+    "title": "当前没有比赛",
+    "hint": "比赛即将继续——以下是接下来的比赛。",
+    "startsAt": "锦标赛将于 {{time}} 开始。",
+    "nextUp": "下一场",
+    "lastResult": "最近结果",
+    "finishedTitle": "锦标赛已结束",
+    "finishedHint": "所有名次和统计数据请查看总览。"
+  },
   "tabs": {
     "live": "直播",
     "results": "最新赛果",

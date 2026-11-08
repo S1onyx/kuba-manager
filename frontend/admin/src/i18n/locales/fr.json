@@ -207,7 +207,7 @@
       "extraTimePlaceholder": "p. ex. 02:00",
       "finishGame": "Terminer le match",
       "saveGame": "Enregistrer le match",
-      "newGame": "Préparer un nouveau match"
+      "newGame": "Réinitialiser (sans enregistrer)"
     },
     "penalties": {
       "title": "Pénalités de temps",
@@ -526,8 +526,9 @@
     "gameSaved": "Match enregistré.",
     "gameSaveFailed": "Le match n'a pas pu être enregistré.",
     "confirmSaveGame": "Enregistrer le score actuel ?",
-    "newGamePrepared": "Nouveau match préparé.",
-    "newGameFailed": "Le nouveau match n'a pas pu être lancé.",
+    "newGamePrepared": "Match réinitialisé – prêt pour le suivant.",
+    "confirmResetGame": "Réinitialiser le match ? Équipes, points et temps seront effacés. Si le match n'a pas été enregistré, le résultat sera perdu.",
+    "newGameFailed": "Le match n'a pas pu être réinitialisé.",
     "displayNowScoreboard": "Le vidéoprojecteur affiche désormais le score en direct.",
     "displayNowBracket": "Le vidéoprojecteur affiche désormais le tableau du tournoi.",
     "displayUpdateFailed": "Le mode d'affichage n'a pas pu être mis à jour.",

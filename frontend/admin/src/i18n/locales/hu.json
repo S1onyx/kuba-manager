@@ -207,7 +207,7 @@
       "extraTimePlaceholder": "pl. 02:00",
       "finishGame": "Mérkőzés befejezése",
       "saveGame": "Mérkőzés mentése",
-      "newGame": "Új mérkőzés előkészítése"
+      "newGame": "Visszaállítás (mentés nélkül)"
     },
     "penalties": {
       "title": "Időbüntetések",
@@ -526,8 +526,9 @@
     "gameSaved": "Mérkőzés mentve.",
     "gameSaveFailed": "A mérkőzés mentése nem sikerült.",
     "confirmSaveGame": "Menti az aktuális állást?",
-    "newGamePrepared": "Új mérkőzés előkészítve.",
-    "newGameFailed": "Az új mérkőzés indítása nem sikerült.",
+    "newGamePrepared": "Mérkőzés visszaállítva – kész a következőre.",
+    "confirmResetGame": "Visszaállítod a mérkőzést? A csapatok, pontok és az idő törlődnek. Ha a mérkőzés nincs mentve, az eredmény elvész.",
+    "newGameFailed": "A mérkőzést nem sikerült visszaállítani.",
     "displayNowScoreboard": "A kivetítő mostantól az élő állást mutatja.",
     "displayNowBracket": "A kivetítő mostantól a tornatablát mutatja.",
     "displayUpdateFailed": "A megjelenítési mód frissítése nem sikerült.",

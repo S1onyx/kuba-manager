@@ -207,7 +207,7 @@
       "extraTimePlaceholder": "z.B. 02:00",
       "finishGame": "Spiel beenda",
       "saveGame": "Spiel speichera",
-      "newGame": "Neus Spiel vorbereita"
+      "newGame": "Zrücksetza (ohne Speichra)"
     },
     "penalties": {
       "title": "Zeitstrafe",
@@ -526,8 +526,9 @@
     "gameSaved": "Spiel gsichert.",
     "gameSaveFailed": "Spiel hot net gsichert werda könna.",
     "confirmSaveGame": "Aktuelle Spielstand speichera?",
-    "newGamePrepared": "Neus Spiel vorbereitet.",
-    "newGameFailed": "Neus Spiel hot net gstartet werda könna.",
+    "newGamePrepared": "Spiel zrückgsetzt – bereit fürs nächste Spiel.",
+    "confirmResetGame": "Spiel zrücksetza? Teams, Punkt ond Zeit werret glöscht. Wenn s'Spiel ned gspeichert isch, isch s'Ergebnis weg.",
+    "newGameFailed": "Spiel hot ned zrückgsetzt werra könna.",
     "displayNowScoreboard": "Beamer zeigt jetzt'n Live-Spielstand.",
     "displayNowBracket": "Beamer zeigt jetzt'n Turnierbaum.",
     "displayUpdateFailed": "Anzeige-Modus hot net aktualisiert werda könna.",

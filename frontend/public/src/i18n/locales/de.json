@@ -22,6 +22,15 @@
   "footer": {
     "impressum": "Impressum"
   },
+  "idle": {
+    "title": "Gerade läuft kein Spiel",
+    "hint": "Gleich geht es weiter – hier siehst du die nächsten Partien.",
+    "startsAt": "Das Turnier beginnt um {{time}} Uhr.",
+    "nextUp": "Als Nächstes",
+    "lastResult": "Zuletzt gespielt",
+    "finishedTitle": "Das Turnier ist beendet",
+    "finishedHint": "Alle Platzierungen und Statistiken findest du in der Gesamtübersicht."
+  },
   "tabs": {
     "live": "Live",
     "results": "Letzte Ergebnisse",

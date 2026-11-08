@@ -207,7 +207,7 @@
       "extraTimePlaceholder": "e.g. 02:00",
       "finishGame": "Finish game",
       "saveGame": "Save game",
-      "newGame": "Prepare new game"
+      "newGame": "Reset (without saving)"
     },
     "penalties": {
       "title": "Time Penalties",
@@ -526,8 +526,9 @@
     "gameSaved": "Game saved.",
     "gameSaveFailed": "The game could not be saved.",
     "confirmSaveGame": "Save the current score?",
-    "newGamePrepared": "New game prepared.",
-    "newGameFailed": "The new game could not be started.",
+    "newGamePrepared": "Game reset – ready for the next game.",
+    "confirmResetGame": "Reset the game? Teams, points and time will be cleared. If the game has not been saved, the result will be lost.",
+    "newGameFailed": "Game could not be reset.",
     "displayNowScoreboard": "The projector now shows the live score.",
     "displayNowBracket": "The projector now shows the bracket.",
     "displayUpdateFailed": "The display mode could not be updated.",

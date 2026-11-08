@@ -53,3 +53,15 @@ test('Vor Turnierbeginn kein Verzug, kein Fortschritt', () => {
   assert.equal(progress.delayMinutes, null);
   assert.equal(progress.nextKey, 1);
 });
+
+test('Live-Erkennung: Spiel aus Spielplan läuft, gespeichertes oder zurückgesetztes nicht', async () => {
+  const { isMatchLive } = await import('../src/utils/scheduleProgress.js');
+  const base = { tournamentId: 28, durationSeconds: 600, remainingSeconds: 600, scoreA: 0, scoreB: 0, isRunning: false };
+  const playedEntries = [{ code: 'GRP_A_R1_M1', result: { hasResult: true } }, { code: 'GRP_A_R1_M2', result: null }];
+  assert.equal(isMatchLive({ ...base, scheduleCode: 'GRP_A_R1_M2' }, playedEntries, 28), true);
+  assert.equal(isMatchLive({ ...base, scheduleCode: 'GRP_A_R1_M1', scoreA: 7 }, playedEntries, 28), false);
+  assert.equal(isMatchLive({ ...base, scheduleCode: null }, playedEntries, 28), false);
+  assert.equal(isMatchLive({ ...base, scheduleCode: 'GRP_A_R1_M2' }, playedEntries, 21), false);
+  assert.equal(isMatchLive({ ...base, teamAId: 4, teamBId: 9, isRunning: true }, playedEntries, 28), true);
+  assert.equal(isMatchLive(null, playedEntries, 28), false);
+});

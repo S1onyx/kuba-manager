@@ -207,7 +207,7 @@
       "extraTimePlaceholder": "z.B. 02:00",
       "finishGame": "Spiel beenden",
       "saveGame": "Spiel speichern",
-      "newGame": "Neues Spiel vorbereiten"
+      "newGame": "Zurücksetzen (ohne Speichern)"
     },
     "penalties": {
       "title": "Zeitstrafen",
@@ -526,8 +526,9 @@
     "gameSaved": "Spiel gespeichert.",
     "gameSaveFailed": "Spiel konnte nicht gespeichert werden.",
     "confirmSaveGame": "Aktuellen Spielstand speichern?",
-    "newGamePrepared": "Neues Spiel vorbereitet.",
-    "newGameFailed": "Neues Spiel konnte nicht gestartet werden.",
+    "newGamePrepared": "Spiel zurückgesetzt – bereit für das nächste Spiel.",
+    "confirmResetGame": "Spiel zurücksetzen? Teams, Punkte und Zeit werden gelöscht. Wurde das Spiel nicht gespeichert, geht das Ergebnis verloren.",
+    "newGameFailed": "Spiel konnte nicht zurückgesetzt werden.",
     "displayNowScoreboard": "Beamer zeigt jetzt den Live-Spielstand.",
     "displayNowBracket": "Beamer zeigt jetzt den Turnierbaum.",
     "displayUpdateFailed": "Anzeige-Modus konnte nicht aktualisiert werden.",
