@@ -1,3 +1,5 @@
+import { evaluateShootout } from './shootoutRules.js';
+
 const DEFAULT_DURATION_SECONDS = 10 * 60;
 const DISPLAY_VIEWS = ['scoreboard', 'bracket'];
 const DEFAULT_DISPLAY_VIEW = DISPLAY_VIEWS[0];
@@ -167,6 +169,7 @@ function createDefaultState(overrides = {}) {
     },
     scoringLog: [],
     penaltyLog: [],
+    shootout: null,
     ...overrides
   };
 
@@ -529,7 +532,14 @@ export function snapshotState() {
       b: cloneStats(state.playerStats.b)
     },
     scoringLog: state.scoringLog.map((event) => ({ ...event })),
-    penaltyLog: state.penaltyLog.map((event) => ({ ...event }))
+    penaltyLog: state.penaltyLog.map((event) => ({ ...event })),
+    shootout: state.shootout
+      ? {
+          ...state.shootout,
+          attempts: state.shootout.attempts.map((attempt) => ({ ...attempt })),
+          status: evaluateShootout(state.shootout)
+        }
+      : null
   };
 }
 

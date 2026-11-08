@@ -471,3 +471,22 @@ export function updateRegistrationStatus(tournamentId, regId, status) {
     body: JSON.stringify({ status })
   });
 }
+
+export function startShootout(firstTeam) {
+  return request('/scoreboard/shootout/start', { method: 'POST', body: JSON.stringify({ firstTeam }) });
+}
+
+export function recordShootoutAttempt({ team, playerId, hit }) {
+  return request('/scoreboard/shootout/attempt', {
+    method: 'POST',
+    body: JSON.stringify({ team, hit, ...(playerId ? { playerId: Number(playerId) } : {}) })
+  });
+}
+
+export function undoShootoutAttempt() {
+  return request('/scoreboard/shootout/undo', { method: 'POST' });
+}
+
+export function cancelShootout() {
+  return request('/scoreboard/shootout/cancel', { method: 'POST' });
+}

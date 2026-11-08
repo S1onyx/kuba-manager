@@ -1,4 +1,11 @@
 {
+  "shootout": {
+    "title": "罚球决胜",
+    "suddenDeath": "突然死亡",
+    "winner": "胜者：{{team}}",
+    "regular": "常规时间 {{a}}:{{b}}",
+    "short": "罚球胜"
+  },
   "app": {
     "mirrorStandard": "显示屏 1（标准）",
     "mirrorInverted": "显示屏 2（反向）"

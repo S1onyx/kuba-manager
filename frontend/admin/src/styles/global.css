@@ -854,6 +854,11 @@ a {
   font-weight: 700;
 }
 
+.paper .sheet-score__note {
+  font-size: 7pt;
+  font-weight: 700;
+}
+
 .paper .sheet-divider td {
   background: #e4e4e4 !important;
   font-weight: 700;

@@ -1,4 +1,11 @@
 {
+  "shootout": {
+    "title": "Freiwurf-Stäche",
+    "suddenDeath": "Sudden Death",
+    "winner": "Sieger: {{team}}",
+    "regular": "nach de reguläre Spiilziit {{a}}:{{b}}",
+    "short": "n.F."
+  },
   "app": {
     "mirrorStandard": "Display 1 (Standard)",
     "mirrorInverted": "Display 2 (umgechehrt)"

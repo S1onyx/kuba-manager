@@ -19,6 +19,7 @@ import {
 } from './timer.js';
 import { addPenalty, removePenalty } from './penalties.js';
 import { clearGame, resetGame } from './reset.js';
+import { startShootout, recordShootoutAttempt, undoShootoutAttempt, cancelShootout, ShootoutError } from './shootout.js';
 
 export function getScoreboardState() {
   return snapshotState();
@@ -43,6 +44,11 @@ export {
   removePenalty,
   resetGame,
   clearGame,
+  startShootout,
+  recordShootoutAttempt,
+  undoShootoutAttempt,
+  cancelShootout,
+  ShootoutError,
   normalizeGroupStageLabel,
   setDisplayView,
   bumpScheduleVersion,

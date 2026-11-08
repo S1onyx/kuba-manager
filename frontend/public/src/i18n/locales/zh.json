@@ -1,4 +1,11 @@
 {
+  "shootout": {
+    "title": "罚球决胜",
+    "suddenDeath": "突然死亡",
+    "winner": "胜者：{{team}}",
+    "regular": "常规时间 {{a}}:{{b}}",
+    "short": "罚球胜"
+  },
   "header": {
     "subtitle": "当前所选锦标赛的实时比分、积分榜和统计数据。",
     "navSchedule": "赛程",

@@ -133,6 +133,7 @@ export function resetScores() {
   resetTeamStats('a');
   resetTeamStats('b');
   state.scoringLog = [];
+  state.shootout = null;
   resetScoreEventIds();
   notifySubscribers();
   return snapshotState();

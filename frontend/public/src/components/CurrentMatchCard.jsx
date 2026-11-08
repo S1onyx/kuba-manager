@@ -159,6 +159,44 @@ function buildStageLabel(scoreboard, t) {
   return scoreboard.stageLabel;
 }
 
+function ShootoutSummary({ shootout, scoreboard, t }) {
+  const status = shootout.status ?? { hits: { a: 0, b: 0 }, decided: false, suddenDeath: false, winner: null };
+  const attempts = shootout.attempts ?? [];
+  const subtitle = status.decided
+    ? t('shootout.winner', { team: status.winner === 'b' ? scoreboard.teamBName : scoreboard.teamAName })
+    : status.suddenDeath
+      ? t('shootout.suddenDeath')
+      : t('shootout.regular', { a: shootout.regularScoreA ?? 0, b: shootout.regularScoreB ?? 0 });
+  const dots = (team) => {
+    const own = attempts.filter((attempt) => attempt.team === team);
+    return Array.from({ length: Math.max(5, own.length) }, (_, index) => (
+      <span
+        key={index}
+        style={{
+          width: '0.95rem',
+          height: '0.95rem',
+          borderRadius: '999px',
+          border: '2px solid rgba(255,255,255,0.7)',
+          background: !own[index] ? 'transparent' : own[index].hit ? '#4ade80' : '#f87171'
+        }}
+      />
+    ));
+  };
+  return (
+    <div style={{ display: 'grid', gap: '0.6rem', padding: '0.9rem 1rem', borderRadius: '16px', border: '1px solid rgba(255,224,129,0.45)', background: 'rgba(255,224,129,0.08)', textAlign: 'center' }}>
+      <strong style={{ letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+        {t('shootout.title')} {status.hits.a}:{status.hits.b}
+      </strong>
+      <span style={{ fontSize: '0.9rem', color: status.decided ? '#4ade80' : '#ffe081' }}>{subtitle}</span>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+        {['a', 'b'].map((team) => (
+          <div key={team} style={{ display: 'flex', gap: '0.35rem', justifyContent: 'center', flexWrap: 'wrap' }}>{dots(team)}</div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function CurrentMatchCard({ scoreboard }) {
   const { t } = useTranslation();
   const status = buildStatusLabel(scoreboard, t);
@@ -216,6 +254,8 @@ export default function CurrentMatchCard({ scoreboard }) {
                 <div style={{ fontSize: '0.85rem', opacity: 0.75 }}>{t('currentMatch.penalties', { count: penaltiesB })}</div>
               </div>
             </div>
+
+            {scoreboard.shootout ? <ShootoutSummary shootout={scoreboard.shootout} scoreboard={scoreboard} t={t} /> : null}
 
             <div className="current-card__info" style={infoMetaStyle}>
               <span>{t('currentMatch.time', { time: timer })}</span>

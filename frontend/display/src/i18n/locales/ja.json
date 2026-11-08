@@ -1,4 +1,11 @@
 {
+  "shootout": {
+    "title": "フリースロー戦",
+    "suddenDeath": "サドンデス",
+    "winner": "勝者：{{team}}",
+    "regular": "規定時間終了時 {{a}}:{{b}}",
+    "short": "FT戦"
+  },
   "app": {
     "mirrorStandard": "ディスプレイ 1（標準）",
     "mirrorInverted": "ディスプレイ 2（反転）"

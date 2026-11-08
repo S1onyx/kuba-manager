@@ -8,6 +8,11 @@ import {
   removePenalty,
   resetGame,
   clearGame,
+  startShootout,
+  recordShootoutAttempt,
+  undoShootoutAttempt,
+  cancelShootout,
+  ShootoutError,
   resetScores,
   setExtraSeconds,
   setHalftimeSeconds,
@@ -23,6 +28,7 @@ import {
   bumpScheduleVersion,
   setTournamentCompleted
 } from '../scoreboard/index.js';
+import { evaluateShootout } from '../scoreboard/shootoutRules.js';
 import {
   computeGroupStandings,
   deleteGame,
@@ -442,6 +448,12 @@ router.post('/finish', (_req, res) => {
 router.post('/save', async (_req, res) => {
   try {
     const snapshot = getScoreboardState();
+    if (snapshot.shootout && !evaluateShootout(snapshot.shootout).decided) {
+      return res.status(409).json({ code: 'SHOOTOUT_UNDECIDED', message: 'Das Freiwurf-Stechen ist noch nicht entschieden.' });
+    }
+    if (['knockout', 'placement'].includes(snapshot.stageType) && (snapshot.scoreA ?? 0) === (snapshot.scoreB ?? 0)) {
+      return res.status(409).json({ code: 'KNOCKOUT_DRAW', message: 'Unentschieden im KO-Spiel – bitte Freiwurf-Stechen durchführen.' });
+    }
     const savedGame = await saveGame(snapshot);
     bumpScheduleVersion();
     res.json(savedGame);
@@ -450,6 +462,23 @@ router.post('/save', async (_req, res) => {
     res.status(500).json({ code: 'GAME_SAVE_FAILED', message: 'Spiel konnte nicht gespeichert werden.' });
   }
 });
+
+const shootoutAction = (action) => (req, res) => {
+  try {
+    res.json(action(req.body ?? {}));
+  } catch (error) {
+    if (error instanceof ShootoutError) {
+      return res.status(409).json({ code: error.code, message: error.message });
+    }
+    console.error('Freiwurf-Stechen fehlgeschlagen:', error);
+    res.status(500).json({ code: 'SHOOTOUT_FAILED', message: 'Freiwurf-Stechen konnte nicht aktualisiert werden.' });
+  }
+};
+
+router.post('/shootout/start', shootoutAction((body) => startShootout({ firstTeam: body.firstTeam })));
+router.post('/shootout/attempt', shootoutAction((body) => recordShootoutAttempt({ team: body.team, playerId: body.playerId, hit: body.hit === true })));
+router.post('/shootout/undo', shootoutAction(() => undoShootoutAttempt()));
+router.post('/shootout/cancel', shootoutAction(() => cancelShootout()));
 
 router.post('/game/clear', (_req, res) => {
   try {

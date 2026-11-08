@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { formatResultScore } from '../utils/shootout.js';
 import { formatStageLabelI18n } from '../utils/stageLabels.js';
 
 const sectionStyle = {
@@ -70,7 +71,7 @@ const matchTimeStyle = {
 function renderMatch(match, index, formatDateTime) {
   const labelKey = match.id || `${match.stage_label}-${index}`;
   const hasResult = Boolean(match.result?.hasResult);
-  const scoreText = hasResult ? `${match.result.scoreA ?? 0} : ${match.result.scoreB ?? 0}` : 'vs';
+  const scoreText = hasResult ? formatResultScore(match.result.scoreA, match.result.scoreB, match.result.shootout) : 'vs';
   const scheduledLabel = formatDateTime ? formatDateTime(match.scheduled_at) : null;
   return (
     <article key={labelKey} className="bracket-stage__match" style={matchStyle}>

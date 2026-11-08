@@ -1,4 +1,11 @@
 {
+  "shootout": {
+    "title": "Freiwurf-Stechen",
+    "suddenDeath": "Sudden Death",
+    "winner": "Sieger: {{team}}",
+    "regular": "nach regulärer Spielzeit {{a}}:{{b}}",
+    "short": "n.F."
+  },
   "header": {
     "subtitle": "Live-Spielstand, Tabellen und Statistiken zum aktuell ausgewählten Turnier.",
     "navSchedule": "Spielplan",

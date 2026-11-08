@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { formatResultScore } from '../utils/shootout.js';
 import { useTranslation } from 'react-i18next';
 import { useDateLocale } from '../i18n/index.js';
 import BracketStageList from './BracketStageList.jsx';
@@ -329,7 +330,7 @@ function renderGroupSchedule(groupStages, formatDateTime, t) {
                             }}
                           >
                             {match.result?.hasResult
-                              ? `${match.result.scoreA ?? 0} : ${match.result.scoreB ?? 0}`
+                              ? formatResultScore(match.result.scoreA, match.result.scoreB, match.result.shootout)
                               : 'vs'}
                           </span>
                           <span style={{ fontWeight: 600, textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -461,7 +462,7 @@ function renderTimelineRow(entry, status, formatDateTime, formatTime, t) {
     classNames.push('schedule-timeline__item--now');
   }
   const scoreLabel = entry.result?.hasResult
-    ? `${entry.result.scoreA ?? 0} : ${entry.result.scoreB ?? 0}`
+    ? formatResultScore(entry.result.scoreA, entry.result.scoreB, entry.result.shootout)
     : 'vs';
   const metaParts = [];
   if (entry.phaseLabel) {

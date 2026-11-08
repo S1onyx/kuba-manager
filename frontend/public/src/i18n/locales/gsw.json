@@ -1,4 +1,11 @@
 {
+  "shootout": {
+    "title": "Freiwurf-Stäche",
+    "suddenDeath": "Sudden Death",
+    "winner": "Sieger: {{team}}",
+    "regular": "nach de reguläre Spiilziit {{a}}:{{b}}",
+    "short": "n.F."
+  },
   "header": {
     "subtitle": "Live-Spilstand, Tabälle und Statischtike vom grad usgwählte Turnier.",
     "navSchedule": "Spilplan",

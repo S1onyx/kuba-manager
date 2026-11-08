@@ -1,4 +1,11 @@
 {
+  "shootout": {
+    "title": "Lancers francs",
+    "suddenDeath": "Mort subite",
+    "winner": "Vainqueur : {{team}}",
+    "regular": "après le temps réglementaire {{a}}:{{b}}",
+    "short": "a.l.f."
+  },
   "app": {
     "mirrorStandard": "Écran 1 (standard)",
     "mirrorInverted": "Écran 2 (inversé)"

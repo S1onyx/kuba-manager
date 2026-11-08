@@ -41,13 +41,14 @@ function createTimeFormatter(matches, dateLocale) {
   };
 }
 
-function ScoreBoxes({ match }) {
+function ScoreBoxes({ match, t }) {
   const hasResult = Boolean(match.result?.hasResult);
   return (
     <span className="sheet-score">
       <span className="sheet-score__box">{hasResult ? match.result.scoreA ?? 0 : ''}</span>
       <span className="sheet-score__sep">:</span>
       <span className="sheet-score__box">{hasResult ? match.result.scoreB ?? 0 : ''}</span>
+      {match.result?.shootout ? <small className="sheet-score__note">{t('export.shootoutShort')}</small> : null}
     </span>
   );
 }
@@ -70,7 +71,7 @@ function MatchRow({ match, number, time, stage, t }) {
       <td className="sheet-time">{time}</td>
       {stage !== undefined ? <td className="sheet-stage">{stage}</td> : null}
       <td className="sheet-team sheet-team--home">{sideLabel(match, 'home', t)}</td>
-      <td className="sheet-result"><ScoreBoxes match={match} /></td>
+      <td className="sheet-result"><ScoreBoxes match={match} t={t} /></td>
       <td className="sheet-team">{sideLabel(match, 'away', t)}</td>
     </tr>
   );

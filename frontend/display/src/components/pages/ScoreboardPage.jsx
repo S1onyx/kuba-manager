@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import Scoreboard from '../Scoreboard.jsx';
 import Timer from '../Timer.jsx';
 import PenaltiesSection from '../scoreboard/PenaltiesSection.jsx';
+import ShootoutPanel from '../scoreboard/ShootoutPanel.jsx';
 import StandingsSection from '../scoreboard/StandingsSection.jsx';
 import TournamentSummaryView from '../summary/TournamentSummaryView.jsx';
 import useLocalTimer from '../../hooks/useLocalTimer.js';
@@ -148,17 +149,23 @@ export default function ScoreboardPage({
 
       <Scoreboard score={score} teamNames={teamNames} />
 
-      <Timer
-        time={formattedRemaining}
-        isRunning={Boolean(scoreboard?.isRunning)}
-        extraTime={extraExpected}
-        extraElapsed={extraElapsed}
-        isHalftimeBreak={isHalftimeBreak}
-        halftimeBreakRemaining={halftimeBreakRemaining}
-        isExtraTime={isExtraTime}
-      />
+      {scoreboard?.shootout ? (
+        <ShootoutPanel shootout={scoreboard.shootout} teamNames={teamNames} />
+      ) : (
+        <>
+          <Timer
+            time={formattedRemaining}
+            isRunning={Boolean(scoreboard?.isRunning)}
+            extraTime={extraExpected}
+            extraElapsed={extraElapsed}
+            isHalftimeBreak={isHalftimeBreak}
+            halftimeBreakRemaining={halftimeBreakRemaining}
+            isExtraTime={isExtraTime}
+          />
 
-      <PenaltiesSection penalties={penalties} teamNames={teamNames} />
+          <PenaltiesSection penalties={penalties} teamNames={teamNames} />
+        </>
+      )}
 
       <StandingsSection
         visible={showStandingsSection}

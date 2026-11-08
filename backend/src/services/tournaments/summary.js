@@ -1,4 +1,5 @@
 import { getTournament } from './base.js';
+import { shootoutSummary } from '../shared/shootout.js';
 import { listGamesByTournament } from '../gamesService.js';
 import { listPlayersByTeam } from '../playersService.js';
 import {
@@ -184,7 +185,7 @@ export async function getTournamentSummary(tournamentId) {
     return {
       winner,
       loser,
-      scoreLine: `${scoreA}:${scoreB}`
+      scoreLine: `${scoreA}:${scoreB}${shootoutSummary(game.snapshot) ? ' n.F.' : ''}`
     };
   };
 
@@ -527,6 +528,7 @@ const topThreePointers = playerOverview
       teamB: game.team_b,
       scoreA: game.score_a,
       scoreB: game.score_b,
+      shootout: shootoutSummary(game.snapshot),
       created_at: game.created_at
     }))
     .sort((a, b) => {
@@ -547,6 +549,7 @@ const topThreePointers = playerOverview
       teamB: game.team_b,
       scoreA: game.score_a,
       scoreB: game.score_b,
+      shootout: shootoutSummary(game.snapshot),
       created_at: game.created_at
     }));
 

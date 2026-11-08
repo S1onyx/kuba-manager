@@ -1,4 +1,11 @@
 {
+  "shootout": {
+    "title": "Büntetődobás-párbaj",
+    "suddenDeath": "Hirtelen halál",
+    "winner": "Győztes: {{team}}",
+    "regular": "a rendes játékidő után {{a}}:{{b}}",
+    "short": "bünt. után"
+  },
   "header": {
     "subtitle": "Élő állás, tabellák és statisztikák az aktuálisan kiválasztott tornához.",
     "navSchedule": "Program",
