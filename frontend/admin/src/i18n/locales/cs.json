@@ -211,7 +211,7 @@
       "extraTimePlaceholder": "např. 02:00",
       "finishGame": "Ukončit zápas",
       "saveGame": "Uložit zápas",
-      "newGame": "Připravit nový zápas"
+      "newGame": "Resetovat (bez uložení)"
     },
     "penalties": {
       "title": "Časové tresty",
@@ -538,8 +538,9 @@
     "gameSaved": "Zápas uložen.",
     "gameSaveFailed": "Zápas se nepodařilo uložit.",
     "confirmSaveGame": "Uložit aktuální stav?",
-    "newGamePrepared": "Nový zápas připraven.",
-    "newGameFailed": "Nový zápas se nepodařilo spustit.",
+    "newGamePrepared": "Zápas resetován – připraveno na další zápas.",
+    "confirmResetGame": "Resetovat zápas? Týmy, body a čas budou smazány. Pokud zápas nebyl uložen, výsledek bude ztracen.",
+    "newGameFailed": "Zápas se nepodařilo resetovat.",
     "displayNowScoreboard": "Projektor nyní zobrazuje živý stav.",
     "displayNowBracket": "Projektor nyní zobrazuje turnajový strom.",
     "displayUpdateFailed": "Režim zobrazení se nepodařilo aktualizovat.",

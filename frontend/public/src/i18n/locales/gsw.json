@@ -22,6 +22,15 @@
   "footer": {
     "impressum": "Impressum"
   },
+  "idle": {
+    "title": "Grad lauft kei Spiil",
+    "hint": "Gli gaht's wiiter – da gsehsch di nächschte Spiil.",
+    "startsAt": "S'Turnier fangt um {{time}} Uhr a.",
+    "nextUp": "Als Nächschts",
+    "lastResult": "Zletscht gspillt",
+    "finishedTitle": "S'Turnier isch fertig",
+    "finishedHint": "Alli Platzierige und Statistike findsch i de Gsamtübersicht."
+  },
   "tabs": {
     "live": "Live",
     "results": "Letschti Ergebnis",

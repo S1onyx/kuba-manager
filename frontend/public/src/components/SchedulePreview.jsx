@@ -350,7 +350,7 @@ function renderGroupSchedule(groupStages, formatDateTime, t) {
   );
 }
 
-function buildTimelineEntries(schedule, t, dateLocale) {
+export function buildTimelineEntries(schedule, t, dateLocale) {
   if (!schedule) {
     return [];
   }

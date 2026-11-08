@@ -5,7 +5,10 @@ import { formatStageLabelI18n } from '../../utils/stageLabels.js';
 import CurrentMatchCard from '../CurrentMatchCard.jsx';
 import GroupStandingsCard from '../GroupStandingsCard.jsx';
 import RecentResults from '../RecentResults.jsx';
-import SchedulePreview from '../SchedulePreview.jsx';
+import SchedulePreview, { buildTimelineEntries } from '../SchedulePreview.jsx';
+import IdleOverview from '../IdleOverview.jsx';
+import { isMatchLive } from '../../utils/scheduleProgress.js';
+import { useDateLocale } from '../../i18n/index.js';
 import StatHighlights from '../StatHighlights.jsx';
 import TeamStatsGrid from '../TeamStatsGrid.jsx';
 import PlayerStatsTable from '../PlayerStatsTable.jsx';
@@ -13,12 +16,14 @@ import TournamentFinalOverview from '../TournamentFinalOverview.jsx';
 
 export default function SummaryContent() {
   const { t } = useTranslation();
+  const dateLocale = useDateLocale();
   const {
     summary: {
       activeTab,
       tournamentSummary,
       showCurrentGroup,
-      currentCardData
+      currentCardData,
+      tournamentCompleted
     },
     scoreboardState: { scoreboard, currentGroupStandings, recordedGamesCount }
   } = usePublicApp();
@@ -28,6 +33,16 @@ export default function SummaryContent() {
   }
 
   if (activeTab === 'live') {
+    const entries = buildTimelineEntries(tournamentSummary.schedule, t, dateLocale);
+    if (!isMatchLive(currentCardData, entries, tournamentSummary.tournament?.id)) {
+      return (
+        <IdleOverview
+          entries={entries}
+          recentGames={tournamentSummary.recentGames}
+          tournamentCompleted={Boolean(tournamentCompleted)}
+        />
+      );
+    }
     return (
       <section style={{ display: 'grid', gap: '1.5rem' }}>
         <CurrentMatchCard scoreboard={currentCardData} />

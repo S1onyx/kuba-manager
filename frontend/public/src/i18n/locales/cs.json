@@ -22,6 +22,15 @@
   "footer": {
     "impressum": "Impressum"
   },
+  "idle": {
+    "title": "Právě se nehraje",
+    "hint": "Brzy se pokračuje – zde jsou další zápasy.",
+    "startsAt": "Turnaj začíná v {{time}}.",
+    "nextUp": "Další na řadě",
+    "lastResult": "Poslední výsledek",
+    "finishedTitle": "Turnaj skončil",
+    "finishedHint": "Všechna umístění a statistiky najdete v celkovém přehledu."
+  },
   "tabs": {
     "live": "Živě",
     "results": "Poslední výsledky",

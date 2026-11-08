@@ -7,6 +7,7 @@ import {
   clearScoreboardTicker,
   removePenalty,
   resetGame,
+  clearGame,
   resetScores,
   setExtraSeconds,
   setHalftimeSeconds,
@@ -447,6 +448,15 @@ router.post('/save', async (_req, res) => {
   } catch (error) {
     console.error('Spiel konnte nicht gespeichert werden:', error);
     res.status(500).json({ code: 'GAME_SAVE_FAILED', message: 'Spiel konnte nicht gespeichert werden.' });
+  }
+});
+
+router.post('/game/clear', (_req, res) => {
+  try {
+    res.json(clearGame());
+  } catch (error) {
+    console.error('Spiel konnte nicht zurückgesetzt werden:', error);
+    res.status(500).json({ code: 'GAME_CLEAR_FAILED', message: 'Spiel konnte nicht zurückgesetzt werden.' });
   }
 });
 

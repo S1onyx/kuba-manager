@@ -22,6 +22,15 @@
   "footer": {
     "impressum": "Legal notice"
   },
+  "idle": {
+    "title": "No game in progress",
+    "hint": "Play resumes shortly – here are the next games.",
+    "startsAt": "The tournament starts at {{time}}.",
+    "nextUp": "Up next",
+    "lastResult": "Last result",
+    "finishedTitle": "The tournament has finished",
+    "finishedHint": "All placements and statistics are in the overview."
+  },
   "tabs": {
     "live": "Live",
     "results": "Recent results",

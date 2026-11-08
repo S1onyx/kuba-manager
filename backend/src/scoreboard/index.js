@@ -18,7 +18,7 @@ import {
   clearScoreboardTicker
 } from './timer.js';
 import { addPenalty, removePenalty } from './penalties.js';
-import { resetGame } from './reset.js';
+import { clearGame, resetGame } from './reset.js';
 
 export function getScoreboardState() {
   return snapshotState();
@@ -42,6 +42,7 @@ export {
   addPenalty,
   removePenalty,
   resetGame,
+  clearGame,
   normalizeGroupStageLabel,
   setDisplayView,
   bumpScheduleVersion,

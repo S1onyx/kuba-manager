@@ -207,7 +207,7 @@
       "extraTimePlaceholder": "z.B. 02:00",
       "finishGame": "Spil beände",
       "saveGame": "Spil speichere",
-      "newGame": "Nöis Spil vorbereite"
+      "newGame": "Zruggsetze (ohni Spichere)"
     },
     "penalties": {
       "title": "Zytstrafe",
@@ -526,8 +526,9 @@
     "gameSaved": "Spil gspeicheret.",
     "gameSaveFailed": "Spil het nid chöne gspeicheret werde.",
     "confirmSaveGame": "Aktuelle Spielstand speichere?",
-    "newGamePrepared": "Nöis Spil vorbereitet.",
-    "newGameFailed": "Nöis Spil het nid chöne gstartet werde.",
+    "newGamePrepared": "Spiil zruggsetzt – parat fürs nächschte Spiil.",
+    "confirmResetGame": "Spiil zruggsetze? Teams, Pünkt und Ziit werdet glöscht. Wänn s'Spiil nöd gspicheret isch, isch s'Resultat weg.",
+    "newGameFailed": "Spiil het nöd chönne zruggsetzt werde.",
     "displayNowScoreboard": "Beamer zeigt jetzt de Live-Spielstand.",
     "displayNowBracket": "Beamer zeigt jetzt de Turnierboum.",
     "displayUpdateFailed": "Aazeig-Modus het nid chöne aktualisiert werde.",

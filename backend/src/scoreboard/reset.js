@@ -25,6 +25,7 @@ export function resetGame() {
     teamBId: state.teamBId,
     scheduleCode: state.scheduleCode,
     displayView: state.displayView,
+    scheduleVersion: state.scheduleVersion,
     players: {
       a: state.players?.a ?? [],
       b: state.players?.b ?? []
@@ -32,6 +33,26 @@ export function resetGame() {
   };
 
   Object.assign(state, createDefaultState(context));
+  notifySubscribers();
+  return snapshotState();
+}
+
+export function clearGame() {
+  const state = getState();
+  stopTicker();
+  resetPenaltyIds();
+  resetScoreEventIds();
+
+  Object.assign(
+    state,
+    createDefaultState({
+      tournamentId: state.tournamentId,
+      tournamentName: state.tournamentName,
+      tournamentCompleted: state.tournamentCompleted,
+      displayView: state.displayView,
+      scheduleVersion: state.scheduleVersion
+    })
+  );
   notifySubscribers();
   return snapshotState();
 }

@@ -22,6 +22,15 @@
   "footer": {
     "impressum": "法的表示"
   },
+  "idle": {
+    "title": "現在試合は行われていません",
+    "hint": "まもなく再開します。次の試合はこちらです。",
+    "startsAt": "大会は{{time}}に開始します。",
+    "nextUp": "次の試合",
+    "lastResult": "直近の結果",
+    "finishedTitle": "大会は終了しました",
+    "finishedHint": "全順位と統計は総合概要にあります。"
+  },
   "tabs": {
     "live": "ライブ",
     "results": "最新の試合結果",

@@ -217,8 +217,8 @@ export function saveCurrentGame() {
   });
 }
 
-export function startNewGame() {
-  return request('/scoreboard/game/new', {
+export function clearGame() {
+  return request('/scoreboard/game/clear', {
     method: 'POST'
   });
 }

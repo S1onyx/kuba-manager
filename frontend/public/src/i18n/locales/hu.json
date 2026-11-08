@@ -22,6 +22,15 @@
   "footer": {
     "impressum": "Impresszum"
   },
+  "idle": {
+    "title": "Most nincs mérkőzés",
+    "hint": "Hamarosan folytatódik – itt a következő mérkőzések.",
+    "startsAt": "A torna {{time}}-kor kezdődik.",
+    "nextUp": "Következik",
+    "lastResult": "Legutóbbi eredmény",
+    "finishedTitle": "A torna véget ért",
+    "finishedHint": "Minden helyezés és statisztika az összesítőben található."
+  },
   "tabs": {
     "live": "Élő",
     "results": "Legutóbbi eredmények",

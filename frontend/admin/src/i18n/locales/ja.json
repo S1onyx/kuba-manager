@@ -205,7 +205,7 @@
       "extraTimePlaceholder": "例: 02:00",
       "finishGame": "試合を終了",
       "saveGame": "試合を保存",
-      "newGame": "新しい試合を準備"
+      "newGame": "リセット（保存しない）"
     },
     "penalties": {
       "title": "タイムペナルティ",
@@ -520,8 +520,9 @@
     "gameSaved": "試合を保存しました。",
     "gameSaveFailed": "試合を保存できませんでした。",
     "confirmSaveGame": "現在のスコアを保存しますか？",
-    "newGamePrepared": "新しい試合を準備しました。",
-    "newGameFailed": "新しい試合を開始できませんでした。",
+    "newGamePrepared": "試合をリセットしました。次の試合の準備ができました。",
+    "confirmResetGame": "試合をリセットしますか？チーム・得点・時間が消去されます。保存していない場合、結果は失われます。",
+    "newGameFailed": "試合をリセットできませんでした。",
     "displayNowScoreboard": "プロジェクターにライブスコアが表示されています。",
     "displayNowBracket": "プロジェクターにトーナメント表が表示されています。",
     "displayUpdateFailed": "表示モードを更新できませんでした。",

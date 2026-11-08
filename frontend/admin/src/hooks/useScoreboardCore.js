@@ -15,7 +15,7 @@ import {
   setHalftimePause,
   setScoreAbsolute,
   setScoreboardTimer,
-  startNewGame,
+  clearGame,
   startScoreboardTimer,
   updateTeams,
   fetchScoreboard
@@ -562,8 +562,14 @@ export default function useScoreboardCore({ updateMessage }) {
 
   const handleNewGame = useCallback(
     async ({ onReset } = {}) => {
+      const hasProgress =
+        (scoreboard?.scoreA ?? 0) + (scoreboard?.scoreB ?? 0) > 0 ||
+        (scoreboard?.remainingSeconds ?? 0) < (scoreboard?.durationSeconds ?? 0);
+      if (hasProgress && !window.confirm(t('feedback.confirmResetGame'))) {
+        return false;
+      }
       try {
-        const newState = await startNewGame();
+        const newState = await clearGame();
         initializeStateFromScoreboard(newState);
         setTeamDirty(false);
         setManualDirty({ a: false, b: false });
@@ -578,7 +584,7 @@ export default function useScoreboardCore({ updateMessage }) {
         return false;
       }
     },
-    [initializeStateFromScoreboard, updateMessage, t]
+    [scoreboard?.scoreA, scoreboard?.scoreB, scoreboard?.remainingSeconds, scoreboard?.durationSeconds, initializeStateFromScoreboard, updateMessage, t]
   );
 
   const handleDisplayViewChange = useCallback(

@@ -205,7 +205,7 @@
       "extraTimePlaceholder": "例如 02:00",
       "finishGame": "结束比赛",
       "saveGame": "保存比赛",
-      "newGame": "准备新比赛"
+      "newGame": "重置（不保存）"
     },
     "penalties": {
       "title": "限时处罚",
@@ -520,8 +520,9 @@
     "gameSaved": "比赛已保存。",
     "gameSaveFailed": "无法保存比赛。",
     "confirmSaveGame": "保存当前比分？",
-    "newGamePrepared": "新比赛已准备好。",
-    "newGameFailed": "无法开始新比赛。",
+    "newGamePrepared": "比赛已重置——可以开始下一场。",
+    "confirmResetGame": "重置比赛？队伍、得分和时间将被清除。如果比赛尚未保存，结果将丢失。",
+    "newGameFailed": "比赛无法重置。",
     "displayNowScoreboard": "投影仪现在显示实时比分。",
     "displayNowBracket": "投影仪现在显示淘汰赛对阵图。",
     "displayUpdateFailed": "无法更新显示模式。",

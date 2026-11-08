@@ -22,6 +22,15 @@
   "footer": {
     "impressum": "Mentions légales"
   },
+  "idle": {
+    "title": "Aucun match en cours",
+    "hint": "Ça reprend bientôt – voici les prochains matchs.",
+    "startsAt": "Le tournoi commence à {{time}}.",
+    "nextUp": "À suivre",
+    "lastResult": "Dernier résultat",
+    "finishedTitle": "Le tournoi est terminé",
+    "finishedHint": "Tous les classements et statistiques sont dans l'aperçu général."
+  },
   "tabs": {
     "live": "Live",
     "results": "Derniers résultats",
