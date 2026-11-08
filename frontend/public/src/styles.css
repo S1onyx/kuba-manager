@@ -131,6 +131,15 @@ textarea {
   z-index: 40;
 }
 
+@media (max-width: 560px) {
+  .public-lang-picker {
+    position: static;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.5rem;
+  }
+}
+
 /* ─── Header ──────────────────────────────────────────────────── */
 
 .public-header {
