@@ -47,7 +47,7 @@ export default function IdleOverview({ entries, recentGames, tournamentCompleted
   const { t } = useTranslation();
   const dateLocale = useDateLocale();
   const nowTs = Date.now();
-  const progress = computeScheduleProgress(entries, null, nowTs);
+  const progress = computeScheduleProgress(entries, null, nowTs, { completed: tournamentCompleted });
   const formatTime = (timestamp) =>
     timestamp == null ? t('schedule.openDate') : new Date(timestamp).toLocaleTimeString(dateLocale, { hour: '2-digit', minute: '2-digit' });
   const nextIndex = entries.findIndex((entry) => entry.key === progress.nextKey);

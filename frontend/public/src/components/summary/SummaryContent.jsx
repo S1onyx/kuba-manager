@@ -10,7 +10,7 @@ import IdleOverview from '../IdleOverview.jsx';
 import { isMatchLive } from '../../utils/scheduleProgress.js';
 import { useDateLocale } from '../../i18n/index.js';
 import StatHighlights from '../StatHighlights.jsx';
-import TeamStatsGrid from '../TeamStatsGrid.jsx';
+import TeamOverview from '../TeamOverview.jsx';
 import PlayerStatsTable from '../PlayerStatsTable.jsx';
 import TournamentFinalOverview from '../TournamentFinalOverview.jsx';
 
@@ -74,6 +74,7 @@ export default function SummaryContent() {
     return (
       <SchedulePreview
         schedule={tournamentSummary.schedule}
+        tournamentCompleted={Boolean(tournamentCompleted)}
         liveMatch={
           scoreboard?.tournamentId === tournamentSummary.tournament?.id && scoreboard?.scheduleCode
             ? {
@@ -119,7 +120,7 @@ export default function SummaryContent() {
   }
 
   if (activeTab === 'teams') {
-    return <TeamStatsGrid stats={tournamentSummary.overallStats} />;
+    return <TeamOverview summary={tournamentSummary} />;
   }
 
   if (activeTab === 'players') {

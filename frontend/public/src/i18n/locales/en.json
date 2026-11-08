@@ -31,13 +31,24 @@
     "finishedTitle": "The tournament has finished",
     "finishedHint": "All placements and statistics are in the overview."
   },
+  "teamOverview": {
+    "title": "Teams & rosters",
+    "description": "All teams with their group and players. Statistics appear after the first game.",
+    "descriptionPlayed": "All teams with their group, record and players.",
+    "points": "{{count}} pts",
+    "record": "W-D-L {{wins}}-{{draws}}-{{losses}}",
+    "baskets": "Baskets {{scored}}:{{conceded}}",
+    "playerPoints": "{{count}} pts",
+    "noRoster": "Roster to follow",
+    "empty": "No teams registered yet."
+  },
   "tabs": {
     "live": "Live",
     "results": "Recent results",
     "schedule": "Schedule",
     "groups": "Groups",
     "tournament": "Tournament stats",
-    "teams": "Team stats",
+    "teams": "Teams",
     "players": "Player stats",
     "final": "Final overview"
   },

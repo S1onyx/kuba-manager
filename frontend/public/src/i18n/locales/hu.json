@@ -31,13 +31,24 @@
     "finishedTitle": "A torna véget ért",
     "finishedHint": "Minden helyezés és statisztika az összesítőben található."
   },
+  "teamOverview": {
+    "title": "Csapatok és keretek",
+    "description": "Minden csapat csoporttal és játékosokkal. A statisztika az első mérkőzés után jelenik meg.",
+    "descriptionPlayed": "Minden csapat csoporttal, mérleggel és játékosokkal.",
+    "points": "{{count}} pont",
+    "record": "GY-D-V {{wins}}-{{draws}}-{{losses}}",
+    "baskets": "Kosarak {{scored}}:{{conceded}}",
+    "playerPoints": "{{count}} pont",
+    "noRoster": "A keret később",
+    "empty": "Még nincs jelentkezett csapat."
+  },
   "tabs": {
     "live": "Élő",
     "results": "Legutóbbi eredmények",
     "schedule": "Program",
     "groups": "Csoportok",
     "tournament": "Tornastatisztika",
-    "teams": "Csapatstatisztika",
+    "teams": "Csapatok",
     "players": "Játékosstatisztika",
     "final": "Összesítés"
   },

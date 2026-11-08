@@ -65,3 +65,17 @@ test('Live-Erkennung: Spiel aus Spielplan läuft, gespeichertes oder zurückgese
   assert.equal(isMatchLive({ ...base, teamAId: 4, teamBId: 9, isRunning: true }, playedEntries, 28), true);
   assert.equal(isMatchLive(null, playedEntries, 28), false);
 });
+
+test('Abgeschlossenes Turnier: kein Verzug, kein „Als Nächstes“, keine ca.-Zeiten', () => {
+  const progress = computeScheduleProgress(entries, null, at('15:00') + 400 * 24 * 3600 * 1000, { completed: true });
+  assert.equal(progress.delayMinutes, null);
+  assert.equal(progress.nextKey, null);
+  assert.equal(progress.activeKey, null);
+  assert.equal(progress.expectedTimestamp(entries[2]), null);
+});
+
+test('Unplausibler Verzug (anderer Tag) wird nicht angezeigt', () => {
+  const progress = computeScheduleProgress(entries, null, at('13:40') + 2 * 24 * 3600 * 1000);
+  assert.equal(progress.delayMinutes, null);
+  assert.equal(progress.expectedTimestamp(entries[3]), null);
+});

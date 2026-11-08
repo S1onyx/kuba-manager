@@ -31,13 +31,24 @@
     "finishedTitle": "大会は終了しました",
     "finishedHint": "全順位と統計は総合概要にあります。"
   },
+  "teamOverview": {
+    "title": "チームとメンバー",
+    "description": "全チームのグループと選手。統計は最初の試合後に表示されます。",
+    "descriptionPlayed": "全チームのグループ・成績・選手。",
+    "points": "{{count}}点",
+    "record": "勝-分-負 {{wins}}-{{draws}}-{{losses}}",
+    "baskets": "ゴール {{scored}}:{{conceded}}",
+    "playerPoints": "{{count}}点",
+    "noRoster": "メンバーは後日",
+    "empty": "まだ登録チームはありません。"
+  },
   "tabs": {
     "live": "ライブ",
     "results": "最新の試合結果",
     "schedule": "試合日程",
     "groups": "グループ",
     "tournament": "トーナメント統計",
-    "teams": "チーム成績",
+    "teams": "チーム",
     "players": "選手成績",
     "final": "総合概要"
   },

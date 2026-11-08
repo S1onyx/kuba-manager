@@ -31,13 +31,24 @@
     "finishedTitle": "Turnaj skončil",
     "finishedHint": "Všechna umístění a statistiky najdete v celkovém přehledu."
   },
+  "teamOverview": {
+    "title": "Týmy a soupisky",
+    "description": "Všechny týmy se skupinou a hráči. Statistiky se zobrazí po prvním zápase.",
+    "descriptionPlayed": "Všechny týmy se skupinou, bilancí a hráči.",
+    "points": "{{count}} b.",
+    "record": "V-R-P {{wins}}-{{draws}}-{{losses}}",
+    "baskets": "Koše {{scored}}:{{conceded}}",
+    "playerPoints": "{{count}} b.",
+    "noRoster": "Soupiska bude doplněna",
+    "empty": "Zatím nejsou přihlášeny žádné týmy."
+  },
   "tabs": {
     "live": "Živě",
     "results": "Poslední výsledky",
     "schedule": "Program",
     "groups": "Skupiny",
     "tournament": "Statistiky turnaje",
-    "teams": "Statistiky týmů",
+    "teams": "Týmy",
     "players": "Statistiky hráčů",
     "final": "Celkový přehled"
   },

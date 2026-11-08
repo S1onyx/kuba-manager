@@ -31,13 +31,24 @@
     "finishedTitle": "Le tournoi est terminé",
     "finishedHint": "Tous les classements et statistiques sont dans l'aperçu général."
   },
+  "teamOverview": {
+    "title": "Équipes & effectifs",
+    "description": "Toutes les équipes avec leur groupe et leurs joueurs. Les statistiques apparaissent après le premier match.",
+    "descriptionPlayed": "Toutes les équipes avec leur groupe, leur bilan et leurs joueurs.",
+    "points": "{{count}} pts",
+    "record": "V-N-D {{wins}}-{{draws}}-{{losses}}",
+    "baskets": "Paniers {{scored}}:{{conceded}}",
+    "playerPoints": "{{count}} pts",
+    "noRoster": "Effectif à venir",
+    "empty": "Aucune équipe inscrite pour le moment."
+  },
   "tabs": {
     "live": "Live",
     "results": "Derniers résultats",
     "schedule": "Programme",
     "groups": "Groupes",
     "tournament": "Stats du tournoi",
-    "teams": "Stats des équipes",
+    "teams": "Équipes",
     "players": "Stats des joueurs",
     "final": "Vue d’ensemble"
   },
