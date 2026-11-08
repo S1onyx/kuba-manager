@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { getSaveStatus } from '../../../utils/gameStatus.js';
 import PanelCard from '../../common/PanelCard.jsx';
 import { useDashboard } from '../../../context/DashboardContext.jsx';
 import { formatTime } from '../../../utils/formatters.js';
@@ -40,6 +41,7 @@ export default function TimerControlCard() {
   } = useDashboard();
 
   const autoStart = Boolean(timerCueSettings?.halftimeAutoStart);
+  const saveStatus = getSaveStatus(scoreboard);
 
   return (
     <PanelCard
@@ -222,14 +224,14 @@ export default function TimerControlCard() {
               handleSaveGame({
                 onSaved: () => {
                   history.loadHistory();
-                  ui.setActiveTab('history');
                 }
               })
             }
-            disabled={scoreboard.isRunning}
+            disabled={scoreboard.isRunning || saveStatus === 'saved'}
+            className={saveStatus === 'needsSave' || saveStatus === 'changed' ? 'btn-save-needed' : undefined}
             style={{ background: 'rgba(11,26,43,0.95)', color: '#fff' }}
           >
-            {t('control.timer.saveGame')}
+            {saveStatus === 'saved' ? t('control.saveBanner.savedButton') : t('control.timer.saveGame')}
           </button>
           <button
             type="button"

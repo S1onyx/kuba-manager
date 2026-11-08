@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { getSaveStatus } from '../../utils/gameStatus.js';
 import { useTranslation } from 'react-i18next';
 import { CONTROL_TABS } from '../../constants/dashboard.js';
 import { SUPPORTED_LANGUAGES, resolveLanguage } from '../../i18n/index.js';
@@ -60,6 +61,11 @@ export default function SidebarNavigation({
               {formattedRemaining} · {liveStateLabel}
             </span>
           </div>
+          {['needsSave', 'changed'].includes(getSaveStatus(scoreboard)) ? (
+            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fdba74' }}>{t('control.saveBanner.sidebarUnsaved')}</span>
+          ) : getSaveStatus(scoreboard) === 'saved' ? (
+            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#86efac' }}>{t('control.saveBanner.sidebarSaved')}</span>
+          ) : null}
         </div>
       ) : null}
 

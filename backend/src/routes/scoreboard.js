@@ -13,6 +13,8 @@ import {
   undoShootoutAttempt,
   cancelShootout,
   ShootoutError,
+  markGameSaved,
+  markGameFinished,
   resetScores,
   setExtraSeconds,
   setHalftimeSeconds,
@@ -429,6 +431,7 @@ router.post('/finish', (_req, res) => {
   try {
     pauseTimer();
     clearScoreboardTicker();
+    markGameFinished();
     const snapshot = getScoreboardState();
     triggerAudioEvent('game_end', {
       teamA: snapshot.teamAName,
@@ -454,7 +457,11 @@ router.post('/save', async (_req, res) => {
     if (['knockout', 'placement'].includes(snapshot.stageType) && (snapshot.scoreA ?? 0) === (snapshot.scoreB ?? 0)) {
       return res.status(409).json({ code: 'KNOCKOUT_DRAW', message: 'Unentschieden im KO-Spiel – bitte Freiwurf-Stechen durchführen.' });
     }
+    if (snapshot.savedGameId) {
+      await deleteGame(snapshot.savedGameId);
+    }
     const savedGame = await saveGame(snapshot);
+    markGameSaved(savedGame?.id ?? null);
     bumpScheduleVersion();
     res.json(savedGame);
   } catch (error) {

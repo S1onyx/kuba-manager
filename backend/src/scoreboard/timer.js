@@ -74,6 +74,7 @@ function stopTicker() {
 }
 
 function endGame(state) {
+  state.isFinished = true;
   state.remainingSeconds = 0;
   state.extraElapsedSeconds = 0;
   state.isExtraTime = false;
@@ -299,6 +300,7 @@ export function startTimer() {
   if (state.isRunning) {
     return snapshotState();
   }
+  state.isFinished = false;
 
   if (state.isHalftimeBreak) {
     state.isHalftimeBreak = false;

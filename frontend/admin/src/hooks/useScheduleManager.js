@@ -11,6 +11,7 @@ import {
   normalizeLocalDateTimeToISO
 } from '../utils/formatters.js';
 import { createPenaltyForms } from '../utils/forms.js';
+import { getSaveStatus } from '../utils/gameStatus.js';
 import { countUnsavedDrafts, interleaveGroupSlots, mergeScheduleDrafts } from '../utils/scheduleDrafts.js';
 import { formatApiError } from '../utils/apiError.js';
 import { formatStageLabelI18n } from '../utils/stageLabels.js';
@@ -547,6 +548,15 @@ export default function useScheduleManager({
         updateMessage('error', t('feedback.tournamentRequired'));
         return false;
       }
+      const currentStatus = getSaveStatus(scoreboard);
+      const currentHasProgress =
+        (scoreboard?.scoreA ?? 0) + (scoreboard?.scoreB ?? 0) > 0 ||
+        (scoreboard?.remainingSeconds ?? 0) < (scoreboard?.durationSeconds ?? 0);
+      const unsavedResult =
+        ['needsSave', 'changed', 'blocked'].includes(currentStatus) || (currentStatus === 'running' && currentHasProgress);
+      if (unsavedResult && selectedCode !== scoreboard?.scheduleCode && !window.confirm(t('feedback.confirmReplaceUnsavedGame'))) {
+        return false;
+      }
 
       const match = scheduleOptionData.matchMap.get(selectedCode);
       if (!match) {
@@ -595,6 +605,7 @@ export default function useScheduleManager({
     [
       resolvedTournamentId,
       scheduleOptionData.matchMap,
+      scoreboard,
       initializeStateFromScoreboard,
       setTeamDirty,
       setPenaltyForms,

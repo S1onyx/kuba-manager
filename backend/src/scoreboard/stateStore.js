@@ -170,6 +170,9 @@ function createDefaultState(overrides = {}) {
     scoringLog: [],
     penaltyLog: [],
     shootout: null,
+    isFinished: false,
+    savedGameId: null,
+    savedSignature: null,
     ...overrides
   };
 
@@ -519,9 +522,29 @@ export function markPenaltyRemoval(penaltyId, timestamp = new Date().toISOString
   });
 }
 
+function resultSignature() {
+  return JSON.stringify([
+    state.teamAName,
+    state.teamBName,
+    state.scoreA,
+    state.scoreB,
+    state.scoringLog.length,
+    state.penaltyLog.length,
+    state.shootout?.attempts?.length ?? 0
+  ]);
+}
+
+export function markGameSaved(gameId) {
+  state.savedGameId = gameId ?? null;
+  state.savedSignature = resultSignature();
+  notifySubscribers();
+}
+
 export function snapshotState() {
+  const saveState = !state.savedGameId ? 'unsaved' : state.savedSignature === resultSignature() ? 'saved' : 'changed';
   return {
     ...state,
+    saveState,
     penalties: copyPenalties(),
     players: {
       a: cloneRoster(state.players.a),
