@@ -23,3 +23,9 @@ test('Team in zweitem Slot, ohne den ersten zu ändern, wird erkannt', () => {
 test('Slots ohne festes Team zählen nicht als doppelt', () => {
   assert.equal(findDuplicateSlotTeam(current, [{ slotNumber: 1, teamId: null }]), null);
 });
+
+test('Teamwechsel in Slots wird erkannt, reine Namensgleichheit nicht', async () => {
+  const { changesSlotTeams } = await import('../src/services/tournaments/helpers.js');
+  assert.equal(changesSlotTeams(current, [{ slotNumber: 1, teamId: 20 }, { slotNumber: 2, teamId: 10 }]), true);
+  assert.equal(changesSlotTeams(current, [{ slotNumber: 1, teamId: 10 }, { slotNumber: 3, teamId: null }]), false);
+});

@@ -741,6 +741,7 @@
     "AUTH_INVALID_INPUT": "Zadejte uživatelské jméno a heslo.",
     "AUTH_REQUIRED": "Relace vypršela. Přihlaste se znovu.",
     "TOURNAMENT_REQUIRED": "Nejprve vyberte turnaj.",
+    "GROUP_RESULTS_EXIST": "Skupinová fáze už má výsledky – týmy už nelze prohodit.",
     "TEAM_OTHER_TOURNAMENT": "Hráči mohou měnit tým jen v rámci jednoho turnaje.",
     "TOURNAMENT_CREATE_FAILED": "Turnaj se nepodařilo vytvořit.",
     "TOURNAMENT_DELETE_FAILED": "Turnaj se nepodařilo smazat.",

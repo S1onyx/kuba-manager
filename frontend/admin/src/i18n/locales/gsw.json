@@ -723,6 +723,7 @@
     "AUTH_INVALID_INPUT": "Bitte Benutzername und Passwort iigäh.",
     "AUTH_REQUIRED": "Sitzig abgloffe. Bitte nomol aamälde.",
     "TOURNAMENT_REQUIRED": "Bitte zerscht es Turnier wähle.",
+    "GROUP_RESULTS_EXIST": "I de Gruppephase gits scho Resultat – Teams chönd nüme tuuscht werde.",
     "TEAM_OTHER_TOURNAMENT": "Spiiler chönd nur innerhalb vo eim Turnier s'Team wächsle.",
     "TOURNAMENT_CREATE_FAILED": "S'Turnier het nid chöne erstellt werde.",
     "TOURNAMENT_DELETE_FAILED": "S'Turnier het nid chöne glöscht werde.",

@@ -888,3 +888,8 @@ export function expectedKnockoutSources(tournament) {
   );
   return sources;
 }
+
+export function changesSlotTeams(currentSlots, assignments) {
+  const currentTeamBySlot = new Map(currentSlots.map((entry) => [entry.slot_number, entry.team_id ?? null]));
+  return assignments.some((assignment) => (currentTeamBySlot.get(assignment.slotNumber) ?? null) !== (assignment.teamId ?? null));
+}

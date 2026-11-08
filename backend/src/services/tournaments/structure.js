@@ -10,6 +10,7 @@ import {
   canonicalGroupLabel,
   generateGroupFixtures,
   findDuplicateSlotTeam,
+  changesSlotTeams,
   createSlotSource,
   createMatchCode,
   planKnockoutStages,
@@ -332,6 +333,14 @@ export async function setTournamentTeams(tournamentId, assignments = []) {
     throw new Error(
       `Team mit ID ${duplicate.teamId} ist mehreren Slots zugewiesen (Slot ${duplicate.slots.join(' und ')}).`
     );
+  }
+
+  if (changesSlotTeams(currentSlots, normalizedAssignments)) {
+    const { db: readDb } = await getConnection();
+    const playedGroupGames = readDb.exec("SELECT COUNT(*) FROM games WHERE tournament_id = ? AND stage_type = 'group'", [id])[0]?.values[0][0] ?? 0;
+    if (playedGroupGames > 0) {
+      throw new Error('Die Gruppenphase hat bereits Ergebnisse – Teams können nicht mehr zwischen Slots getauscht werden.');
+    }
   }
 
   const uniqueTeamIds = Array.from(

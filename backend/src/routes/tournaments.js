@@ -23,7 +23,7 @@ import {
   storePosterUpload
 } from '../services/index.js';
 import { getAudioFileById } from '../services/audio/index.js';
-import { getScoreboardState, setTournamentCompleted } from '../scoreboard/index.js';
+import { bumpScheduleVersion, getScoreboardState, setTournamentCompleted } from '../scoreboard/index.js';
 
 async function withPosterUrl(tournament) {
   if (!tournament || !tournament.poster_file_id) return tournament;
@@ -42,6 +42,13 @@ async function withPosterUrls(tournaments) {
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
 
 const router = express.Router();
+
+const SCHEDULE_CHANGE_DEBOUNCE_MS = 400;
+let scheduleChangeTimer = null;
+function scheduleChanged() {
+  clearTimeout(scheduleChangeTimer);
+  scheduleChangeTimer = setTimeout(bumpScheduleVersion, SCHEDULE_CHANGE_DEBOUNCE_MS);
+}
 
 router.get('/', async (_req, res) => {
   try {
@@ -125,6 +132,7 @@ router.put('/:id', async (req, res) => {
     if (!updated) {
       return res.status(404).json({ code: 'TOURNAMENT_NOT_FOUND', message: 'Turnier nicht gefunden.' });
     }
+    scheduleChanged();
     res.json(await withPosterUrl(updated));
   } catch (error) {
     console.error('Turnier konnte nicht aktualisiert werden:', error);
@@ -264,6 +272,7 @@ router.put('/:id/schedule/:scheduleId', async (req, res) => {
     if (!updated) {
       return res.status(404).json({ code: 'SCHEDULE_ENTRY_NOT_FOUND', message: 'Spielplan-Eintrag nicht gefunden.' });
     }
+    scheduleChanged();
     res.json(updated);
   } catch (error) {
     console.error('Spielplan-Eintrag konnte nicht aktualisiert werden:', error);
@@ -317,9 +326,13 @@ router.put('/:id/teams', async (req, res) => {
 
   try {
     const structure = await setTournamentTeams(id, assignments);
+    scheduleChanged();
     res.json(structure);
   } catch (error) {
     console.error('Teamzuweisungen konnten nicht gespeichert werden:', error);
+    if (String(error?.message || '').includes('Gruppenphase hat bereits Ergebnisse')) {
+      return res.status(409).json({ code: 'GROUP_RESULTS_EXIST', message: error.message });
+    }
     const status = String(error?.message || '').includes('Slot') || String(error?.message || '').includes('Team')
       ? 400
       : 500;
@@ -401,6 +414,7 @@ router.post('/:id/activate', async (req, res) => {
       { forceRegenerate: true }
     );
 
+    scheduleChanged();
     res.json(await withPosterUrl(updated));
   } catch (error) {
     console.error('Turnier konnte nicht aktiviert werden:', error);
@@ -467,6 +481,7 @@ router.patch('/:id/registrations/:regId', async (req, res) => {
       await updateRegistrationStatus(regId, status);
     }
 
+    scheduleChanged();
     res.json({ ok: true });
   } catch (error) {
     console.error('Status konnte nicht aktualisiert werden:', error);

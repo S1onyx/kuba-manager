@@ -723,6 +723,7 @@
     "AUTH_INVALID_INPUT": "Please enter username and password.",
     "AUTH_REQUIRED": "Session expired. Please sign in again.",
     "TOURNAMENT_REQUIRED": "Please select a tournament first.",
+    "GROUP_RESULTS_EXIST": "The group stage already has results – teams can no longer be swapped.",
     "TEAM_OTHER_TOURNAMENT": "Players can only change teams within the same tournament.",
     "TOURNAMENT_CREATE_FAILED": "The tournament could not be created.",
     "TOURNAMENT_DELETE_FAILED": "The tournament could not be deleted.",
