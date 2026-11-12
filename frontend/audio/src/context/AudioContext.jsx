@@ -15,6 +15,7 @@ export function AudioProvider({ children }) {
 
   const {
     audioElementRef,
+    audioGraphRef,
     audioReady,
     setAudioReady,
     playbackError,
@@ -32,7 +33,7 @@ export function AudioProvider({ children }) {
     refreshAudioOutputs,
     selectDevice,
     applyCurrentDevice
-  } = useAudioDevices(audioElementRef);
+  } = useAudioDevices(audioElementRef, audioGraphRef);
 
   const { events, addEvent, addSystemEvent } = useEventLog();
 

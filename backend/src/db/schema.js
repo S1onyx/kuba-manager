@@ -204,6 +204,13 @@ export default function initializeSchema(db) {
 
   const audioFilesInfo = db.exec('PRAGMA table_info(audio_files)');
   const audioFileColumns = (audioFilesInfo[0]?.values ?? []).map(([, name]) => name);
+  // Gemessene Lautheit (EBU R128, integriert) und Spitzenpegel – das Audio-Frontend gleicht damit live aus.
+  if (!audioFileColumns.includes('loudness_lufs')) {
+    db.exec('ALTER TABLE audio_files ADD COLUMN loudness_lufs REAL');
+  }
+  if (!audioFileColumns.includes('peak_db')) {
+    db.exec('ALTER TABLE audio_files ADD COLUMN peak_db REAL');
+  }
   if (!audioFileColumns.includes('tournament_id')) {
     db.exec('ALTER TABLE audio_files ADD COLUMN tournament_id INTEGER');
     // Einmal-Backfill: Korbhymnen über ihr Label dem Turnier der bestätigten Anmeldung zuordnen

@@ -33,6 +33,8 @@ function mapAudioFile(row) {
     tournament_name: row.tournament_name ?? null,
     created_at: row.created_at,
     updated_at: row.updated_at,
+    loudness_lufs: row.loudness_lufs ?? null,
+    peak_db: row.peak_db ?? null,
     url: buildFileUrl(row.file_name)
   };
 }
@@ -62,7 +64,9 @@ function mapAudioTrigger(row) {
       usage: row.file_usage,
       tournament_id: row.file_tournament_id ?? null,
       created_at: row.file_created_at,
-      updated_at: row.file_updated_at
+      updated_at: row.file_updated_at,
+      loudness_lufs: row.file_loudness_lufs,
+      peak_db: row.file_peak_db
     });
   } else {
     trigger.file = null;
@@ -175,6 +179,31 @@ export async function getAudioFileById(id) {
   }
 }
 
+const LUFS_RANGE = [-70, 0];
+const PEAK_DB_RANGE = [-100, 6];
+const inRange = (value, [min, max]) => typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max;
+
+export class AudioLoudnessError extends Error {}
+
+// Messwerte kommen aus dem Admin-Browser (EBU R128); gerundet auf 0,01 gespeichert.
+export async function setAudioFileLoudness(id, { lufs, peakDb } = {}) {
+  if (!inRange(lufs, LUFS_RANGE)) {
+    throw new AudioLoudnessError('LUFS-Wert muss zwischen -70 und 0 liegen.');
+  }
+  if (!inRange(peakDb, PEAK_DB_RANGE)) {
+    throw new AudioLoudnessError('Spitzenpegel muss zwischen -100 und +6 dB liegen.');
+  }
+  const file = await getAudioFileById(id);
+  if (!file) {
+    return null;
+  }
+  const { SQL, db } = await getConnection();
+  const round = (value) => Math.round(value * 100) / 100;
+  db.run("UPDATE audio_files SET loudness_lufs = ?, peak_db = ?, updated_at = datetime('now') WHERE id = ?", [round(lufs), round(peakDb), file.id]);
+  persistDatabase(db, SQL);
+  return getAudioFileById(file.id);
+}
+
 export async function deleteAudioFile(id) {
   const file = await getAudioFileById(id);
   if (!file) {
@@ -274,6 +303,8 @@ export async function listAudioTriggers() {
       f.tournament_id AS file_tournament_id,
       f.created_at AS file_created_at,
       f.updated_at AS file_updated_at,
+      f.loudness_lufs AS file_loudness_lufs,
+      f.peak_db AS file_peak_db,
       tn.name AS tournament_name
     FROM audio_triggers t
     LEFT JOIN audio_files f ON f.id = t.audio_file_id
@@ -311,7 +342,9 @@ export async function getAudioTrigger(key) {
       f.size_bytes AS file_size_bytes,
       f.usage AS file_usage,
       f.created_at AS file_created_at,
-      f.updated_at AS file_updated_at
+      f.updated_at AS file_updated_at,
+      f.loudness_lufs AS file_loudness_lufs,
+      f.peak_db AS file_peak_db
     FROM audio_triggers t
     LEFT JOIN audio_files f ON f.id = t.audio_file_id
     WHERE t.key = ?
