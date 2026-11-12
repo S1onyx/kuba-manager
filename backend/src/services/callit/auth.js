@@ -14,9 +14,18 @@ const MAX_REGISTRATIONS_PER_IP = 100;
 const NICKNAME_PATTERN = /^[\p{L}\p{N} _.-]{3,20}$/u;
 
 const failedLogins = new Map();
+// Gleiche Antwortzeit auch für unbekannte Nicknames
+const DUMMY_HASH = bcrypt.hashSync('callit-timing-dummy', BCRYPT_ROUNDS);
 const registrations = new Map();
 
+const MAX_TRACKED_KEYS = 5000;
+
 function hitWindow(map, key, windowMs, now) {
+  if (map.size > MAX_TRACKED_KEYS) {
+    map.forEach((entry, entryKey) => {
+      if (entry.windowStart + windowMs <= now) map.delete(entryKey);
+    });
+  }
   const entry = map.get(key);
   if (!entry || entry.windowStart + windowMs <= now) {
     map.set(key, { windowStart: now, count: 1 });
@@ -89,7 +98,7 @@ export async function loginUser({ nickname, password, clientKey = 'unknown' }, n
     throw new CallitError('CALLIT_TOO_MANY_ATTEMPTS', 'Zu viele Fehlversuche. Bitte später erneut versuchen.', 429);
   }
   const user = await queryOne('SELECT * FROM callit_users WHERE nickname = ?', [nickname.trim().replace(/\s+/g, ' ')]);
-  const valid = user ? await bcrypt.compare(password, user.password_hash) : false;
+  const valid = await bcrypt.compare(password, user?.password_hash ?? DUMMY_HASH) && Boolean(user);
   if (!valid) {
     hitWindow(failedLogins, limiterKey, LOGIN_WINDOW_MS, now);
     throw new CallitError('CALLIT_INVALID_CREDENTIALS', 'Nickname oder Passwort falsch.', 401);

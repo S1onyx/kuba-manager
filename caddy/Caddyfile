@@ -120,6 +120,10 @@ callit.kunstradbasketball.de {
     reverse_proxy backend:3000
   }
 
+  handle /media/* {
+    reverse_proxy backend:3000
+  }
+
   handle /socket.io/* {
     reverse_proxy backend:3000
   }

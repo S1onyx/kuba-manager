@@ -10,7 +10,8 @@ import {
   registerUser,
   requireCallitUser
 } from '../services/callit/auth.js';
-import { CallitError } from '../services/callit/db.js';
+import { CallitError, queryAll } from '../services/callit/db.js';
+import { emitCallitUpdate } from '../services/callit/events.js';
 import {
   deleteTip,
   getParticipant,
@@ -98,7 +99,9 @@ router.delete(
   '/me',
   requireCallitUser,
   handle(async (req, res) => {
+    const tournaments = await queryAll('SELECT tournament_id FROM callit_participants WHERE user_id = ?', [req.callitUser.id]);
     await deleteUserCascade(req.callitUser.id);
+    tournaments.forEach((row) => emitCallitUpdate(row.tournament_id, 'participants'));
     res.status(204).end();
   })
 );

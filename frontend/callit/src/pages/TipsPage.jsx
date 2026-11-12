@@ -26,7 +26,7 @@ export default function TipsPage({ id, matches, joined, joinCard }) {
   const filtered = useMemo(
     () =>
       list.filter((match) => {
-        if (activeFilter === 'open') return match.status === 'open' || match.status === 'live' || match.status === 'pending';
+        if (activeFilter === 'open') return match.status === 'open';
         if (activeFilter === 'done') return match.status === 'finished' || match.status === 'locked' || match.status === 'live';
         return true;
       }),
@@ -38,6 +38,7 @@ export default function TipsPage({ id, matches, joined, joinCard }) {
   const specialList = specials.data ?? [];
   const openSpecials = specialList.filter((bet) => !bet.locked);
   const missingSpecials = joined ? openSpecials.filter((bet) => !bet.myValue).length : 0;
+  const openTotal = openWithoutTip.length + missingSpecials;
   const jokers = matches.data?.jokers;
 
   return (
@@ -55,15 +56,15 @@ export default function TipsPage({ id, matches, joined, joinCard }) {
       ) : null}
 
       {joined ? (
-        openWithoutTip.length + missingSpecials > 0 ? (
+        openTotal > 0 ? (
           <div className="banner">
-            <span className="banner__big">{openWithoutTip.length + missingSpecials}</span>
+            <span className="banner__big">{openTotal}</span>
             <span className="grow">
-              <strong>{t('tips.openTitle', { count: openWithoutTip.length + missingSpecials })}</strong>
+              <strong>{t('tips.openTitle', { count: openTotal })}</strong>
               <br />
               <span className="small muted">
                 {next?.scheduledAt
-                  ? t('tips.nextKickoff', { time: formatCountdown(Date.parse(next.scheduledAt) - now) })
+                  ? t('tips.nextKickoff', { time: formatCountdown(Date.parse(next.scheduledAt) - now, t) })
                   : missingSpecials > 0
                     ? t('tips.specialsMissing', { count: missingSpecials })
                     : t('tips.openHint')}

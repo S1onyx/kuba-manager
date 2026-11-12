@@ -818,7 +818,14 @@
     "FREE_THROWS_DONE": "Minden büntetődobás megtörtént.",
     "FREE_THROWS_HAS_ATTEMPTS": "Előbb dobd el vagy vond vissza az összes büntetődobást.",
     "FREE_THROWS_NO_ATTEMPTS": "Nincs visszavonható büntetődobás.",
-    "FREE_THROWS_NOT_ACTIVE": "Nincsenek folyamatban büntetődobások."
+    "FREE_THROWS_NOT_ACTIVE": "Nincsenek folyamatban büntetődobások.",
+    "CALLIT_NICKNAME_TAKEN": "Ez a becenév már foglalt.",
+    "CALLIT_INVALID_NICKNAME": "Érvénytelen becenév (3–20 karakter).",
+    "CALLIT_TOURNAMENT_NOT_FOUND": "A torna nem található.",
+    "CALLIT_NOT_AVAILABLE": "A tippjáték nem aktív ennél a tornánál.",
+    "CALLIT_INVALID_VALUE": "Érvénytelen érték.",
+    "CALLIT_MATCH_NOT_FOUND": "A meccs nem található.",
+    "CALLIT_USER_NOT_FOUND": "A felhasználó nem található."
   },
   "export": {
     "title": "PDF-export / Nyomtatás",

@@ -1,12 +1,16 @@
-import { addSubscriber } from '../../scoreboard/stateStore.js';
+import { addSubscriber, getState } from '../../scoreboard/stateStore.js';
 import { queryAll, write } from './db.js';
 import { emitCallitUpdate } from './events.js';
 import { invalidateTournamentContext } from './context.js';
 
 const enabledTournaments = new Set();
 const lockedKeys = new Set();
+const unlockedKeys = new Set();
 let lastRunningKey = null;
 let lastSignature = null;
+let lastTournamentId = null;
+
+const lockKey = (tournamentId, code) => `${Number(tournamentId)}|${code}`;
 
 export async function refreshEnabledTournaments() {
   const rows = await queryAll('SELECT tournament_id FROM callit_tournaments WHERE enabled = 1');
@@ -20,23 +24,31 @@ export async function loadLocks(tournamentId) {
 }
 
 export async function setLock(tournamentId, code, state, reason) {
-  const key = `${tournamentId}|${code}`;
+  const key = lockKey(tournamentId, code);
   if (state === null) {
     await write(['DELETE FROM callit_locks WHERE tournament_id = ? AND schedule_code = ?', [tournamentId, code]]);
-    lockedKeys.delete(key);
   } else {
     await write([
       `INSERT INTO callit_locks (tournament_id, schedule_code, state, reason, changed_at) VALUES (?, ?, ?, ?, datetime('now'))
        ON CONFLICT(tournament_id, schedule_code) DO UPDATE SET state = excluded.state, reason = excluded.reason, changed_at = excluded.changed_at`,
       [tournamentId, code, state, reason]
     ]);
-    if (state === 'locked') lockedKeys.add(key);
-    else lockedKeys.delete(key);
   }
+  lockedKeys.delete(key);
+  unlockedKeys.delete(key);
+  if (state === 'locked') lockedKeys.add(key);
+  if (state === 'unlocked') unlockedKeys.add(key);
   emitCallitUpdate(tournamentId, 'lock');
 }
 
+// Läuft die Uhr gerade für genau dieses Spiel? Synchrone Prüfung gegen Anpfiff-Races.
+export function isRunningOnScoreboard(tournamentId, code, state = getState()) {
+  return Boolean(state && Number(state.tournamentId) === Number(tournamentId) && state.scheduleCode === code && state.isRunning);
+}
+
+// Gespeichertes Ergebnis sperrt immer. Manuelles Entsperren hebt Anpfiff-, Live- und Uhrzeit-Sperre auf.
 export function isMatchLocked(match, lockRow, settings, now = Date.now()) {
+  if (match.result?.saved) return true;
   if (lockRow?.state === 'unlocked') return false;
   if (lockRow?.state === 'locked') return true;
   if (match.result) return true;
@@ -47,14 +59,21 @@ export function isMatchLocked(match, lockRow, settings, now = Date.now()) {
   return false;
 }
 
-// Anpfiff = Uhr startet für einen Spielplan-Code. Jeder (Wieder-)Start sperrt das Spiel.
+// Anpfiff = Uhr startet für einen Spielplan-Code (Scoreboard-Zustand ist nicht persistent, nach einem
+// Neustart läuft keine Uhr). Ein manuelles Entsperren gilt, bis das Scoreboard ein anderes Spiel lädt.
 export async function handleScoreboardState(state) {
   const tournamentId = Number(state?.tournamentId);
+  const runningKey = state?.isRunning && state.scheduleCode ? lockKey(tournamentId, state.scheduleCode) : null;
+  if (lastTournamentId !== null && lastTournamentId !== tournamentId && enabledTournaments.has(lastTournamentId)) {
+    // Scoreboard hat das Turnier verlassen: Live-Stand des alten Turniers ist vorbei.
+    invalidateTournamentContext(lastTournamentId);
+    emitCallitUpdate(lastTournamentId, 'live');
+  }
+  lastTournamentId = tournamentId;
   if (!enabledTournaments.has(tournamentId)) {
-    lastRunningKey = null;
+    lastRunningKey = runningKey;
     return;
   }
-  const runningKey = state.isRunning && state.scheduleCode ? `${tournamentId}|${state.scheduleCode}` : null;
   const kickoff = runningKey && runningKey !== lastRunningKey;
   lastRunningKey = runningKey;
 
@@ -70,27 +89,40 @@ export async function handleScoreboardState(state) {
     state.scheduleVersion,
     state.shootout?.attempts?.length ?? 0
   ].join('|');
-  if (signature !== lastSignature) {
-    lastSignature = signature;
-    invalidateTournamentContext(tournamentId);
-    emitCallitUpdate(tournamentId, 'live');
+  if (signature === lastSignature && !kickoff) return;
+  lastSignature = signature;
+  invalidateTournamentContext(tournamentId);
+  emitCallitUpdate(tournamentId, 'live');
+
+  const currentKey = state.scheduleCode ? lockKey(tournamentId, state.scheduleCode) : null;
+  for (const key of Array.from(unlockedKeys)) {
+    const [keyTournament, ...codeParts] = key.split('|');
+    if (Number(keyTournament) === tournamentId && key !== currentKey) {
+      await setLock(tournamentId, codeParts.join('|'), null, null);
+    }
   }
 
-  if (kickoff && !lockedKeys.has(runningKey)) {
+  if (kickoff && !lockedKeys.has(runningKey) && !unlockedKeys.has(runningKey)) {
     await setLock(tournamentId, state.scheduleCode, 'locked', 'kickoff');
   }
 }
 
 export function resetLockTracking() {
   lockedKeys.clear();
+  unlockedKeys.clear();
   lastRunningKey = null;
   lastSignature = null;
+  lastTournamentId = null;
 }
 
 export async function registerCallitScoreboardHook() {
   await refreshEnabledTournaments();
-  const rows = await queryAll("SELECT tournament_id, schedule_code FROM callit_locks WHERE state = 'locked'");
-  rows.forEach((row) => lockedKeys.add(`${row.tournament_id}|${row.schedule_code}`));
+  const rows = await queryAll('SELECT tournament_id, schedule_code, state FROM callit_locks');
+  rows.forEach((row) => {
+    const key = lockKey(row.tournament_id, row.schedule_code);
+    if (row.state === 'locked') lockedKeys.add(key);
+    if (row.state === 'unlocked') unlockedKeys.add(key);
+  });
   addSubscriber((state) => {
     handleScoreboardState(state).catch((error) => console.error('[callit] Sperre bei Anpfiff fehlgeschlagen:', error));
   });

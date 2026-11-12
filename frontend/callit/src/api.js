@@ -5,7 +5,7 @@ const DEFAULT_BASE_URL =
         const devPorts = new Set(['5173', '5174', '5175', '5176', '5177', '8081', '8082']);
         if (!port || port === '80' || port === '443') return `${protocol}//${hostname}`;
         if (devPorts.has(port)) return `${protocol}//${hostname}:3000`;
-        return `${protocol}//${hostname}`;
+        return `${protocol}//${hostname}:${port}`;
       })()
     : 'http://localhost:3000';
 

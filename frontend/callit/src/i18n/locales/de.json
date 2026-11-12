@@ -143,7 +143,10 @@
       "all": "Alle",
       "done": "Gespielt"
     },
-    "empty": "Hier gibt es gerade nichts zu tippen."
+    "empty": "Hier gibt es gerade nichts zu tippen.",
+    "advanceNeeded": "Weiterkommer wählen",
+    "jokerShort": "Joker",
+    "underdogShort": "Underdog"
   },
   "specials": {
     "title": "Sonderwetten",
@@ -302,5 +305,8 @@
     "CALLIT_BET_LOCKED": "Diese Sonderwette ist geschlossen.",
     "CALLIT_INVALID_VALUE": "Ungültige Auswahl.",
     "CALLIT_AUTH_REQUIRED": "Bitte anmelden."
+  },
+  "time": {
+    "daysHours": "{{days}} T {{hours}} h"
   }
 }

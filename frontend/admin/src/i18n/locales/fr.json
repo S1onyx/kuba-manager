@@ -818,7 +818,14 @@
     "FREE_THROWS_DONE": "Tous les lancers francs ont déjà été effectués.",
     "FREE_THROWS_HAS_ATTEMPTS": "Veuillez d'abord effectuer ou annuler tous les lancers francs.",
     "FREE_THROWS_NO_ATTEMPTS": "Aucun lancer franc à annuler.",
-    "FREE_THROWS_NOT_ACTIVE": "Aucun lancer franc en cours."
+    "FREE_THROWS_NOT_ACTIVE": "Aucun lancer franc en cours.",
+    "CALLIT_NICKNAME_TAKEN": "Ce pseudo est déjà pris.",
+    "CALLIT_INVALID_NICKNAME": "Pseudo invalide (3 à 20 caractères).",
+    "CALLIT_TOURNAMENT_NOT_FOUND": "Tournoi introuvable.",
+    "CALLIT_NOT_AVAILABLE": "Le jeu de pronostics n'est pas actif pour ce tournoi.",
+    "CALLIT_INVALID_VALUE": "Valeur invalide.",
+    "CALLIT_MATCH_NOT_FOUND": "Match introuvable.",
+    "CALLIT_USER_NOT_FOUND": "Utilisateur introuvable."
   },
   "export": {
     "title": "Export PDF / Impression",

@@ -58,9 +58,14 @@ export function Heatmap({ cells, result, homeLabel, awayLabel }) {
   const { t } = useTranslation();
   if (!cells?.length) return null;
   const maxScore = Math.min(12, Math.max(4, ...cells.map((cell) => Math.max(cell.home, cell.away)), result ? Math.max(result.home, result.away) : 0));
-  const maxCount = Math.max(...cells.map((cell) => cell.count));
-  const lookup = new Map(cells.map((cell) => [`${Math.min(cell.home, maxScore)}:${Math.min(cell.away, maxScore)}`, cell.count]));
+  
+  const lookup = new Map();
+  cells.forEach((cell) => {
+    const key = `${Math.min(cell.home, maxScore)}:${Math.min(cell.away, maxScore)}`;
+    lookup.set(key, (lookup.get(key) ?? 0) + cell.count);
+  });
   const size = maxScore + 1;
+  const maxCount = Math.max(...lookup.values());
   return (
     <div className="stack" style={{ gap: 6 }}>
       <div className="row row--between dim small">

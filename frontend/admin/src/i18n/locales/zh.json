@@ -809,7 +809,14 @@
     "FREE_THROWS_DONE": "所有罚球已完成。",
     "FREE_THROWS_HAS_ATTEMPTS": "请先完成或撤销所有罚球。",
     "FREE_THROWS_NO_ATTEMPTS": "没有可撤销的罚球。",
-    "FREE_THROWS_NOT_ACTIVE": "当前没有罚球。"
+    "FREE_THROWS_NOT_ACTIVE": "当前没有罚球。",
+    "CALLIT_NICKNAME_TAKEN": "该昵称已被占用。",
+    "CALLIT_INVALID_NICKNAME": "昵称无效(3–20 个字符)。",
+    "CALLIT_TOURNAMENT_NOT_FOUND": "未找到赛事。",
+    "CALLIT_NOT_AVAILABLE": "该赛事未启用竞猜游戏。",
+    "CALLIT_INVALID_VALUE": "数值无效。",
+    "CALLIT_MATCH_NOT_FOUND": "未找到比赛。",
+    "CALLIT_USER_NOT_FOUND": "未找到用户。"
   },
   "export": {
     "title": "PDF导出 / 打印",

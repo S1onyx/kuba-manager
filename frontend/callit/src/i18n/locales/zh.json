@@ -136,7 +136,10 @@
       "all": "全部",
       "done": "已比赛"
     },
-    "empty": "目前没有可竞猜的比赛。"
+    "empty": "目前没有可竞猜的比赛。",
+    "advanceNeeded": "请选择晋级队",
+    "jokerShort": "加倍",
+    "underdogShort": "冷门"
   },
   "specials": {
     "title": "特别竞猜",
@@ -289,5 +292,8 @@
     "CALLIT_BET_LOCKED": "该特别竞猜已截止。",
     "CALLIT_INVALID_VALUE": "选择无效。",
     "CALLIT_AUTH_REQUIRED": "请先登录。"
+  },
+  "time": {
+    "daysHours": "{{days}}天{{hours}}小时"
   }
 }

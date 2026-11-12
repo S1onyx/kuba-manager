@@ -2,10 +2,10 @@ import { getScoreboardState } from '../../scoreboard/index.js';
 import { getTournament } from '../tournaments/base.js';
 import { CallitError, parseJson, queryAll, queryOne, write } from './db.js';
 import { DEFAULT_SETTINGS, SPECIAL_BET_TYPES, normalizeSettings, specialTypeOf } from './settings.js';
-import { computeStandings, phaseGroupOf, rankRows, scoreMatchTip, scoreSpecials, validTipsByMatch, tendency } from './scoring.js';
+import { computeStandings, isTipValidForMatch, phaseGroupOf, rankRows, scoreMatchTip, scoreSpecials, validTipsByMatch, tendency } from './scoring.js';
 import { applyLiveState, deriveSpecialOutcomes, invalidateTournamentContext, loadTournamentBase } from './context.js';
-import { isMatchLocked, loadLocks, refreshEnabledTournaments } from './locks.js';
-import { emitCallitUpdate } from './events.js';
+import { isMatchLocked, isRunningOnScoreboard, loadLocks, refreshEnabledTournaments } from './locks.js';
+import { emitCallitUpdate, tournamentVersion } from './events.js';
 
 const MAX_SCORE = 99;
 const MAX_TOTAL_BASKETS = 100000;
@@ -64,7 +64,7 @@ export async function listEnabledTournaments() {
     `SELECT c.tournament_id, t.name, t.status, t.is_completed, t.is_public, t.planned_at, t.location,
        (SELECT COUNT(*) FROM callit_participants p WHERE p.tournament_id = c.tournament_id AND p.is_disqualified = 0) AS participant_count
      FROM callit_tournaments c JOIN tournaments t ON t.id = c.tournament_id
-     WHERE c.enabled = 1
+     WHERE c.enabled = 1 AND t.is_public = 1
      ORDER BY t.is_completed ASC, datetime(t.planned_at) DESC, t.id DESC`
   );
   return rows.map((row) => ({
@@ -169,11 +169,14 @@ export async function loadTournamentState(tournamentId, now = Date.now()) {
   const { config, tournament } = await requireEnabled(tournamentId);
   const [base, locks, overrides] = await Promise.all([loadTournamentBase(tournamentId, now), loadLocks(tournamentId), loadOverrides(tournamentId)]);
   const { settings } = config;
-  const { matches: liveMatches, liveCode } = applyLiveState(base.matches, getScoreboardState(), tournamentId, base.resolveKey);
+  const scoreboardState = getScoreboardState();
+  const { matches: liveMatches, liveCode } = applyLiveState(base.matches, scoreboardState, tournamentId, base.resolveKey);
   const matches = liveMatches.map((match) => {
     const lockRow = locks.get(match.code);
     const known = Boolean(match.home && match.away);
-    const locked = isMatchLocked(match, lockRow, settings, now);
+    const locked =
+      isMatchLocked(match, lockRow, settings, now) ||
+      (lockRow?.state !== 'unlocked' && isRunningOnScoreboard(tournamentId, match.code, scoreboardState));
     const status = !known ? 'pending' : !locked ? 'open' : match.result?.live ? 'live' : match.result ? 'finished' : 'locked';
     return { ...match, locked, lockReason: lockRow?.state === 'locked' ? lockRow.reason : null, unlockedOverride: lockRow?.state === 'unlocked', status };
   });
@@ -275,6 +278,8 @@ export async function listMatchesForUser(tournamentId, user) {
   });
   const open = matches.filter((match) => match.status === 'open');
   const openWithoutTip = open.filter((match) => !match.myTip);
+  const mySpecialKeys = new Set(user ? (await loadSpecialTips(tournamentId, user.id)).map((tip) => tip.betKey) : []);
+  const openSpecials = state.bets.filter((bet) => !bet.locked && !mySpecialKeys.has(bet.betKey)).length;
   return {
     matches,
     liveCode: state.liveCode,
@@ -282,7 +287,9 @@ export async function listMatchesForUser(tournamentId, user) {
       const bucket = buckets.get(tip.code);
       return bucket?.tips.includes(tip);
     })),
-    openCount: openWithoutTip.length,
+    openCount: openWithoutTip.length + openSpecials,
+    openMatchCount: openWithoutTip.length,
+    openSpecialCount: openSpecials,
     nextOpen: openWithoutTip[0] ? { code: openWithoutTip[0].code, scheduledAt: openWithoutTip[0].scheduledAt } : null
   };
 }
@@ -322,7 +329,9 @@ export async function submitTip(tournamentId, user, code, payload = {}) {
     const phase = phaseGroupOf(match);
     const myTips = await loadTips(tournamentId, user.id);
     const byCode = new Map(state.matches.map((entry) => [entry.code, entry]));
-    const otherJokers = myTips.filter((tip) => tip.isJoker && tip.code !== code && byCode.get(tip.code) && phaseGroupOf(byCode.get(tip.code)) === phase);
+    const otherJokers = myTips.filter(
+      (tip) => tip.isJoker && tip.code !== code && isTipValidForMatch(tip, byCode.get(tip.code)) && phaseGroupOf(byCode.get(tip.code)) === phase
+    );
     if (otherJokers.length >= state.settings.joker.perPhase) {
       const movable = otherJokers.find((tip) => !byCode.get(tip.code).locked);
       if (!movable) throw new CallitError('CALLIT_JOKER_USED', 'Joker für diese Phase bereits eingesetzt.', 409);
@@ -330,6 +339,9 @@ export async function submitTip(tournamentId, user, code, payload = {}) {
     }
   }
 
+  if (!match.unlockedOverride && isRunningOnScoreboard(tournamentId, code)) {
+    throw new CallitError('CALLIT_MATCH_LOCKED', 'Das Spiel hat bereits begonnen.', 409);
+  }
   statements.push([
     `INSERT INTO callit_tips (tournament_id, user_id, schedule_code, score_home, score_away, advance, is_joker, home_key, away_key, updated_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
@@ -347,7 +359,9 @@ export async function deleteTip(tournamentId, user, code) {
   const state = await loadTournamentState(tournamentId);
   const match = state.matches.find((entry) => entry.code === code);
   if (!match) throw new CallitError('CALLIT_MATCH_NOT_FOUND', 'Spiel nicht gefunden.', 404);
-  if (match.locked) throw new CallitError('CALLIT_MATCH_LOCKED', 'Das Spiel hat bereits begonnen.', 409);
+  if (match.locked || (!match.unlockedOverride && isRunningOnScoreboard(tournamentId, code))) {
+    throw new CallitError('CALLIT_MATCH_LOCKED', 'Das Spiel hat bereits begonnen.', 409);
+  }
   await write(['DELETE FROM callit_tips WHERE tournament_id = ? AND user_id = ? AND schedule_code = ?', [tournamentId, user.id, code]]);
   emitCallitUpdate(tournamentId, 'tips');
 }
@@ -424,8 +438,25 @@ function latestCode(state) {
   return finished[0]?.code ?? null;
 }
 
-export async function computeRanking(tournamentId, category = 'total', preloaded = null) {
-  const state = preloaded ?? (await loadTournamentState(tournamentId));
+const RANKING_TTL_MS = 2000;
+const rankingCache = new Map();
+
+// Kurzer Cache: Beamer, Public-Seite und viele Handys fragen gleichzeitig dasselbe Ranking ab.
+export async function computeRanking(tournamentId, category = 'total') {
+  const key = `${Number(tournamentId)}|${category}`;
+  const version = tournamentVersion(tournamentId);
+  const cached = rankingCache.get(key);
+  if (cached && cached.version === version && cached.at + RANKING_TTL_MS > Date.now()) return cached.promise;
+  const promise = computeRankingUncached(tournamentId, category).catch((error) => {
+    rankingCache.delete(key);
+    throw error;
+  });
+  rankingCache.set(key, { version, at: Date.now(), promise });
+  return promise;
+}
+
+async function computeRankingUncached(tournamentId, category) {
+  const state = await loadTournamentState(tournamentId);
   const [participants, tips, specialTips] = await Promise.all([activeParticipants(tournamentId), loadTips(tournamentId), loadSpecialTips(tournamentId)]);
   const input = { participants, matches: state.matches.filter((match) => match.locked), tips, specialTips, specialOutcomes: state.outcomes, settings: state.settings };
   const rows = rankRows(computeStandings(input), category);

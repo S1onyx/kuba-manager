@@ -53,6 +53,8 @@ test('Settings werden begrenzt und unbekannte Felder verworfen', () => {
   assert.equal(normalized.points.diff, 3);
   assert.equal(normalized.underdog.thresholdPct, 100);
   assert.equal('hack' in normalized, false);
+  assert.equal(normalizeSettings({ points: { exact: '' }, multipliers: { final: null } }).points.exact, 4);
+  assert.equal(normalizeSettings({ multipliers: { final: null } }).multipliers.final, 2);
 });
 
 test('specialTypeOf erkennt Gruppensieger-Keys', () => {
@@ -87,6 +89,8 @@ test('KO-Weiterkommer gibt +1 nur bei Unentschieden-Tipp', () => {
   assert.equal(scoreMatchTip(tip(2, 2, { advance: 'home' }), ko, ctx).total, 4);
   assert.equal(scoreMatchTip(tip(0, 0, { advance: 'away' }), ko, ctx).total, 4);
   assert.equal(scoreMatchTip(tip(2, 2, { advance: 'away' }), match({ result: ko.result }), ctx).total, 4);
+  const notDraw = match({ phase: 'knockout', result: { home: 5, away: 3, winner: 'home', live: false } });
+  assert.equal(scoreMatchTip(tip(2, 2, { advance: 'home' }), notDraw, ctx).total, 0);
 });
 
 test('Finale ×2 und Joker ×2 multiplizieren, Underdog nicht', () => {

@@ -303,7 +303,7 @@ export default function CallitTab() {
             <a href={url} target="_blank" rel="noopener noreferrer" style={{ overflowWrap: 'anywhere' }}>
               {url}
             </a>
-            <button type="button" onClick={() => navigator.clipboard?.writeText(url).then(() => updateMessage('info', t('callit.copied')))}>
+            <button type="button" onClick={() => navigator.clipboard ? navigator.clipboard.writeText(url).then(() => updateMessage('info', t('callit.copied'))).catch(() => window.prompt(t('callit.copyLink'), url)) : window.prompt(t('callit.copyLink'), url)}>
               {t('callit.copyLink')}
             </button>
           </div>

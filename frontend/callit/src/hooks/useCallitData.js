@@ -10,13 +10,17 @@ export default function useCallitData(loader, tournamentId, deps = []) {
   loaderRef.current = loader;
   const timerRef = useRef(null);
 
+  const seqRef = useRef(0);
+
+  // Nur die zuletzt gestartete Anfrage darf den Zustand setzen (Kategorie-Wechsel, Socket + Intervall).
   const reload = useCallback(async () => {
+    const seq = ++seqRef.current;
     try {
       const data = await loaderRef.current();
-      setState({ data, error: null, loading: false });
+      if (seq === seqRef.current) setState({ data, error: null, loading: false });
       return data;
     } catch (error) {
-      setState((prev) => ({ data: prev.data, error, loading: false }));
+      if (seq === seqRef.current) setState((prev) => ({ data: prev.data, error, loading: false }));
       return null;
     }
   }, []);
@@ -36,7 +40,9 @@ export default function useCallitData(loader, tournamentId, deps = []) {
       }, 400 + Math.random() * 600);
     };
     const onUpdate = (payload) => {
-      if (!tournamentId || Number(payload?.tournamentId) === Number(tournamentId)) schedule();
+      if (tournamentId ? Number(payload?.tournamentId) === Number(tournamentId) : payload?.reasons?.some((reason) => reason !== 'live' && reason !== 'tips')) {
+        schedule();
+      }
     };
     const onVisible = () => {
       if (document.visibilityState === 'visible') schedule();

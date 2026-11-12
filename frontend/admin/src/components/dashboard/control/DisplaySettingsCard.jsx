@@ -30,7 +30,7 @@ export default function DisplaySettingsCard() {
                 handleDisplayViewChange(
                   option.id,
                   option.id === 'callit'
-                    ? { callitTournamentId: scoreboard?.tournamentId ?? scoreboard?.displayCallitTournamentId ?? undefined }
+                    ? { callitTournamentId: scoreboard?.displayCallitTournamentId ?? scoreboard?.tournamentId ?? undefined }
                     : undefined
                 )
               }

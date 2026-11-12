@@ -12,7 +12,8 @@ import {
 test('Countdown-Formate', () => {
   assert.equal(formatCountdown(65_000), '01:05');
   assert.equal(formatCountdown(3_725_000), '1:02:05');
-  assert.equal(formatCountdown(2 * 86_400_000 + 3 * 3_600_000), '2 T 03 h');
+  assert.equal(formatCountdown(2 * 86_400_000 + 3 * 3_600_000), '2d 03h');
+  assert.equal(formatCountdown(2 * 86_400_000, (key, v) => `${key}:${v.days}:${v.hours}`), 'time.daysHours:2:00');
   assert.equal(formatCountdown(-5), '00:00');
 });
 

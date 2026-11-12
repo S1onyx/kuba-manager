@@ -836,7 +836,14 @@
     "FREE_THROWS_DONE": "Všechny trestné hody už byly provedeny.",
     "FREE_THROWS_HAS_ATTEMPTS": "Nejprve proveďte nebo vraťte všechny trestné hody.",
     "FREE_THROWS_NO_ATTEMPTS": "Není žádný trestný hod k vrácení.",
-    "FREE_THROWS_NOT_ACTIVE": "Neprobíhají žádné trestné hody."
+    "FREE_THROWS_NOT_ACTIVE": "Neprobíhají žádné trestné hody.",
+    "CALLIT_NICKNAME_TAKEN": "Tato přezdívka je už obsazená.",
+    "CALLIT_INVALID_NICKNAME": "Neplatná přezdívka (3–20 znaků).",
+    "CALLIT_TOURNAMENT_NOT_FOUND": "Turnaj nenalezen.",
+    "CALLIT_NOT_AVAILABLE": "Tipovačka není pro tento turnaj aktivní.",
+    "CALLIT_INVALID_VALUE": "Neplatná hodnota.",
+    "CALLIT_MATCH_NOT_FOUND": "Zápas nenalezen.",
+    "CALLIT_USER_NOT_FOUND": "Uživatel nenalezen."
   },
   "export": {
     "title": "Export PDF / Tisk",

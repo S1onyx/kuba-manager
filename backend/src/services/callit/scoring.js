@@ -48,7 +48,7 @@ export function scoreMatchTip(tip, match, { settings, shares }) {
   const base = level === 'miss' ? 0 : settings.points[level];
   const tipTendency = tendency(tip.scoreHome, tip.scoreAway);
   const koBonus =
-    match.phase !== 'group' && tipTendency === 'draw' && tip.advance && tip.advance === result.winner
+    match.phase !== 'group' && level !== 'miss' && tipTendency === 'draw' && tip.advance && tip.advance === result.winner
       ? settings.points.koAdvance
       : 0;
   const multiplier = matchMultiplier(match, settings);
@@ -172,7 +172,7 @@ export function computeStandings({ participants, matches, tips, specialTips, spe
       if (score.underdog > 0) row.underdogHits += 1;
       row.matchPoints = round1(row.matchPoints + score.total);
       row.phasePoints[phaseGroupOf(match)] = round1(row.phasePoints[phaseGroupOf(match)] + score.total);
-      if (score.joker > 1) row.jokerPoints = round1(row.jokerPoints + score.total / 2);
+      if (score.joker > 1) row.jokerPoints = round1(row.jokerPoints + (score.total - score.underdog) / 2);
       if (match.result.live) row.livePoints = round1(row.livePoints + score.total);
     });
   });

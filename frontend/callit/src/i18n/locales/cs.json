@@ -156,7 +156,10 @@
       "all": "Vše",
       "done": "Odehrané"
     },
-    "empty": "Teď není co tipovat."
+    "empty": "Teď není co tipovat.",
+    "advanceNeeded": "Vyber postupujícího",
+    "jokerShort": "Žolík",
+    "underdogShort": "Outsider"
   },
   "specials": {
     "title": "Speciální sázky",
@@ -327,5 +330,8 @@
     "CALLIT_BET_LOCKED": "Tato speciální sázka je uzavřená.",
     "CALLIT_INVALID_VALUE": "Neplatná volba.",
     "CALLIT_AUTH_REQUIRED": "Přihlas se prosím."
+  },
+  "time": {
+    "daysHours": "{{days}} d {{hours}} h"
   }
 }

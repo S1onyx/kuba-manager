@@ -143,7 +143,10 @@
       "all": "Alli",
       "done": "Gspielt"
     },
-    "empty": "Grad gits nüt zum Tippe."
+    "empty": "Grad gits nüt zum Tippe.",
+    "advanceNeeded": "Wiiterchömer wähle",
+    "jokerShort": "Joker",
+    "underdogShort": "Underdog"
   },
   "specials": {
     "title": "Sonderwette",
@@ -302,5 +305,8 @@
     "CALLIT_BET_LOCKED": "Die Sonderwett isch zue.",
     "CALLIT_INVALID_VALUE": "Ungültigi Uswahl.",
     "CALLIT_AUTH_REQUIRED": "Bitte aamälde."
+  },
+  "time": {
+    "daysHours": "{{days}} T {{hours}} h"
   }
 }

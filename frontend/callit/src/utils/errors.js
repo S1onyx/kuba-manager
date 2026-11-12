@@ -24,6 +24,7 @@ const KNOWN = new Set([
 export function errorMessage(t, error) {
   if (!error) return '';
   if (error.code && KNOWN.has(error.code)) return t(`errors.${error.code}`);
+  if (error.status === 401) return t('errors.CALLIT_AUTH_REQUIRED');
   if (error.status === 404) return t('errors.notFound');
   return t('errors.generic');
 }

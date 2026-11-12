@@ -143,7 +143,10 @@
       "all": "Älle",
       "done": "Gschbielt"
     },
-    "empty": "Grad gibt's nix zum Tippa."
+    "empty": "Grad gibt's nix zum Tippa.",
+    "advanceNeeded": "Weiterkommer wähla",
+    "jokerShort": "Joker",
+    "underdogShort": "Underdog"
   },
   "specials": {
     "title": "Sonderwetta",
@@ -302,5 +305,8 @@
     "CALLIT_BET_LOCKED": "Die Sonderwett isch zua.",
     "CALLIT_INVALID_VALUE": "Ungültige Auswahl.",
     "CALLIT_AUTH_REQUIRED": "Bitte aamelda."
+  },
+  "time": {
+    "daysHours": "{{days}} T {{hours}} h"
   }
 }

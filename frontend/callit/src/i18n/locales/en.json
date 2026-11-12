@@ -143,7 +143,10 @@
       "all": "All",
       "done": "Played"
     },
-    "empty": "Nothing to predict right now."
+    "empty": "Nothing to predict right now.",
+    "advanceNeeded": "Pick who goes through",
+    "jokerShort": "Joker",
+    "underdogShort": "Underdog"
   },
   "specials": {
     "title": "Special bets",
@@ -302,5 +305,8 @@
     "CALLIT_BET_LOCKED": "This special bet is closed.",
     "CALLIT_INVALID_VALUE": "Invalid choice.",
     "CALLIT_AUTH_REQUIRED": "Please log in."
+  },
+  "time": {
+    "daysHours": "{{days}}d {{hours}}h"
   }
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../api.js';
 import { useDateLocale } from '../i18n/index.js';
@@ -37,7 +37,7 @@ export function KickoffInfo({ match, now }) {
   if (match.status === 'open' && diff > 0 && diff < 24 * 3600 * 1000) {
     return (
       <span>
-        {label} · <strong style={{ color: '#fed7aa' }}>{t('tips.inCountdown', { time: formatCountdown(diff) })}</strong>
+        {label} · <strong style={{ color: '#fed7aa' }}>{t('tips.inCountdown', { time: formatCountdown(diff, t) })}</strong>
       </span>
     );
   }
@@ -51,8 +51,8 @@ export function PointsPill({ points }) {
   return (
     <span className={`pill ${tone}`}>
       +{formatPoints(points.total, i18n.language)} · {t(`levels.${points.level}`)}
-      {points.joker > 1 ? ' · J' : ''}
-      {points.underdog > 0 ? ' · U' : ''}
+      {points.joker > 1 ? ` · ${t('tips.jokerShort')}` : ''}
+      {points.underdog > 0 ? ` · ${t('tips.underdogShort')}` : ''}
     </span>
   );
 }
@@ -64,6 +64,7 @@ function StatusPill({ match, saveState }) {
   if (match.status === 'locked') return <span className="pill"><IconLock /> {t('status.locked')}</span>;
   if (match.status === 'pending') return <span className="pill">{t('status.pending')}</span>;
   if (saveState === 'saving') return <span className="pill pill--open">{t('tips.saving')}</span>;
+  if (saveState === 'needsInput') return <span className="pill pill--todo">{t('tips.advanceNeeded')}</span>;
   if (saveState === 'error') return <span className="pill" style={{ background: 'var(--red-soft)', color: '#fecaca' }}>{t('tips.saveError')}</span>;
   if (match.myTip || saveState === 'saved') return <span className="pill pill--saved">{t('tips.saved')}</span>;
   return <span className="pill pill--todo">{t('tips.todo')}</span>;
@@ -76,12 +77,57 @@ export default function MatchCard({ tournamentId, match, now, jokers, canTip, on
   const [error, setError] = useState(null);
   const dirtyRef = useRef(false);
   const timerRef = useRef(null);
+  const draftRef = useRef(draft);
+  const editRef = useRef(0);
+  const chainRef = useRef(Promise.resolve());
+  const contextRef = useRef({ tournamentId, match, onSaved });
+  contextRef.current = { tournamentId, match, onSaved };
 
   useEffect(() => {
-    if (!dirtyRef.current) setDraft(fromTip(match.myTip));
+    if (!dirtyRef.current) {
+      const next = fromTip(match.myTip);
+      draftRef.current = next;
+      setDraft(next);
+    }
   }, [match.myTip]);
 
-  useEffect(() => () => window.clearTimeout(timerRef.current), []);
+  // Speichert immer den neuesten Entwurf; Aufrufe laufen nacheinander, damit kein alter Stand gewinnt.
+  const flush = useCallback(() => {
+    chainRef.current = chainRef.current.then(async () => {
+      const { tournamentId: tid, match: current, onSaved: done } = contextRef.current;
+      const edit = editRef.current;
+      const next = draftRef.current;
+      if (!dirtyRef.current || !canSaveTip(current, next)) return;
+      try {
+        await api.saveTip(tid, current.code, next);
+        if (edit !== editRef.current) return;
+        dirtyRef.current = false;
+        setError(null);
+        setSaveState('saved');
+        done?.();
+      } catch (err) {
+        if (edit !== editRef.current) return;
+        setError(err);
+        setSaveState('error');
+        if (err.code === 'CALLIT_MATCH_LOCKED') {
+          dirtyRef.current = false;
+          done?.();
+        }
+      }
+    });
+    return chainRef.current;
+  }, []);
+
+  useEffect(
+    () => () => {
+      if (timerRef.current) {
+        window.clearTimeout(timerRef.current);
+        timerRef.current = null;
+        flush();
+      }
+    },
+    [flush]
+  );
 
   const editable = match.status === 'open' && canTip;
   const home = teamName(match, 'home');
@@ -89,33 +135,23 @@ export default function MatchCard({ tournamentId, match, now, jokers, canTip, on
   const phaseKey = match.phase === 'group' ? 'group' : 'ko';
   const jokerAvailable = jokers?.enabled && (jokers?.[phaseKey]?.total ?? 0) > 0;
 
-  const persist = (next) => {
+  const update = (next) => {
+    if (sameDraft(next, draftRef.current)) return;
+    dirtyRef.current = true;
+    editRef.current += 1;
+    draftRef.current = next;
+    setDraft(next);
     window.clearTimeout(timerRef.current);
+    timerRef.current = null;
     if (!canSaveTip(match, next)) {
-      setSaveState('idle');
+      setSaveState('needsInput');
       return;
     }
     setSaveState('saving');
-    timerRef.current = window.setTimeout(async () => {
-      try {
-        await api.saveTip(tournamentId, match.code, next);
-        dirtyRef.current = false;
-        setError(null);
-        setSaveState('saved');
-        onSaved?.();
-      } catch (err) {
-        setError(err);
-        setSaveState('error');
-        if (err.code === 'CALLIT_MATCH_LOCKED') onSaved?.();
-      }
+    timerRef.current = window.setTimeout(() => {
+      timerRef.current = null;
+      flush();
     }, 500);
-  };
-
-  const update = (next) => {
-    if (sameDraft(next, draft)) return;
-    dirtyRef.current = true;
-    setDraft(next);
-    persist(next);
   };
 
   const showAdvance = editable && isKoDraw(match, draft);

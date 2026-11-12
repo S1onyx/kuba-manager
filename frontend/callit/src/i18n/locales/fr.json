@@ -143,7 +143,10 @@
       "all": "Tous",
       "done": "Joués"
     },
-    "empty": "Rien à pronostiquer pour l'instant."
+    "empty": "Rien à pronostiquer pour l'instant.",
+    "advanceNeeded": "Choisis le qualifié",
+    "jokerShort": "Joker",
+    "underdogShort": "Outsider"
   },
   "specials": {
     "title": "Paris spéciaux",
@@ -302,5 +305,8 @@
     "CALLIT_BET_LOCKED": "Ce pari spécial est fermé.",
     "CALLIT_INVALID_VALUE": "Choix invalide.",
     "CALLIT_AUTH_REQUIRED": "Merci de te connecter."
+  },
+  "time": {
+    "daysHours": "{{days}} j {{hours}} h"
   }
 }

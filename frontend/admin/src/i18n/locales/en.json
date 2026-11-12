@@ -818,7 +818,14 @@
     "FREE_THROWS_DONE": "All free throws have already been taken.",
     "FREE_THROWS_HAS_ATTEMPTS": "Please take or undo all free throws first.",
     "FREE_THROWS_NO_ATTEMPTS": "There is no free throw to undo.",
-    "FREE_THROWS_NOT_ACTIVE": "No free throws in progress."
+    "FREE_THROWS_NOT_ACTIVE": "No free throws in progress.",
+    "CALLIT_NICKNAME_TAKEN": "This nickname is already taken.",
+    "CALLIT_INVALID_NICKNAME": "Invalid nickname (3–20 characters).",
+    "CALLIT_TOURNAMENT_NOT_FOUND": "Tournament not found.",
+    "CALLIT_NOT_AVAILABLE": "Prediction game is not active for this tournament.",
+    "CALLIT_INVALID_VALUE": "Invalid value.",
+    "CALLIT_MATCH_NOT_FOUND": "Game not found.",
+    "CALLIT_USER_NOT_FOUND": "User not found."
   },
   "export": {
     "title": "PDF Export / Print",

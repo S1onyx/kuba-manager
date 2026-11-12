@@ -15,14 +15,16 @@ export const DEFAULT_SETTINGS = Object.freeze({
   locks: { atScheduledTime: false }
 });
 
+const toNumber = (value) => (value === '' || value === null || value === undefined || typeof value === 'boolean' ? NaN : Number(value));
+
 function num(value, fallback, min, max) {
-  const parsed = Number(value);
+  const parsed = toNumber(value);
   if (!Number.isFinite(parsed)) return fallback;
   return Math.min(max, Math.max(min, Math.round(parsed * 100) / 100));
 }
 
 function int(value, fallback, min, max) {
-  const parsed = Number(value);
+  const parsed = toNumber(value);
   if (!Number.isFinite(parsed)) return fallback;
   return Math.min(max, Math.max(min, Math.trunc(parsed)));
 }

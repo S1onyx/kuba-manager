@@ -818,7 +818,14 @@
     "FREE_THROWS_DONE": "Alli Freiwürf sind scho gworfe.",
     "FREE_THROWS_HAS_ATTEMPTS": "Bitte zerscht alli Freiwürf wärfe oder zruggneh.",
     "FREE_THROWS_NO_ATTEMPTS": "Es git kei Freiwurf zum Zruggneh.",
-    "FREE_THROWS_NOT_ACTIVE": "Es laufed kei Freiwürf."
+    "FREE_THROWS_NOT_ACTIVE": "Es laufed kei Freiwürf.",
+    "CALLIT_NICKNAME_TAKEN": "De Nickname isch scho vergäh.",
+    "CALLIT_INVALID_NICKNAME": "Ungültige Nickname (3–20 Zeiche).",
+    "CALLIT_TOURNAMENT_NOT_FOUND": "Turnier nöd gfunde.",
+    "CALLIT_NOT_AVAILABLE": "Tippspiel isch für das Turnier nöd aktiv.",
+    "CALLIT_INVALID_VALUE": "Ungültige Wärt.",
+    "CALLIT_MATCH_NOT_FOUND": "Spiel nöd gfunde.",
+    "CALLIT_USER_NOT_FOUND": "Nutzer nöd gfunde."
   },
   "export": {
     "title": "PDF-Export / Drucken",

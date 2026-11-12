@@ -10,10 +10,10 @@ export function splitDuration(ms) {
 
 const pad = (value) => String(value).padStart(2, '0');
 
-// Kompakter Countdown: "3 T 04 h", "1:05:09" oder "04:09".
-export function formatCountdown(ms) {
+// Kompakter Countdown: "3 T 04 h" (lokalisiert über t), "1:05:09" oder "04:09".
+export function formatCountdown(ms, t) {
   const { days, hours, minutes, seconds } = splitDuration(ms);
-  if (days > 0) return `${days} T ${pad(hours)} h`;
+  if (days > 0) return t ? t('time.daysHours', { days, hours: pad(hours) }) : `${days}d ${pad(hours)}h`;
   if (hours > 0) return `${hours}:${pad(minutes)}:${pad(seconds)}`;
   return `${pad(minutes)}:${pad(seconds)}`;
 }

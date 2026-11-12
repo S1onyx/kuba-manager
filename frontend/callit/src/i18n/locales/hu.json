@@ -143,7 +143,10 @@
       "all": "Mind",
       "done": "Lejátszott"
     },
-    "empty": "Most nincs mit tippelni."
+    "empty": "Most nincs mit tippelni.",
+    "advanceNeeded": "Válaszd a továbbjutót",
+    "jokerShort": "Joker",
+    "underdogShort": "Esélytelen"
   },
   "specials": {
     "title": "Különfogadások",
@@ -302,5 +305,8 @@
     "CALLIT_BET_LOCKED": "Ez a különfogadás lezárult.",
     "CALLIT_INVALID_VALUE": "Érvénytelen választás.",
     "CALLIT_AUTH_REQUIRED": "Kérjük, lépj be."
+  },
+  "time": {
+    "daysHours": "{{days}} nap {{hours}} ó"
   }
 }

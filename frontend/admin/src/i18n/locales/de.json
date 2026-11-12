@@ -818,7 +818,14 @@
     "FREE_THROWS_DONE": "Alle Freiwürfe wurden bereits geworfen.",
     "FREE_THROWS_HAS_ATTEMPTS": "Bitte zuerst alle Freiwürfe werfen oder zurücknehmen.",
     "FREE_THROWS_NO_ATTEMPTS": "Es gibt keinen Freiwurf zum Zurücknehmen.",
-    "FREE_THROWS_NOT_ACTIVE": "Es laufen keine Freiwürfe."
+    "FREE_THROWS_NOT_ACTIVE": "Es laufen keine Freiwürfe.",
+    "CALLIT_NICKNAME_TAKEN": "Dieser Nickname ist bereits vergeben.",
+    "CALLIT_INVALID_NICKNAME": "Ungültiger Nickname (3–20 Zeichen).",
+    "CALLIT_TOURNAMENT_NOT_FOUND": "Turnier nicht gefunden.",
+    "CALLIT_NOT_AVAILABLE": "Tippspiel ist für dieses Turnier nicht aktiv.",
+    "CALLIT_INVALID_VALUE": "Ungültiger Wert.",
+    "CALLIT_MATCH_NOT_FOUND": "Spiel nicht gefunden.",
+    "CALLIT_USER_NOT_FOUND": "Nutzer nicht gefunden."
   },
   "export": {
     "title": "PDF-Export / Drucken",

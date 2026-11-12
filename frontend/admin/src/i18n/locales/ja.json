@@ -809,7 +809,14 @@
     "FREE_THROWS_DONE": "すべてのフリースローが終了しています。",
     "FREE_THROWS_HAS_ATTEMPTS": "先にすべてのフリースローを投げるか取り消してください。",
     "FREE_THROWS_NO_ATTEMPTS": "取り消せるフリースローはありません。",
-    "FREE_THROWS_NOT_ACTIVE": "進行中のフリースローはありません。"
+    "FREE_THROWS_NOT_ACTIVE": "進行中のフリースローはありません。",
+    "CALLIT_NICKNAME_TAKEN": "このニックネームは既に使われています。",
+    "CALLIT_INVALID_NICKNAME": "無効なニックネーム(3〜20文字)。",
+    "CALLIT_TOURNAMENT_NOT_FOUND": "大会が見つかりません。",
+    "CALLIT_NOT_AVAILABLE": "この大会では予想ゲームが有効になっていません。",
+    "CALLIT_INVALID_VALUE": "無効な値です。",
+    "CALLIT_MATCH_NOT_FOUND": "試合が見つかりません。",
+    "CALLIT_USER_NOT_FOUND": "ユーザーが見つかりません。"
   },
   "export": {
     "title": "PDFエクスポート / 印刷",

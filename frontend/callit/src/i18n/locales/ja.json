@@ -136,7 +136,10 @@
       "all": "すべて",
       "done": "終了"
     },
-    "empty": "現在予想できる試合はありません。"
+    "empty": "現在予想できる試合はありません。",
+    "advanceNeeded": "勝ち上がりを選択",
+    "jokerShort": "ジョーカー",
+    "underdogShort": "大穴"
   },
   "specials": {
     "title": "特別予想",
@@ -289,5 +292,8 @@
     "CALLIT_BET_LOCKED": "この特別予想は締め切られました。",
     "CALLIT_INVALID_VALUE": "無効な選択です。",
     "CALLIT_AUTH_REQUIRED": "ログインしてください。"
+  },
+  "time": {
+    "daysHours": "{{days}}日{{hours}}時間"
   }
 }

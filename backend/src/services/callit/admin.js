@@ -3,7 +3,7 @@ import { computeRanking, getConfig, listSpecialsForUser, loadTournamentState } f
 import { setLock } from './locks.js';
 import { specialTypeOf } from './settings.js';
 import { emitCallitUpdate } from './events.js';
-import { invalidateTournamentContext } from './context.js';
+import { invalidateTournamentContext, loadTournamentBase } from './context.js';
 import { validTipsByMatch } from './scoring.js';
 import { getTournament } from '../tournaments/base.js';
 
@@ -72,8 +72,8 @@ export async function getAdminOverview(tournamentId) {
 }
 
 export async function adminSetLock(tournamentId, code, action) {
-  const state = await loadTournamentState(tournamentId);
-  if (!state.matches.some((match) => match.code === code)) throw new CallitError('CALLIT_MATCH_NOT_FOUND', 'Spiel nicht gefunden.', 404);
+  const base = await loadTournamentBase(tournamentId);
+  if (!base?.matches.some((match) => match.code === code)) throw new CallitError('CALLIT_MATCH_NOT_FOUND', 'Spiel nicht gefunden.', 404);
   const target = action === 'lock' ? 'locked' : action === 'unlock' ? 'unlocked' : action === 'auto' ? null : undefined;
   if (target === undefined) throw new CallitError('CALLIT_INVALID_ACTION', 'Ungültige Aktion.');
   await setLock(tournamentId, code, target, target ? 'manual' : null);

@@ -818,7 +818,14 @@
     "FREE_THROWS_DONE": "Alle Freiwürf sen scho gworfa.",
     "FREE_THROWS_HAS_ATTEMPTS": "Bitte zerscht alle Freiwürf werfa oder zrucknemma.",
     "FREE_THROWS_NO_ATTEMPTS": "S'gibt koin Freiwurf zom Zrucknemma.",
-    "FREE_THROWS_NOT_ACTIVE": "S'laufet koine Freiwürf."
+    "FREE_THROWS_NOT_ACTIVE": "S'laufet koine Freiwürf.",
+    "CALLIT_NICKNAME_TAKEN": "Der Nickname isch scho vergeba.",
+    "CALLIT_INVALID_NICKNAME": "Ungültiger Nickname (3–20 Zeicha).",
+    "CALLIT_TOURNAMENT_NOT_FOUND": "Turnier net gfunda.",
+    "CALLIT_NOT_AVAILABLE": "Tippschbiel isch für des Turnier net aktiv.",
+    "CALLIT_INVALID_VALUE": "Ungültiger Wert.",
+    "CALLIT_MATCH_NOT_FOUND": "Schbiel net gfunda.",
+    "CALLIT_USER_NOT_FOUND": "Nutzer net gfunda."
   },
   "export": {
     "title": "PDF-Export / Drucker",

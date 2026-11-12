@@ -45,6 +45,8 @@ for (const name of ['Adler', 'Biber', 'Chamäleon', 'Dachs']) {
 }
 await setTournamentTeams(tournament.id, teams.map((team, index) => ({ slot_number: index + 1, team_id: team.id })));
 await registerCallitScoreboardHook();
+const { isMatchLocked } = await import('../src/services/callit/locks.js');
+const { normalizeSettings } = await import('../src/services/callit/settings.js');
 
 const schedule = await getTournamentSchedule(tournament.id);
 const groupMatch = schedule.find((entry) => entry.phase === 'group');
@@ -59,11 +61,13 @@ test('Tippspiel ist ohne Freischaltung nicht erreichbar', async () => {
   assert.equal(res.body.code, 'CALLIT_NOT_AVAILABLE');
 });
 
-test('Admin schaltet Tippspiel mit Beitrittscode frei', async () => {
+test('Admin schaltet Tippspiel mit Beitrittscode frei, private Turniere erscheinen nicht in der Liste', async () => {
   const res = await call('PUT', `/callit-admin/tournaments/${TID}`, { body: { enabled: true, joinCode: 'Halle1', settings: { points: { exact: 4 } } } });
   assert.equal(res.status, 200);
   assert.equal(res.body.enabled, true);
-  const list = await call('GET', '/callit/tournaments');
+  const hidden = await createTournament({ name: 'Geheim', group_count: 1, knockout_rounds: 0, team_count: 2, is_public: false, status: 'active' });
+  await call('PUT', `/callit-admin/tournaments/${hidden.id}`, { body: { enabled: true } });
+  const list = await call('GET', '/callit/tournaments?top=3');
   assert.deepEqual(list.body.map((entry) => entry.id), [TID]);
 });
 
@@ -157,6 +161,24 @@ test('Sonderwette: Sieger tippen, ungültige Auswahl abgelehnt', async () => {
   assert.equal(total.status, 200);
 });
 
+test('Laufende Uhr sperrt sofort, auch bei 0:0 und vollem Spielstand', async () => {
+  const state = getState();
+  const other = schedule.filter((entry) => entry.phase === 'group')[2];
+  Object.assign(state, { tournamentId: TID, scheduleCode: other.code, isRunning: true, remainingSeconds: state.durationSeconds, scoreA: 0, scoreB: 0 });
+  const res = await call('PUT', `/callit/tournaments/${TID}/tips/${other.code}`, { token: users.Zocker.token, body: { scoreHome: 1, scoreAway: 0 } });
+  assert.equal(res.status, 409);
+  Object.assign(state, { tournamentId: null, scheduleCode: null, isRunning: false });
+  const { setLock } = await import('../src/services/callit/locks.js');
+  await setLock(TID, other.code, null, null);
+});
+
+test('Gespeichertes Ergebnis bleibt trotz manuellem Entsperren gesperrt', () => {
+  const settings = normalizeSettings({});
+  assert.equal(isMatchLocked({ result: { saved: true } }, { state: 'unlocked' }, settings), true);
+  assert.equal(isMatchLocked({ result: { saved: false, live: true } }, { state: 'unlocked' }, settings), false);
+  assert.equal(isMatchLocked({ result: null }, { state: 'locked' }, settings), true);
+});
+
 test('Anpfiff sperrt Spiel und Sonderwetten, Tipp danach 409', async () => {
   const state = getState();
   Object.assign(state, {
@@ -239,7 +261,7 @@ test('Admin: Sperre aufheben, Teilnehmer ausschließen, CSV, Passwort zurückset
   const unlock = await call('POST', `/callit-admin/tournaments/${TID}/matches/${groupMatch.code}/lock`, { body: { action: 'unlock' } });
   assert.equal(unlock.status, 204);
   const overview = await call('GET', `/callit-admin/tournaments/${TID}`);
-  assert.equal(overview.body.matches.find((m) => m.code === groupMatch.code).locked, false);
+  assert.equal(overview.body.matches.find((m) => m.code === groupMatch.code).locked, true);
   await call('POST', `/callit-admin/tournaments/${TID}/matches/${groupMatch.code}/lock`, { body: { action: 'auto' } });
 
   await call('POST', `/callit-admin/tournaments/${TID}/participants/${users.Orakel.id}/disqualify`, { body: { disqualified: true } });
