@@ -497,12 +497,14 @@ router.post('/shootout/attempt', shootoutAction((body) => recordShootoutAttempt(
 router.post('/shootout/undo', shootoutAction(() => undoShootoutAttempt()));
 router.post('/shootout/cancel', shootoutAction(() => cancelShootout()));
 
+const FREE_THROW_INPUT_ERRORS = ['INVALID_TEAM_SIDE', 'FREE_THROWS_INVALID_TOTAL', 'PLAYER_NOT_IN_TEAM'];
+
 const freeThrowAction = (action) => (req, res) => {
   try {
     res.json(action(req.body ?? {}));
   } catch (error) {
     if (error instanceof FreeThrowError) {
-      return res.status(409).json({ code: error.code, message: error.message });
+      return res.status(FREE_THROW_INPUT_ERRORS.includes(error.code) ? 400 : 409).json({ code: error.code, message: error.message });
     }
     console.error('Freiwürfe fehlgeschlagen:', error);
     res.status(500).json({ code: 'FREE_THROWS_FAILED', message: 'Freiwürfe konnten nicht aktualisiert werden.' });
