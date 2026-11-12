@@ -124,5 +124,10 @@
     "loadStandings": "The standings could not be loaded.",
     "loadStructure": "The tournament structure could not be loaded.",
     "loadSummary": "The tournament overview could not be loaded."
+  },
+  "freeThrows": {
+    "title": "Free throw",
+    "next": "Throw {{current}} of {{total}}",
+    "result": "{{made}} of {{total}} made"
   }
 }

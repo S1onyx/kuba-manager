@@ -124,5 +124,10 @@
     "loadStandings": "D'Tabälle hod ned glade werda kenna.",
     "loadStructure": "D'Turnierstruktur hod ned glade werda kenna.",
     "loadSummary": "D'Turnierübersicht hod ned glade werda kenna."
+  },
+  "freeThrows": {
+    "title": "Freiwurf",
+    "next": "Wurf {{current}} vo {{total}}",
+    "result": "{{made}} vo {{total}} troffa"
   }
 }

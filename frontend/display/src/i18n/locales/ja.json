@@ -120,5 +120,10 @@
     "loadStandings": "順位表を読み込めませんでした。",
     "loadStructure": "トーナメント構成を読み込めませんでした。",
     "loadSummary": "トーナメント概要を読み込めませんでした。"
+  },
+  "freeThrows": {
+    "title": "フリースロー",
+    "next": "{{total}}本中{{current}}本目",
+    "result": "{{total}}本中{{made}}本成功"
   }
 }

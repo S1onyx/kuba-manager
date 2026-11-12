@@ -124,5 +124,10 @@
     "loadStandings": "D'Tabäu het nid chönne glade wärde.",
     "loadStructure": "D'Turnierstruktur het nid chönne glade wärde.",
     "loadSummary": "D'Turnierübersicht het nid chönne glade wärde."
+  },
+  "freeThrows": {
+    "title": "Freiwurf",
+    "next": "Wurf {{current}} vo {{total}}",
+    "result": "{{made}} vo {{total}} troffe"
   }
 }

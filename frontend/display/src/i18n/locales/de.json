@@ -124,5 +124,10 @@
     "loadStandings": "Tabelle konnte nicht geladen werden.",
     "loadStructure": "Turnierstruktur konnte nicht geladen werden.",
     "loadSummary": "Turnierübersicht konnte nicht geladen werden."
+  },
+  "freeThrows": {
+    "title": "Freiwurf",
+    "next": "Wurf {{current}} von {{total}}",
+    "result": "{{made}} von {{total}} getroffen"
   }
 }

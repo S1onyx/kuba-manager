@@ -128,5 +128,10 @@
     "loadStandings": "Tabulku se nepodařilo načíst.",
     "loadStructure": "Strukturu turnaje se nepodařilo načíst.",
     "loadSummary": "Přehled turnaje se nepodařilo načíst."
+  },
+  "freeThrows": {
+    "title": "Trestný hod",
+    "next": "Hod {{current}} z {{total}}",
+    "result": "Proměněno {{made}} z {{total}}"
   }
 }
