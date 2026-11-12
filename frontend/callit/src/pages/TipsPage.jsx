@@ -37,7 +37,11 @@ export default function TipsPage({ id, matches, joined, joinCard }) {
   const live = list.find((match) => match.status === 'live');
   const specialList = specials.data ?? [];
   const openSpecials = specialList.filter((bet) => !bet.locked);
-  const missingSpecials = joined ? openSpecials.filter((bet) => !bet.myValue).length : 0;
+  // Oben nur, was noch fehlt – bereits getippte Sonderwetten wandern in einen zugeklappten Bereich.
+  const todoSpecials = joined ? openSpecials.filter((bet) => !bet.myValue) : openSpecials;
+  const doneSpecials = joined ? openSpecials.filter((bet) => bet.myValue) : [];
+  const missingSpecials = joined ? todoSpecials.length : 0;
+  const pendingCount = list.filter((match) => match.status === 'pending').length;
   const openTotal = openWithoutTip.length + missingSpecials;
   const jokers = matches.data?.jokers;
 
@@ -90,13 +94,28 @@ export default function TipsPage({ id, matches, joined, joinCard }) {
         </span>
       ) : null}
 
-      {openSpecials.length > 0 ? (
+      {todoSpecials.length > 0 ? (
         <>
           <h2 className="section-title">{t('specials.title')}</h2>
-          {openSpecials.map((bet) => (
+          {todoSpecials.map((bet) => (
             <SpecialBetCard key={bet.betKey} tournamentId={id} bet={bet} canTip={joined} onSaved={specials.reload} />
           ))}
         </>
+      ) : null}
+
+      {doneSpecials.length > 0 ? (
+        <details className="card">
+          <summary className="row row--between" style={{ cursor: 'pointer', minHeight: 32 }}>
+            <strong>{t('specials.doneTitle', { count: doneSpecials.length })}</strong>
+            <span className="pill pill--saved">{t('tips.saved')}</span>
+          </summary>
+          <div className="stack" style={{ marginTop: 12 }}>
+            <span className="dim small">{t('specials.doneHint')}</span>
+            {doneSpecials.map((bet) => (
+              <SpecialBetCard key={bet.betKey} tournamentId={id} bet={bet} canTip={joined} onSaved={specials.reload} />
+            ))}
+          </div>
+        </details>
       ) : null}
 
       <div className="chips" role="tablist" style={{ marginTop: 8 }}>
@@ -119,6 +138,13 @@ export default function TipsPage({ id, matches, joined, joinCard }) {
           ))}
         </section>
       ))}
+
+      {activeFilter === 'open' && pendingCount > 0 ? (
+        <button type="button" className="link-row small" onClick={() => setFilter('all')}>
+          <span className="muted">{t('tips.pendingCount', { count: pendingCount })}</span>
+          <span>{t('tips.filters.all')} →</span>
+        </button>
+      ) : null}
 
       {specialList.some((bet) => bet.locked) ? (
         <>

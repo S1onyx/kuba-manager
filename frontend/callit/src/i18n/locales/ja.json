@@ -47,7 +47,9 @@
     "tips": "予想",
     "ranking": "ランキング",
     "stats": "統計",
-    "me": "マイページ"
+    "me": "マイページ",
+    "mainSite": "メインサイトへ",
+    "mainSiteLong": "ライブスコア・日程・順位表は kunstradbasketball.de へ"
   },
   "auth": {
     "login": "ログイン",
@@ -139,7 +141,8 @@
     "empty": "現在予想できる試合はありません。",
     "advanceNeeded": "勝ち上がりを選択",
     "jokerShort": "ジョーカー",
-    "underdogShort": "大穴"
+    "underdogShort": "大穴",
+    "pendingCount_other": "あと{{count}}試合、チームが決まり次第予想できます"
   },
   "specials": {
     "title": "特別予想",
@@ -166,7 +169,9 @@
       "most_penalty_seconds": "ペナルティ秒数が最も多いのは?",
       "group_winner": "グループ1位になるのは?",
       "total_baskets": "総得点(正規時間)はいくつ?一番近い人が勝ち。"
-    }
+    },
+    "doneTitle_other": "特別予想 {{count}}件 予想済み",
+    "doneHint": "最初のキックオフまで変更できます。"
   },
   "ranking": {
     "title": "ランキング",

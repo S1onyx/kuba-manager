@@ -48,7 +48,9 @@
     "tips": "Tippen",
     "ranking": "Ranking",
     "stats": "Statistik",
-    "me": "Ich"
+    "me": "Ich",
+    "mainSite": "Zur Hauptseite",
+    "mainSiteLong": "Live-Ergebnisse, Spielplan & Tabellen auf kunstradbasketball.de"
   },
   "auth": {
     "login": "Anmelden",
@@ -146,7 +148,9 @@
     "empty": "Hier gibt es gerade nichts zu tippen.",
     "advanceNeeded": "Weiterkommer wählen",
     "jokerShort": "Joker",
-    "underdogShort": "Underdog"
+    "underdogShort": "Underdog",
+    "pendingCount_one": "{{count}} weiteres Spiel wird tippbar, sobald die Teams feststehen",
+    "pendingCount_other": "{{count}} weitere Spiele werden tippbar, sobald die Teams feststehen"
   },
   "specials": {
     "title": "Sonderwetten",
@@ -173,7 +177,10 @@
       "most_penalty_seconds": "Wer sammelt die meisten Strafsekunden?",
       "group_winner": "Wer wird Gruppenerster?",
       "total_baskets": "Wie viele Punkte fallen insgesamt (reguläre Spielzeit)? Wer am nächsten dran ist, gewinnt."
-    }
+    },
+    "doneTitle_one": "{{count}} Sonderwette getippt",
+    "doneTitle_other": "{{count}} Sonderwetten getippt",
+    "doneHint": "Bis zum ersten Anpfiff kannst du sie noch ändern."
   },
   "ranking": {
     "title": "Ranking",

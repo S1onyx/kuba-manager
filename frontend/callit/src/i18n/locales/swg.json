@@ -48,7 +48,9 @@
     "tips": "Tippa",
     "ranking": "Ranking",
     "stats": "Statistik",
-    "me": "I"
+    "me": "I",
+    "mainSite": "Zur Hauptseit",
+    "mainSiteLong": "Live-Ergebnis, Schbielplan & Tabella uff kunstradbasketball.de"
   },
   "auth": {
     "login": "Aamelda",
@@ -146,7 +148,9 @@
     "empty": "Grad gibt's nix zum Tippa.",
     "advanceNeeded": "Weiterkommer wähla",
     "jokerShort": "Joker",
-    "underdogShort": "Underdog"
+    "underdogShort": "Underdog",
+    "pendingCount_one": "{{count}} weiters Schbiel wird tippbar, sobald d Teams feschtschdandet",
+    "pendingCount_other": "{{count}} weitere Schbiel werdet tippbar, sobald d Teams feschtschdandet"
   },
   "specials": {
     "title": "Sonderwetta",
@@ -173,7 +177,10 @@
       "most_penalty_seconds": "Wer sammelt d' meischde Schdrofsekonda?",
       "group_winner": "Wer wird Gruppaerschder?",
       "total_baskets": "Wie viel Punkt fallet insgsamt (reguläre Schbielzeit)? Wer am nägschda dra isch, gwinnt."
-    }
+    },
+    "doneTitle_one": "{{count}} Sonderwett tippt",
+    "doneTitle_other": "{{count}} Sonderwetta tippt",
+    "doneHint": "Bis zum erschda Aapfiff kasch se no ändra."
   },
   "ranking": {
     "title": "Ranking",
