@@ -214,7 +214,7 @@ router.get('/tournaments/:id/summary', async (req, res) => {
   }
 
   try {
-    const summary = await getTournamentSummary(id);
+    const summary = await getTournamentSummary(id, { currentSnapshot: getScoreboardState() });
     if (!summary) {
       return res.status(404).json({ code: 'TOURNAMENT_NOT_FOUND', message: 'Turnier nicht gefunden.' });
     }

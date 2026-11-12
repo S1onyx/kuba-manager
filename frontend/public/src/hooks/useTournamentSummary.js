@@ -11,6 +11,8 @@ export function useTournamentSummary(selectedTournamentId) {
   const targetIdRef = useRef(null);
   const initializedRef = useRef(false);
   const fetchingRef = useRef(false);
+  const pendingRef = useRef(false);
+  const refreshRef = useRef(null);
 
   const refresh = useCallback(
     async (explicitId) => {
@@ -24,6 +26,7 @@ export function useTournamentSummary(selectedTournamentId) {
       targetIdRef.current = targetId;
 
       if (fetchingRef.current) {
+        pendingRef.current = true;
         return;
       }
       fetchingRef.current = true;
@@ -45,9 +48,15 @@ export function useTournamentSummary(selectedTournamentId) {
         setLoading(false);
         fetchingRef.current = false;
       }
+      // Während des Abrufs eingetroffene Änderungen sofort nachladen statt bis zum nächsten Intervall zu warten.
+      if (pendingRef.current) {
+        pendingRef.current = false;
+        refreshRef.current?.();
+      }
     },
     []
   );
+  refreshRef.current = refresh;
 
   useEffect(() => {
     targetIdRef.current = selectedTournamentId || null;

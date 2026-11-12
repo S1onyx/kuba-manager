@@ -1,6 +1,7 @@
 import { getTournament } from './base.js';
 import { shootoutSummary } from '../shared/shootout.js';
 import { freeThrowPct, rankFreeThrowShooters, collectTeamFreeThrows } from './freeThrowStats.js';
+import { withLiveGame } from './liveGame.js';
 import { listGamesByTournament } from '../gamesService.js';
 import { listPlayersByTeam } from '../playersService.js';
 import {
@@ -18,13 +19,14 @@ import {
 } from './standings.js';
 import { canonicalGroupLabel, createGroupLabels, describeStageLabel } from './helpers.js';
 
-export async function getTournamentSummary(tournamentId) {
+export async function getTournamentSummary(tournamentId, { currentSnapshot } = {}) {
   const tournament = await getTournament(tournamentId);
   if (!tournament || !tournament.is_public) {
     return null;
   }
 
   const games = await listGamesByTournament(tournament.id);
+  const statGames = withLiveGame(games, currentSnapshot, tournament.id);
   const participants = await getTournamentTeams(tournament.id);
   const scheduleEntries = await getTournamentSchedule(tournament.id);
   const schedule = groupScheduleByPhase(scheduleEntries);
@@ -191,7 +193,7 @@ export async function getTournamentSummary(tournamentId) {
   };
 
   const totals = {
-    totalGames: games.length,
+    totalGames: statGames.length,
     totalGoals: 0,
     totalPenalties: 0,
     totalPenaltySeconds: 0,
@@ -276,7 +278,7 @@ const registerPlayerStats = (teamId, teamName, stats = []) => {
     });
 };
 
-  games.forEach((game) => {
+  statGames.forEach((game) => {
     const penalties = game.penalties ?? { a: [], b: [] };
     totals.totalGoals += (game.score_a ?? 0) + (game.score_b ?? 0);
     totals.totalPenalties += (penalties.a?.length ?? 0) + (penalties.b?.length ?? 0);
@@ -314,7 +316,10 @@ const registerPlayerStats = (teamId, teamName, stats = []) => {
 
     incrementTeamGames(game.team_a_id, game.team_a);
     incrementTeamGames(game.team_b_id, game.team_b);
+  });
 
+  // Platzierungen nur aus gespeicherten Ergebnissen – ein laufendes Spiel entscheidet noch nichts.
+  games.forEach((game) => {
     const outcome = determineOutcome(game);
     if (outcome) {
       const label = game.stage_label || '';
@@ -469,7 +474,7 @@ const topFreeThrowShooters = rankFreeThrowShooters(playerOverview);
     return a.team.localeCompare(b.team, 'de', { sensitivity: 'base' });
   });
 
-  const teamFreeThrows = collectTeamFreeThrows(games);
+  const teamFreeThrows = collectTeamFreeThrows(statGames);
   overallStats.forEach((entry) => {
     const { freeThrowsAttempted = 0, freeThrowsMade = 0 } = teamFreeThrows.get(entry.team) ?? {};
     Object.assign(entry, { freeThrowsAttempted, freeThrowsMade, freeThrowPct: freeThrowPct(freeThrowsMade, freeThrowsAttempted) });
@@ -525,7 +530,7 @@ const topFreeThrowShooters = rankFreeThrowShooters(playerOverview);
 
   for (const canonical of orderedCanonicals) {
     const display = groupLabelMap.get(canonical) || `Gruppe ${canonical}`;
-    const { standings, recordedGamesCount } = await computeGroupStandings(tournament.id, canonical, {});
+    const { standings, recordedGamesCount } = await computeGroupStandings(tournament.id, canonical, { currentSnapshot });
     groups.push({
       label: display,
       labelI18n: describeStageLabel('group', display, { group: canonical }),
