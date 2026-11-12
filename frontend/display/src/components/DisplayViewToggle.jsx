@@ -25,9 +25,9 @@ export default function DisplayViewToggle({ displayView, style = {} }) {
   const { t } = useTranslation();
   const [pending, setPending] = useState(false);
 
-  const nextView = displayView === 'bracket' ? 'scoreboard' : 'bracket';
+  const nextView = displayView === 'scoreboard' ? 'bracket' : 'scoreboard';
   const label = useMemo(
-    () => (displayView === 'bracket' ? t('controls.showLive') : t('controls.showBracket')),
+    () => (displayView !== 'scoreboard' ? t('controls.showLive') : t('controls.showBracket')),
     [displayView, t]
   );
 

@@ -5,6 +5,7 @@ import FullscreenToggle from './components/FullscreenToggle.jsx';
 import DisplayViewToggle from './components/DisplayViewToggle.jsx';
 import BracketPage from './components/pages/BracketPage.jsx';
 import ScoreboardPage from './components/pages/ScoreboardPage.jsx';
+import CallitPage from './components/pages/CallitPage.jsx';
 import useBodyScrollLock from './hooks/useBodyScrollLock.js';
 import useDisplayScaling from './hooks/useDisplayScaling.js';
 import useMediaQuery from './hooks/useMediaQuery.js';
@@ -60,7 +61,7 @@ export default function App() {
     typeof document !== 'undefined' ? Boolean(document.fullscreenElement) : false
   );
 
-  const normalizedView = displayView === 'bracket' ? 'bracket' : 'scoreboard';
+  const normalizedView = displayView === 'bracket' || displayView === 'callit' ? displayView : 'scoreboard';
   const effectiveDisplayView =
     mirrorMode && (normalizedView === 'bracket' || normalizedView === 'scoreboard')
       ? normalizedView === 'bracket'
@@ -116,7 +117,9 @@ export default function App() {
   const autoFullscreen = searchParams?.has('fullscreen');
 
   const activeContent =
-    effectiveDisplayView === 'bracket' ? (
+    effectiveDisplayView === 'callit' ? (
+      <CallitPage scoreboard={scoreboard} />
+    ) : effectiveDisplayView === 'bracket' ? (
       <BracketPage
         scoreboard={scoreboard}
         error={scoreboardError}

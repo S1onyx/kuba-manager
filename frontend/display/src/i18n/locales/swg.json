@@ -129,5 +129,23 @@
     "title": "Freiwurf",
     "next": "Wurf {{current}} vo {{total}}",
     "result": "{{made}} vo {{total}} troffa"
+  },
+  "callit": {
+    "title": "Tippschbiel-Ranking",
+    "live": "LIVE",
+    "liveMatch": "Lauft: {{home}} {{score}} {{away}} – Punkt zählet vorläufig",
+    "join": "Jetzt mittippa!",
+    "participants_one": "{{count}} Tipper",
+    "participants_other": "{{count}} Tipper",
+    "rowDetail": "{{exact}}× exakt · {{diff}}× Differenz · {{tendency}}× Tendenz",
+    "livePlus": "live +{{points}}",
+    "exactKing": "Exakt-Keenig",
+    "underdogKing": "Underdog-Keenig",
+    "climber": "Aufschdeiger",
+    "empty": "No koine Tipper – scanna ond mitmacha!",
+    "loading": "Lad Tippschbiel …",
+    "loadError": "Tippschbiel hot net glada werra könna.",
+    "notEnabled": "Für des Turnier isch koi Tippschbiel aktiv.",
+    "noTournament": "Koi Turnier fürs Tippschbiel gwählt."
   }
 }

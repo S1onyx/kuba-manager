@@ -9,7 +9,8 @@
 
 http://kunstradbasketball.de, http://www.kunstradbasketball.de,
 http://display.kunstradbasketball.de, http://admin.kunstradbasketball.de,
-http://audio.kunstradbasketball.de, http://dashboard.kunstradbasketball.de {
+http://audio.kunstradbasketball.de, http://dashboard.kunstradbasketball.de,
+http://callit.kunstradbasketball.de {
   redir https://{host}{uri} 301
 }
 
@@ -101,6 +102,36 @@ admin.kunstradbasketball.de {
 
   handle {
     reverse_proxy admin-frontend:80
+  }
+}
+
+callit.kunstradbasketball.de {
+  encode gzip zstd
+
+  header {
+    Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "SAMEORIGIN"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    -Server
+  }
+
+  handle /api/* {
+    reverse_proxy backend:3000
+  }
+
+  handle /media/* {
+    reverse_proxy backend:3000
+  }
+
+  handle /socket.io/* {
+    reverse_proxy backend:3000
+  }
+
+  import frontend_cache
+
+  handle {
+    reverse_proxy callit-frontend:80
   }
 }
 

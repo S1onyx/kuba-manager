@@ -55,11 +55,13 @@
     "players": "Spieler",
     "teams": "Teams",
     "tournaments": "Turniere",
-    "export": "PDF-Export / Drucken"
+    "export": "PDF-Export / Drucken",
+    "callit": "Tippspiel"
   },
   "displayViews": {
     "scoreboard": "Live-Spielstand",
-    "bracket": "Turnierbaum"
+    "bracket": "Turnierbaum",
+    "callit": "Tippspiel-Ranking"
   },
   "penaltyPresets": {
     "minutes_one": "{{count}} Minute",
@@ -122,7 +124,8 @@
       "description": "Wechsle zwischen Live-Spielstand und Turnierbaum auf dem Beamer.",
       "bracketHint": "Für den Turnierbaum zuerst das Turnier wählen:",
       "chooseTournament": "Turnier wählen …",
-      "updating": "Anzeige wird aktualisiert..."
+      "updating": "Anzeige wird aktualisiert...",
+      "callitHint": "Tippspiel-Ranking für dieses Turnier zeigen:"
     },
     "context": {
       "title": "Match-Kontext",
@@ -688,7 +691,8 @@
     "timerCuesSaved": "Timer-Einstellungen gespeichert.",
     "timerCuesSaveFailed": "Timer-Einstellungen konnten nicht gespeichert werden.",
     "audioLoadFailed": "Audiodaten konnten nicht geladen werden.",
-    "penaltyFreeThrowsSkipped": "Zeitstrafe für Team {{team}} hinzugefügt – Freiwürfe nicht angelegt, weil noch eine Serie offen ist."
+    "penaltyFreeThrowsSkipped": "Zeitstrafe für Team {{team}} hinzugefügt – Freiwürfe nicht angelegt, weil noch eine Serie offen ist.",
+    "displayNowCallit": "Beamer zeigt jetzt das Tippspiel-Ranking."
   },
   "error": {
     "generic": "Ein Fehler ist aufgetreten. Bitte versuche es erneut.",
@@ -814,7 +818,14 @@
     "FREE_THROWS_DONE": "Alle Freiwürfe wurden bereits geworfen.",
     "FREE_THROWS_HAS_ATTEMPTS": "Bitte zuerst alle Freiwürfe werfen oder zurücknehmen.",
     "FREE_THROWS_NO_ATTEMPTS": "Es gibt keinen Freiwurf zum Zurücknehmen.",
-    "FREE_THROWS_NOT_ACTIVE": "Es laufen keine Freiwürfe."
+    "FREE_THROWS_NOT_ACTIVE": "Es laufen keine Freiwürfe.",
+    "CALLIT_NICKNAME_TAKEN": "Dieser Nickname ist bereits vergeben.",
+    "CALLIT_INVALID_NICKNAME": "Ungültiger Nickname (3–20 Zeichen).",
+    "CALLIT_TOURNAMENT_NOT_FOUND": "Turnier nicht gefunden.",
+    "CALLIT_NOT_AVAILABLE": "Tippspiel ist für dieses Turnier nicht aktiv.",
+    "CALLIT_INVALID_VALUE": "Ungültiger Wert.",
+    "CALLIT_MATCH_NOT_FOUND": "Spiel nicht gefunden.",
+    "CALLIT_USER_NOT_FOUND": "Nutzer nicht gefunden."
   },
   "export": {
     "title": "PDF-Export / Drucken",
@@ -890,5 +901,128 @@
     "emptyHint": "Turnier auswaehlen um Druckvorlagen zu sehen",
     "collapse": "Einklappen",
     "expand": "Aufklappen"
+  },
+  "callit": {
+    "title": "Tippspiel CallIt",
+    "description": "Tippspiel pro Turnier steuern: Freischaltung, Punkte, Sperren, Sonderwetten und Teilnehmer.",
+    "active": "aktiv",
+    "loading": "Lade Tippspiel …",
+    "statusTitle": "Status",
+    "statusOn": "Tippspiel ist aktiv · {{count}} Teilnehmer",
+    "statusOff": "Tippspiel ist für dieses Turnier aus.",
+    "enable": "Tippspiel aktivieren",
+    "disable": "Tippspiel deaktivieren",
+    "notPublic": "Turnier ist privat – der Link auf der Hauptseite erscheint erst, wenn das Turnier öffentlich ist.",
+    "registrationOpen": "Anmeldung offen",
+    "joinCode": "Beitrittscode (optional)",
+    "joinCodePlaceholder": "leer = ohne Code",
+    "saveJoinCode": "Code speichern",
+    "copyLink": "Link kopieren",
+    "copied": "Link kopiert.",
+    "beamerOn": "Ranking auf Beamer",
+    "beamerOff": "Beamer zurück zum Scoreboard",
+    "exportCsv": "CSV-Export",
+    "refresh": "Aktualisieren",
+    "saved": "Gespeichert.",
+    "loadFailed": "Tippspiel konnte nicht geladen werden.",
+    "actionFailed": "Aktion fehlgeschlagen.",
+    "settings": {
+      "title": "Regeln & Punkte",
+      "description": "Alle Werte gelten sofort – Punkte werden live neu berechnet.",
+      "points": "Spielpunkte",
+      "exact": "Exakt",
+      "diff": "Richtige Differenz",
+      "tendency": "Richtige Tendenz",
+      "koAdvance": "KO-Weiterkommer (Bonus)",
+      "multipliers": "Multiplikatoren",
+      "phase": {
+        "group": "Gruppe",
+        "knockout": "KO",
+        "placement": "Platzierung",
+        "final": "Finale"
+      },
+      "jokerEnabled": "Joker aktiv",
+      "jokerPerPhase": "Joker pro Phase",
+      "underdogEnabled": "Underdog-Bonus aktiv",
+      "underdogThreshold": "Schwelle (%)",
+      "underdogMinTips": "Mindestanzahl Tipps",
+      "underdogBonus": "Bonuspunkte",
+      "lockAtScheduled": "Spiele zusätzlich zur geplanten Uhrzeit sperren (sonst erst beim Anpfiff)",
+      "specials": "Sonderwetten",
+      "specialPoints": "Punkte",
+      "deadline": "Frist (optional)",
+      "deadlineHint": "Ohne Frist schließen Sonderwetten beim ersten Anpfiff des Turniers.",
+      "rulesText": "Hinweise / Preise (für Tipper sichtbar)"
+    },
+    "specialTypes": {
+      "winner": "Turniersieger",
+      "top_scorer": "Topscorer",
+      "most_penalty_seconds": "Meiste Strafsekunden",
+      "group_winner": "Gruppensieger",
+      "group_winner_label": "Gruppensieger {{group}}",
+      "total_baskets": "Gesamtpunkte"
+    },
+    "matches": {
+      "title": "Spiele & Sperren",
+      "description": "Spiele sperren automatisch beim Anpfiff. Manuell sperren/entsperren überschreibt das (z. B. falscher Spielcode).",
+      "match": "Spiel",
+      "time": "Zeit",
+      "status": "Status",
+      "tips": "Tipps",
+      "actions": "Aktionen",
+      "lock": "Sperren",
+      "unlock": "Entsperren",
+      "auto": "Automatik",
+      "locked": "Spiel gesperrt.",
+      "unlocked": "Spiel entsperrt."
+    },
+    "status": {
+      "pending": "Teams offen",
+      "open": "Offen",
+      "locked": "Gesperrt",
+      "live": "Live",
+      "finished": "Beendet"
+    },
+    "lockReason": {
+      "kickoff": "Anpfiff",
+      "manual": "manuell",
+      "unlocked": "manuell entsperrt"
+    },
+    "specials": {
+      "title": "Sonderwetten-Ergebnisse",
+      "description": "Werden automatisch aus den Turnierdaten ermittelt. Bei Bedarf hier überschreiben.",
+      "none": "Keine Sonderwetten aktiv.",
+      "locked": "geschlossen",
+      "open": "offen",
+      "result": "Ergebnis",
+      "provisional": "vorläufig",
+      "overridePlaceholder": "Wert eintragen",
+      "saveOverride": "Ergebnis festlegen",
+      "resetOverride": "Automatik",
+      "overrideActive": "Manuelles Ergebnis aktiv.",
+      "overrideHint": "Mehrfachauswahl möglich (Gleichstand)."
+    },
+    "participants": {
+      "title": "Teilnehmer",
+      "description": "Nicknames moderieren, Passwörter zurücksetzen, Teilnehmer ausschließen.",
+      "search": "Nickname suchen …",
+      "empty": "Noch keine Teilnehmer.",
+      "banned": "gesperrt",
+      "disqualified": "ausgeschlossen",
+      "meta": "{{points}} Pkt. · {{tips}} Tipps · letzter Login {{login}}",
+      "rename": "Umbenennen",
+      "renamePrompt": "Neuer Nickname:",
+      "resetPassword": "Passwort zurücksetzen",
+      "resetConfirm": "Passwort von {{name}} zurücksetzen? Alle Sitzungen werden beendet.",
+      "resetResult": "Temporäres Passwort für {{name}} (nur jetzt sichtbar):",
+      "disqualify": "Ausschließen",
+      "requalify": "Wieder zulassen",
+      "ban": "Konto sperren",
+      "unban": "Konto entsperren",
+      "remove": "Aus Tippspiel entfernen",
+      "removeConfirm": "{{name}} samt Tipps aus diesem Tippspiel entfernen?",
+      "deleteAccount": "Konto löschen",
+      "deleteConfirm": "Konto {{name}} mit allen Tipps in allen Turnieren endgültig löschen?"
+    }
   }
 }

@@ -55,11 +55,13 @@
     "players": "Spieler",
     "teams": "Teams",
     "tournaments": "Turniere",
-    "export": "PDF-Export / Drucker"
+    "export": "PDF-Export / Drucker",
+    "callit": "Tippschbiel"
   },
   "displayViews": {
     "scoreboard": "Live-Spielstand",
-    "bracket": "Turnierbaum"
+    "bracket": "Turnierbaum",
+    "callit": "Tippschbiel-Ranking"
   },
   "penaltyPresets": {
     "minutes_one": "{{count}} Minute",
@@ -122,7 +124,8 @@
       "description": "Wechsel zwische Live-Spielstand ond Turnierbaum uff'm Beamer.",
       "bracketHint": "Fürs Turnierbaum zerscht s'Turnier wähla:",
       "chooseTournament": "Turnier wähla …",
-      "updating": "Anzeig wird aktualisiert..."
+      "updating": "Anzeig wird aktualisiert...",
+      "callitHint": "Tippschbiel-Ranking für des Turnier zeiga:"
     },
     "context": {
       "title": "Match-Kontext",
@@ -688,7 +691,8 @@
     "timerCuesSaved": "Timer-Eistellunge gsichert.",
     "timerCuesSaveFailed": "Timer-Eistellunge hen net gsichert werda könna.",
     "audioLoadFailed": "Audiodatä hen net gladä werda könna.",
-    "penaltyFreeThrowsSkipped": "Zeitstraf für Team {{team}} dazua gdo – Freiwürf ned aglegt, weil no a Serie offa isch."
+    "penaltyFreeThrowsSkipped": "Zeitstraf für Team {{team}} dazua gdo – Freiwürf ned aglegt, weil no a Serie offa isch.",
+    "displayNowCallit": "Dr Beamer zeigt jetzt s Tippschbiel-Ranking."
   },
   "error": {
     "generic": "A Fehler isch passiert. Bittschön versuch's nomol.",
@@ -814,7 +818,14 @@
     "FREE_THROWS_DONE": "Alle Freiwürf sen scho gworfa.",
     "FREE_THROWS_HAS_ATTEMPTS": "Bitte zerscht alle Freiwürf werfa oder zrucknemma.",
     "FREE_THROWS_NO_ATTEMPTS": "S'gibt koin Freiwurf zom Zrucknemma.",
-    "FREE_THROWS_NOT_ACTIVE": "S'laufet koine Freiwürf."
+    "FREE_THROWS_NOT_ACTIVE": "S'laufet koine Freiwürf.",
+    "CALLIT_NICKNAME_TAKEN": "Der Nickname isch scho vergeba.",
+    "CALLIT_INVALID_NICKNAME": "Ungültiger Nickname (3–20 Zeicha).",
+    "CALLIT_TOURNAMENT_NOT_FOUND": "Turnier net gfunda.",
+    "CALLIT_NOT_AVAILABLE": "Tippschbiel isch für des Turnier net aktiv.",
+    "CALLIT_INVALID_VALUE": "Ungültiger Wert.",
+    "CALLIT_MATCH_NOT_FOUND": "Schbiel net gfunda.",
+    "CALLIT_USER_NOT_FOUND": "Nutzer net gfunda."
   },
   "export": {
     "title": "PDF-Export / Drucker",
@@ -890,5 +901,128 @@
     "emptyHint": "Turnier auswaehla zum Druckvorlaga agucka",
     "collapse": "Zuklappa",
     "expand": "Ufklappa"
+  },
+  "callit": {
+    "title": "Tippschbiel CallIt",
+    "description": "Tippschbiel pro Turnier schdeira: Freischaltung, Punkt, Schberra, Sonderwetta ond Teilnehmer.",
+    "active": "aktiv",
+    "loading": "Lad Tippschbiel …",
+    "statusTitle": "Schdatus",
+    "statusOn": "Tippschbiel isch aktiv · {{count}} Teilnehmer",
+    "statusOff": "Tippschbiel isch für des Turnier aus.",
+    "enable": "Tippschbiel aktiviera",
+    "disable": "Tippschbiel deaktiviera",
+    "notPublic": "S Turnier isch privat – dr Link uff dr Hauptseit kommt erscht, wenn s Turnier öffentlich isch.",
+    "registrationOpen": "Aameldung offa",
+    "joinCode": "Beitrittscode (optional)",
+    "joinCodePlaceholder": "leer = ohne Code",
+    "saveJoinCode": "Code schbeichra",
+    "copyLink": "Link kopiera",
+    "copied": "Link kopiert.",
+    "beamerOn": "Ranking uff da Beamer",
+    "beamerOff": "Beamer zrück zum Scoreboard",
+    "exportCsv": "CSV-Export",
+    "refresh": "Aktualisiera",
+    "saved": "Gschbeichert.",
+    "loadFailed": "Tippschbiel hot net glada werra könna.",
+    "actionFailed": "Aktion isch schiefganga.",
+    "settings": {
+      "title": "Regla & Punkt",
+      "description": "Älle Werte geltet sofort – d Punkt werdet live nei grechnet.",
+      "points": "Schbielpunkt",
+      "exact": "Exakt",
+      "diff": "Richtige Differenz",
+      "tendency": "Richtige Tendenz",
+      "koAdvance": "KO-Weiterkommer (Bonus)",
+      "multipliers": "Multiplikatora",
+      "phase": {
+        "group": "Grupp",
+        "knockout": "KO",
+        "placement": "Blatzierung",
+        "final": "Finale"
+      },
+      "jokerEnabled": "Joker aktiv",
+      "jokerPerPhase": "Joker pro Phase",
+      "underdogEnabled": "Underdog-Bonus aktiv",
+      "underdogThreshold": "Schwelle (%)",
+      "underdogMinTips": "Mindeschtzahl Tipps",
+      "underdogBonus": "Bonuspunkt",
+      "lockAtScheduled": "Schbiel au zur gplante Uhrzeit schberra (sonscht erscht beim Aapfiff)",
+      "specials": "Sonderwetta",
+      "specialPoints": "Punkt",
+      "deadline": "Frischt (optional)",
+      "deadlineHint": "Ohne Frischt gehet Sonderwetta beim erschda Aapfiff vom Turnier zua.",
+      "rulesText": "Hinweis / Preis (für Tipper sichtbar)"
+    },
+    "specialTypes": {
+      "winner": "Turniersieger",
+      "top_scorer": "Topscorer",
+      "most_penalty_seconds": "Meischde Schdrofsekonda",
+      "group_winner": "Gruppasieger",
+      "group_winner_label": "Gruppasieger {{group}}",
+      "total_baskets": "Gsamtpunkt"
+    },
+    "matches": {
+      "title": "Schbiel & Schberra",
+      "description": "Schbiel schberret automatisch beim Aapfiff. Manuell schberra/entschberra goht vor (z. B. falscher Schbielcode).",
+      "match": "Schbiel",
+      "time": "Zeit",
+      "status": "Schdatus",
+      "tips": "Tipps",
+      "actions": "Aktiona",
+      "lock": "Schberra",
+      "unlock": "Entschberra",
+      "auto": "Automatik",
+      "locked": "Schbiel gschberrt.",
+      "unlocked": "Schbiel entschberrt."
+    },
+    "status": {
+      "pending": "Teams offa",
+      "open": "Offa",
+      "locked": "Gschberrt",
+      "live": "Live",
+      "finished": "Rum"
+    },
+    "lockReason": {
+      "kickoff": "Aapfiff",
+      "manual": "manuell",
+      "unlocked": "manuell entschberrt"
+    },
+    "specials": {
+      "title": "Sonderwetta-Ergebnis",
+      "description": "Werdet automatisch aus de Turnierdata ermittelt. Wenn nötig, do überschreiba.",
+      "none": "Koine Sonderwetta aktiv.",
+      "locked": "zua",
+      "open": "offa",
+      "result": "Ergebnis",
+      "provisional": "vorläufig",
+      "overridePlaceholder": "Wert eitraga",
+      "saveOverride": "Ergebnis feschtlega",
+      "resetOverride": "Automatik",
+      "overrideActive": "Manuells Ergebnis aktiv.",
+      "overrideHint": "Mehrfachauswahl möglich (Gleichschdand)."
+    },
+    "participants": {
+      "title": "Teilnehmer",
+      "description": "Nicknames moderiera, Passwörter zrücksetza, Teilnehmer ausschließa.",
+      "search": "Nickname sucha …",
+      "empty": "No koine Teilnehmer.",
+      "banned": "gschberrt",
+      "disqualified": "ausgschlossa",
+      "meta": "{{points}} Pkt. · {{tips}} Tipps · letschder Login {{login}}",
+      "rename": "Umbenenna",
+      "renamePrompt": "Neier Nickname:",
+      "resetPassword": "Passwort zrücksetza",
+      "resetConfirm": "Passwort vo {{name}} zrücksetza? Älle Sitzunga werdet beendet.",
+      "resetResult": "Temporärs Passwort für {{name}} (bloß jetzt sichtbar):",
+      "disqualify": "Ausschließa",
+      "requalify": "Wieder zulassa",
+      "ban": "Konto schberra",
+      "unban": "Konto entschberra",
+      "remove": "Aus em Tippschbiel nehma",
+      "removeConfirm": "{{name}} mitsamt Tipps aus dem Tippschbiel nehma?",
+      "deleteAccount": "Konto lösche",
+      "deleteConfirm": "Konto {{name}} mit älle Tipps in älle Turnier endgültig lösche?"
+    }
   }
 }

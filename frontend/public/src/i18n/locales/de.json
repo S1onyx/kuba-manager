@@ -340,5 +340,15 @@
     "title": "Freiwurf",
     "next": "Wurf {{current}} von {{total}}",
     "result": "{{made}} von {{total}} getroffen"
+  },
+  "callit": {
+    "badge": "Tippspiel",
+    "title": "Tipp mit und schlag die Halle!",
+    "text": "Spielstände tippen, Sonderwetten abgeben, live im Ranking mitfiebern – kostenlos, nur mit Nickname.",
+    "cta": "Jetzt mittippen",
+    "participants_one": "{{count}} Tipper dabei",
+    "participants_other": "{{count}} Tipper dabei",
+    "leaders": "Aktuelle Spitze",
+    "points": "{{points}} Pkt."
   }
 }

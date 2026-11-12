@@ -1,7 +1,7 @@
 import { evaluateShootout } from './shootoutRules.js';
 
 const DEFAULT_DURATION_SECONDS = 10 * 60;
-const DISPLAY_VIEWS = ['scoreboard', 'bracket'];
+const DISPLAY_VIEWS = ['scoreboard', 'bracket', 'callit'];
 const DEFAULT_DISPLAY_VIEW = DISPLAY_VIEWS[0];
 
 const TEAM_KEYS = ['a', 'b'];
@@ -160,6 +160,7 @@ function createDefaultState(overrides = {}) {
         ? Math.max(0, Math.trunc(Number(overrides.scheduleVersion) || 0))
         : 0,
     displayView: DEFAULT_DISPLAY_VIEW,
+    displayCallitTournamentId: null,
     lastUpdated: new Date().toISOString(),
     players: {
       a: [],

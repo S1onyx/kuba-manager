@@ -26,7 +26,14 @@ export default function DisplaySettingsCard() {
             <button
               key={option.id}
               type="button"
-              onClick={() => handleDisplayViewChange(option.id)}
+              onClick={() =>
+                handleDisplayViewChange(
+                  option.id,
+                  option.id === 'callit'
+                    ? { callitTournamentId: scoreboard?.displayCallitTournamentId ?? scoreboard?.tournamentId ?? undefined }
+                    : undefined
+                )
+              }
               disabled={isActive || displayViewPending}
               style={{
                 padding: '0.65rem 1.3rem',
@@ -47,6 +54,22 @@ export default function DisplaySettingsCard() {
         <label style={{ display: 'grid', gap: '0.35rem', color: 'var(--warning)', fontSize: '0.9rem' }}>
           {t('control.display.bracketHint')}
           <select value="" onChange={(event) => event.target.value && handleContextTournamentSet(event.target.value)}>
+            <option value="">{t('control.display.chooseTournament')}</option>
+            {tournaments.map((tournament) => (
+              <option key={tournament.id} value={tournament.id}>
+                {tournament.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : null}
+      {displayView === 'callit' ? (
+        <label style={{ display: 'grid', gap: '0.35rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+          {t('control.display.callitHint')}
+          <select
+            value={scoreboard?.displayCallitTournamentId ?? ''}
+            onChange={(event) => event.target.value && handleDisplayViewChange('callit', { callitTournamentId: Number(event.target.value) })}
+          >
             <option value="">{t('control.display.chooseTournament')}</option>
             {tournaments.map((tournament) => (
               <option key={tournament.id} value={tournament.id}>

@@ -133,5 +133,25 @@
     "title": "Trestný hod",
     "next": "Hod {{current}} z {{total}}",
     "result": "Proměněno {{made}} z {{total}}"
+  },
+  "callit": {
+    "title": "Pořadí tipovačky",
+    "live": "ŽIVĚ",
+    "liveMatch": "Právě: {{home}} {{score}} {{away}} – body předběžně",
+    "join": "Tipuj s námi!",
+    "participants_one": "{{count}} tipér",
+    "participants_few": "{{count}} tipéři",
+    "participants_many": "{{count}} tipérů",
+    "participants_other": "{{count}} tipérů",
+    "rowDetail": "{{exact}}× přesně · {{diff}}× rozdíl · {{tendency}}× tendence",
+    "livePlus": "živě +{{points}}",
+    "exactKing": "Král přesnosti",
+    "underdogKing": "Král outsiderů",
+    "climber": "Skokan",
+    "empty": "Zatím žádní tipéři – naskenuj a hraj!",
+    "loading": "Načítám tipovačku …",
+    "loadError": "Tipovačku se nepodařilo načíst.",
+    "notEnabled": "Pro tento turnaj není tipovačka aktivní.",
+    "noTournament": "Pro tipovačku není vybrán turnaj."
   }
 }

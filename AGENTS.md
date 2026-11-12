@@ -11,3 +11,9 @@
 - Reglement-Inhalt: `frontend/public/src/components/reglement/content.<lang>.js`, PDF unter `frontend/public/public/reglement/`. Word-PDFs immer über "Speichern unter → PDF" exportieren (nicht Drucken), sonst fehlen eingebettete Schriften.
 - Lokaler Dev-Login (ohne `ADMIN_PASSWORD_HASH`): Benutzer `admin`, Passwort siehe `DEV_FALLBACK_PASSWORD` in `backend/src/auth/index.js`; API erwartet `Authorization: Bearer <token>`.
 - Commits ohne KI-Attribution.
+
+## Tippspiel CallIt
+- Backend: `backend/src/services/callit/*` (reine Punkte-Logik in `scoring.js`, Turnierdaten-Adapter in `context.js`, Sperren in `locks.js`), Routen `/api/callit` und `/api/callit-admin` (Admin-Login). Tests: `test/callitScoring.test.js`, `test/callitApi.test.js`.
+- Frontend `frontend/callit` (Dev-Port 5177). Beamer-Ansicht `displayView = 'callit'` mit `displayCallitTournamentId`.
+- Socket-Clients mit `query.client = 'callit'` bekommen keinen Scoreboard-Stream, nur `callit:update`.
+- DNS-A-Record `callit.kunstradbasketball.de` muss auf den Server zeigen, sonst bekommt Caddy kein Zertifikat.

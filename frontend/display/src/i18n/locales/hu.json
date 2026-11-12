@@ -129,5 +129,23 @@
     "title": "Büntetődobás",
     "next": "{{current}}. dobás / {{total}}",
     "result": "{{total}}-ből {{made}} sikeres"
+  },
+  "callit": {
+    "title": "Tippjáték-rangsor",
+    "live": "ÉLŐ",
+    "liveMatch": "Most: {{home}} {{score}} {{away}} – a pontok ideiglenesek",
+    "join": "Tippelj te is!",
+    "participants_one": "{{count}} tippelő",
+    "participants_other": "{{count}} tippelő",
+    "rowDetail": "{{exact}}× pontos · {{diff}}× különbség · {{tendency}}× kimenetel",
+    "livePlus": "élő +{{points}}",
+    "exactKing": "Pontos király",
+    "underdogKing": "Esélytelen-király",
+    "climber": "Legnagyobb előrelépés",
+    "empty": "Még nincs tippelő – szkenneld és csatlakozz!",
+    "loading": "Tippjáték betöltése …",
+    "loadError": "A tippjáték nem tölthető be.",
+    "notEnabled": "Ennél a tornánál nincs aktív tippjáték.",
+    "noTournament": "Nincs kiválasztott torna a tippjátékhoz."
   }
 }

@@ -592,18 +592,21 @@ export default function useScoreboardCore({ updateMessage }) {
   );
 
   const handleDisplayViewChange = useCallback(
-    async (targetView) => {
+    async (targetView, { callitTournamentId } = {}) => {
       const normalized = typeof targetView === 'string' ? targetView : '';
-      if (!normalized || scoreboard?.displayView === normalized) {
+      const callitChanged = callitTournamentId && scoreboard?.displayCallitTournamentId !== Number(callitTournamentId);
+      if (!normalized || (scoreboard?.displayView === normalized && !callitChanged)) {
         return;
       }
 
       setDisplayViewPending(true);
       try {
-        await setDisplayView(normalized);
+        await setDisplayView(normalized, { callitTournamentId });
         updateMessage('info', normalized === 'scoreboard'
           ? t('feedback.displayNowScoreboard')
-          : t('feedback.displayNowBracket'));
+          : normalized === 'callit'
+            ? t('feedback.displayNowCallit')
+            : t('feedback.displayNowBracket'));
       } catch (err) {
         console.error(err);
         updateMessage('error', formatApiError(err, t, 'feedback.displayUpdateFailed'));
@@ -611,7 +614,7 @@ export default function useScoreboardCore({ updateMessage }) {
         setDisplayViewPending(false);
       }
     },
-    [scoreboard?.displayView, updateMessage, t]
+    [scoreboard?.displayView, scoreboard?.displayCallitTournamentId, updateMessage, t]
   );
 
 

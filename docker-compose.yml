@@ -39,6 +39,12 @@ services:
     networks:
       - app
 
+  callit-frontend:
+    image: ${IMAGE_REGISTRY:-your-dockerhub-username}/kuba-callit:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    networks:
+      - app
+
   plausible-db:
     image: postgres:16-alpine
     restart: unless-stopped
@@ -114,6 +120,7 @@ services:
       - display-frontend
       - admin-frontend
       - audio-frontend
+      - callit-frontend
       - plausible
     ports:
       - "80:80"

@@ -129,5 +129,23 @@
     "title": "Lancer franc",
     "next": "Lancer {{current}} sur {{total}}",
     "result": "{{made}} sur {{total}} réussis"
+  },
+  "callit": {
+    "title": "Classement des pronostics",
+    "live": "LIVE",
+    "liveMatch": "En cours : {{home}} {{score}} {{away}} – points provisoires",
+    "join": "Viens pronostiquer !",
+    "participants_one": "{{count}} joueur",
+    "participants_other": "{{count}} joueurs",
+    "rowDetail": "{{exact}}× exact · {{diff}}× écart · {{tendency}}× tendance",
+    "livePlus": "live +{{points}}",
+    "exactKing": "Roi de l'exact",
+    "underdogKing": "Roi des outsiders",
+    "climber": "Meilleure progression",
+    "empty": "Pas encore de joueurs – scanne et participe !",
+    "loading": "Chargement du jeu …",
+    "loadError": "Impossible de charger le jeu.",
+    "notEnabled": "Aucun jeu de pronostics actif pour ce tournoi.",
+    "noTournament": "Aucun tournoi choisi pour le jeu."
   }
 }

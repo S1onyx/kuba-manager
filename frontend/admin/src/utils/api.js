@@ -324,10 +324,10 @@ export function updateMatchContext(payload) {
   });
 }
 
-export function setDisplayView(view) {
+export function setDisplayView(view, { callitTournamentId } = {}) {
   return request('/scoreboard/display', {
     method: 'POST',
-    body: JSON.stringify({ view })
+    body: JSON.stringify({ view, callitTournamentId })
   });
 }
 
@@ -516,3 +516,23 @@ export function undoFreeThrow() {
 export function closeFreeThrows() {
   return request('/scoreboard/freethrows/close', { method: 'POST' });
 }
+
+const callitPath = (tournamentId) => `/callit-admin/tournaments/${encodeURIComponent(tournamentId)}`;
+
+export const callitAdmin = {
+  tournaments: () => request('/callit-admin/tournaments'),
+  overview: (tournamentId) => request(callitPath(tournamentId)),
+  updateConfig: (tournamentId, payload) => request(callitPath(tournamentId), { method: 'PUT', body: JSON.stringify(payload) }),
+  setLock: (tournamentId, code, action) =>
+    request(`${callitPath(tournamentId)}/matches/${encodeURIComponent(code)}/lock`, { method: 'POST', body: JSON.stringify({ action }) }),
+  matchTips: (tournamentId, code) => request(`${callitPath(tournamentId)}/matches/${encodeURIComponent(code)}/tips`),
+  setSpecialResult: (tournamentId, betKey, value) =>
+    request(`${callitPath(tournamentId)}/specials/${encodeURIComponent(betKey)}/result`, { method: 'PUT', body: JSON.stringify({ value }) }),
+  setDisqualified: (tournamentId, userId, disqualified) =>
+    request(`${callitPath(tournamentId)}/participants/${userId}/disqualify`, { method: 'POST', body: JSON.stringify({ disqualified }) }),
+  removeParticipant: (tournamentId, userId) => request(`${callitPath(tournamentId)}/participants/${userId}`, { method: 'DELETE' }),
+  updateUser: (userId, payload) => request(`/callit-admin/users/${userId}`, { method: 'PATCH', body: JSON.stringify(payload) }),
+  resetPassword: (userId) => request(`/callit-admin/users/${userId}/reset-password`, { method: 'POST' }),
+  deleteUser: (userId) => request(`/callit-admin/users/${userId}`, { method: 'DELETE' }),
+  exportCsv: (tournamentId) => downloadProtectedFile(`/api${callitPath(tournamentId)}/export.csv`)
+};

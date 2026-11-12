@@ -55,11 +55,13 @@
     "players": "Játékosok",
     "teams": "Csapatok",
     "tournaments": "Tornák",
-    "export": "PDF-export / Nyomtatás"
+    "export": "PDF-export / Nyomtatás",
+    "callit": "Tippjáték"
   },
   "displayViews": {
     "scoreboard": "Élő állás",
-    "bracket": "Tornatabla"
+    "bracket": "Tornatabla",
+    "callit": "Tippjáték-rangsor"
   },
   "penaltyPresets": {
     "minutes_one": "{{count}} perc",
@@ -122,7 +124,8 @@
       "description": "Váltás az élő állás és a tornatabla között a kivetítőn.",
       "bracketHint": "Az ágrajzhoz először válaszd ki a tornát:",
       "chooseTournament": "Torna kiválasztása …",
-      "updating": "Megjelenítés frissítése..."
+      "updating": "Megjelenítés frissítése...",
+      "callitHint": "A torna tippjáték-rangsorának megjelenítése:"
     },
     "context": {
       "title": "Mérkőzés-kontextus",
@@ -688,7 +691,8 @@
     "timerCuesSaved": "Időzítő-beállítások mentve.",
     "timerCuesSaveFailed": "Az időzítő-beállítások mentése nem sikerült.",
     "audioLoadFailed": "A hangadatok betöltése nem sikerült.",
-    "penaltyFreeThrowsSkipped": "Kiállítás hozzáadva a(z) {{team}} csapathoz – büntetődobások nem jöttek létre, mert még nyitott egy sorozat."
+    "penaltyFreeThrowsSkipped": "Kiállítás hozzáadva a(z) {{team}} csapathoz – büntetődobások nem jöttek létre, mert még nyitott egy sorozat.",
+    "displayNowCallit": "A kivetítő most a tippjáték rangsorát mutatja."
   },
   "error": {
     "generic": "Hiba történt. Kérjük, próbálja újra.",
@@ -814,7 +818,14 @@
     "FREE_THROWS_DONE": "Minden büntetődobás megtörtént.",
     "FREE_THROWS_HAS_ATTEMPTS": "Előbb dobd el vagy vond vissza az összes büntetődobást.",
     "FREE_THROWS_NO_ATTEMPTS": "Nincs visszavonható büntetődobás.",
-    "FREE_THROWS_NOT_ACTIVE": "Nincsenek folyamatban büntetődobások."
+    "FREE_THROWS_NOT_ACTIVE": "Nincsenek folyamatban büntetődobások.",
+    "CALLIT_NICKNAME_TAKEN": "Ez a becenév már foglalt.",
+    "CALLIT_INVALID_NICKNAME": "Érvénytelen becenév (3–20 karakter).",
+    "CALLIT_TOURNAMENT_NOT_FOUND": "A torna nem található.",
+    "CALLIT_NOT_AVAILABLE": "A tippjáték nem aktív ennél a tornánál.",
+    "CALLIT_INVALID_VALUE": "Érvénytelen érték.",
+    "CALLIT_MATCH_NOT_FOUND": "A meccs nem található.",
+    "CALLIT_USER_NOT_FOUND": "A felhasználó nem található."
   },
   "export": {
     "title": "PDF-export / Nyomtatás",
@@ -890,5 +901,128 @@
     "emptyHint": "Valasszon tornait a nyomtatasi sablonok megtekintesehez",
     "collapse": "Osszecsukas",
     "expand": "Kibontas"
+  },
+  "callit": {
+    "title": "CallIt tippjáték",
+    "description": "Tippjáték kezelése tornánként: aktiválás, pontok, zárolások, különfogadások és résztvevők.",
+    "active": "aktív",
+    "loading": "Tippjáték betöltése …",
+    "statusTitle": "Állapot",
+    "statusOn": "A tippjáték aktív · {{count}} résztvevő",
+    "statusOff": "A tippjáték ki van kapcsolva ennél a tornánál.",
+    "enable": "Tippjáték aktiválása",
+    "disable": "Tippjáték kikapcsolása",
+    "notPublic": "A torna privát – a főoldali link csak akkor jelenik meg, ha a torna nyilvános.",
+    "registrationOpen": "Jelentkezés nyitva",
+    "joinCode": "Belépőkód (opcionális)",
+    "joinCodePlaceholder": "üres = kód nélkül",
+    "saveJoinCode": "Kód mentése",
+    "copyLink": "Link másolása",
+    "copied": "Link kimásolva.",
+    "beamerOn": "Rangsor a kivetítőn",
+    "beamerOff": "Kivetítő vissza az eredményjelzőre",
+    "exportCsv": "CSV export",
+    "refresh": "Frissítés",
+    "saved": "Mentve.",
+    "loadFailed": "A tippjáték nem tölthető be.",
+    "actionFailed": "A művelet sikertelen.",
+    "settings": {
+      "title": "Szabályok és pontok",
+      "description": "Minden érték azonnal érvényes – a pontok élőben újraszámolódnak.",
+      "points": "Meccspontok",
+      "exact": "Pontos",
+      "diff": "Helyes különbség",
+      "tendency": "Helyes kimenetel",
+      "koAdvance": "Kieséses továbbjutó (bónusz)",
+      "multipliers": "Szorzók",
+      "phase": {
+        "group": "Csoport",
+        "knockout": "Kieséses",
+        "placement": "Helyosztó",
+        "final": "Döntő"
+      },
+      "jokerEnabled": "Joker aktív",
+      "jokerPerPhase": "Joker szakaszonként",
+      "underdogEnabled": "Esélytelen-bónusz aktív",
+      "underdogThreshold": "Küszöb (%)",
+      "underdogMinTips": "Minimális tippszám",
+      "underdogBonus": "Bónuszpont",
+      "lockAtScheduled": "Zárolás a tervezett időpontban is (különben csak kezdéskor)",
+      "specials": "Különfogadások",
+      "specialPoints": "Pontok",
+      "deadline": "Határidő (opcionális)",
+      "deadlineHint": "Határidő nélkül a különfogadások a torna első kezdésével zárulnak.",
+      "rulesText": "Megjegyzések / nyeremények (a tippelők látják)"
+    },
+    "specialTypes": {
+      "winner": "Tornagyőztes",
+      "top_scorer": "Gólkirály",
+      "most_penalty_seconds": "Legtöbb büntetőmásodperc",
+      "group_winner": "Csoportgyőztes",
+      "group_winner_label": "{{group}} győztese",
+      "total_baskets": "Összes pont"
+    },
+    "matches": {
+      "title": "Meccsek és zárolások",
+      "description": "A meccsek kezdéskor automatikusan zárolódnak. A kézi zárolás/feloldás felülírja (pl. hibás meccskód).",
+      "match": "Meccs",
+      "time": "Idő",
+      "status": "Állapot",
+      "tips": "Tippek",
+      "actions": "Műveletek",
+      "lock": "Zárolás",
+      "unlock": "Feloldás",
+      "auto": "Automatikus",
+      "locked": "Meccs zárolva.",
+      "unlocked": "Meccs feloldva."
+    },
+    "status": {
+      "pending": "Csapatok nyitottak",
+      "open": "Nyitott",
+      "locked": "Zárolva",
+      "live": "Élő",
+      "finished": "Vége"
+    },
+    "lockReason": {
+      "kickoff": "kezdés",
+      "manual": "kézi",
+      "unlocked": "kézzel feloldva"
+    },
+    "specials": {
+      "title": "Különfogadások eredményei",
+      "description": "Automatikusan a torna adataiból. Szükség esetén itt felülírható.",
+      "none": "Nincs aktív különfogadás.",
+      "locked": "lezárva",
+      "open": "nyitott",
+      "result": "Eredmény",
+      "provisional": "ideiglenes",
+      "overridePlaceholder": "Érték megadása",
+      "saveOverride": "Eredmény rögzítése",
+      "resetOverride": "Automatikus",
+      "overrideActive": "Kézi eredmény aktív.",
+      "overrideHint": "Többes választás lehetséges (holtverseny)."
+    },
+    "participants": {
+      "title": "Résztvevők",
+      "description": "Becenevek moderálása, jelszavak visszaállítása, résztvevők kizárása.",
+      "search": "Becenév keresése …",
+      "empty": "Még nincs résztvevő.",
+      "banned": "letiltva",
+      "disqualified": "kizárva",
+      "meta": "{{points}} pont · {{tips}} tipp · utolsó belépés {{login}}",
+      "rename": "Átnevezés",
+      "renamePrompt": "Új becenév:",
+      "resetPassword": "Jelszó visszaállítása",
+      "resetConfirm": "{{name}} jelszavának visszaállítása? Minden munkamenet megszűnik.",
+      "resetResult": "Ideiglenes jelszó {{name}} számára (csak most látható):",
+      "disqualify": "Kizárás",
+      "requalify": "Visszaengedés",
+      "ban": "Fiók letiltása",
+      "unban": "Fiók feloldása",
+      "remove": "Eltávolítás a játékból",
+      "removeConfirm": "{{name}} és tippjeinek eltávolítása ebből a játékból?",
+      "deleteAccount": "Fiók törlése",
+      "deleteConfirm": "{{name}} fiókjának végleges törlése az összes tippel együtt minden tornán?"
+    }
   }
 }

@@ -19,9 +19,9 @@ import {
 } from './standings.js';
 import { canonicalGroupLabel, createGroupLabels, describeStageLabel } from './helpers.js';
 
-export async function getTournamentSummary(tournamentId, { currentSnapshot } = {}) {
+export async function getTournamentSummary(tournamentId, { currentSnapshot, includePrivate = false } = {}) {
   const tournament = await getTournament(tournamentId);
-  if (!tournament || !tournament.is_public) {
+  if (!tournament || (!tournament.is_public && !includePrivate)) {
     return null;
   }
 

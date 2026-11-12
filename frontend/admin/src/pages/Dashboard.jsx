@@ -11,6 +11,7 @@ import TeamsTab from '../components/dashboard/TeamsTab.jsx';
 import TournamentsTab from '../components/dashboard/TournamentsTab.jsx';
 import ScheduleTab from '../components/dashboard/ScheduleTab.jsx';
 import ExportTab from '../components/dashboard/ExportTab.jsx';
+import CallitTab from '../components/dashboard/CallitTab.jsx';
 import useFeedback from '../hooks/useFeedback.js';
 import useScoreboardCore from '../hooks/useScoreboardCore.js';
 import useMatchContext from '../hooks/useMatchContext.js';
@@ -202,6 +203,8 @@ export default function Dashboard() {
           <TeamsTab />
         ) : activeTab === 'export' ? (
           <ExportTab />
+        ) : activeTab === 'callit' ? (
+          <CallitTab />
         ) : (
           <TournamentsTab />
         )}

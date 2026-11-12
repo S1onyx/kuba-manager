@@ -335,5 +335,14 @@
     "title": "フリースロー",
     "next": "{{total}}本中{{current}}本目",
     "result": "{{total}}本中{{made}}本成功"
+  },
+  "callit": {
+    "badge": "予想ゲーム",
+    "title": "予想して会場の頂点へ!",
+    "text": "スコアを予想、特別予想に挑戦、ライブランキングで盛り上がろう – 無料、ニックネームだけでOK。",
+    "cta": "今すぐ予想する",
+    "participants_other": "{{count}}人参加中",
+    "leaders": "現在の上位",
+    "points": "{{points}}pt"
   }
 }

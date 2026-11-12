@@ -7,6 +7,7 @@ Das Projekt besteht aus vier Oberflächen sowie einem kleinen Node.js-Backend:
 - `frontend/display`: Public Display für die Halle mit Teamnamen, Spielstand und Restzeit.
 - `frontend/public`: Öffentliche Turnierübersicht mit Live-Spiel, Gruppen- und KO-Tabellen sowie Team-Statistiken (mobilfreundlich).
 - `frontend/audio`: Audio-Frontend auf einer eigenen Subdomain, das automatisch eingehende Spiel- und manuell ausgelöste Sounds abspielt.
+- `frontend/callit`: Tippspiel „CallIt“ unter `callit.kunstradbasketball.de` (mobil-first).
 - `backend`: REST- und WebSocket-Server, der den Scoreboard-Zustand verwaltet.
 - `plausible-ce`: Docker-Konfiguration für die Self-Hosted-Plausible-Instanz auf `dashboard.kunstradbasketball.de`.
 
@@ -24,6 +25,7 @@ Entwicklungsserver parallel:
 - Display: http://localhost:5174
 - Public Interface: http://localhost:5175
 - Audio Interface: http://localhost:5176
+- Tippspiel CallIt: http://localhost:5177
 
 Die Frontends sprechen das Backend standardmäßig über `http://localhost:3000`
 (die REST-Routen liegen dort unter `/api/...`). Falls ein anderer Host oder
@@ -47,9 +49,18 @@ entsprechend an.
 - Audioverwaltung im Admin-Panel: Für Spielstart, Pause, Ende, Körbe der Teams sowie Fouls lassen sich individuelle MP3-Sounds hochladen, aktivieren/deaktivieren und testen; zusätzlich können beliebige Sounds in einer Bibliothek gespeichert und manuell ausgelöst werden. Die Wiedergabe erfolgt über die eigenständige Audio-Domain.
 
 
+## Tippspiel „CallIt“
+
+- Pro Turnier im Admin-Tab „Tippspiel“ aktivierbar; Tipper melden sich auf `callit.kunstradbasketball.de` mit Nickname + Passwort an (ein Konto für alle Turniere, Sessions 30 Tage in der DB).
+- Getippt wird der Stand nach regulärer Spielzeit auf alle Spiele, deren Teams feststehen. Sperre serverseitig beim Anpfiff (Uhr startet für den Spielplan-Code), bei gespeichertem Ergebnis oder manuell; optional zur geplanten Uhrzeit.
+- Punkte (alles im Admin änderbar): exakt 4 · Differenz 3 · Tendenz 2 · KO-Remis mit richtigem Weiterkommer +1 · Multiplikator je Phase (Finale ×2) · Joker ×2 je Phase · Underdog-Bonus +1 (≤ 25 %, ab 5 Tipps).
+- Sonderwetten: Turniersieger, Topscorer (Punkte), meiste Strafsekunden, Gruppensieger, Gesamtpunkte (nächster Wert). Schließen standardmäßig mit dem ersten Anpfiff, Ergebnisse automatisch aus den Turnierdaten, im Admin überschreibbar.
+- Ranking gesamt und nach Kategorien, live mit vorläufigen Punkten und Rangpfeilen; Statistiken mit Verteilung, Quoten (1 ÷ Anteil), Heatmap, Trefferquoten. Fremde Tipps erst nach der Sperre sichtbar.
+- Beamer-Ansicht „Tippspiel-Ranking“ (Top 10, QR-Code) per Knopf im Admin; prominenter Link auf der Hauptseite.
+- Punkte werden nicht gespeichert, sondern aus Tipps + Ergebnissen berechnet – Ergebniskorrekturen wirken sofort.
+
 ## Geplante Features
 - User Management mit Admin, User und Beamer Accounts. Bestätigung der Accounts durch den Admin. Login ins Admin Panel und Beamer Anzeige. Optionaler Login in Public Interface. Speicherung der Sessions in Cookies (24h)
-- Wettsystem: Eingeloggte User können virtuelle Coins auf den Sieger der geplanten matches setzen. Beim richtigen Tipp gewinn von Betrag X (guter Algorithums nötig). Eigener Tab mit Tippspieltabelle! Hier sollen user gerankt werden, wer am ende am besten getippt hat. (Gewinner tipp, unentschieden und genauer Endstand) Coins kann man nur durch Admins über das admin panel zugeschrieben bkeommen. Im admin panel soll das usermanagement sein.
 
 ## Deployment (Docker & Caddy)
 
@@ -69,6 +80,7 @@ Das Repository enthält eine komplette Container-Orchestrierung mit Caddy als Re
 - `display-frontend` (Beameransicht, Port 8081)
 - `admin-frontend` (Scoreboard-Steuerung, Port 8082)
 - `audio-frontend` (Audio-Ausgabe, Port 8083)
+- `callit-frontend` (Tippspiel, über `callit.kunstradbasketball.de`)
 - `plausible` (Self-Hosted Plausible Dashboard, intern Port 8000 – extern über `dashboard.kunstradbasketball.de`)
 - `caddy` (Reverse Proxy, mapped Ports `80:80`, `8081:8081`, `8082:8082`, `8083:8083`, `3000:3000`)
 

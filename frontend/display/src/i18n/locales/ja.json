@@ -125,5 +125,22 @@
     "title": "フリースロー",
     "next": "{{total}}本中{{current}}本目",
     "result": "{{total}}本中{{made}}本成功"
+  },
+  "callit": {
+    "title": "予想ランキング",
+    "live": "ライブ",
+    "liveMatch": "試合中:{{home}} {{score}} {{away}} – ポイントは暫定",
+    "join": "今すぐ予想に参加!",
+    "participants_other": "{{count}}人参加",
+    "rowDetail": "完全 {{exact}} · 点差 {{diff}} · 勝敗 {{tendency}}",
+    "livePlus": "ライブ +{{points}}",
+    "exactKing": "完全的中王",
+    "underdogKing": "大穴キング",
+    "climber": "急上昇",
+    "empty": "まだ参加者がいません – スキャンして参加しよう!",
+    "loading": "予想ゲームを読み込み中 …",
+    "loadError": "予想ゲームを読み込めませんでした。",
+    "notEnabled": "この大会では予想ゲームは有効になっていません。",
+    "noTournament": "予想ゲームの大会が選択されていません。"
   }
 }

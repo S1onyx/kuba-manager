@@ -55,11 +55,13 @@
     "players": "Joueurs",
     "teams": "Équipes",
     "tournaments": "Tournois",
-    "export": "Export PDF / Impression"
+    "export": "Export PDF / Impression",
+    "callit": "Pronostics"
   },
   "displayViews": {
     "scoreboard": "Score en direct",
-    "bracket": "Tableau du tournoi"
+    "bracket": "Tableau du tournoi",
+    "callit": "Classement des pronostics"
   },
   "penaltyPresets": {
     "minutes_one": "{{count}} minute",
@@ -122,7 +124,8 @@
       "description": "Basculez entre le score en direct et le tableau du tournoi sur le vidéoprojecteur.",
       "bracketHint": "Choisissez d'abord le tournoi pour le tableau :",
       "chooseTournament": "Choisir un tournoi …",
-      "updating": "Mise à jour de l'affichage..."
+      "updating": "Mise à jour de l'affichage...",
+      "callitHint": "Afficher le classement des pronostics de ce tournoi :"
     },
     "context": {
       "title": "Contexte du match",
@@ -688,7 +691,8 @@
     "timerCuesSaved": "Paramètres du chronomètre enregistrés.",
     "timerCuesSaveFailed": "Les paramètres du chronomètre n'ont pas pu être enregistrés.",
     "audioLoadFailed": "Les données audio n'ont pas pu être chargées.",
-    "penaltyFreeThrowsSkipped": "Pénalité ajoutée pour l'équipe {{team}} – lancers francs non créés car une série est encore ouverte."
+    "penaltyFreeThrowsSkipped": "Pénalité ajoutée pour l'équipe {{team}} – lancers francs non créés car une série est encore ouverte.",
+    "displayNowCallit": "Le projecteur affiche maintenant le classement des pronostics."
   },
   "error": {
     "generic": "Une erreur s'est produite. Veuillez réessayer.",
@@ -814,7 +818,14 @@
     "FREE_THROWS_DONE": "Tous les lancers francs ont déjà été effectués.",
     "FREE_THROWS_HAS_ATTEMPTS": "Veuillez d'abord effectuer ou annuler tous les lancers francs.",
     "FREE_THROWS_NO_ATTEMPTS": "Aucun lancer franc à annuler.",
-    "FREE_THROWS_NOT_ACTIVE": "Aucun lancer franc en cours."
+    "FREE_THROWS_NOT_ACTIVE": "Aucun lancer franc en cours.",
+    "CALLIT_NICKNAME_TAKEN": "Ce pseudo est déjà pris.",
+    "CALLIT_INVALID_NICKNAME": "Pseudo invalide (3 à 20 caractères).",
+    "CALLIT_TOURNAMENT_NOT_FOUND": "Tournoi introuvable.",
+    "CALLIT_NOT_AVAILABLE": "Le jeu de pronostics n'est pas actif pour ce tournoi.",
+    "CALLIT_INVALID_VALUE": "Valeur invalide.",
+    "CALLIT_MATCH_NOT_FOUND": "Match introuvable.",
+    "CALLIT_USER_NOT_FOUND": "Utilisateur introuvable."
   },
   "export": {
     "title": "Export PDF / Impression",
@@ -890,5 +901,128 @@
     "emptyHint": "Selectionnez un tournoi pour voir les modeles",
     "collapse": "Reduire",
     "expand": "Developper"
+  },
+  "callit": {
+    "title": "Jeu de pronostics CallIt",
+    "description": "Piloter le jeu de pronostics par tournoi : activation, points, verrouillages, paris spéciaux et participants.",
+    "active": "actif",
+    "loading": "Chargement du jeu …",
+    "statusTitle": "Statut",
+    "statusOn": "Le jeu est actif · {{count}} participants",
+    "statusOff": "Le jeu est désactivé pour ce tournoi.",
+    "enable": "Activer le jeu",
+    "disable": "Désactiver le jeu",
+    "notPublic": "Le tournoi est privé – le lien sur la page d'accueil n'apparaît que si le tournoi est public.",
+    "registrationOpen": "Inscriptions ouvertes",
+    "joinCode": "Code d'accès (optionnel)",
+    "joinCodePlaceholder": "vide = sans code",
+    "saveJoinCode": "Enregistrer le code",
+    "copyLink": "Copier le lien",
+    "copied": "Lien copié.",
+    "beamerOn": "Classement au projecteur",
+    "beamerOff": "Projecteur : retour au score",
+    "exportCsv": "Export CSV",
+    "refresh": "Actualiser",
+    "saved": "Enregistré.",
+    "loadFailed": "Impossible de charger le jeu.",
+    "actionFailed": "L'action a échoué.",
+    "settings": {
+      "title": "Règles et points",
+      "description": "Toutes les valeurs s'appliquent immédiatement – les points sont recalculés en direct.",
+      "points": "Points de match",
+      "exact": "Exact",
+      "diff": "Bon écart",
+      "tendency": "Bonne tendance",
+      "koAdvance": "Qualifié en KO (bonus)",
+      "multipliers": "Multiplicateurs",
+      "phase": {
+        "group": "Groupe",
+        "knockout": "KO",
+        "placement": "Classement",
+        "final": "Finale"
+      },
+      "jokerEnabled": "Joker actif",
+      "jokerPerPhase": "Jokers par phase",
+      "underdogEnabled": "Bonus outsider actif",
+      "underdogThreshold": "Seuil (%)",
+      "underdogMinTips": "Nombre minimum de pronos",
+      "underdogBonus": "Points bonus",
+      "lockAtScheduled": "Verrouiller aussi à l'heure prévue (sinon seulement au coup d'envoi)",
+      "specials": "Paris spéciaux",
+      "specialPoints": "Points",
+      "deadline": "Échéance (optionnelle)",
+      "deadlineHint": "Sans échéance, les paris spéciaux ferment au premier coup d'envoi du tournoi.",
+      "rulesText": "Informations / lots (visibles par les joueurs)"
+    },
+    "specialTypes": {
+      "winner": "Vainqueur du tournoi",
+      "top_scorer": "Meilleur marqueur",
+      "most_penalty_seconds": "Le plus de secondes de pénalité",
+      "group_winner": "Vainqueur de groupe",
+      "group_winner_label": "Vainqueur {{group}}",
+      "total_baskets": "Total des points"
+    },
+    "matches": {
+      "title": "Matchs et verrouillages",
+      "description": "Les matchs se verrouillent automatiquement au coup d'envoi. Le verrouillage manuel prime (p. ex. mauvais code de match).",
+      "match": "Match",
+      "time": "Heure",
+      "status": "Statut",
+      "tips": "Pronos",
+      "actions": "Actions",
+      "lock": "Verrouiller",
+      "unlock": "Déverrouiller",
+      "auto": "Automatique",
+      "locked": "Match verrouillé.",
+      "unlocked": "Match déverrouillé."
+    },
+    "status": {
+      "pending": "Équipes à définir",
+      "open": "Ouvert",
+      "locked": "Verrouillé",
+      "live": "Live",
+      "finished": "Terminé"
+    },
+    "lockReason": {
+      "kickoff": "coup d'envoi",
+      "manual": "manuel",
+      "unlocked": "déverrouillé manuellement"
+    },
+    "specials": {
+      "title": "Résultats des paris spéciaux",
+      "description": "Déterminés automatiquement à partir des données du tournoi. À corriger ici si besoin.",
+      "none": "Aucun pari spécial actif.",
+      "locked": "fermé",
+      "open": "ouvert",
+      "result": "Résultat",
+      "provisional": "provisoire",
+      "overridePlaceholder": "Saisir une valeur",
+      "saveOverride": "Fixer le résultat",
+      "resetOverride": "Automatique",
+      "overrideActive": "Résultat manuel actif.",
+      "overrideHint": "Sélection multiple possible (égalité)."
+    },
+    "participants": {
+      "title": "Participants",
+      "description": "Modérer les pseudos, réinitialiser les mots de passe, exclure des participants.",
+      "search": "Chercher un pseudo …",
+      "empty": "Pas encore de participants.",
+      "banned": "bloqué",
+      "disqualified": "exclu",
+      "meta": "{{points}} pts · {{tips}} pronos · dernière connexion {{login}}",
+      "rename": "Renommer",
+      "renamePrompt": "Nouveau pseudo :",
+      "resetPassword": "Réinitialiser le mot de passe",
+      "resetConfirm": "Réinitialiser le mot de passe de {{name}} ? Toutes les sessions seront fermées.",
+      "resetResult": "Mot de passe temporaire pour {{name}} (visible uniquement maintenant) :",
+      "disqualify": "Exclure",
+      "requalify": "Réadmettre",
+      "ban": "Bloquer le compte",
+      "unban": "Débloquer le compte",
+      "remove": "Retirer du jeu",
+      "removeConfirm": "Retirer {{name}} et ses pronos de ce jeu ?",
+      "deleteAccount": "Supprimer le compte",
+      "deleteConfirm": "Supprimer définitivement le compte {{name}} avec tous ses pronos dans tous les tournois ?"
+    }
   }
 }

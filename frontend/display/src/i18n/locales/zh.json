@@ -125,5 +125,22 @@
     "title": "罚球",
     "next": "第 {{current}} 罚,共 {{total}} 罚",
     "result": "{{total}} 罚中 {{made}}"
+  },
+  "callit": {
+    "title": "竞猜排行榜",
+    "live": "直播",
+    "liveMatch": "进行中:{{home}} {{score}} {{away}}——积分暂定",
+    "join": "快来参与竞猜!",
+    "participants_other": "{{count}} 名玩家",
+    "rowDetail": "{{exact}}× 完全正确 · {{diff}}× 分差 · {{tendency}}× 胜负",
+    "livePlus": "实时 +{{points}}",
+    "exactKing": "精准之王",
+    "underdogKing": "冷门之王",
+    "climber": "上升最快",
+    "empty": "还没有玩家——扫码参与吧!",
+    "loading": "正在加载竞猜游戏 …",
+    "loadError": "无法加载竞猜游戏。",
+    "notEnabled": "该赛事没有启用竞猜游戏。",
+    "noTournament": "尚未为竞猜游戏选择赛事。"
   }
 }

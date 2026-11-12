@@ -340,5 +340,15 @@
     "title": "Free throw",
     "next": "Throw {{current}} of {{total}}",
     "result": "{{made}} of {{total}} made"
+  },
+  "callit": {
+    "badge": "Prediction game",
+    "title": "Predict and beat the hall!",
+    "text": "Predict scores, place special bets, follow the live ranking – free, just a nickname.",
+    "cta": "Join the game",
+    "participants_one": "{{count}} player joined",
+    "participants_other": "{{count}} players joined",
+    "leaders": "Current leaders",
+    "points": "{{points}} pts"
   }
 }

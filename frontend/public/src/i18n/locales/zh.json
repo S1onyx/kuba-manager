@@ -335,5 +335,14 @@
     "title": "罚球",
     "next": "第 {{current}} 罚,共 {{total}} 罚",
     "result": "{{total}} 罚中 {{made}}"
+  },
+  "callit": {
+    "badge": "竞猜游戏",
+    "title": "一起竞猜,击败全场!",
+    "text": "竞猜比分、参与特别竞猜、实时关注排行榜——免费,只需一个昵称。",
+    "cta": "立即竞猜",
+    "participants_other": "已有 {{count}} 名玩家",
+    "leaders": "当前领先",
+    "points": "{{points}} 分"
   }
 }
