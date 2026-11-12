@@ -1,7 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { resolveMediaUrl } from '../config.js';
+import { measureAudioUrl } from '../utils/loudness.js';
 import {
   assignAudioTriggerFile,
+  saveAudioLoudness,
   deleteAudioLibraryFile,
   fetchAudioLibrary,
   fetchAudioTriggers,
@@ -14,6 +17,11 @@ import {
   uploadAudioTriggerFile
 } from '../utils/api.js';
 import { formatApiError } from '../utils/apiError.js';
+
+const SILENT_LUFS = -70;
+const SILENT_PEAK_DB = -100;
+const MAX_PEAK_DB = 6;
+const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
 export default function useAudioManager({ updateMessage, reloadDependencies = [] }) {
   const { t } = useTranslation();
@@ -59,6 +67,48 @@ export default function useAudioManager({ updateMessage, reloadDependencies = []
   useEffect(() => {
     loadAudioData(true);
   }, [loadAudioData, ...reloadDependencies]);
+
+  // Lautheit fehlender Dateien automatisch messen (neue Uploads, Korbhymnen, Altbestand) – nacheinander, einmal pro Sitzung.
+  const measuringRef = useRef(false);
+  const attemptedRef = useRef(new Set());
+  const [loudnessProgress, setLoudnessProgress] = useState(null);
+
+  const measureLoudnessFor = useCallback(
+    async (files) => {
+      if (measuringRef.current || files.length === 0) return;
+      measuringRef.current = true;
+      setLoudnessProgress({ done: 0, total: files.length });
+      for (const [index, file] of files.entries()) {
+        attemptedRef.current.add(file.id);
+        try {
+          const { lufs, peakDb } = await measureAudioUrl(resolveMediaUrl(file.url));
+          // Stille: als leisester gültiger Wert speichern, damit nicht endlos neu gemessen wird.
+          await saveAudioLoudness(file.id, {
+            lufs: clamp(lufs ?? SILENT_LUFS, SILENT_LUFS, 0),
+            peakDb: clamp(peakDb ?? SILENT_PEAK_DB, SILENT_PEAK_DB, MAX_PEAK_DB)
+          });
+        } catch (err) {
+          console.error('Lautheit konnte nicht gemessen werden.', err);
+          updateMessage('error', t('feedback.loudnessFailed', { name: file.label || file.original_name }));
+        }
+        setLoudnessProgress({ done: index + 1, total: files.length });
+      }
+      measuringRef.current = false;
+      setLoudnessProgress(null);
+      await loadAudioData();
+    },
+    [loadAudioData, updateMessage, t]
+  );
+
+  useEffect(() => {
+    const missing = audioLibrary.filter((file) => file.loudness_lufs == null && !attemptedRef.current.has(file.id));
+    measureLoudnessFor(missing);
+  }, [audioLibrary, measureLoudnessFor]);
+
+  const handleRemeasureLoudness = useCallback(() => {
+    attemptedRef.current.clear();
+    measureLoudnessFor(audioLibrary);
+  }, [audioLibrary, measureLoudnessFor]);
 
   const handleAudioTriggerLabelChange = useCallback((key, value) => {
     setAudioTriggerLabels((prev) => ({
@@ -297,6 +347,8 @@ export default function useAudioManager({ updateMessage, reloadDependencies = []
     handleAudioLibraryDelete,
     handleAudioLibraryPlay,
     handleTimerCueSave,
+    loudnessProgress,
+    handleRemeasureLoudness,
     describeAudioFile
   };
 }

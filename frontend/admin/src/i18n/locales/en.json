@@ -370,7 +370,14 @@
     "noFilterResults": "No audio files match the filter.",
     "filterTriggersPlaceholder": "Filter by event or team...",
     "filterTournament": "Tournament",
-    "filterAllTournaments": "All tournaments"
+    "filterAllTournaments": "All tournaments",
+    "loudness": {
+      "hint": "All sounds are automatically levelled to −14 LUFS in the audio frontend. New files are measured automatically.",
+      "measuring": "Measuring loudness … {{done}}/{{total}}",
+      "remeasure": "Re-measure loudness",
+      "missing": "Loudness not measured yet",
+      "value": "{{lufs}} LUFS"
+    }
   },
   "history": {
     "title": "History",
@@ -688,7 +695,8 @@
     "timerCuesSaved": "Timer settings saved.",
     "timerCuesSaveFailed": "The timer settings could not be saved.",
     "audioLoadFailed": "The audio data could not be loaded.",
-    "penaltyFreeThrowsSkipped": "Time penalty added for team {{team}} – free throws not created because a series is still open."
+    "penaltyFreeThrowsSkipped": "Time penalty added for team {{team}} – free throws not created because a series is still open.",
+    "loudnessFailed": "Loudness of “{{name}}” could not be measured."
   },
   "error": {
     "generic": "An error occurred. Please try again.",

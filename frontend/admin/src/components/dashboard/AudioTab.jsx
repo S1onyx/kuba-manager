@@ -31,6 +31,8 @@ export default function AudioTab() {
       handleAudioLibraryDelete,
       handleAudioLibraryPlay,
       handleTimerCueSave,
+      loudnessProgress,
+      handleRemeasureLoudness,
       describeAudioFile
     }
   } = useDashboard();
@@ -341,6 +343,19 @@ export default function AudioTab() {
         </form>
 
         {audioLibrary.length > 0 && (
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '0.85rem', opacity: 0.75 }}>
+              {loudnessProgress
+                ? t('audio.loudness.measuring', { done: loudnessProgress.done, total: loudnessProgress.total })
+                : t('audio.loudness.hint')}
+            </span>
+            <button type="button" onClick={handleRemeasureLoudness} disabled={Boolean(loudnessProgress)}>
+              {t('audio.loudness.remeasure')}
+            </button>
+          </div>
+        )}
+
+        {audioLibrary.length > 0 && (
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
             <input
               type="search"
@@ -395,7 +410,12 @@ export default function AudioTab() {
                         </span>
                       ) : null}
                     </strong>
-                    <span style={{ fontSize: '0.82rem', opacity: 0.65 }}>{file.original_name}</span>
+                    <span style={{ fontSize: '0.82rem', opacity: 0.65 }}>
+                      {file.original_name} ·{' '}
+                      {file.loudness_lufs == null
+                        ? t('audio.loudness.missing')
+                        : t('audio.loudness.value', { lufs: file.loudness_lufs.toFixed(1) })}
+                    </span>
                   </div>
                   <div className="audio-library-item__actions">
                     <button

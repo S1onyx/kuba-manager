@@ -293,6 +293,13 @@ export function uploadAudioLibraryFile(file, label) {
   });
 }
 
+export function saveAudioLoudness(id, { lufs, peakDb }) {
+  return request(`/audio/library/${id}/loudness`, {
+    method: 'PUT',
+    body: JSON.stringify({ lufs, peakDb })
+  });
+}
+
 export function deleteAudioLibraryFile(id) {
   return request(`/audio/library/${id}`, {
     method: 'DELETE'

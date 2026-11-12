@@ -376,7 +376,14 @@
     "noFilterResults": "Filtru neodpovídají žádné soubory.",
     "filterTriggersPlaceholder": "Filtrovat podle události nebo týmu...",
     "filterTournament": "Turnaj",
-    "filterAllTournaments": "Všechny turnaje"
+    "filterAllTournaments": "Všechny turnaje",
+    "loudness": {
+      "hint": "Všechny zvuky se ve zvukovém rozhraní automaticky vyrovnají na −14 LUFS. Nové soubory se měří automaticky.",
+      "measuring": "Měří se hlasitost … {{done}}/{{total}}",
+      "remeasure": "Znovu změřit hlasitost",
+      "missing": "Hlasitost zatím nezměřena",
+      "value": "{{lufs}} LUFS"
+    }
   },
   "history": {
     "title": "Historie",
@@ -706,7 +713,8 @@
     "timerCuesSaved": "Nastavení časomíry uložena.",
     "timerCuesSaveFailed": "Nastavení časomíry se nepodařilo uložit.",
     "audioLoadFailed": "Zvuková data se nepodařilo načíst.",
-    "penaltyFreeThrowsSkipped": "Časový trest přidán týmu {{team}} – trestné hody nevytvořeny, protože je ještě otevřená série."
+    "penaltyFreeThrowsSkipped": "Časový trest přidán týmu {{team}} – trestné hody nevytvořeny, protože je ještě otevřená série.",
+    "loudnessFailed": "Hlasitost „{{name}}“ se nepodařilo změřit."
   },
   "error": {
     "generic": "Došlo k chybě. Zkuste to prosím znovu.",

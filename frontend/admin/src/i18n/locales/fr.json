@@ -370,7 +370,14 @@
     "noFilterResults": "Aucun fichier audio trouvé.",
     "filterTriggersPlaceholder": "Filtrer par événement ou équipe...",
     "filterTournament": "Tournoi",
-    "filterAllTournaments": "Tous les tournois"
+    "filterAllTournaments": "Tous les tournois",
+    "loudness": {
+      "hint": "Tous les sons sont automatiquement alignés sur −14 LUFS dans le frontend audio. Les nouveaux fichiers sont mesurés automatiquement.",
+      "measuring": "Mesure de la sonie … {{done}}/{{total}}",
+      "remeasure": "Mesurer à nouveau la sonie",
+      "missing": "Sonie pas encore mesurée",
+      "value": "{{lufs}} LUFS"
+    }
   },
   "history": {
     "title": "Historique",
@@ -688,7 +695,8 @@
     "timerCuesSaved": "Paramètres du chronomètre enregistrés.",
     "timerCuesSaveFailed": "Les paramètres du chronomètre n'ont pas pu être enregistrés.",
     "audioLoadFailed": "Les données audio n'ont pas pu être chargées.",
-    "penaltyFreeThrowsSkipped": "Pénalité ajoutée pour l'équipe {{team}} – lancers francs non créés car une série est encore ouverte."
+    "penaltyFreeThrowsSkipped": "Pénalité ajoutée pour l'équipe {{team}} – lancers francs non créés car une série est encore ouverte.",
+    "loudnessFailed": "La sonie de « {{name}} » n'a pas pu être mesurée."
   },
   "error": {
     "generic": "Une erreur s'est produite. Veuillez réessayer.",
