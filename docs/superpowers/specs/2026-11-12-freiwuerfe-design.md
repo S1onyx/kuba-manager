@@ -12,12 +12,15 @@ Freiwürfe sollen im Spiel explizit dokumentiert werden (wer wirft, wie viele, T
 - Beamer (Display) und Public (CurrentMatchCard) zeigen die aktive Serie: Teamname, Werfer, Punkte pro Wurf (grün Treffer, rot Fehlwurf, leer offen). Optik wie `ShootoutView`.
 - Freiwurfquote (Treffer/Versuche, %) pro Spieler und Team in den Public-Statistiken.
 - Würfe aus dem Freiwurf-Stechen zählen ebenfalls in die Quote.
+- Uhr gemäß Reglement 2.9: Serie starten hält laufende Spieluhr automatisch an; nach dem letzten Wurf der Serie läuft die Uhr automatisch weiter.
+
+Reglement-Bezug (Stand 12.11.2026): 2.4 Verstoß in eigener Freiwurfzone → 2 Freiwürfe für Gegner (ohne Zeitstrafe → manuelle Serie); 2.7 Foul in der Freiwurfzone → Zeitstrafe + Freiwurf (→ Kopplung an Zeitstrafe); 2.9 grundsätzlich 2 Freiwürfe, Uhr angehalten, danach läuft sie weiter.
 
 ## Nicht-Ziele
 
 - Keine eigene DB-Tabelle, keine Migration.
 - Alte Spiele werden nicht nachträglich umgerechnet; ohne Versuche wird die Quote als "—" angezeigt.
-- Reglement-Text (3.3 sagt "ein Freiwurf") wird nicht angepasst.
+- Reglement-Seite wird separat aktualisiert (eigene Aufgabe, wartet auf sauberen PDF-Export).
 - Export-Tab, Turnier-Abschlussansichten (Display/Public) bekommen vorerst keine Freiwurf-Werte.
 
 ## Anti-Ziele
@@ -46,7 +49,8 @@ Freiwürfe sollen im Spiel explizit dokumentiert werden (wer wirft, wie viele, T
   - `recordFreeThrow({ hit })` – Fehler, wenn Serie voll. Treffer → `addPoints(team, 1, { playerId, shotType: 'free', type: 'freethrow', description: 'Freiwurf' })`. Zähler erhöhen.
   - `undoFreeThrow()` – letzten Wurf zurücknehmen inkl. Punkt und Zähler.
   - `closeFreeThrows()` – abgeschlossene Serie ausblenden; offene Serie ohne Würfe abbrechen; offene Serie mit Würfen → Fehler (erst zurücknehmen).
-- Abgeschlossene Serie (`attempts.length === total`) bleibt sichtbar, bis Admin schließt oder die Spieluhr gestartet wird (`start` setzt `freeThrows = null`, wenn abgeschlossen). Eine neue Serie darf eine abgeschlossene ersetzen.
+- Uhr: `startFreeThrows` pausiert die Spieluhr, falls sie läuft (nicht während Halbzeitpause). Nach dem letzten Wurf (`attempts.length === total`) startet die Uhr automatisch, sofern Restzeit bzw. geplante Nachspielzeit übrig ist und keine Halbzeitpause läuft. Zurücknehmen fasst die Uhr nicht an. Uhr-Funktionen aus `timer.js` wiederverwenden.
+- Abgeschlossene Serie bekommt `completedAt`. Beamer/Public blenden sie 10 s nach `completedAt` clientseitig aus; Admin kann vorher schließen. Eine neue Serie darf eine abgeschlossene ersetzen.
 - Snapshot liefert `freeThrows` mit `status: { made, taken, done }`.
 - Stat-Einträge (`createEmptyStat`, Merge in `setTeamPlayers`, `cloneStats`) bekommen `freeThrowsAttempted`, `freeThrowsMade`. Gezählt auf Team-Total-Eintrag und Spieler- bzw. Unknown-Eintrag (wie Strafen).
 - Stechen: `recordShootoutAttempt` / `undoShootoutAttempt` erhöhen/verringern dieselben Zähler.
@@ -105,7 +109,8 @@ Freiwürfe sollen im Spiel explizit dokumentiert werden (wer wirft, wie viele, T
 
 - `+1`/`-1` bleiben als Korrektur, ohne Freiwurf-Statistik.
 - Werfer pro Serie (nicht pro Wurf), änderbar bis zum ersten Wurf.
-- Abgeschlossene Serie bleibt sichtbar bis Schließen oder Uhrstart.
+- Abgeschlossene Serie wird 10 s nach dem letzten Wurf ausgeblendet (Uhr läuft dann ja schon wieder).
+- Nach Zurücknehmen eines Wurfs wird die Uhr nicht automatisch wieder angehalten.
 - Offene Serie blockiert Spiel speichern.
 - Bestenliste ab 2 Versuchen.
 - Quote "—" bei 0 Versuchen (alte Spiele).
