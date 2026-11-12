@@ -1,5 +1,6 @@
 import { getTournament } from './base.js';
 import { shootoutSummary } from '../shared/shootout.js';
+import { freeThrowPct, rankFreeThrowShooters, collectTeamFreeThrows } from './freeThrowStats.js';
 import { listGamesByTournament } from '../gamesService.js';
 import { listPlayersByTeam } from '../playersService.js';
 import {
@@ -221,7 +222,8 @@ const registerPlayerStats = (teamId, teamName, stats = []) => {
         (stat.points ?? 0) !== 0 ||
         (stat.scores ?? 0) !== 0 ||
         (stat.penalties ?? 0) !== 0 ||
-        (stat.penaltySeconds ?? 0) !== 0;
+        (stat.penaltySeconds ?? 0) !== 0 ||
+        (stat.freeThrowsAttempted ?? 0) !== 0;
 
       if (!impact) {
         return;
@@ -246,6 +248,8 @@ const registerPlayerStats = (teamId, teamName, stats = []) => {
           breakdown: { '1': 0, '2': 0, '3': 0 },
           penalties: 0,
           penaltySeconds: 0,
+          freeThrowsAttempted: 0,
+          freeThrowsMade: 0,
           games: 0,
           lastScoreAt: null
         };
@@ -259,6 +263,8 @@ const registerPlayerStats = (teamId, teamName, stats = []) => {
       aggregate.breakdown['3'] += stat.breakdown?.['3'] ?? 0;
       aggregate.penalties += stat.penalties ?? 0;
       aggregate.penaltySeconds += stat.penaltySeconds ?? 0;
+      aggregate.freeThrowsAttempted += stat.freeThrowsAttempted ?? 0;
+      aggregate.freeThrowsMade += stat.freeThrowsMade ?? 0;
       aggregate.games += 1;
 
       if (stat.lastScoreAt) {
@@ -367,6 +373,8 @@ const registerPlayerStats = (teamId, teamName, stats = []) => {
           breakdown: { '1': 0, '2': 0, '3': 0 },
           penalties: 0,
           penaltySeconds: 0,
+          freeThrowsAttempted: 0,
+          freeThrowsMade: 0,
           games: 0,
           lastScoreAt: null
         });
@@ -384,6 +392,7 @@ playerOverview.forEach((entry) => {
   entry.pointsPerGame = totalGames > 0 ? entry.points / totalGames : 0;
   entry.scoresPerGame = totalGames > 0 ? entry.scores / totalGames : 0;
   entry.penaltySecondsPerGame = totalGames > 0 ? entry.penaltySeconds / totalGames : 0;
+  entry.freeThrowPct = freeThrowPct(entry.freeThrowsMade, entry.freeThrowsAttempted);
   delete entry.teamKey;
 });
 
@@ -418,6 +427,8 @@ const topThreePointers = playerOverview
     return a.name.localeCompare(b.name, 'de', { sensitivity: 'base' });
   })
   .slice(0, 15);
+
+const topFreeThrowShooters = rankFreeThrowShooters(playerOverview);
 
   const usedPlacements = new Set();
   placementAssignments.forEach((entry) => {
@@ -456,6 +467,12 @@ const topThreePointers = playerOverview
     if (b.goalDiff !== a.goalDiff) return b.goalDiff - a.goalDiff;
     if (b.goalsFor !== a.goalsFor) return b.goalsFor - a.goalsFor;
     return a.team.localeCompare(b.team, 'de', { sensitivity: 'base' });
+  });
+
+  const teamFreeThrows = collectTeamFreeThrows(games);
+  overallStats.forEach((entry) => {
+    const { freeThrowsAttempted = 0, freeThrowsMade = 0 } = teamFreeThrows.get(entry.team) ?? {};
+    Object.assign(entry, { freeThrowsAttempted, freeThrowsMade, freeThrowPct: freeThrowPct(freeThrowsMade, freeThrowsAttempted) });
   });
 
   overallStats.forEach((entry) => {
@@ -570,7 +587,8 @@ const topThreePointers = playerOverview
       leaders: {
         topScorers,
         mostPenalized,
-        topThreePointers
+        topThreePointers,
+        topFreeThrowShooters
       },
       players: playerOverview
     },
