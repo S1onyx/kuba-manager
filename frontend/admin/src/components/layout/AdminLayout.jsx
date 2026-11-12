@@ -202,7 +202,12 @@ export default function AdminLayout({ sidebar, header, children, footer }) {
             position: 'sticky',
             top: '1.75rem',
             display: 'grid',
-            gap: '1.75rem'
+            gap: '1.75rem',
+            // Sticky-Navigation höher als der Viewport wäre sonst unten abgeschnitten
+            maxHeight: 'calc(100vh - 3.5rem)',
+            overflowY: 'auto',
+            overscrollBehavior: 'contain',
+            paddingRight: '0.25rem'
           }}
         >
           {sidebar}
