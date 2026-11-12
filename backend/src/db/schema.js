@@ -281,7 +281,7 @@ export default function initializeSchema(db) {
   const defaultSettings = [
     ['timer_warning_seconds', '15'],
     ['timer_countdown_from', '5'],
-    ['halftime_auto_start', '0']
+    ['halftime_auto_start', '1']
   ];
 
   defaultSettings.forEach(([key, value]) => {
@@ -291,6 +291,15 @@ export default function initializeSchema(db) {
       WHERE NOT EXISTS (SELECT 1 FROM app_settings WHERE key = '${key}');
     `);
   });
+
+  // Einmalig: Auto-Start nach der Halbzeitpause war früher standardmäßig aus und ist jetzt an.
+  const autoStartMigrated = db.exec("SELECT 1 FROM app_settings WHERE key = 'halftime_auto_start_default_on'").length > 0;
+  if (!autoStartMigrated) {
+    db.exec(`
+      UPDATE app_settings SET value = '1', updated_at = datetime('now') WHERE key = 'halftime_auto_start';
+      INSERT INTO app_settings (key, value) VALUES ('halftime_auto_start_default_on', '1');
+    `);
+  }
 
   return migrateTeamsToTournaments(db);
 }

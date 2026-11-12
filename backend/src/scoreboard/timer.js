@@ -150,7 +150,7 @@ function ensureTicker() {
           state.isRunning = true;
           triggerStartTone(createAudioContext(state));
         } else {
-          // Default: leave paused, ref starts 2nd half manually.
+          // Auto-start disabled: leave paused, ref starts 2nd half manually.
           // No sound plays here, so cut off the last countdown beep explicitly.
           state.isRunning = false;
           stopTicker();
