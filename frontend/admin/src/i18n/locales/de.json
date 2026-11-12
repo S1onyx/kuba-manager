@@ -813,7 +813,6 @@
     "FREE_THROWS_INVALID_TOTAL": "Es sind nur 1 oder 2 Freiwürfe möglich.",
     "FREE_THROWS_DONE": "Alle Freiwürfe wurden bereits geworfen.",
     "FREE_THROWS_HAS_ATTEMPTS": "Bitte zuerst alle Freiwürfe werfen oder zurücknehmen.",
-    "FREE_THROWS_SHOOTER_LOCKED": "Der Werfer kann nach dem ersten Wurf nicht mehr geändert werden.",
     "FREE_THROWS_NO_ATTEMPTS": "Es gibt keinen Freiwurf zum Zurücknehmen.",
     "FREE_THROWS_NOT_ACTIVE": "Es laufen keine Freiwürfe."
   },

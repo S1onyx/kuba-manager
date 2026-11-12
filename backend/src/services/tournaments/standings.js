@@ -45,6 +45,25 @@ export function addMatchStats(statsMap, team, opponent, goalsFor, goalsAgainst, 
   }
 }
 
+export function hasLiveGameStarted(snapshot) {
+  return (
+    (snapshot?.scoreA ?? 0) !== 0 ||
+    (snapshot?.scoreB ?? 0) !== 0 ||
+    (snapshot?.remainingSeconds ?? 0) !== (snapshot?.durationSeconds ?? 0)
+  );
+}
+
+// Live-Spiel zählt nur in die Tabelle seiner eigenen Gruppe und erst, wenn es begonnen hat.
+function liveSnapshotForGroup(snapshot, tournamentId, targetCanonical) {
+  const matches =
+    snapshot &&
+    snapshot.stageType === 'group' &&
+    snapshot.tournamentId === tournamentId &&
+    canonicalGroupLabel(snapshot.stageLabel) === targetCanonical &&
+    hasLiveGameStarted(snapshot);
+  return matches ? snapshot : null;
+}
+
 export async function computeGroupStandings(tournamentId, stageLabel, { currentSnapshot } = {}) {
   if (!tournamentId || !stageLabel) {
     return { standings: [], recordedGamesCount: 0 };
@@ -56,6 +75,8 @@ export async function computeGroupStandings(tournamentId, stageLabel, { currentS
     return { standings: [], recordedGamesCount: 0 };
   }
   const targetRawUpper = targetRaw.toUpperCase();
+
+  const liveSnapshot = liveSnapshotForGroup(currentSnapshot, tournamentId, targetCanonical);
 
   const { db } = await getConnection();
   const stmt = db.prepare(
@@ -78,7 +99,9 @@ export async function computeGroupStandings(tournamentId, stageLabel, { currentS
       const matchesTarget =
         rowRawUpper === targetRawUpper || (rowCanonical && rowCanonical === targetCanonical);
 
-      if (!matchesTarget) {
+      // Das gespeicherte Exemplar des Live-Spiels überspringen – der aktuelle Stand kommt aus currentSnapshot.
+      const isLiveGame = liveSnapshot?.savedGameId != null && row.id === liveSnapshot.savedGameId;
+      if (!matchesTarget || isLiveGame) {
         continue;
       }
 
@@ -94,39 +117,11 @@ export async function computeGroupStandings(tournamentId, stageLabel, { currentS
 
   let snapshotCountsAsMatch = false;
 
-  if (
-    currentSnapshot &&
-    currentSnapshot.stageType === 'group' &&
-    canonicalGroupLabel(currentSnapshot.stageLabel) === targetCanonical &&
-    currentSnapshot.tournamentId === tournamentId
-  ) {
-    const penalties = currentSnapshot.penalties ?? { a: [], b: [] };
-    const remainingSeconds = currentSnapshot.remainingSeconds ?? 0;
-    const durationSeconds = currentSnapshot.durationSeconds ?? 0;
-    const started =
-      (currentSnapshot.scoreA ?? 0) !== 0 ||
-      (currentSnapshot.scoreB ?? 0) !== 0 ||
-      remainingSeconds !== durationSeconds;
-
-    if (started) {
-      addMatchStats(
-        stats,
-        currentSnapshot.teamAName,
-        currentSnapshot.teamBName,
-        currentSnapshot.scoreA ?? 0,
-        currentSnapshot.scoreB ?? 0,
-        penalties.a?.length ?? 0
-      );
-      addMatchStats(
-        stats,
-        currentSnapshot.teamBName,
-        currentSnapshot.teamAName,
-        currentSnapshot.scoreB ?? 0,
-        currentSnapshot.scoreA ?? 0,
-        penalties.b?.length ?? 0
-      );
-      snapshotCountsAsMatch = true;
-    }
+  if (liveSnapshot) {
+    const penalties = liveSnapshot.penalties ?? { a: [], b: [] };
+    addMatchStats(stats, liveSnapshot.teamAName, liveSnapshot.teamBName, liveSnapshot.scoreA ?? 0, liveSnapshot.scoreB ?? 0, penalties.a?.length ?? 0);
+    addMatchStats(stats, liveSnapshot.teamBName, liveSnapshot.teamAName, liveSnapshot.scoreB ?? 0, liveSnapshot.scoreA ?? 0, penalties.b?.length ?? 0);
+    snapshotCountsAsMatch = true;
   }
 
   // ensure all participants are represented, even without recorded games

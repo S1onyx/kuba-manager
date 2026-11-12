@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import i18n from '../i18n/index.js';
 import { fetchJson } from '../utils/api.js';
+import { standingsSignature } from '../utils/standingsSignature.js';
 
 export default function useStandingsData(scoreboard) {
   const [standings, setStandings] = useState(null);
@@ -10,16 +11,13 @@ export default function useStandingsData(scoreboard) {
   const [recordedGamesCount, setRecordedGamesCount] = useState(0);
   const contextKeyRef = useRef(null);
   const lastFetchSignatureRef = useRef(null);
+  const scoreboardSignature = standingsSignature(scoreboard);
 
   useEffect(() => {
     const contextKey =
       scoreboard?.tournamentId && scoreboard?.stageType === 'group' && scoreboard?.stageLabel
         ? `${scoreboard.tournamentId}::${scoreboard.stageLabel}`
         : null;
-    const scoreboardSignature = scoreboard
-      ? `${scoreboard.scoreA ?? 0}|${scoreboard.scoreB ?? 0}|${scoreboard.lastUpdated ?? ''}`
-      : null;
-
     if (!contextKey) {
       contextKeyRef.current = null;
       lastFetchSignatureRef.current = null;
@@ -35,10 +33,6 @@ export default function useStandingsData(scoreboard) {
     const contextChanged = contextKeyRef.current !== contextKey;
     const signatureChanged = lastFetchSignatureRef.current !== scoreboardSignature;
     const shouldFetch = contextChanged || !hasStandings || signatureChanged;
-
-    if ((scoreboard?.isRunning || scoreboard?.isHalftimeBreak) && hasStandings && !contextChanged) {
-      return;
-    }
 
     if (!shouldFetch || !scoreboardSignature) {
       return;
@@ -81,16 +75,7 @@ export default function useStandingsData(scoreboard) {
     return () => {
       cancelled = true;
     };
-  }, [
-    scoreboard?.tournamentId,
-    scoreboard?.stageType,
-    scoreboard?.stageLabel,
-    scoreboard?.scoreA,
-    scoreboard?.scoreB,
-    scoreboard?.lastUpdated,
-    scoreboard?.isRunning,
-    scoreboard?.isHalftimeBreak
-  ]);
+  }, [scoreboardSignature]);
 
   return {
     standings,

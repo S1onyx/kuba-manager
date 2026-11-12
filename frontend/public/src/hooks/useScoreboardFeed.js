@@ -3,6 +3,7 @@ import socket from '../socket.js';
 import { fetchCurrentStatus } from '../api.js';
 import i18n from '../i18n/index.js';
 import { REFRESH_INTERVAL_MS } from '../constants.js';
+import { liveSignature } from '../utils/liveSignature.js';
 
 export function useScoreboardFeed({ onScoreboardEvent } = {}) {
   const [scoreboard, setScoreboard] = useState(null);
@@ -11,6 +12,7 @@ export function useScoreboardFeed({ onScoreboardEvent } = {}) {
   const [currentTournamentMeta, setCurrentTournamentMeta] = useState(null);
   const [error, setError] = useState('');
   const intervalRef = useRef(null);
+  const lastSignatureRef = useRef(null);
 
   const refresh = useCallback(async () => {
     try {
@@ -41,6 +43,12 @@ export function useScoreboardFeed({ onScoreboardEvent } = {}) {
   useEffect(() => {
     const handleUpdate = (payload) => {
       setScoreboard((prev) => ({ ...(prev ?? {}), ...(payload ?? {}) }));
+      // Uhr-Ticks nur übernehmen; Tabellen und Statistiken nur bei relevanten Änderungen neu laden.
+      const signature = liveSignature(payload);
+      if (signature === lastSignatureRef.current) {
+        return;
+      }
+      lastSignatureRef.current = signature;
       refresh();
       if (typeof onScoreboardEvent === 'function') {
         onScoreboardEvent(payload);

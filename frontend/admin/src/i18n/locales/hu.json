@@ -813,7 +813,6 @@
     "FREE_THROWS_INVALID_TOTAL": "Csak 1 vagy 2 büntetődobás lehetséges.",
     "FREE_THROWS_DONE": "Minden büntetődobás megtörtént.",
     "FREE_THROWS_HAS_ATTEMPTS": "Előbb dobd el vagy vond vissza az összes büntetődobást.",
-    "FREE_THROWS_SHOOTER_LOCKED": "Az első dobás után a dobó nem módosítható.",
     "FREE_THROWS_NO_ATTEMPTS": "Nincs visszavonható büntetődobás.",
     "FREE_THROWS_NOT_ACTIVE": "Nincsenek folyamatban büntetődobások."
   },

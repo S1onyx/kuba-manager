@@ -1,6 +1,7 @@
-import { getState, notifySubscribers, snapshotState, applyFreeThrowToStats } from './stateStore.js';
+import { getState, notifySubscribers, snapshotState, applyFreeThrowToStats, updatePenaltyEvent } from './stateStore.js';
 import { addPoints } from './scoring.js';
-import { pauseTimer, startTimer } from './timer.js';
+import { pauseTimer, startTimer, stopTicker } from './timer.js';
+import { triggerAudioEvent } from '../audio/dispatcher.js';
 
 export class FreeThrowError extends Error {
   constructor(code, message) {
@@ -12,6 +13,7 @@ export class FreeThrowError extends Error {
 export const DEFAULT_FREE_THROWS = 2;
 const ALLOWED_TOTALS = [1, 2];
 const FREE_THROW_DESCRIPTION = 'Freiwurf';
+export const freeThrowSoundKey = (hit) => (hit ? 'free_throw_hit' : 'free_throw_miss');
 
 const normalizeTeam = (team) => (String(team).toLowerCase() === 'b' ? 'b' : 'a');
 const isDone = (series) => series.attempts.length >= series.total;
@@ -40,6 +42,8 @@ function hasPlayTimeLeft(state) {
   const gameStarted = (state.remainingSeconds ?? 0) < (state.durationSeconds ?? 0) || (state.extraElapsedSeconds ?? 0) > 0;
   return gameStarted && ((state.remainingSeconds ?? 0) > 0 || extraLeft > 0);
 }
+
+const canResumeClock = (state) => !state.isRunning && !state.isHalftimeBreak && hasPlayTimeLeft(state);
 
 export function startFreeThrows({ team = 'a', playerId = null, total = DEFAULT_FREE_THROWS, source = 'manual' } = {}) {
   const state = getState();
@@ -70,38 +74,79 @@ export function startFreeThrows({ team = 'a', playerId = null, total = DEFAULT_F
   return snapshotState();
 }
 
+// Werfer für den nächsten Wurf; jeder Wurf einer Serie darf von einem anderen Spieler kommen.
 export function setFreeThrowShooter({ playerId = null } = {}) {
   const state = getState();
   const series = requireSeries(state);
-  if (series.attempts.length > 0) {
-    throw new FreeThrowError('FREE_THROWS_SHOOTER_LOCKED', 'Der Werfer kann nach dem ersten Wurf nicht mehr geändert werden.');
+  if (isDone(series)) {
+    throw new FreeThrowError('FREE_THROWS_DONE', 'Alle Freiwürfe wurden bereits geworfen.');
   }
   Object.assign(series, resolveShooter(state, series.team, playerId));
   notifySubscribers();
   return snapshotState();
 }
 
-export function recordFreeThrow({ hit } = {}) {
+export function recordFreeThrow({ hit, playerId } = {}) {
   const state = getState();
   const series = requireSeries(state);
   if (isDone(series)) {
     throw new FreeThrowError('FREE_THROWS_DONE', 'Alle Freiwürfe wurden bereits geworfen.');
   }
+  if (playerId !== undefined) {
+    Object.assign(series, resolveShooter(state, series.team, playerId));
+  }
   const attemptHit = Boolean(hit);
-  series.attempts.push({ id: `${Date.now()}-${series.attempts.length + 1}`, hit: attemptHit, at: new Date().toISOString() });
+  series.attempts.push({
+    id: `${Date.now()}-${series.attempts.length + 1}`,
+    hit: attemptHit,
+    playerId: series.playerId,
+    playerName: series.playerName,
+    at: new Date().toISOString()
+  });
   applyFreeThrowToStats(series.team, series.playerId, attemptHit);
   if (isDone(series)) {
     series.completedAt = new Date().toISOString();
   }
+  triggerAudioEvent(freeThrowSoundKey(attemptHit), { team: series.team, playerName: series.playerName }).catch((error) => {
+    console.error('Audio-Trigger (Freiwurf) fehlgeschlagen:', error);
+  });
   if (attemptHit) {
-    addPoints(series.team, 1, { playerId: series.playerId, shotType: 'free', type: 'freethrow', description: FREE_THROW_DESCRIPTION });
+    // Freiwurf-Treffer hat einen eigenen Sound statt Korb-Sound bzw. Korbhymne.
+    addPoints(series.team, 1, { playerId: series.playerId, shotType: 'free', type: 'freethrow', description: FREE_THROW_DESCRIPTION, scoreAudio: false });
   } else {
     notifySubscribers();
   }
-  if (series.completedAt && !state.isRunning && !state.isHalftimeBreak && hasPlayTimeLeft(state)) {
-    return startTimer();
+  if (series.completedAt && canResumeClock(state)) {
+    series.clockBeforeResume = captureClock(state);
+    // Ohne Startton, damit der Freiwurf-Sound nicht abgeschnitten wird.
+    return startTimer({ silent: true });
   }
   return snapshotState();
+}
+
+const CLOCK_FIELDS = ['remainingSeconds', 'extraElapsedSeconds', 'isExtraTime', 'currentHalf', 'halftimeTriggered', 'isHalftimeBreak', 'halftimePauseRemaining', 'isFinished'];
+const PENALTY_CLOCK_FIELDS = ['remainingSeconds', 'isExpired', 'expiredAt'];
+const pick = (source, fields) => Object.fromEntries(fields.map((field) => [field, source[field]]));
+
+// Uhr- und Strafenstand im Moment des Auto-Starts, um ihn beim Zurücknehmen wiederherzustellen.
+function captureClock(state) {
+  return {
+    ...pick(state, CLOCK_FIELDS),
+    penalties: ['a', 'b'].flatMap((team) => state.penalties[team].map((penalty) => ({ team, id: penalty.id, ...pick(penalty, PENALTY_CLOCK_FIELDS) })))
+  };
+}
+
+// Still anhalten (kein Pause-Ton) – auch wenn inzwischen Halbzeitpause oder Spielende eingetreten ist.
+function restoreClock(state, saved) {
+  state.isRunning = false;
+  stopTicker();
+  Object.assign(state, pick(saved, CLOCK_FIELDS));
+  saved.penalties.forEach(({ team, id, ...fields }) => {
+    const penalty = state.penalties[team].find((entry) => entry.id === id);
+    if (!penalty) return;
+    Object.assign(penalty, fields);
+    updatePenaltyEvent(id, (entry) => ({ ...entry, ...fields }));
+  });
 }
 
 export function undoFreeThrow() {
@@ -112,9 +157,14 @@ export function undoFreeThrow() {
     throw new FreeThrowError('FREE_THROWS_NO_ATTEMPTS', 'Es gibt keinen Freiwurf zum Zurücknehmen.');
   }
   series.completedAt = null;
-  applyFreeThrowToStats(series.team, series.playerId, last.hit, -1);
+  if (series.clockBeforeResume) {
+    restoreClock(state, series.clockBeforeResume);
+    series.clockBeforeResume = null;
+  }
+  Object.assign(series, { playerId: last.playerId ?? null, playerName: last.playerName ?? null });
+  applyFreeThrowToStats(series.team, last.playerId, last.hit, -1);
   if (last.hit) {
-    return addPoints(series.team, -1, { playerId: series.playerId, shotType: 'free', type: 'freethrow', description: FREE_THROW_DESCRIPTION });
+    return addPoints(series.team, -1, { playerId: last.playerId, shotType: 'free', type: 'freethrow', description: FREE_THROW_DESCRIPTION });
   }
   notifySubscribers();
   return snapshotState();
@@ -126,7 +176,12 @@ export function closeFreeThrows() {
   if (!isDone(series) && series.attempts.length > 0) {
     throw new FreeThrowError('FREE_THROWS_HAS_ATTEMPTS', 'Bitte zuerst alle Freiwürfe werfen oder zurücknehmen.');
   }
+  const cancelled = !isDone(series);
   state.freeThrows = null;
+  // Abbrechen: Uhr läuft wie nach dem letzten Wurf weiter.
+  if (cancelled && canResumeClock(state)) {
+    return startTimer({ silent: true });
+  }
   notifySubscribers();
   return snapshotState();
 }

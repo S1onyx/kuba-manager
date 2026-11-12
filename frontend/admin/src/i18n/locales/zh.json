@@ -804,7 +804,6 @@
     "FREE_THROWS_INVALID_TOTAL": "只能罚 1 次或 2 次。",
     "FREE_THROWS_DONE": "所有罚球已完成。",
     "FREE_THROWS_HAS_ATTEMPTS": "请先完成或撤销所有罚球。",
-    "FREE_THROWS_SHOOTER_LOCKED": "第一罚后不能更换罚球队员。",
     "FREE_THROWS_NO_ATTEMPTS": "没有可撤销的罚球。",
     "FREE_THROWS_NOT_ACTIVE": "当前没有罚球。"
   },

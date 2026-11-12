@@ -47,6 +47,34 @@ test('Start hält laufende Uhr an, nach letztem Wurf läuft sie weiter', () => {
   assert.throws(() => ft.recordFreeThrow({ hit: true }), (error) => error.code === 'FREE_THROWS_DONE');
 });
 
+test('Letzten Wurf zurücknehmen nach Auto-Start: Uhr hält an und springt auf alte Zeit, Strafe auch', () => {
+  freshGame();
+  addPenalty('a', 'Foul', 60);
+  startTimer();
+  ft.startFreeThrows({ team: 'b', playerId: 2 });
+  ft.recordFreeThrow({ hit: false });
+  const resumed = ft.recordFreeThrow({ hit: true });
+  assert.deepEqual([resumed.isRunning, 'clockBeforeResume' in resumed.freeThrows], [true, false]);
+  // Uhr lief weiter: 7 Sekunden vergehen, Strafe läuft mit
+  const live = getState();
+  live.remainingSeconds -= 7;
+  live.penalties.a[0].remainingSeconds -= 7;
+  const state = ft.undoFreeThrow();
+  assert.deepEqual([state.isRunning, state.remainingSeconds, state.penalties.a[0].remainingSeconds, state.scoreB], [false, 400, 60, 0]);
+  assert.deepEqual([state.freeThrows.status.done, state.freeThrows.completedAt], [false, null]);
+  // Erneut werfen: Uhr läuft wieder an
+  assert.equal(ft.recordFreeThrow({ hit: true }).isRunning, true);
+});
+
+test('Zurücknehmen ohne vorherigen Auto-Start ändert die Uhr nicht', () => {
+  freshGame();
+  ft.startFreeThrows({ team: 'b' });
+  ft.recordFreeThrow({ hit: true });
+  getState().remainingSeconds = 390;
+  const state = ft.undoFreeThrow();
+  assert.deepEqual([state.isRunning, state.remainingSeconds], [false, 390]);
+});
+
 test('Keine Restzeit und keine Nachspielzeit: Uhr bleibt nach letztem Wurf aus', () => {
   freshGame({ remainingSeconds: 0, extraSeconds: 0 });
   ft.startFreeThrows({ team: 'a', total: 1 });
@@ -60,15 +88,40 @@ test('Vor Spielbeginn startet die Uhr nach den Freiwürfen nicht', () => {
   assert.equal(ft.recordFreeThrow({ hit: false }).isRunning, false);
 });
 
-test('Zurücknehmen nimmt Punkt und Zähler zurück; Werfer nur vor erstem Wurf änderbar', () => {
+test('Jeder Wurf einer Serie kann von einem anderen Spieler kommen', () => {
   freshGame();
-  ft.startFreeThrows({ team: 'a' });
-  let state = ft.setFreeThrowShooter({ playerId: 1 });
-  assert.equal(state.freeThrows.playerName, 'Anna');
+  setTeamPlayers('a', [{ playerId: 1, name: 'Anna' }, { playerId: 3, name: 'Clara' }]);
+  ft.startFreeThrows({ team: 'a', playerId: 1 });
   ft.recordFreeThrow({ hit: true });
-  assert.throws(() => ft.setFreeThrowShooter({ playerId: null }), (error) => error.code === 'FREE_THROWS_SHOOTER_LOCKED');
-  state = ft.undoFreeThrow();
-  assert.deepEqual([state.scoreA, state.freeThrows.attempts.length, totalOf(state, 'a').freeThrowsAttempted, totalOf(state, 'a').freeThrowsMade], [0, 0, 0, 0]);
+  assert.equal(ft.setFreeThrowShooter({ playerId: 3 }).freeThrows.playerName, 'Clara');
+  const state = ft.recordFreeThrow({ hit: false });
+  assert.deepEqual(state.freeThrows.attempts.map((attempt) => [attempt.playerName, attempt.hit]), [['Anna', true], ['Clara', false]]);
+  assert.deepEqual([playerOf(state, 'a', 1).freeThrowsMade, playerOf(state, 'a', 1).freeThrowsAttempted, playerOf(state, 'a', 1).points], [1, 1, 1]);
+  assert.deepEqual([playerOf(state, 'a', 3).freeThrowsMade, playerOf(state, 'a', 3).freeThrowsAttempted, playerOf(state, 'a', 3).points], [0, 1, 0]);
+  assert.throws(() => ft.setFreeThrowShooter({ playerId: 1 }), (error) => error.code === 'FREE_THROWS_DONE');
+});
+
+test('Werfer direkt beim Wurf mitgeben; fremder Spieler abgelehnt', () => {
+  freshGame();
+  setTeamPlayers('a', [{ playerId: 1, name: 'Anna' }, { playerId: 3, name: 'Clara' }]);
+  ft.startFreeThrows({ team: 'a' });
+  assert.equal(ft.recordFreeThrow({ hit: true, playerId: 3 }).freeThrows.attempts[0].playerName, 'Clara');
+  assert.throws(() => ft.recordFreeThrow({ hit: true, playerId: 2 }), (error) => error.code === 'PLAYER_NOT_IN_TEAM');
+});
+
+test('Freiwurf-Sounds: eigener Trigger für Treffer und daneben', () => {
+  assert.deepEqual([ft.freeThrowSoundKey(true), ft.freeThrowSoundKey(false)], ['free_throw_hit', 'free_throw_miss']);
+});
+
+test('Zurücknehmen nimmt Punkt und Zähler beim richtigen Werfer zurück', () => {
+  freshGame();
+  setTeamPlayers('a', [{ playerId: 1, name: 'Anna' }, { playerId: 3, name: 'Clara' }]);
+  ft.startFreeThrows({ team: 'a', playerId: 1 });
+  ft.recordFreeThrow({ hit: true, playerId: 3 });
+  ft.setFreeThrowShooter({ playerId: 1 });
+  const state = ft.undoFreeThrow();
+  assert.deepEqual([state.scoreA, state.freeThrows.attempts.length, state.freeThrows.playerName], [0, 0, 'Clara']);
+  assert.deepEqual([playerOf(state, 'a', 3).freeThrowsAttempted, playerOf(state, 'a', 3).points, totalOf(state, 'a').freeThrowsMade], [0, 0, 0]);
   assert.throws(() => ft.undoFreeThrow(), (error) => error.code === 'FREE_THROWS_NO_ATTEMPTS');
 });
 
@@ -81,6 +134,32 @@ test('Schließen: offene Serie mit Würfen abgelehnt, ohne Würfe oder fertig er
   assert.equal(ft.closeFreeThrows().freeThrows, null);
   ft.startFreeThrows({ team: 'a' });
   assert.equal(ft.closeFreeThrows().freeThrows, null);
+});
+
+test('Freiwürfe abbrechen lässt die Uhr wieder laufen', () => {
+  freshGame();
+  startTimer();
+  assert.equal(ft.startFreeThrows({ team: 'a' }).isRunning, false);
+  const state = ft.closeFreeThrows();
+  assert.deepEqual([state.freeThrows, state.isRunning, state.remainingSeconds], [null, true, 400]);
+});
+
+test('Abbrechen vor Spielbeginn oder ohne Restzeit startet die Uhr nicht', () => {
+  freshGame({ remainingSeconds: 600 });
+  ft.startFreeThrows({ team: 'a' });
+  assert.equal(ft.closeFreeThrows().isRunning, false);
+  freshGame({ remainingSeconds: 0, extraSeconds: 0 });
+  ft.startFreeThrows({ team: 'a' });
+  assert.equal(ft.closeFreeThrows().isRunning, false);
+});
+
+test('Fertige Serie ausblenden fasst die Uhr nicht an', () => {
+  freshGame();
+  ft.startFreeThrows({ team: 'a', total: 1 });
+  ft.recordFreeThrow({ hit: false });
+  getState().isRunning = false;
+  clearScoreboardTicker();
+  assert.equal(ft.closeFreeThrows().isRunning, false);
 });
 
 test('Fertige Serie darf durch neue ersetzt werden', () => {

@@ -420,7 +420,7 @@ export async function updateTriggerSettings(key, { isActive, fileId }) {
   return getAudioTrigger(trigger.key);
 }
 
-const timerCueCache = { warningSeconds: 15, countdownFrom: 5, halftimeAutoStart: false };
+const timerCueCache = { warningSeconds: 15, countdownFrom: 5, halftimeAutoStart: true };
 let timerCueCacheLoaded = false;
 
 async function loadTimerCueCache() {

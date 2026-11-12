@@ -513,7 +513,7 @@ const freeThrowAction = (action) => (req, res) => {
 
 router.post('/freethrows/start', freeThrowAction((body) => startFreeThrows({ team: body.team, playerId: body.playerId, total: body.total })));
 router.post('/freethrows/shooter', freeThrowAction((body) => setFreeThrowShooter({ playerId: body.playerId })));
-router.post('/freethrows/attempt', freeThrowAction((body) => recordFreeThrow({ hit: body.hit === true })));
+router.post('/freethrows/attempt', freeThrowAction((body) => recordFreeThrow({ hit: body.hit === true, ...('playerId' in body ? { playerId: body.playerId } : {}) })));
 router.post('/freethrows/undo', freeThrowAction(() => undoFreeThrow()));
 router.post('/freethrows/close', freeThrowAction(() => closeFreeThrows()));
 

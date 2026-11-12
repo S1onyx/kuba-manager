@@ -26,7 +26,7 @@ export default function useAudioManager({ updateMessage, reloadDependencies = []
   const [audioManualBusy, setAudioManualBusy] = useState({});
   const [audioTriggerLabels, setAudioTriggerLabels] = useState({});
   const [audioLibraryUploadLabel, setAudioLibraryUploadLabel] = useState('');
-  const [timerCueSettings, setTimerCueSettings] = useState({ warningSeconds: 15, countdownFrom: 5, halftimeAutoStart: false });
+  const [timerCueSettings, setTimerCueSettings] = useState({ warningSeconds: 15, countdownFrom: 5, halftimeAutoStart: true });
   const [timerCueBusy, setTimerCueBusy] = useState(false);
 
   const loadAudioData = useCallback(

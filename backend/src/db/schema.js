@@ -256,6 +256,8 @@ export default function initializeSchema(db) {
     ['score_team_b', 'Korb Team B', 'Wird bei einem Korb für Team B abgespielt.'],
     ['foul', 'Foul', 'Wird bei einem Foul abgespielt.'],
     ['penalty_expired', 'Strafe abgelaufen', 'Wird abgespielt, wenn eine Zeitstrafe abgelaufen ist.'],
+    ['free_throw_hit', 'Freiwurf Treffer', 'Wird bei einem getroffenen Freiwurf abgespielt (statt Korb-Sound bzw. Korbhymne).'],
+    ['free_throw_miss', 'Freiwurf daneben', 'Wird bei einem verworfenen Freiwurf abgespielt.'],
     ['timer_warning', 'Vorsignal', 'Dezentes Signal kurz vor Spielende bzw. Halbzeit (konfigurierbar).'],
     ['timer_countdown_beep', 'Countdown-Piepser', 'Sekundlicher Piepser in der Schlussphase bzw. vor Wiederanpfiff (konfigurierbar).']
   ];
@@ -279,7 +281,7 @@ export default function initializeSchema(db) {
   const defaultSettings = [
     ['timer_warning_seconds', '15'],
     ['timer_countdown_from', '5'],
-    ['halftime_auto_start', '0']
+    ['halftime_auto_start', '1']
   ];
 
   defaultSettings.forEach(([key, value]) => {
@@ -289,6 +291,15 @@ export default function initializeSchema(db) {
       WHERE NOT EXISTS (SELECT 1 FROM app_settings WHERE key = '${key}');
     `);
   });
+
+  // Einmalig: Auto-Start nach der Halbzeitpause war früher standardmäßig aus und ist jetzt an.
+  const autoStartMigrated = db.exec("SELECT 1 FROM app_settings WHERE key = 'halftime_auto_start_default_on'").length > 0;
+  if (!autoStartMigrated) {
+    db.exec(`
+      UPDATE app_settings SET value = '1', updated_at = datetime('now') WHERE key = 'halftime_auto_start';
+      INSERT INTO app_settings (key, value) VALUES ('halftime_auto_start_default_on', '1');
+    `);
+  }
 
   return migrateTeamsToTournaments(db);
 }
