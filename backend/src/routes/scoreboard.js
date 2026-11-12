@@ -290,9 +290,9 @@ router.post('/context', async (req, res) => {
 });
 
 router.post('/display', (req, res) => {
-  const { view } = req.body ?? {};
+  const { view, callitTournamentId } = req.body ?? {};
   try {
-    const nextState = setDisplayView(view);
+    const nextState = setDisplayView(view, { callitTournamentId });
     res.json(nextState);
   } catch (error) {
     if (error?.code === 'INVALID_DISPLAY_VIEW') {

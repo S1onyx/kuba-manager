@@ -1,5 +1,82 @@
 import { migrateTeamsToTournaments } from './migrations/tournamentTeams.js';
 
+// Tippspiel „CallIt“: Konten sind turnierübergreifend, Teilnahme/Tipps je Turnier.
+function initializeCallitSchema(db) {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS callit_users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nickname TEXT NOT NULL UNIQUE COLLATE NOCASE,
+      password_hash TEXT NOT NULL,
+      is_banned INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT DEFAULT (datetime('now')),
+      last_login_at TEXT
+    );
+    CREATE TABLE IF NOT EXISTS callit_sessions (
+      token_hash TEXT PRIMARY KEY,
+      user_id INTEGER NOT NULL,
+      created_at TEXT DEFAULT (datetime('now')),
+      expires_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_callit_sessions_user ON callit_sessions (user_id);
+    CREATE TABLE IF NOT EXISTS callit_tournaments (
+      tournament_id INTEGER PRIMARY KEY,
+      enabled INTEGER NOT NULL DEFAULT 0,
+      registration_open INTEGER NOT NULL DEFAULT 1,
+      join_code TEXT,
+      settings_json TEXT NOT NULL DEFAULT '{}',
+      rules_text TEXT,
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS callit_participants (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tournament_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      joined_at TEXT DEFAULT (datetime('now')),
+      is_disqualified INTEGER NOT NULL DEFAULT 0,
+      UNIQUE(tournament_id, user_id)
+    );
+    CREATE TABLE IF NOT EXISTS callit_tips (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tournament_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      schedule_code TEXT NOT NULL,
+      score_home INTEGER NOT NULL,
+      score_away INTEGER NOT NULL,
+      advance TEXT,
+      is_joker INTEGER NOT NULL DEFAULT 0,
+      home_key TEXT NOT NULL,
+      away_key TEXT NOT NULL,
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now')),
+      UNIQUE(tournament_id, user_id, schedule_code)
+    );
+    CREATE INDEX IF NOT EXISTS idx_callit_tips_match ON callit_tips (tournament_id, schedule_code);
+    CREATE TABLE IF NOT EXISTS callit_locks (
+      tournament_id INTEGER NOT NULL,
+      schedule_code TEXT NOT NULL,
+      state TEXT NOT NULL,
+      reason TEXT,
+      changed_at TEXT DEFAULT (datetime('now')),
+      PRIMARY KEY (tournament_id, schedule_code)
+    );
+    CREATE TABLE IF NOT EXISTS callit_special_tips (
+      tournament_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      bet_key TEXT NOT NULL,
+      value_json TEXT NOT NULL,
+      updated_at TEXT DEFAULT (datetime('now')),
+      PRIMARY KEY (tournament_id, user_id, bet_key)
+    );
+    CREATE TABLE IF NOT EXISTS callit_special_results (
+      tournament_id INTEGER NOT NULL,
+      bet_key TEXT NOT NULL,
+      value_json TEXT NOT NULL,
+      updated_at TEXT DEFAULT (datetime('now')),
+      PRIMARY KEY (tournament_id, bet_key)
+    );
+  `);
+}
+
 export default function initializeSchema(db) {
   db.exec(`
     CREATE TABLE IF NOT EXISTS games (
@@ -300,6 +377,8 @@ export default function initializeSchema(db) {
       INSERT INTO app_settings (key, value) VALUES ('halftime_auto_start_default_on', '1');
     `);
   }
+
+  initializeCallitSchema(db);
 
   return migrateTeamsToTournaments(db);
 }

@@ -6,7 +6,7 @@ import {
   DEFAULT_DISPLAY_VIEW
 } from './stateStore.js';
 
-export function setDisplayView(view) {
+export function setDisplayView(view, { callitTournamentId } = {}) {
   const normalized = typeof view === 'string' ? view.toLowerCase().trim() : '';
   const target = DISPLAY_VIEWS.includes(normalized) ? normalized : null;
 
@@ -18,11 +18,17 @@ export function setDisplayView(view) {
   }
 
   const state = getState();
-  if (state.displayView === target) {
+  const numericTournamentId = Number(callitTournamentId);
+  const nextCallitTournamentId =
+    Number.isInteger(numericTournamentId) && numericTournamentId > 0
+      ? numericTournamentId
+      : state.displayCallitTournamentId ?? null;
+  if (state.displayView === target && state.displayCallitTournamentId === nextCallitTournamentId) {
     return snapshotState();
   }
 
   state.displayView = target;
+  state.displayCallitTournamentId = nextCallitTournamentId;
   notifySubscribers();
   return snapshotState();
 }

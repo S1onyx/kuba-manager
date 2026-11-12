@@ -12,6 +12,10 @@ import playerRoutes from './routes/players.js';
 import audioRoutes from './routes/audio.js';
 import inboundRoutes from './routes/inbound.js';
 import authRoutes from './routes/auth.js';
+import callitRoutes from './routes/callit.js';
+import callitAdminRoutes from './routes/callitAdmin.js';
+import { setCallitIo } from './services/callit/events.js';
+import { registerCallitScoreboardHook } from './services/callit/locks.js';
 import { getAuthConfig, requireAdmin, requireAdminExcept } from './auth/index.js';
 import { getAudioStorageDirectory, initTimerCueSettings } from './services/index.js';
 import { getRegistrationAudioDir } from './services/registrations/index.js';
@@ -26,6 +30,7 @@ const io = new SocketIO(server, {
 });
 
 setupSocket(io);
+setCallitIo(io);
 
 app.use(cors());
 app.use(express.json());
@@ -63,6 +68,8 @@ app.use('/api/teams', requireAdmin, teamRoutes);
 app.use('/api/players', requireAdmin, playerRoutes);
 app.use('/api/audio', requireAdmin, audioRoutes);
 app.use('/api/inbound', inboundRoutes);
+app.use('/api/callit', callitRoutes);
+app.use('/api/callit-admin', requireAdmin, callitAdminRoutes);
 
 const authConfig = getAuthConfig();
 if (!authConfig.passwordHash) {
@@ -72,6 +79,8 @@ if (!authConfig.passwordHash) {
       : '[auth] ADMIN_PASSWORD_HASH nicht gesetzt – Admin-Login ist deaktiviert.'
   );
 }
+
+registerCallitScoreboardHook().catch((err) => console.error('[callit] Initialisierung fehlgeschlagen:', err));
 
 initTimerCueSettings().catch((err) => console.error('Timer-Cue-Einstellungen konnten nicht geladen werden:', err));
 
