@@ -172,6 +172,7 @@ function createDefaultState(overrides = {}) {
     scoringLog: [],
     penaltyLog: [],
     shootout: null,
+    freeThrows: null,
     isFinished: false,
     savedGameId: null,
     savedSignature: null,
@@ -546,7 +547,8 @@ function resultSignature() {
     state.scoreB,
     state.scoringLog.length,
     state.penaltyLog.length,
-    state.shootout?.attempts?.length ?? 0
+    state.shootout?.attempts?.length ?? 0,
+    TEAM_KEYS.map((teamKey) => state.playerStats?.[teamKey]?.[TEAM_TOTAL_KEY]?.freeThrowsAttempted ?? 0)
   ]);
 }
 
@@ -577,6 +579,17 @@ export function snapshotState() {
           ...state.shootout,
           attempts: state.shootout.attempts.map((attempt) => ({ ...attempt })),
           status: evaluateShootout(state.shootout)
+        }
+      : null,
+    freeThrows: state.freeThrows
+      ? {
+          ...state.freeThrows,
+          attempts: state.freeThrows.attempts.map((attempt) => ({ ...attempt })),
+          status: {
+            taken: state.freeThrows.attempts.length,
+            made: state.freeThrows.attempts.filter((attempt) => attempt.hit).length,
+            done: state.freeThrows.attempts.length >= state.freeThrows.total
+          }
         }
       : null
   };

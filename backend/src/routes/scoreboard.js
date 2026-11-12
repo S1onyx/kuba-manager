@@ -13,6 +13,13 @@ import {
   undoShootoutAttempt,
   cancelShootout,
   ShootoutError,
+  startFreeThrows,
+  setFreeThrowShooter,
+  recordFreeThrow,
+  undoFreeThrow,
+  closeFreeThrows,
+  awardFreeThrowsForPenalty,
+  FreeThrowError,
   markGameSaved,
   markGameFinished,
   resetScores,
@@ -454,6 +461,9 @@ router.post('/save', async (_req, res) => {
     if (snapshot.shootout && !evaluateShootout(snapshot.shootout).decided) {
       return res.status(409).json({ code: 'SHOOTOUT_UNDECIDED', message: 'Das Freiwurf-Stechen ist noch nicht entschieden.' });
     }
+    if (snapshot.freeThrows && !snapshot.freeThrows.status.done) {
+      return res.status(409).json({ code: 'FREE_THROWS_OPEN', message: 'Es sind noch Freiwürfe offen.' });
+    }
     if (['knockout', 'placement'].includes(snapshot.stageType) && (snapshot.scoreA ?? 0) === (snapshot.scoreB ?? 0)) {
       return res.status(409).json({ code: 'KNOCKOUT_DRAW', message: 'Unentschieden im KO-Spiel – bitte Freiwurf-Stechen durchführen.' });
     }
@@ -486,6 +496,24 @@ router.post('/shootout/start', shootoutAction((body) => startShootout({ firstTea
 router.post('/shootout/attempt', shootoutAction((body) => recordShootoutAttempt({ team: body.team, playerId: body.playerId, hit: body.hit === true })));
 router.post('/shootout/undo', shootoutAction(() => undoShootoutAttempt()));
 router.post('/shootout/cancel', shootoutAction(() => cancelShootout()));
+
+const freeThrowAction = (action) => (req, res) => {
+  try {
+    res.json(action(req.body ?? {}));
+  } catch (error) {
+    if (error instanceof FreeThrowError) {
+      return res.status(409).json({ code: error.code, message: error.message });
+    }
+    console.error('Freiwürfe fehlgeschlagen:', error);
+    res.status(500).json({ code: 'FREE_THROWS_FAILED', message: 'Freiwürfe konnten nicht aktualisiert werden.' });
+  }
+};
+
+router.post('/freethrows/start', freeThrowAction((body) => startFreeThrows({ team: body.team, playerId: body.playerId, total: body.total })));
+router.post('/freethrows/shooter', freeThrowAction((body) => setFreeThrowShooter({ playerId: body.playerId })));
+router.post('/freethrows/attempt', freeThrowAction((body) => recordFreeThrow({ hit: body.hit === true })));
+router.post('/freethrows/undo', freeThrowAction(() => undoFreeThrow()));
+router.post('/freethrows/close', freeThrowAction(() => closeFreeThrows()));
 
 router.post('/game/clear', (_req, res) => {
   try {
@@ -640,10 +668,15 @@ router.delete('/history/:id', async (req, res) => {
 });
 
 router.post('/penalties', (req, res) => {
-  const { team, name, seconds, playerId, description } = req.body ?? {};
+  const { team, name, seconds, playerId, description, freeThrows = 0 } = req.body ?? {};
 
   if (!team || !['a', 'b', 'A', 'B'].includes(team)) {
     return res.status(400).json({ code: 'INVALID_TEAM_SIDE', message: 'Ungültiges Team. Erlaubt sind \"A\" oder \"B\".' });
+  }
+
+  const freeThrowCount = Number(freeThrows);
+  if (![0, 1, 2].includes(freeThrowCount)) {
+    return res.status(400).json({ code: 'FREE_THROWS_INVALID_TOTAL', message: 'freeThrows muss 0, 1 oder 2 sein.' });
   }
 
   if (!Number.isFinite(Number(seconds)) || Number(seconds) <= 0) {
@@ -671,7 +704,11 @@ router.post('/penalties', (req, res) => {
     playerId: resolvedPlayerId,
     description
   });
-  res.json(nextState);
+  if (freeThrowCount === 0) {
+    return res.json(nextState);
+  }
+  const { skipped, state } = awardFreeThrowsForPenalty(team, freeThrowCount);
+  res.json({ ...state, freeThrowsSkipped: skipped });
 });
 
 router.delete('/penalties/:id', (req, res) => {

@@ -23,6 +23,15 @@ import {
 import { addPenalty, removePenalty } from './penalties.js';
 import { clearGame, resetGame } from './reset.js';
 import { startShootout, recordShootoutAttempt, undoShootoutAttempt, cancelShootout, ShootoutError } from './shootout.js';
+import {
+  startFreeThrows,
+  setFreeThrowShooter,
+  recordFreeThrow,
+  undoFreeThrow,
+  closeFreeThrows,
+  awardFreeThrowsForPenalty,
+  FreeThrowError
+} from './freeThrows.js';
 
 export function getScoreboardState() {
   return snapshotState();
@@ -57,6 +66,13 @@ export {
   undoShootoutAttempt,
   cancelShootout,
   ShootoutError,
+  startFreeThrows,
+  setFreeThrowShooter,
+  recordFreeThrow,
+  undoFreeThrow,
+  closeFreeThrows,
+  awardFreeThrowsForPenalty,
+  FreeThrowError,
   markGameSaved,
   normalizeGroupStageLabel,
   setDisplayView,
