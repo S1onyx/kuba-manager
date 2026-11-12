@@ -136,6 +136,32 @@ test('Schließen: offene Serie mit Würfen abgelehnt, ohne Würfe oder fertig er
   assert.equal(ft.closeFreeThrows().freeThrows, null);
 });
 
+test('Freiwürfe abbrechen lässt die Uhr wieder laufen', () => {
+  freshGame();
+  startTimer();
+  assert.equal(ft.startFreeThrows({ team: 'a' }).isRunning, false);
+  const state = ft.closeFreeThrows();
+  assert.deepEqual([state.freeThrows, state.isRunning, state.remainingSeconds], [null, true, 400]);
+});
+
+test('Abbrechen vor Spielbeginn oder ohne Restzeit startet die Uhr nicht', () => {
+  freshGame({ remainingSeconds: 600 });
+  ft.startFreeThrows({ team: 'a' });
+  assert.equal(ft.closeFreeThrows().isRunning, false);
+  freshGame({ remainingSeconds: 0, extraSeconds: 0 });
+  ft.startFreeThrows({ team: 'a' });
+  assert.equal(ft.closeFreeThrows().isRunning, false);
+});
+
+test('Fertige Serie ausblenden fasst die Uhr nicht an', () => {
+  freshGame();
+  ft.startFreeThrows({ team: 'a', total: 1 });
+  ft.recordFreeThrow({ hit: false });
+  getState().isRunning = false;
+  clearScoreboardTicker();
+  assert.equal(ft.closeFreeThrows().isRunning, false);
+});
+
 test('Fertige Serie darf durch neue ersetzt werden', () => {
   freshGame();
   ft.startFreeThrows({ team: 'a', total: 1 });

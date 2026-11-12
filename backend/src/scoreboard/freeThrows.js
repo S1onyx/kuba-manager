@@ -43,6 +43,8 @@ function hasPlayTimeLeft(state) {
   return gameStarted && ((state.remainingSeconds ?? 0) > 0 || extraLeft > 0);
 }
 
+const canResumeClock = (state) => !state.isRunning && !state.isHalftimeBreak && hasPlayTimeLeft(state);
+
 export function startFreeThrows({ team = 'a', playerId = null, total = DEFAULT_FREE_THROWS, source = 'manual' } = {}) {
   const state = getState();
   if (state.freeThrows && !isDone(state.freeThrows)) {
@@ -114,7 +116,7 @@ export function recordFreeThrow({ hit, playerId } = {}) {
   } else {
     notifySubscribers();
   }
-  if (series.completedAt && !state.isRunning && !state.isHalftimeBreak && hasPlayTimeLeft(state)) {
+  if (series.completedAt && canResumeClock(state)) {
     series.clockBeforeResume = captureClock(state);
     // Ohne Startton, damit der Freiwurf-Sound nicht abgeschnitten wird.
     return startTimer({ silent: true });
@@ -174,7 +176,12 @@ export function closeFreeThrows() {
   if (!isDone(series) && series.attempts.length > 0) {
     throw new FreeThrowError('FREE_THROWS_HAS_ATTEMPTS', 'Bitte zuerst alle Freiwürfe werfen oder zurücknehmen.');
   }
+  const cancelled = !isDone(series);
   state.freeThrows = null;
+  // Abbrechen: Uhr läuft wie nach dem letzten Wurf weiter.
+  if (cancelled && canResumeClock(state)) {
+    return startTimer({ silent: true });
+  }
   notifySubscribers();
   return snapshotState();
 }
