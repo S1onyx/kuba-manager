@@ -16,7 +16,12 @@ export default {
             {
               type: 'paragraph',
               text:
-                'A Kunstrad Basketballt művészeti kerékpárokon, a fejcső-álló pozícióban, két négyszemélyes csapat játssza. A cél kosarakat szerezni és megakadályozni az ellenfél kosarait. A játékot játékvezetők és a mérkőzésvezetés felügyeli; az a csapat nyer, amelyik a játékidő leteltével a legtöbb ponttal rendelkezik.'
+                'A Kunstrad Basketballt művészeti kerékpárokon, fejcső-álló pozícióban, két négyfős csapat játssza. Minden csapat célja, hogy a labdát az ellenfél kosarába juttassa, illetve megakadályozza a másik csapatot ebben.'
+            },
+            {
+              type: 'paragraph',
+              text:
+                'A játékot két játékvezető és a mérkőzésvezetés felügyeli. Minden kosárért meghatározott számú pont jár. Az a csapat nyer, amelyik a játékidő végén a legtöbb pontot szerezte.'
             }
           ]
         },
@@ -27,20 +32,20 @@ export default {
               type: 'list',
               items: [
                 'Egy csapat legfeljebb öt játékosból áll.',
-                'Csapatonként egyszerre legfeljebb négy játékos tartózkodhat a pályán. A pályán lévő túl sok játékos 2 perces időbüntetéssel jár.',
-                'A játékoscserék repülőcsere formájában, kizárólag a saját coaching zónán keresztül történnek.'
+                'Csapatonként legfeljebb négy játékos van a pályán és vesz részt aktívan a játékban.',
+                'A cserék játék közben, a játékvezető engedélye nélkül történnek, és csak a coaching zóna alapvonalán keresztül hajthatók végre. A csapatnak ügyelnie kell arra, hogy egyszerre legfeljebb négy játékos legyen a pályán. A szabály megszegése egy játékos 2 perces kiállítását vonja maga után; a csapat eggyel kevesebb játékossal folytatja.'
               ]
             }
           ]
         },
         {
-          heading: '1.3 Vezetési pozíció',
+          heading: '1.3 Haladási pozíció',
           body: [
             {
               type: 'list',
               items: [
-                'Az egész játék a fejcső-álló pozícióban zajlik, az UCI szabályzatának megfelelő művészeti vagy kerékpárlabda-kerékpáron; a pozíciót a coaching zónában kell felvenni.',
-                'Leszállás, időbüntetés vagy hasonló helyzetek esetén a pályát azonnal el kell hagyni, és az csak a coaching zónából, fejcső-álló pozícióban hajtható be újra.'
+                'A teljes mérkőzést fejcső-álló pozícióban, művészeti vagy kerékpárlabda-kerékpáron kell lejátszani az UCI-szabályzat szerint – ezt a pozíciót a coaching zónában kell felvenni.',
+                'Leszállás, kiállítás vagy hasonló esetén a pályát azonnal el kell hagyni, és csak fejcső-álló pozícióban, a coaching zónából szabad visszatérni.'
               ]
             }
           ]
@@ -51,12 +56,24 @@ export default {
             {
               type: 'list',
               items: [
-                'Minden csapat saját coaching zónával rendelkezik, ahol a cserejátékosok tartózkodnak.',
-                'Sikeres kosárdobás után a kosarat kapó csapat a saját alapvonaláról kezd bedobással.',
+                'Minden csapatnak saját coaching zónája van, ahol a cserejátékosoknak tartózkodniuk kell.',
                 {
-                  text: 'A pontozás megfelel a kosárlabdának:',
-                  subItems: ['1 pont – szabaddobás', '2 pont – játékból szerzett dobás', '3 pont – a hárompontos vonal mögüli dobás']
+                  text: 'A pontozás a kosárlabdáéval megegyezik:',
+                  subItems: ['1 pont – büntetődobás', '2 pont – normál mezőnydobás', '3 pont – dobás a hárompontos vonal mögül']
                 }
+              ]
+            },
+            {
+              type: 'image',
+              src: '/reglement/spielfeld.png',
+              alt: 'Pálya büntetőzónákkal, hárompontos vonalakkal és coaching zónákkal',
+              caption: 'Pálya – a büntetőzóna sötétszürkével jelölt.'
+            },
+            {
+              type: 'list',
+              items: [
+                'A büntetőzóna sötétszürkével van jelölve.',
+                'Sikeres kosár után labdacsere következik; a csapat az alapvonalról indul.'
               ]
             }
           ]
@@ -67,15 +84,21 @@ export default {
       title: '2. A játék menete',
       subsections: [
         {
-          heading: '2.1 Játékidő, kezdés & vége',
+          heading: '2.1 Játékidő, kezdés & befejezés',
           body: [
             {
               type: 'list',
               items: [
-                'Játékidő: 2×5 perc, 1 perces félidőszünettel; az óra megszakítás nélkül jár.',
-                'A kezdés előtt véletlenszerű döntés (pl. pénzfeldobás) határozza meg, melyik csapat kapja a labdabirtoklást.',
-                'A kezdőjáték a saját térfélen történik; mindkét csapat a saját térfeléről indul, és a játék a játékvezető sípjelzésére kezdődik.',
-                'A mérkőzésvezetés figyeli az időt és sípjelzéssel jelzi a végét.'
+                '2 × 5 perc térfélcserével – 1 perc félidei szünet.',
+                'Alapvetően futó órával játszanak. Az órát csak a játékvezető sípszója és a megfelelő kézjel állítja meg (lásd 3.2). Ennek oka lehet figyelmeztetés, szabálytalanság, pályán kívüli labda vagy egyéb, a játékvezetők mérlegelésére bízott ok.',
+                {
+                  text: 'Kieséses mérkőzéseken a véletlen (a játékvezető pénzfeldobása) dönti el, melyik csapat kezd. Csoportmérkőzéseken az elsőként megnevezett csapat kezd.',
+                  subItems: [
+                    'A kezdés a saját térfélen, az alapvonalnál történik; mindkét csapat a saját térfeléről indul.',
+                    'A mérkőzés a játékvezető sípszavával és a jelzőhanggal kezdődik.'
+                  ]
+                },
+                'A játékidőt a mérkőzésvezetés felügyeli; a mérkőzés végét sípszó és jelzőhang jelzi.'
               ]
             }
           ]
@@ -86,126 +109,191 @@ export default {
             {
               type: 'list',
               items: [
-                'Labdával a kézben legfeljebb három pedálfordulat engedélyezett.',
-                'Legkésőbb három pedálfordulat után pattogtatni kell a labdát vagy passzolni kell. A dupla pattogtatás – a labda felvétele és újbóli pattogtatása – tilos.',
-                'Háromnál több pedálfordulat esetén passz vagy pattogtatás nélkül a labdabirtoklás az ellenfél csapatához kerül.',
-                'Ha egy csapat nem tudja felvenni a labdát anélkül, hogy elhagyná a fejcső-álló pozíciót, az ellenfél kapja a labdabirtoklást; a játékvezető felemeli a labdát, hogy az ellenfél átvehesse.',
-                'Ha a labda elhagyja a pályát, az ellenfél csapata szintén ezen a helyen kapja meg a labdát, amelyet a játékvezető ad játékba.'
-              ]
-            }
-          ]
-        },
-        {
-          heading: '2.3 Tornamódusz',
-          body: [
-            {
-              type: 'list',
-              items: [
-                'A selejtezőkör egy vagy több csoportban kerül megrendezésre.',
-                'Pontozás: győzelem 3 pont, döntetlen 1 pont, vereség 0 pont.',
-                'A döntőkör egyenes kieséses rendszerben zajlik. Rendes játékidő utáni döntetlen esetén a játékidő felének megfelelő hosszabbítás következik.',
-                'Ha ezután is döntetlen az állás, szabaddobás-párbaj következik: mindkét csapat felváltva ötször dob a hárompontos vonal mögül – minden játékosnak legalább egyszer dobnia kell. Ha továbbra sincs győztes, a folyamat addig ismétlődik, amíg egy csapat nyer.'
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      title: '3. Szabálytalanságok & faultok',
-      subsections: [
-        {
-          heading: '3.1 A fejcső-álló pozíció elhagyása',
-          body: [
-            {
-              type: 'paragraph',
-              text:
-                'Aki elhagyja a fejcső-álló pozíciót vagy elesik, annak haladéktalanul a legközelebbi külső jelöléshez kell hajtania, el kell hagynia a pályát, és a pozíció újbóli felvétele után a saját coaching zónából szállhat vissza. Ez közben a játékmenetet nem szabad akadályoznia.'
-            }
-          ]
-        },
-        {
-          heading: '3.2 Technikai fault, érintkezés & szabálytalan blokkolás',
-          body: [
-            {
-              type: 'list',
-              items: [
-                'Ide tartozik többek között a lelökés, a nagy sebességnél történő szabálytalan blokkolás, a szándékos ráfutás vagy az út elé vágás (mozgó játékos elé fékezési távolság nélkül keresztbe állni).',
-                'A játékmenetet nem befolyásoló, elkerülhetetlen testi érintkezés nem minősül faultnak.',
-                'Ütközések esetén a játékvezető dönt a vétkesség kérdésében; tisztázatlan esetben mindkét játékos időbüntetést kap.',
+                'Labdával a kézben legfeljebb három pedálfordulatot lehet megtenni.',
                 {
-                  text: 'Időbüntetések katalógusa:',
-                  subItems: ['Enyhe fault: 1 perc', 'Súlyos fault: 2 perc', 'Sportszemélytelen vagy veszélyes fault: kizárás a játékból']
-                },
-                'A fault súlyosságának megítélése kizárólag a játékvezető hatásköre.',
-                {
-                  text: 'Az ismételt szabálytalanságok szigorúbban büntethetők:',
+                  text: 'Legkésőbb három pedálfordulat után pattintani vagy passzolni kell.',
                   subItems: [
-                    'Hosszabb időbüntetés ismételt enyhe faultok esetén',
-                    'Kizárás a játékból ismételt súlyos faultok esetén',
-                    'Játékosok vagy a csapat kizárása a tornáról játékbeli kizárás(ok) esetén'
+                    'Kettős indítás tilos: ha a labdát másodszor is felvették, újabb pattintással sem lehet háromnál több pedálfordulatot megtenni – a második felvétel után a labdát passzolni vagy dobni kell.',
+                    'A szabály megszegése labdacserével jár az ellenfél javára.'
                   ]
                 },
-                'A játék megszakad, és az ellenfél labdabirtoklásával folytatódik, kivéve, ha a faultot elszenvedő játékos megtartja az előnyt és folytathatja a támadást.'
+                {
+                  text: 'Ha a labda a földre esik, és a fejcső-álló pozíció elhagyása nélkül nem vehető fel, az ellenfél kapja a labdát.',
+                  subItems: ['A játékvezető ezen a helyen a levegőbe emeli a labdát, amelyet az ellenfél csapatának kell átvennie.']
+                },
+                {
+                  text: 'Ha a labda elhagyja a pályát, ezen a helyen az ellenfél kapja meg.',
+                  subItems: ['A játékvezető ezen a helyen, az oldalvonalnál a levegőbe emeli a labdát, amelyet az ellenfél csapatának kell átvennie.']
+                }
               ]
             }
           ]
         },
         {
-          heading: '3.3 Fault a hárompontos zónában',
-          body: [
-            {
-              type: 'paragraph',
-              text: 'Az időbüntetésen felül a faultot elszenvedő csapat szabaddobást kap.'
-            }
-          ]
-        },
-        {
-          heading: '3.4 Az időbüntetés vége',
-          body: [
-            {
-              type: 'paragraph',
-              text:
-                'A mérkőzésvezetés jelzi a büntetés végét; a játékos csak ezután az engedélyezés után léphet újra a pályára.'
-            }
-          ]
-        },
-        {
-          heading: '3.5 Szabaddobás',
+          heading: '2.3 Tornarendszer',
           body: [
             {
               type: 'list',
               items: [
-                'A szabaddobásokat a hárompontos vonal mögül kell elvégezni.',
-                'A dobó játékosnak három pedálfordulat áll rendelkezésére a szabaddobás elvégzéséhez.',
-                'Az ellenfél játékosainak a szabaddobás alatt a hárompontos zónán kívül kell maradniuk.',
-                'Ha a szabaddobás kosarat ér, az ellenfél csapata dob be az alapvonaltól.'
+                'A csapatok az előselejtezőben egy vagy több csoportban mérkőznek egymással.',
+                'Győzelem: 3 pont, döntetlen: 1 pont, vereség: 0 pont.',
+                {
+                  text: 'A döntőkörtől kieséses rendszerben játszanak.',
+                  subItems: [
+                    'Ha a rendes játékidő végén döntetlen az állás, a játékidő felével (5 perc) hosszabbítás következik.',
+                    'Ha a hosszabbítás után is döntetlen, mindkét csapat öt büntetődobást végez – minden játékosnak legalább egyszer dobnia kell.',
+                    'Ha ezután sincs győztes, a csapatok felváltva egy-egy további dobást végeznek, amíg az egyik nem nyer.'
+                  ]
+                }
               ]
             }
           ]
         },
         {
-          heading: '3.6 Időhúzás',
+          heading: '2.4 Büntetőzóna',
+          body: [
+            {
+              type: 'list',
+              items: [
+                'Egy játékos mind a saját, mind az ellenfél büntetőzónájában legfeljebb három ingamozdulatig maradhat egy helyben (egyensúlyozás). Ezután a büntetőzónát azonnal el kell hagynia.',
+                {
+                  text: 'Büntetések:',
+                  subItems: [
+                    'Ha a saját büntetőzónában (védekezés) elkövetett szabálysértés akadályozza az ellenfél támadását, az ellenfél két büntetődobást kap.',
+                    'Az ellenfél büntetőzónájában (támadás) elkövetett szabálysértésnél a támadást lefújják, és az ellenfél kapja a labdát.'
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          heading: '2.5 A fejcső-álló pozíció elhagyása',
           body: [
             {
               type: 'paragraph',
               text:
-                'A kosárkísérlet nélküli passzív játék szabálysértésnek minősül. A játékvezető felemeli a kezét, szükség esetén megszakítja a játékot, és a labdabirtoklást a másik csapatnak ítéli.'
+                'Ha egy játékos elhagyja a fejcső-álló pozíciót vagy a földre esik, a játék zavarása nélkül azonnal el kell hagynia a pályát a legközelebbi külső jelölés irányába. Miután saját coaching zónájában újra felvette a pozíciót, onnan visszatérhet a pályára és folytathatja a játékot.'
+            }
+          ]
+        },
+        {
+          heading: '2.6 Technikai hiba, érintkezés & szabálytalan blokkolás',
+          body: [
+            {
+              type: 'list',
+              items: [
+                {
+                  text: 'Ide tartozik például az ellenfél lelökése, szabálytalan blokkolás nagy sebességnél, szándékos nekihajtás vagy az út elvágása. Az enyhe, elkerülhetetlen test- vagy kerékérintkezés megengedett.',
+                  subItems: [
+                    {
+                      text: 'Szabályos blokkolás',
+                      subItems: ['Megengedett a határozott helyezkedés kerék a kerék mellett. A döntő az érintkezés iránya: párhuzamos haladásnál az ellenfél melletti nyomás megengedett.']
+                    },
+                    {
+                      text: 'Szabálytalan blokkolás',
+                      subItems: [
+                        'Szabálytalan az ellenfél haladási vonalába keresztben behajtani vagy közvetlenül előtte elvágni az útját – különösen meredek szögből (~90°) besorolva, így hirtelen fékeznie vagy kitérnie kell, vagy már nem tud kitérni. Tilos az ellenfélbe vagy kerékpárjába történő aktív bekormányzás vagy gyorsítás is.'
+                      ]
+                    }
+                  ]
+                },
+                {
+                  text: 'Kiállítások szabálytalanságokért:',
+                  subItems: [
+                    'Enyhe szabálytalanság: labdabirtoklás az ellenfélnek, nincs kiállítás',
+                    'Közepes szabálytalanság: labdabirtoklás az ellenfélnek, 1 perc kiállítás',
+                    'Súlyos szabálytalanság: labdabirtoklás az ellenfélnek, 2 perc kiállítás',
+                    'Durván sportszerűtlen viselkedés vagy egészséget veszélyeztető szabálytalanság: labdabirtoklás az ellenfélnek, kizárás a mérkőzésről',
+                    'Kiállítás alatt a büntetett csapat emberhátrányban játszik. A kiállított játékos helyére senki sem cserélhető be.',
+                    'A szabálytalanság súlyosságáról a játékvezető dönt.'
+                  ]
+                },
+                {
+                  text: 'Ismételt szabálysértések:',
+                  subItems: [
+                    'Ismételt enyhe szabálysértések hosszabb kiállítást vonhatnak maguk után.',
+                    'Ismételt súlyos szabálysértések kizáráshoz vezethetnek.',
+                    'Egyszeri vagy ismételt kizárás egyes játékosok vagy az egész csapat tornáról való kizárásához vezethet.'
+                  ]
+                },
+                {
+                  text: 'Előnyszabály:',
+                  subItems: ['Ha a szabálytalanságot elszenvedő játékos folytatni tudja az akcióját, a játékot nem szakítják meg.']
+                }
+              ]
+            }
+          ]
+        },
+        {
+          heading: '2.7 Szabálytalanság a büntetőzónában',
+          body: [
+            {
+              type: 'paragraph',
+              text: 'A büntetőzónában elkövetett szabálytalanságot kiállítással és büntetődobással sújtják.'
+            }
+          ]
+        },
+        {
+          heading: '2.8 A kiállítás vége',
+          body: [
+            {
+              type: 'paragraph',
+              text:
+                'A kiállítás végét a mérkőzésvezetés jelenti be. A játékos csak ezt követően térhet vissza a pályára.'
+            }
+          ]
+        },
+        {
+          heading: '2.9 Büntetődobás',
+          body: [
+            {
+              type: 'list',
+              items: [
+                'Az órát megállítják; alapvetően két büntetődobás jár.',
+                'A labdát védekezés nélkül, a büntetővonalról dobják. A csapattársaknak és az ellenfeleknek a büntetőterületen kívül kell maradniuk. A sikeres büntetődobás 1 pontot ér.',
+                'A második büntetődobás után az óra tovább fut.'
+              ]
+            }
+          ]
+        },
+        {
+          heading: '2.10 Időhúzás',
+          body: [
+            {
+              type: 'paragraph',
+              text:
+                'Szabálysértés, ha egy csapat nem játszik aktívan, vagyis nem kísérel meg kosarat szerezni. A játékvezető ilyenkor felemeli a kezét (lásd 3.2), és további 10 másodperc passzív játék után megszakítja a játékot. Az ellenfél kapja a labdát.'
             }
           ]
         }
       ]
     },
     {
-      title: '4. A játékvezetők & a mérkőzésvezetés szerepe',
+      title: '3. Játékvezetők',
       subsections: [
         {
-          heading: '4.1 Feladatok',
+          heading: '3.1 A játékvezetők és a mérkőzésvezetés szerepe',
           body: [
             {
               type: 'paragraph',
               text:
-                'A kifejezetten nem szabályozott helyzetekben a játékvezetői csapat és a mérkőzésvezetés dönt. Ők határozzák meg a faultok súlyosságát, az időbüntetések hosszát és a pontok elismerését is. Elsődleges szempont a sportszerűség, a sportolói verseny és minden résztvevő egészsége.'
+                'A szabályzatban nem rendezett helyzetekről a játékvezetői csapat és a mérkőzésvezetés dönt. A szabálytalanság súlyosságáról, a kiállítás hosszáról és a pontok elismeréséről minden döntés a játékvezetői csapaté.'
+            },
+            {
+              type: 'paragraph',
+              text: 'Kiemelten fontos a fair és sportszerű küzdelem – minden résztvevő testi épségének szem előtt tartásával!'
+            }
+          ]
+        },
+        {
+          heading: '3.2 A játékvezetők kézjelei',
+          body: [
+            {
+              type: 'image',
+              src: '/reglement/handsignale.png',
+              alt: 'Játékvezetői jelek: óra fut, óra áll, 1/2/3 pont, pedálhiba, labda kint/labdacsere, időkérés, időhúzás, támadási irány',
+              caption: 'A játékvezetői jelek áttekintése (német feliratokkal). Támadási irány: minden megszakítás után kinyújtott karral a labdát birtokló csapat támadási irányába.'
             }
           ]
         }

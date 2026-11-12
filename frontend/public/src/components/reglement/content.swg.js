@@ -16,7 +16,12 @@ export default {
             {
               type: 'paragraph',
               text:
-                'Kunstrad Basketball werd uff Kunsträdern en dr Steuerrohrsteiger-Position gschbielt, mit zwei Teams à vier Schbieler. Ziel isch’s, Körbe zom erziela ond Geigentreffer zom verhindra. Schiri ond Schbielleitung bassed uffs Schbiel uff; gwunne hot d’Mannschaft mit de meschde Bungd noch Ablauf vo dr Schbielzeit.'
+                'Kunstrad Basketball werd uff Kunsträdern en dr Steuerrohrsteiger-Position gschbielt, mit zwei Mannschafta à vier Schbieler. Jede Mannschaft will da Ball en da Korb vom Gegner neiwerfa – ond dr andra Mannschaft genau des vermassla.'
+            },
+            {
+              type: 'paragraph',
+              text:
+                'Zwei Schiris ond d’Schbielleitung bassed uffs Schbiel uff. Fir jeden Korb gibt’s a bestimmte Bungdzahl. Gwunne hot d’Mannschaft mit de meischde Bungd, wenn d’Schbielzeit rom isch.'
             }
           ]
         },
@@ -27,8 +32,8 @@ export default {
               type: 'list',
               items: [
                 'A Team beschdod aus höchschdens finf Schbieler.',
-                'Pro Team dürfet maximal vier Schbieler gleichzeitig uffem Feld schdoh. Z’viel Schbieler uffem Feld get mit 2 Minuta Zeitstrafe belegt.',
-                'Schbielerwechsel gänget fliegend ond bloß iber d’eigene Coaching Zone.'
+                'Pro Team sen höchschdens vier Schbieler uffem Feld ond schbielet aktiv mit.',
+                'Gwechselt werd während em Schbiel ohne Freigab vom Schiri, aber bloß iber d’Endlinie vo dr Coaching Zone. D’Mannschaft muss druff gucka, dass nie meh als vier Schbieler uffem Feld sen. Wer des vergisst, kriegt fir oin Schbieler 2 Minuta Zeitstrafe – ond s’Team schbielt mit oim weniger weiter.'
               ]
             }
           ]
@@ -39,24 +44,36 @@ export default {
             {
               type: 'list',
               items: [
-                'Des ganze Schbiel werd em Steuerrohrsteiger uff em Kunstrad oder Radballrad gemäß UCI-Reglement gmacht; d’Position werd en dr Coaching Zone eignomme.',
-                'Beim Abschdenga, bei Zeitstrafe oder ähnliche Situationa muss mer des Schbielfeld glei verlo ond derfsch erschd en dr Steuerrohrsteiger-Position aus dr Coaching Zone wieder befahra.'
+                'S’ganze Schbiel werd em Steuerrohrsteiger uff ma Kunstrad oder Radballrad noch UCI-Reglement gfahra – die Position nemmt mr en dr Coaching Zone ei.',
+                'Wer absteigt, a Zeitstrafe kriegt oder so, muss s’Feld sofort verlassa ond darf erscht em Steuerrohrsteiger aus dr Coaching Zone wieder nei.'
               ]
             }
           ]
         },
         {
-          heading: '1.4 Schbielfeld & Bungdewertung',
+          heading: '1.4 Schbielfeld & Bungd',
           body: [
             {
               type: 'list',
               items: [
-                'Jedes Team hot sei eigeni Coaching Zone, wo sich d’Auswechselschbieler uffhaltet.',
-                'Noch em erfolgreiche Korbwurf fangt des Team, wo kassiert hot, mit Einwurf vo dr eigenen Grundlinie o.',
+                'Jedes Team hot sei eigene Coaching Zone, wo d’Auswechselschbieler bleiba missed.',
                 {
-                  text: 'D’Bungdewertung isch wie beim Basketball:',
-                  subItems: ['1 Bungd – Freiwurf', '2 Bungd – Feldwurf', '3 Bungd – Wurf hinter dr Drei-Bungde-Linie']
+                  text: 'D’Bungd gänget wie em Basketball:',
+                  subItems: ['1 Bungd – Freiwurf', '2 Bungd – normaler Wurf aus em Schbiel', '3 Bungd – Wurf hender dr Dreier-Linie']
                 }
+              ]
+            },
+            {
+              type: 'image',
+              src: '/reglement/spielfeld.png',
+              alt: 'Schbielfeld mit Freiwurfzona, Dreier-Linia ond Coaching Zones',
+              caption: 'Schbielfeld – d’Freiwurfzone isch dunkelgrau.'
+            },
+            {
+              type: 'list',
+              items: [
+                'D’Freiwurfzone isch dunkelgrau eizeichnet.',
+                'Noch ma Korb wechselt dr Ball; s’Team fangt an dr Korbauslinie a.'
               ]
             }
           ]
@@ -67,15 +84,21 @@ export default {
       title: '2. Schbielablauf',
       subsections: [
         {
-          heading: '2.1 Schbieldauer, Ofang & End',
+          heading: '2.1 Schbieldauer, Afang & End',
           body: [
             {
               type: 'list',
               items: [
-                'Schbieldauer: 2×5 Minuta mit 1 Minut Halbzeitbause; d’Uhr lauft ohni Unterbrechung.',
-                'Vor Schbielbeginn entscheidet a Zufallsprinzip (z. B. Minzwurf), welches Team dr Ballbesitz kriegt.',
-                'S’Oschbiel bassiert en dr eigenen Hälft; beidi Teams schdardet en ihrer Hälft ond s’Schbiel fangt mit eme Pfiff vom Schiri o.',
-                'D’Schbielleitung bassed uff d’Zeit uff ond signalisiert s’End mit eme Pfiff.'
+                '2 × 5 Minuta mit Seitawechsel – 1 Minut Halbzeitpause.',
+                'Grundsätzlich lauft d’Uhr durch. Stoppt werd se bloß, wenn dr Schiri pfeift ond’s passende Handzeicha macht (guck 3.2). Grind kennet a Verwarnung, a Foul, dr Ball em Aus oder sonscht ebbes sei, was d’Schiris fir richtig haltet.',
+                {
+                  text: 'Bei K.-o.-Schbiel entscheidet dr Zufall (Münzwurf vom Schiri), wer afanga darf. En dr Vorronde fangt d’Mannschaft a, die zerscht gnennt isch.',
+                  subItems: [
+                    'Agschbielt werd en dr eigena Hälfte an dr Korbauslinie; jede Mannschaft startet en ihrer Hälfte.',
+                    'S’Schbiel goht mit ma Pfiff vom Schiri ond am Azeigeton los.'
+                  ]
+                },
+                'D’Schbielzeit iberwacht d’Schbielleitung; s’End gibt’s mit Pfiff ond Azeigeton.'
               ]
             }
           ]
@@ -86,11 +109,22 @@ export default {
             {
               type: 'list',
               items: [
-                'Mit Ball en dr Hand send maximal drei Pedalumdrehunga erlaubt.',
-                'Schpädeschtens noch drei Pedalumdrehunga muss gbrellt oder abgschbielt werda. Doppeldribbling – Ball uffnehma ond nomol brella – isch verbotn.',
-                'Bei meh als drei Pedalumdrehunga ohni Abschbiel oder Brella get’s Ballwechsel ans geigrische Team.',
-                'Wenn a Team dr Ball nemme kann, ohni d’Steuerrohrsteiger-Position zom verlo, kriegt des geigrische Team Ballbesitz; dr Schiri hebt dr Ball ho, damit des geigrische Team en ibernehma kann.',
-                'Wenn dr Ball des Schbielfeld verlosst, kriegt au des geigrische Team an dr Schtell dr Ball, wo dr Schiri freigibt.'
+                'Mit em Ball en dr Hand darfsch höchschdens drei Pedalumdrehunga fahra.',
+                {
+                  text: 'Spätestens noch drei Pedalumdrehunga muss prellt oder abgschbielt werra.',
+                  subItems: [
+                    'Doppeldribbling gibt’s ned: Hosch da Ball zom zwoita Mol aufgnomma, kannsch au durch nomol Prella ned meh als drei Pedalumdrehunga fahra – noch em zwoita Aufnehma muss dr Ball abgschbielt oder gworfa werra.',
+                    'Wer sich ned dra hält, gibt da Ball an d’Gegner ab.'
+                  ]
+                },
+                {
+                  text: 'Landet dr Ball uffem Boda ond kann ned aufghoba werra, ohne dass mr d’Steuerrohrsteiger-Position verlässt, kriegt d’Gegner da Ball.',
+                  subItems: ['Dr Schiri hebt da Ball an dr Stell en d’Luft; s’gegnerische Team muss en sich hola.']
+                },
+                {
+                  text: 'Goht dr Ball ens Aus, kriegt s’gegnerische Team an dr Stell da Ball.',
+                  subItems: ['Dr Schiri hebt da Ball an dr Stell an dr Auslinie en d’Luft; s’gegnerische Team muss en sich hola.']
+                }
               ]
             }
           ]
@@ -101,111 +135,159 @@ export default {
             {
               type: 'list',
               items: [
-                'D’Vorrunde werd en oiner oder mehrere Gruppa ausdraga.',
-                'Bungdevergab: Sieg 3 Bungd, Unentschiede 1 Bungd, Niederlag 0 Bungd.',
-                'En dr Endrunde werd em K.-o.-Modus gschbielt. Bei Unentschiede noch regulärer Schbielzeit get’s a Verlängerung iber d’halbi Schbielzeit.',
-                'Bleibt’s dennoch unentschiede, get’s a Freiwurf-Shootout: Beidi Teams werfet abwechselnd finfmol hinter dr Drei-Bungde-Linie – jeder Schbieler muss wenigschdens emol werfa. Wenn immer no koi Sieger feschdschdod, werd dr Ablauf wiederholt, bis a Team gwunnt.'
+                'En dr Vorronde schbielet d’Teams en oiner oder mehrere Gruppa gegranand.',
+                'Sieg: 3 Bungd, Unentschieda: 1 Bungd, Niederlag: 0 Bungd.',
+                {
+                  text: 'Ab dr Endronde werd em K.-o.-Modus gschbielt.',
+                  subItems: [
+                    'Stoht’s noch dr Zeit unentschieda, gibt’s a Verlängerung mit dr halba Schbielzeit (5 Minuta).',
+                    'Isch’s noch dr Verlängerung emmer no gleich, werfet beide Teams fünfmol frei – jeder Schbieler muss mindeschdens oimol werfa.',
+                    'Isch dann emmer no koiner vorne, werd abwechselnd je oimol weitergworfa, bis oiner gwinnt.'
+                  ]
+                }
               ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      title: '3. Vergeha & Fouls',
-      subsections: [
-        {
-          heading: '3.1 Verlo vo dr Steuerrohrsteiger-Position',
-          body: [
-            {
-              type: 'paragraph',
-              text:
-                'Wer d’Steuerrohrsteiger-Position verlosst oder schdirzt, muss glei zur nächschde Aussemarkierung fahra, des Schbielfeld verlo ond noch em Wiedereinehma vo dr Position en dr eigenen Coaching Zone wieder eischdenga. Dr Schbielverlauf derf debi nemme beeinträchtigt werda.'
             }
           ]
         },
         {
-          heading: '3.2 Technisches Foul, Berihrung & regelwidriges Blocka',
+          heading: '2.4 Freiwurfzone',
           body: [
             {
               type: 'list',
               items: [
-                'Des umfosst unter anderem Runterschubsa, regelwidriges Blocka bei hoher Gschwindigkeit, absichtliches Ofahra oder Weg-Abschneida (Querschdella vor eme fahrende Schbieler ohni Bremsabstand).',
-                'Unvermeidlichr Körperkontakt ohni Eifluss uff dr Schbielverlauf geldet net als Foul.',
-                'Bei Zommeschtöß entscheidet dr Schiri iber d’Schuldfrag; bei Unklarheit krieget beidi Schbieler a Zeitstrafe.',
+                'En dr eigena wie en dr gegnerischa Freiwurfzone darf a Schbieler höchschdens drei Pendelbewegunga uff dr Stell bleiba (pendla). Dann muss er sofort raus.',
                 {
-                  text: 'Zeitschtrafe-Katalog:',
-                  subItems: ['Leichtes Foul: 1 Minut', 'Schdargas Foul: 2 Minuta', 'Unschbordlichs oder gefährdendes Foul: Schbielverweis']
-                },
-                'D’Bewertung vo dr Foul-Schwere obliegt alloi em Schiri.',
-                {
-                  text: 'Wiederholti Verstöß könnet verschärft geahndet werda:',
+                  text: 'Strofa:',
                   subItems: [
-                    'Hehri Zeitstrafe bei wiederholte leichte Fouls',
-                    'Schbielverweis bei wiederholte schdarge Fouls',
-                    'Turnierausschluss vo Schbieler oder Team bei Schbielverweis(a)'
+                    'Werd en dr eigena Freiwurfzone (Abwehr) gega d’Regel a gegnerischer Agriff behindert, kriegt d’Gegner zwei Freiwürf.',
+                    'Bei ma Verstoß en dr gegnerischa Freiwurfzone (Agriff) werd dr Agriff abpfiffa ond d’Gegner kriegt da Ball.'
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          heading: '2.5 Steuerrohrsteiger-Position verlassa',
+          body: [
+            {
+              type: 'paragraph',
+              text:
+                'Wer d’Steuerrohrsteiger-Position verlässt oder uff da Boda fliegt, muss s’Feld sofort Richtung nächschte Außamarkierung verlassa, ohne s’Schbiel zom störa. Wenn er en dr eigena Coaching Zone wieder em Steuerrohrsteiger isch, darf er von do aus wieder nei ond weiterschbiela.'
+            }
+          ]
+        },
+        {
+          heading: '2.6 Technisches Foul, Berührung & regelwidrigs Blocka',
+          body: [
+            {
+              type: 'list',
+              items: [
+                {
+                  text: 'Do drunter fallt z. B. Runterschubsa, regelwidrigs Blocka bei hohem Tempo, absichtlichs „Afahra“ oder em Gegner da Weg abschneida. Leichter, ovrmeidbarer Körper- oder Radkontakt isch erlaubt.',
+                  subItems: [
+                    {
+                      text: 'Regelkonforms Blocka',
+                      subItems: ['Erlaubt isch robusts Stellungsschbiel Rad an Rad. Entscheidend isch d’Richtung vom Kontakt: Druck neba em Gegner bei paralleler Fahrt isch okay.']
+                    },
+                    {
+                      text: 'Regelwidrigs Blocka',
+                      subItems: [
+                        'Ned erlaubt isch, em Gegner quer en d’Fahrlinie zom fahra oder em direkt davor da Weg abzschneida – vor allem aus ma steila Winkel (~90°), so dass er abrupt brems oder ausweicha muss oder gar nemme ausweicha ka. Au aktives Neilenka oder Beschleunige en da Gegner oder sei Rad isch verbota.'
+                      ]
+                    }
                   ]
                 },
-                'S’Schbiel werd unterbrocha ond mit Ballbesitz firs geigrische Team fordgsotzt, außer dr gefoulte Schbieler behaltet Vorteil ond kann weider ogriffa.'
+                {
+                  text: 'Zeitstrofa fir Fouls:',
+                  subItems: [
+                    'Leichts Foul: Ball fir da Gegner, koi Zeitstrafe',
+                    'Mittelschwers Foul: Ball fir da Gegner, 1 Minut Zeitstrafe',
+                    'Schwers Foul: Ball fir da Gegner, 2 Minuta Zeitstrafe',
+                    'Grob unsportlichs Verhalta oder gsondheitsgfährdends Foul: Ball fir da Gegner, Schbielverweis',
+                    'Während ra Zeitstrafe schbielt s’bestrofte Team en Unterzahl. Fir da bestrofte Schbieler darf koiner neikomma.',
+                    'Wie schwer a Foul isch, entscheidet dr Schiri.'
+                  ]
+                },
+                {
+                  text: 'Wiederholte Verstöß:',
+                  subItems: [
+                    'Wer emmer wieder leicht foult, ka a höhere Zeitstrafe kriega.',
+                    'Wer emmer wieder schwer foult, ka vom Feld fliega.',
+                    'Oi oder mehrere Schbielverweis kennet zom Turnierausschluss vo oizelne Schbieler oder vom ganza Team führa.'
+                  ]
+                },
+                {
+                  text: 'Vorteilregel:',
+                  subItems: ['Ka dr gfoulte Schbieler sein Schbielzug trotzdem fertig macha, werd ned unterbrocha.']
+                }
               ]
             }
           ]
         },
         {
-          heading: '3.3 Foul en dr Drei-Bungde-Zone',
+          heading: '2.7 Foul en dr Freiwurfzone',
+          body: [{ type: 'paragraph', text: 'A Foul en dr Freiwurfzone gibt Zeitstrafe ond Freiwurf.' }]
+        },
+        {
+          heading: '2.8 End vo dr Zeitstrafe',
           body: [
             {
               type: 'paragraph',
-              text: 'Zusätzlich zur Zeitstrafe kriegt des gefoulte Team ene Freiwurf.'
+              text: 'Wann a Zeitstrafe rom isch, sagt d’Schbielleitung a. Erscht noch dera Freigab darf dr Schbieler wieder uffs Feld.'
             }
           ]
         },
         {
-          heading: '3.4 End vo dr Zeitstrafe',
-          body: [
-            {
-              type: 'paragraph',
-              text:
-                'D’Schbielleitung signalisiert s’End vo dr Strafe; erschd noch dera Freigab derf dr Schbieler des Schbielfeld wieder betreda.'
-            }
-          ]
-        },
-        {
-          heading: '3.5 Freiwurf',
+          heading: '2.9 Freiwurf',
           body: [
             {
               type: 'list',
               items: [
-                'Freiwürfe werdet hinter dr Drei-Bungde-Linie ausgfiehrt.',
-                'Dr werfende Schbieler hot drei Pedalumdrehunga Zeit fir dr Freiwurf.',
-                'Geigrischi Schbieler müasset während em Freiwurf außerhalb vo dr Drei-Bungde-Zone bleiba.',
-                'Wenn dr Freiwurf trifft, git des geigrische Team vo dr Grundlinie ei.'
+                'D’Uhr werd aghalta; grundsätzlich gibt’s zwei Freiwürf.',
+                'Dr Ball werd unverteidigt vo dr Freiwurflinie gworfa. Mit- ond Gegaschbieler missed außerhalb vom Freiwurffeld bleiba. A Treffer zählt 1 Bungd.',
+                'Noch em zwoita Freiwurf lauft d’Uhr weiter.'
               ]
             }
           ]
         },
         {
-          heading: '3.6 Zeitschbiel',
+          heading: '2.10 Zeitschbiel',
           body: [
             {
               type: 'paragraph',
               text:
-                'Passivi Schbielweis ohni Korbversuch geldet als Regelverstoß. Dr Schiri hebt d’Hand, unterbricht notfalls s’Schbiel ond ibergibt dr Ballbesitz ans andere Team.'
+                'Wer s’Schbiel ned aktiv verfolgt, also gar ned probiert an Korb zom macha, verstößt gega d’Regel. Dr Schiri hebt d’Hand (guck 3.2) ond unterbricht noch weitere 10 Sekunda Passivschbiel. D’Gegner kriegt da Ball.'
             }
           ]
         }
       ]
     },
     {
-      title: '4. Schdellung vo Schiri & Schbielleitung',
+      title: '3. Schiris',
       subsections: [
         {
-          heading: '4.1 Verantwortlichkeita',
+          heading: '3.1 Schdellung vo Schiri & Schbielleitung',
           body: [
             {
               type: 'paragraph',
               text:
-                'Situationa, wo net ausdricklich gregelt send, werdet vom Schiriteam ond dr Schbielleitung entschiede. Se leget au d’Härti vo Fouls, d’Längi vo Zeitschtrafa ond d’Anerkennung vo Bungda fescht. Fairness, schbordlichr Wedkampf ond d’Gesundheit vo alle Teilnehmer schdehet im Vordergrund.'
+                'Was ned extra gregelt isch, entscheidet s’Schiriteam zamma mit dr Schbielleitung. Wie hart a Foul war, wie lang a Zeitstrafe isch oder ob a Bungd zählt – des entscheidet s’Schiriteam.'
+            },
+            {
+              type: 'paragraph',
+              text: 'Fair ond sportlich soll’s zuganga – ond d’Gsondheit vo alle goht vor!'
+            }
+          ]
+        },
+        {
+          heading: '3.2 Handzeicha vo de Schiris',
+          body: [
+            {
+              type: 'image',
+              src: '/reglement/handsignale.png',
+              alt: 'Schiri-Zeicha: Uhr lauft, Uhr stopp, 1/2/3 Bungd, Pedalfehler, Ball aus/Ballwechsel, Time-Out, Zeitschbiel, Agriffsrichtung',
+              caption: 'Agriffsrichtung: noch jeder Unterbrechung mit gstreckdem Arm en d’Agriffsrichtung vom Team mit em Ball.'
             }
           ]
         }
