@@ -813,7 +813,6 @@
     "FREE_THROWS_INVALID_TOTAL": "Only 1 or 2 free throws are allowed.",
     "FREE_THROWS_DONE": "All free throws have already been taken.",
     "FREE_THROWS_HAS_ATTEMPTS": "Please take or undo all free throws first.",
-    "FREE_THROWS_SHOOTER_LOCKED": "The shooter cannot be changed after the first throw.",
     "FREE_THROWS_NO_ATTEMPTS": "There is no free throw to undo.",
     "FREE_THROWS_NOT_ACTIVE": "No free throws in progress."
   },

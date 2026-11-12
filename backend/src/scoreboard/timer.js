@@ -295,7 +295,7 @@ export function setExtraSeconds(seconds) {
   return snapshotState();
 }
 
-export function startTimer() {
+export function startTimer({ silent = false } = {}) {
   const state = getState();
   if (state.isRunning) {
     return snapshotState();
@@ -317,7 +317,9 @@ export function startTimer() {
   state.isRunning = true;
   ensureTicker();
   notifySubscribers();
-  triggerStartTone(createAudioContext(state));
+  if (!silent) {
+    triggerStartTone(createAudioContext(state));
+  }
   return snapshotState();
 }
 

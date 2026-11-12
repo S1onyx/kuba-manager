@@ -21,29 +21,30 @@ export default function FreeThrowView({ freeThrows, teamAName, teamBName }) {
       <strong style={{ letterSpacing: '0.1em', textTransform: 'uppercase', fontSize: '1.05rem' }}>{t('freeThrows.title')}</strong>
       <span style={{ fontWeight: 600, overflowWrap: 'anywhere' }}>
         {team}
-        {freeThrows.playerName ? ` · ${freeThrows.playerName}` : ''}
       </span>
-      <div style={{ display: 'flex', gap: '0.45rem', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', gap: '0.9rem', justifyContent: 'center' }}>
         {Array.from({ length: freeThrows.total }, (_, index) => {
           const attempt = freeThrows.attempts?.[index];
           return (
-            <span
-              key={index}
-              style={{
-                width: '1.25rem',
-                height: '1.25rem',
-                borderRadius: '999px',
-                border: '2px solid rgba(255,255,255,0.7)',
-                background: !attempt ? 'transparent' : attempt.hit ? '#4ade80' : '#f87171'
-              }}
-            />
+            <span key={index} style={{ display: 'grid', justifyItems: 'center', gap: '0.2rem', minWidth: '2.5rem' }}>
+              <span
+                style={{
+                  width: '1.25rem',
+                  height: '1.25rem',
+                  borderRadius: '999px',
+                  border: '2px solid rgba(255,255,255,0.7)',
+                  background: !attempt ? 'transparent' : attempt.hit ? '#4ade80' : '#f87171'
+                }}
+              />
+              {attempt?.playerName ? <small style={{ opacity: 0.8, overflowWrap: 'anywhere' }}>{attempt.playerName}</small> : null}
+            </span>
           );
         })}
       </div>
       <small style={{ fontWeight: 700, color: status.done ? '#4ade80' : '#ffe081' }}>
         {status.done
           ? t('freeThrows.result', { made: status.made, total: freeThrows.total })
-          : t('freeThrows.next', { current: status.taken + 1, total: freeThrows.total })}
+          : `${t('freeThrows.next', { current: status.taken + 1, total: freeThrows.total })}${freeThrows.playerName ? ` · ${freeThrows.playerName}` : ''}`}
       </small>
     </section>
   );

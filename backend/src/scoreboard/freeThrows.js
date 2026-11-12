@@ -1,6 +1,7 @@
 import { getState, notifySubscribers, snapshotState, applyFreeThrowToStats } from './stateStore.js';
 import { addPoints } from './scoring.js';
 import { pauseTimer, startTimer } from './timer.js';
+import { triggerAudioEvent } from '../audio/dispatcher.js';
 
 export class FreeThrowError extends Error {
   constructor(code, message) {
@@ -12,6 +13,7 @@ export class FreeThrowError extends Error {
 export const DEFAULT_FREE_THROWS = 2;
 const ALLOWED_TOTALS = [1, 2];
 const FREE_THROW_DESCRIPTION = 'Freiwurf';
+export const freeThrowSoundKey = (hit) => (hit ? 'free_throw_hit' : 'free_throw_miss');
 
 const normalizeTeam = (team) => (String(team).toLowerCase() === 'b' ? 'b' : 'a');
 const isDone = (series) => series.attempts.length >= series.total;
@@ -70,36 +72,51 @@ export function startFreeThrows({ team = 'a', playerId = null, total = DEFAULT_F
   return snapshotState();
 }
 
+// Werfer für den nächsten Wurf; jeder Wurf einer Serie darf von einem anderen Spieler kommen.
 export function setFreeThrowShooter({ playerId = null } = {}) {
   const state = getState();
   const series = requireSeries(state);
-  if (series.attempts.length > 0) {
-    throw new FreeThrowError('FREE_THROWS_SHOOTER_LOCKED', 'Der Werfer kann nach dem ersten Wurf nicht mehr geändert werden.');
+  if (isDone(series)) {
+    throw new FreeThrowError('FREE_THROWS_DONE', 'Alle Freiwürfe wurden bereits geworfen.');
   }
   Object.assign(series, resolveShooter(state, series.team, playerId));
   notifySubscribers();
   return snapshotState();
 }
 
-export function recordFreeThrow({ hit } = {}) {
+export function recordFreeThrow({ hit, playerId } = {}) {
   const state = getState();
   const series = requireSeries(state);
   if (isDone(series)) {
     throw new FreeThrowError('FREE_THROWS_DONE', 'Alle Freiwürfe wurden bereits geworfen.');
   }
+  if (playerId !== undefined) {
+    Object.assign(series, resolveShooter(state, series.team, playerId));
+  }
   const attemptHit = Boolean(hit);
-  series.attempts.push({ id: `${Date.now()}-${series.attempts.length + 1}`, hit: attemptHit, at: new Date().toISOString() });
+  series.attempts.push({
+    id: `${Date.now()}-${series.attempts.length + 1}`,
+    hit: attemptHit,
+    playerId: series.playerId,
+    playerName: series.playerName,
+    at: new Date().toISOString()
+  });
   applyFreeThrowToStats(series.team, series.playerId, attemptHit);
   if (isDone(series)) {
     series.completedAt = new Date().toISOString();
   }
+  triggerAudioEvent(freeThrowSoundKey(attemptHit), { team: series.team, playerName: series.playerName }).catch((error) => {
+    console.error('Audio-Trigger (Freiwurf) fehlgeschlagen:', error);
+  });
   if (attemptHit) {
-    addPoints(series.team, 1, { playerId: series.playerId, shotType: 'free', type: 'freethrow', description: FREE_THROW_DESCRIPTION });
+    // Freiwurf-Treffer hat einen eigenen Sound statt Korb-Sound bzw. Korbhymne.
+    addPoints(series.team, 1, { playerId: series.playerId, shotType: 'free', type: 'freethrow', description: FREE_THROW_DESCRIPTION, scoreAudio: false });
   } else {
     notifySubscribers();
   }
   if (series.completedAt && !state.isRunning && !state.isHalftimeBreak && hasPlayTimeLeft(state)) {
-    return startTimer();
+    // Ohne Startton, damit der Freiwurf-Sound nicht abgeschnitten wird.
+    return startTimer({ silent: true });
   }
   return snapshotState();
 }
@@ -112,9 +129,10 @@ export function undoFreeThrow() {
     throw new FreeThrowError('FREE_THROWS_NO_ATTEMPTS', 'Es gibt keinen Freiwurf zum Zurücknehmen.');
   }
   series.completedAt = null;
-  applyFreeThrowToStats(series.team, series.playerId, last.hit, -1);
+  Object.assign(series, { playerId: last.playerId ?? null, playerName: last.playerName ?? null });
+  applyFreeThrowToStats(series.team, last.playerId, last.hit, -1);
   if (last.hit) {
-    return addPoints(series.team, -1, { playerId: series.playerId, shotType: 'free', type: 'freethrow', description: FREE_THROW_DESCRIPTION });
+    return addPoints(series.team, -1, { playerId: last.playerId, shotType: 'free', type: 'freethrow', description: FREE_THROW_DESCRIPTION });
   }
   notifySubscribers();
   return snapshotState();

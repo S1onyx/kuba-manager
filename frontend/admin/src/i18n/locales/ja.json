@@ -804,7 +804,6 @@
     "FREE_THROWS_INVALID_TOTAL": "フリースローは1本または2本のみです。",
     "FREE_THROWS_DONE": "すべてのフリースローが終了しています。",
     "FREE_THROWS_HAS_ATTEMPTS": "先にすべてのフリースローを投げるか取り消してください。",
-    "FREE_THROWS_SHOOTER_LOCKED": "1本目の後はシューターを変更できません。",
     "FREE_THROWS_NO_ATTEMPTS": "取り消せるフリースローはありません。",
     "FREE_THROWS_NOT_ACTIVE": "進行中のフリースローはありません。"
   },

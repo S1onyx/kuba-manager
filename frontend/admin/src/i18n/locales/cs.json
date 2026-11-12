@@ -831,7 +831,6 @@
     "FREE_THROWS_INVALID_TOTAL": "Možné jsou jen 1 nebo 2 trestné hody.",
     "FREE_THROWS_DONE": "Všechny trestné hody už byly provedeny.",
     "FREE_THROWS_HAS_ATTEMPTS": "Nejprve proveďte nebo vraťte všechny trestné hody.",
-    "FREE_THROWS_SHOOTER_LOCKED": "Po prvním hodu už nelze střelce změnit.",
     "FREE_THROWS_NO_ATTEMPTS": "Není žádný trestný hod k vrácení.",
     "FREE_THROWS_NOT_ACTIVE": "Neprobíhají žádné trestné hody."
   },

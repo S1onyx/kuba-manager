@@ -60,15 +60,40 @@ test('Vor Spielbeginn startet die Uhr nach den Freiwürfen nicht', () => {
   assert.equal(ft.recordFreeThrow({ hit: false }).isRunning, false);
 });
 
-test('Zurücknehmen nimmt Punkt und Zähler zurück; Werfer nur vor erstem Wurf änderbar', () => {
+test('Jeder Wurf einer Serie kann von einem anderen Spieler kommen', () => {
   freshGame();
-  ft.startFreeThrows({ team: 'a' });
-  let state = ft.setFreeThrowShooter({ playerId: 1 });
-  assert.equal(state.freeThrows.playerName, 'Anna');
+  setTeamPlayers('a', [{ playerId: 1, name: 'Anna' }, { playerId: 3, name: 'Clara' }]);
+  ft.startFreeThrows({ team: 'a', playerId: 1 });
   ft.recordFreeThrow({ hit: true });
-  assert.throws(() => ft.setFreeThrowShooter({ playerId: null }), (error) => error.code === 'FREE_THROWS_SHOOTER_LOCKED');
-  state = ft.undoFreeThrow();
-  assert.deepEqual([state.scoreA, state.freeThrows.attempts.length, totalOf(state, 'a').freeThrowsAttempted, totalOf(state, 'a').freeThrowsMade], [0, 0, 0, 0]);
+  assert.equal(ft.setFreeThrowShooter({ playerId: 3 }).freeThrows.playerName, 'Clara');
+  const state = ft.recordFreeThrow({ hit: false });
+  assert.deepEqual(state.freeThrows.attempts.map((attempt) => [attempt.playerName, attempt.hit]), [['Anna', true], ['Clara', false]]);
+  assert.deepEqual([playerOf(state, 'a', 1).freeThrowsMade, playerOf(state, 'a', 1).freeThrowsAttempted, playerOf(state, 'a', 1).points], [1, 1, 1]);
+  assert.deepEqual([playerOf(state, 'a', 3).freeThrowsMade, playerOf(state, 'a', 3).freeThrowsAttempted, playerOf(state, 'a', 3).points], [0, 1, 0]);
+  assert.throws(() => ft.setFreeThrowShooter({ playerId: 1 }), (error) => error.code === 'FREE_THROWS_DONE');
+});
+
+test('Werfer direkt beim Wurf mitgeben; fremder Spieler abgelehnt', () => {
+  freshGame();
+  setTeamPlayers('a', [{ playerId: 1, name: 'Anna' }, { playerId: 3, name: 'Clara' }]);
+  ft.startFreeThrows({ team: 'a' });
+  assert.equal(ft.recordFreeThrow({ hit: true, playerId: 3 }).freeThrows.attempts[0].playerName, 'Clara');
+  assert.throws(() => ft.recordFreeThrow({ hit: true, playerId: 2 }), (error) => error.code === 'PLAYER_NOT_IN_TEAM');
+});
+
+test('Freiwurf-Sounds: eigener Trigger für Treffer und daneben', () => {
+  assert.deepEqual([ft.freeThrowSoundKey(true), ft.freeThrowSoundKey(false)], ['free_throw_hit', 'free_throw_miss']);
+});
+
+test('Zurücknehmen nimmt Punkt und Zähler beim richtigen Werfer zurück', () => {
+  freshGame();
+  setTeamPlayers('a', [{ playerId: 1, name: 'Anna' }, { playerId: 3, name: 'Clara' }]);
+  ft.startFreeThrows({ team: 'a', playerId: 1 });
+  ft.recordFreeThrow({ hit: true, playerId: 3 });
+  ft.setFreeThrowShooter({ playerId: 1 });
+  const state = ft.undoFreeThrow();
+  assert.deepEqual([state.scoreA, state.freeThrows.attempts.length, state.freeThrows.playerName], [0, 0, 'Clara']);
+  assert.deepEqual([playerOf(state, 'a', 3).freeThrowsAttempted, playerOf(state, 'a', 3).points, totalOf(state, 'a').freeThrowsMade], [0, 0, 0]);
   assert.throws(() => ft.undoFreeThrow(), (error) => error.code === 'FREE_THROWS_NO_ATTEMPTS');
 });
 

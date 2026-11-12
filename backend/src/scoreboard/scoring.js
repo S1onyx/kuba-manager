@@ -28,7 +28,7 @@ export function addPoints(team, points, metadata = {}) {
         ...metadata,
         type: appliedDelta >= 0 ? metadata.type ?? 'score' : 'adjustment'
       });
-      if (appliedDelta > 0) {
+      if (appliedDelta > 0 && metadata.scoreAudio !== false) {
         const numericTeamIdRaw = Number(state.teamBId);
         const validTeamId = Number.isInteger(numericTeamIdRaw) && numericTeamIdRaw > 0 ? numericTeamIdRaw : null;
         const context = {
@@ -68,7 +68,7 @@ export function addPoints(team, points, metadata = {}) {
         ...metadata,
         type: appliedDelta >= 0 ? metadata.type ?? 'score' : 'adjustment'
       });
-      if (appliedDelta > 0) {
+      if (appliedDelta > 0 && metadata.scoreAudio !== false) {
         const numericTeamIdRaw = Number(state.teamAId);
         const validTeamId = Number.isInteger(numericTeamIdRaw) && numericTeamIdRaw > 0 ? numericTeamIdRaw : null;
         const context = {

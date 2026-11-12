@@ -27,15 +27,15 @@ function ShooterSelect({ players, value, onChange, disabled }) {
 
 function ThrowDots({ series }) {
   return (
-    <div style={{ display: 'flex', gap: '0.45rem' }}>
+    <div style={{ display: 'flex', gap: '0.9rem' }}>
       {Array.from({ length: series.total }, (_, index) => {
         const attempt = series.attempts[index];
         const background = !attempt ? 'transparent' : attempt.hit ? '#4ade80' : '#f87171';
         return (
-          <span
-            key={index}
-            style={{ width: '1.4rem', height: '1.4rem', borderRadius: '999px', border: '2px solid rgba(255,255,255,0.6)', background }}
-          />
+          <span key={index} style={{ display: 'grid', justifyItems: 'center', gap: '0.25rem', minWidth: '2.5rem' }}>
+            <span style={{ width: '1.4rem', height: '1.4rem', borderRadius: '999px', border: '2px solid rgba(255,255,255,0.6)', background }} />
+            {attempt?.playerName ? <small style={{ opacity: 0.8 }}>{attempt.playerName}</small> : null}
+          </span>
         );
       })}
     </div>
@@ -126,7 +126,7 @@ export default function FreeThrowCard() {
         <ShooterSelect
           players={playersOf(series.team)}
           value={series.playerId ?? ''}
-          disabled={busy || status.taken > 0}
+          disabled={busy || status.done}
           onChange={(playerId) => run(() => setFreeThrowShooter(playerId))}
         />
         <ThrowDots series={series} />

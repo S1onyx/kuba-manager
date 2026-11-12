@@ -256,6 +256,8 @@ export default function initializeSchema(db) {
     ['score_team_b', 'Korb Team B', 'Wird bei einem Korb für Team B abgespielt.'],
     ['foul', 'Foul', 'Wird bei einem Foul abgespielt.'],
     ['penalty_expired', 'Strafe abgelaufen', 'Wird abgespielt, wenn eine Zeitstrafe abgelaufen ist.'],
+    ['free_throw_hit', 'Freiwurf Treffer', 'Wird bei einem getroffenen Freiwurf abgespielt (statt Korb-Sound bzw. Korbhymne).'],
+    ['free_throw_miss', 'Freiwurf daneben', 'Wird bei einem verworfenen Freiwurf abgespielt.'],
     ['timer_warning', 'Vorsignal', 'Dezentes Signal kurz vor Spielende bzw. Halbzeit (konfigurierbar).'],
     ['timer_countdown_beep', 'Countdown-Piepser', 'Sekundlicher Piepser in der Schlussphase bzw. vor Wiederanpfiff (konfigurierbar).']
   ];

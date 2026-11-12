@@ -813,7 +813,6 @@
     "FREE_THROWS_INVALID_TOTAL": "Seuls 1 ou 2 lancers francs sont possibles.",
     "FREE_THROWS_DONE": "Tous les lancers francs ont déjà été effectués.",
     "FREE_THROWS_HAS_ATTEMPTS": "Veuillez d'abord effectuer ou annuler tous les lancers francs.",
-    "FREE_THROWS_SHOOTER_LOCKED": "Le tireur ne peut plus être modifié après le premier lancer.",
     "FREE_THROWS_NO_ATTEMPTS": "Aucun lancer franc à annuler.",
     "FREE_THROWS_NOT_ACTIVE": "Aucun lancer franc en cours."
   },
