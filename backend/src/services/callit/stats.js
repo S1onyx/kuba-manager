@@ -54,6 +54,8 @@ function describeMatchStats(match, tips, shares, settings, nicknames) {
   return {
     code: match.code,
     label: matchLabel(match),
+    home: match.home?.name ?? match.homeLabel,
+    away: match.away?.name ?? match.awayLabel,
     tipCount: count,
     counts: shares.counts,
     shares: { home: round(shares.home * 100, 1), draw: round(shares.draw * 100, 1), away: round(shares.away * 100, 1) },
@@ -75,7 +77,7 @@ export async function getMatchStats(tournamentId, code) {
   if (!match) throw new CallitError('CALLIT_MATCH_NOT_FOUND', 'Spiel nicht gefunden.', 404);
   const activeIds = new Set(participants.map((participant) => participant.userId));
   const bucket = validTipsByMatch([match], tips, activeIds).get(code);
-  if (!match.locked) return { code, label: matchLabel(match), hidden: true, tipCount: bucket.tips.length };
+  if (!match.locked) return { code, label: matchLabel(match), home: match.home?.name ?? match.homeLabel, away: match.away?.name ?? match.awayLabel, hidden: true, tipCount: bucket.tips.length };
   const nicknames = new Map(participants.map((participant) => [participant.userId, participant.nickname]));
   return {
     ...describeMatchStats(match, bucket.tips, bucket.shares, state.settings, nicknames),
