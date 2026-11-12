@@ -370,14 +370,7 @@
     "noFilterResults": "Keine Audiodateien gefunden.",
     "filterTriggersPlaceholder": "Nach Ereignis oder Team filtern...",
     "filterTournament": "Turnier",
-    "filterAllTournaments": "Alle Turniere",
-    "loudness": {
-      "hint": "Alle Sounds werden im Audio-Frontend automatisch auf −14 LUFS angeglichen. Neue Dateien werden selbstständig gemessen.",
-      "measuring": "Lautheit wird gemessen … {{done}}/{{total}}",
-      "remeasure": "Lautheit neu messen",
-      "missing": "Lautheit noch nicht gemessen",
-      "value": "{{lufs}} LUFS"
-    }
+    "filterAllTournaments": "Alle Turniere"
   },
   "history": {
     "title": "Historie",
@@ -695,8 +688,7 @@
     "timerCuesSaved": "Timer-Einstellungen gespeichert.",
     "timerCuesSaveFailed": "Timer-Einstellungen konnten nicht gespeichert werden.",
     "audioLoadFailed": "Audiodaten konnten nicht geladen werden.",
-    "penaltyFreeThrowsSkipped": "Zeitstrafe für Team {{team}} hinzugefügt – Freiwürfe nicht angelegt, weil noch eine Serie offen ist.",
-    "loudnessFailed": "Lautheit von „{{name}}“ konnte nicht gemessen werden."
+    "penaltyFreeThrowsSkipped": "Zeitstrafe für Team {{team}} hinzugefügt – Freiwürfe nicht angelegt, weil noch eine Serie offen ist."
   },
   "error": {
     "generic": "Ein Fehler ist aufgetreten. Bitte versuche es erneut.",

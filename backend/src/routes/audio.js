@@ -14,9 +14,7 @@ import {
   getAudioStorageDirectory,
   assignFileToTrigger,
   getTimerCueSettings,
-  updateTimerCueSettings,
-  setAudioFileLoudness,
-  AudioLoudnessError
+  updateTimerCueSettings
 } from '../services/index.js';
 import { playAudioFileById } from '../audio/dispatcher.js';
 
@@ -152,27 +150,6 @@ router.post('/library/upload', upload.single('file'), async (req, res) => {
   } catch (error) {
     console.error('Audiodatei konnte nicht hochgeladen werden:', error);
     res.status(400).json({ code: 'AUDIO_UPLOAD_FAILED', message: error.message || 'Audiodatei konnte nicht hochgeladen werden.' });
-  }
-});
-
-router.put('/library/:id/loudness', async (req, res) => {
-  const id = Number(req.params.id);
-  if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ code: 'INVALID_AUDIO_ID', message: 'Ungültige Audio-ID.' });
-  }
-
-  try {
-    const file = await setAudioFileLoudness(id, { lufs: req.body?.lufs, peakDb: req.body?.peakDb });
-    if (!file) {
-      return res.status(404).json({ code: 'AUDIO_FILE_NOT_FOUND', message: 'Audiodatei nicht gefunden.' });
-    }
-    res.json(file);
-  } catch (error) {
-    if (error instanceof AudioLoudnessError) {
-      return res.status(400).json({ code: 'AUDIO_LOUDNESS_INVALID', message: error.message });
-    }
-    console.error('Lautheit konnte nicht gespeichert werden:', error);
-    res.status(500).json({ code: 'AUDIO_LOUDNESS_SAVE_FAILED', message: 'Lautheit konnte nicht gespeichert werden.' });
   }
 });
 

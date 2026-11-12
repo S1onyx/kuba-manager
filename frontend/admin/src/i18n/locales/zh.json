@@ -367,14 +367,7 @@
     "noFilterResults": "没有符合条件的音频文件。",
     "filterTriggersPlaceholder": "按事件或球队筛选...",
     "filterTournament": "赛事",
-    "filterAllTournaments": "所有赛事",
-    "loudness": {
-      "hint": "音频前端会自动将所有声音统一到 −14 LUFS。新文件会自动测量。",
-      "measuring": "正在测量响度 … {{done}}/{{total}}",
-      "remeasure": "重新测量响度",
-      "missing": "尚未测量响度",
-      "value": "{{lufs}} LUFS"
-    }
+    "filterAllTournaments": "所有赛事"
   },
   "history": {
     "title": "历史记录",
@@ -686,8 +679,7 @@
     "timerCuesSaved": "计时器设置已保存。",
     "timerCuesSaveFailed": "无法保存计时器设置。",
     "audioLoadFailed": "无法加载音频数据。",
-    "penaltyFreeThrowsSkipped": "已为团队 {{team}} 添加罚时——仍有未完成的罚球,未创建新罚球。",
-    "loudnessFailed": "无法测量“{{name}}”的响度。"
+    "penaltyFreeThrowsSkipped": "已为团队 {{team}} 添加罚时——仍有未完成的罚球,未创建新罚球。"
   },
   "error": {
     "generic": "发生错误。请重试。",

@@ -370,14 +370,7 @@
     "noFilterResults": "Nix gfonde mit dem Filter.",
     "filterTriggersPlaceholder": "Noch Ereignis odr Team filtra...",
     "filterTournament": "Turnier",
-    "filterAllTournaments": "All Turniere",
-    "loudness": {
-      "hint": "Älle Sounds werdet em Audio-Frontend von alloi auf −14 LUFS aglicha. Neie Dateia werdet selber gmessa.",
-      "measuring": "Lautheit werd gmessa … {{done}}/{{total}}",
-      "remeasure": "Lautheit nomol messa",
-      "missing": "Lautheit no ned gmessa",
-      "value": "{{lufs}} LUFS"
-    }
+    "filterAllTournaments": "All Turniere"
   },
   "history": {
     "title": "Historie",
@@ -695,8 +688,7 @@
     "timerCuesSaved": "Timer-Eistellunge gsichert.",
     "timerCuesSaveFailed": "Timer-Eistellunge hen net gsichert werda könna.",
     "audioLoadFailed": "Audiodatä hen net gladä werda könna.",
-    "penaltyFreeThrowsSkipped": "Zeitstraf für Team {{team}} dazua gdo – Freiwürf ned aglegt, weil no a Serie offa isch.",
-    "loudnessFailed": "D'Lautheit vo „{{name}}“ hot ned gmessa werra kenna."
+    "penaltyFreeThrowsSkipped": "Zeitstraf für Team {{team}} dazua gdo – Freiwürf ned aglegt, weil no a Serie offa isch."
   },
   "error": {
     "generic": "A Fehler isch passiert. Bittschön versuch's nomol.",
