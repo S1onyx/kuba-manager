@@ -196,7 +196,9 @@
       "reset": "Visszaállítás",
       "savedButton": "Mentve ✓",
       "sidebarUnsaved": "⚠ Nincs mentve",
-      "sidebarSaved": "✓ Mentve"
+      "sidebarSaved": "✓ Mentve",
+      "freeThrowsOpenTitle": "Nyitott büntetődobások",
+      "freeThrowsOpenText": "Mentés csak az összes büntetődobás után lehetséges (büntetődobás-kártya)."
     },
     "shootout": {
       "title": "Büntetődobás-párbaj",
@@ -255,7 +257,29 @@
       "none": "Nincs aktív időbüntetés",
       "expired": "lejárt",
       "remaining": "{{time}} hátra",
-      "remove": "Eltávolítás"
+      "remove": "Eltávolítás",
+      "freeThrows": "Büntetődobások az ellenfélnek"
+    },
+    "freeThrows": {
+      "title": "Büntetődobások",
+      "description": "Büntetődobás-sorozat indítása: csapat, dobó és darabszám kiválasztása. Az óra indításkor megáll, az utolsó dobás után automatikusan tovább fut.",
+      "fromPenalty": "Kiállítás után létrehozva – válaszd ki a dobót.",
+      "team": "Csapat",
+      "shooter": "Dobó",
+      "wholeTeam": "Csapat (játékos nélkül)",
+      "count": "Darabszám",
+      "countOption1": "1 büntetődobás",
+      "countOption2": "2 büntetődobás",
+      "start": "Büntetődobások indítása",
+      "titleRunning": "Büntetődobások {{team}} · {{made}}/{{total}}",
+      "next": "{{current}}. dobás / {{total}}",
+      "done": "Kész: {{total}}-ből {{made}} sikeres",
+      "hit": "Talált",
+      "miss": "Mellé",
+      "undo": "Utolsó dobás visszavonása",
+      "cancel": "Büntetődobások megszakítása",
+      "close": "Elrejtés",
+      "failed": "A büntetődobás művelet sikertelen."
     }
   },
   "schedule": {
@@ -663,7 +687,8 @@
     "soundTriggerFailed": "A hang indítása nem sikerült.",
     "timerCuesSaved": "Időzítő-beállítások mentve.",
     "timerCuesSaveFailed": "Az időzítő-beállítások mentése nem sikerült.",
-    "audioLoadFailed": "A hangadatok betöltése nem sikerült."
+    "audioLoadFailed": "A hangadatok betöltése nem sikerült.",
+    "penaltyFreeThrowsSkipped": "Kiállítás hozzáadva a(z) {{team}} csapathoz – büntetődobások nem jöttek létre, mert még nyitott egy sorozat."
   },
   "error": {
     "generic": "Hiba történt. Kérjük, próbálja újra.",
@@ -783,7 +808,14 @@
     "TRIGGER_NOT_FOUND": "A trigger nem található.",
     "TRIGGER_PLAY_FAILED": "A trigger lejátszása nem sikerült.",
     "TRIGGER_UPDATE_FAILED": "A hangtrigger frissítése nem sikerült.",
-    "UNSUPPORTED_POSTER_FILE_TYPE": "Csak kép- és PDF-fájlok támogatottak."
+    "UNSUPPORTED_POSTER_FILE_TYPE": "Csak kép- és PDF-fájlok támogatottak.",
+    "FREE_THROWS_OPEN": "Már folyamatban vannak büntetődobások.",
+    "FREE_THROWS_INVALID_TOTAL": "Csak 1 vagy 2 büntetődobás lehetséges.",
+    "FREE_THROWS_DONE": "Minden büntetődobás megtörtént.",
+    "FREE_THROWS_HAS_ATTEMPTS": "Előbb dobd el vagy vond vissza az összes büntetődobást.",
+    "FREE_THROWS_SHOOTER_LOCKED": "Az első dobás után a dobó nem módosítható.",
+    "FREE_THROWS_NO_ATTEMPTS": "Nincs visszavonható büntetődobás.",
+    "FREE_THROWS_NOT_ACTIVE": "Nincsenek folyamatban büntetődobások."
   },
   "export": {
     "title": "PDF-export / Nyomtatás",

@@ -52,7 +52,8 @@
     "baskets": "进球 {{scored}}:{{conceded}}",
     "playerPoints": "{{count}} 分",
     "noRoster": "名单待定",
-    "empty": "尚无报名队伍。"
+    "empty": "尚无报名队伍。",
+    "freeThrows": "罚球 {{pct}}({{made}}/{{attempted}})"
   },
   "tabs": {
     "live": "直播",
@@ -255,7 +256,10 @@
     "colGames": "场次",
     "colPointsPerGame": "场均得分",
     "colPenalties": "犯规处罚",
-    "colPenaltySeconds": "受罚秒数"
+    "colPenaltySeconds": "受罚秒数",
+    "topFreeThrowShooters": "最佳罚球命中率",
+    "colFreeThrows": "罚球",
+    "colFreeThrowPct": "罚球%"
   },
   "final": {
     "empty": "暂无最终数据。",
@@ -326,5 +330,10 @@
     },
     "placementMatch": "第 {{from}} 名争夺战",
     "placementRound": "第 {{from}}–{{to}} 名排位赛"
+  },
+  "freeThrows": {
+    "title": "罚球",
+    "next": "第 {{current}} 罚,共 {{total}} 罚",
+    "result": "{{total}} 罚中 {{made}}"
   }
 }

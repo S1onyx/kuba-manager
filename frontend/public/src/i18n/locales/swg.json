@@ -52,7 +52,8 @@
     "baskets": "Körb {{scored}}:{{conceded}}",
     "playerPoints": "{{count}} Pkt.",
     "noRoster": "Kader kommt no",
-    "empty": "No koine Teams agmeldet."
+    "empty": "No koine Teams agmeldet.",
+    "freeThrows": "FW {{pct}} ({{made}}/{{attempted}})"
   },
   "tabs": {
     "live": "Live",
@@ -257,7 +258,10 @@
     "colGames": "Schbiel",
     "colPointsPerGame": "Bungd/Schbiel",
     "colPenalties": "Schtrafa",
-    "colPenaltySeconds": "Schtrafsek."
+    "colPenaltySeconds": "Schtrafsek.",
+    "topFreeThrowShooters": "Beschde Freiwurfquote",
+    "colFreeThrows": "FW",
+    "colFreeThrowPct": "FW-%"
   },
   "final": {
     "empty": "No koi Abschlussdate do.",
@@ -331,5 +335,10 @@
     },
     "placementMatch": "Schbiel om Blatz {{from}}",
     "placementRound": "Blatzierungsrunde {{from}}–{{to}}"
+  },
+  "freeThrows": {
+    "title": "Freiwurf",
+    "next": "Wurf {{current}} vo {{total}}",
+    "result": "{{made}} vo {{total}} troffa"
   }
 }

@@ -52,7 +52,8 @@
     "baskets": "ゴール {{scored}}:{{conceded}}",
     "playerPoints": "{{count}}点",
     "noRoster": "メンバーは後日",
-    "empty": "まだ登録チームはありません。"
+    "empty": "まだ登録チームはありません。",
+    "freeThrows": "FT {{pct}}({{made}}/{{attempted}})"
   },
   "tabs": {
     "live": "ライブ",
@@ -255,7 +256,10 @@
     "colGames": "試合",
     "colPointsPerGame": "得点/試合",
     "colPenalties": "ペナルティ",
-    "colPenaltySeconds": "ペナルティ秒"
+    "colPenaltySeconds": "ペナルティ秒",
+    "topFreeThrowShooters": "フリースロー成功率トップ",
+    "colFreeThrows": "FT",
+    "colFreeThrowPct": "FT%"
   },
   "final": {
     "empty": "最終データはまだありません。",
@@ -326,5 +330,10 @@
     },
     "placementMatch": "{{from}}位決定戦",
     "placementRound": "{{from}}–{{to}}位順位決定ラウンド"
+  },
+  "freeThrows": {
+    "title": "フリースロー",
+    "next": "{{total}}本中{{current}}本目",
+    "result": "{{total}}本中{{made}}本成功"
   }
 }

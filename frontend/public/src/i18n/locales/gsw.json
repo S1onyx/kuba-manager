@@ -52,7 +52,8 @@
     "baskets": "Körb {{scored}}:{{conceded}}",
     "playerPoints": "{{count}} Pkt.",
     "noRoster": "Kader folgt",
-    "empty": "No kei Teams aagmäldet."
+    "empty": "No kei Teams aagmäldet.",
+    "freeThrows": "FW {{pct}} ({{made}}/{{attempted}})"
   },
   "tabs": {
     "live": "Live",
@@ -257,7 +258,10 @@
     "colGames": "Spil",
     "colPointsPerGame": "Pünkt/Spil",
     "colPenalties": "Strofe",
-    "colPenaltySeconds": "Strofsek."
+    "colPenaltySeconds": "Strofsek.",
+    "topFreeThrowShooters": "Bescht Freiwurfquote",
+    "colFreeThrows": "FW",
+    "colFreeThrowPct": "FW-%"
   },
   "final": {
     "empty": "No kei Abschlussdaate vorhande.",
@@ -331,5 +335,10 @@
     },
     "placementMatch": "Es spiel um Platz {{from}}",
     "placementRound": "Blatzierigsrundi {{from}}–{{to}}"
+  },
+  "freeThrows": {
+    "title": "Freiwurf",
+    "next": "Wurf {{current}} vo {{total}}",
+    "result": "{{made}} vo {{total}} troffe"
   }
 }

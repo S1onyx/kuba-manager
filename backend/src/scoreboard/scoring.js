@@ -134,6 +134,7 @@ export function resetScores() {
   resetTeamStats('b');
   state.scoringLog = [];
   state.shootout = null;
+  state.freeThrows = null;
   resetScoreEventIds();
   notifySubscribers();
   return snapshotState();

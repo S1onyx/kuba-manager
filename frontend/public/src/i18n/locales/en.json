@@ -52,7 +52,8 @@
     "baskets": "Baskets {{scored}}:{{conceded}}",
     "playerPoints": "{{count}} pts",
     "noRoster": "Roster to follow",
-    "empty": "No teams registered yet."
+    "empty": "No teams registered yet.",
+    "freeThrows": "FT {{pct}} ({{made}}/{{attempted}})"
   },
   "tabs": {
     "live": "Live",
@@ -257,7 +258,10 @@
     "colGames": "Games",
     "colPointsPerGame": "Points/Game",
     "colPenalties": "Penalties",
-    "colPenaltySeconds": "Pen. sec."
+    "colPenaltySeconds": "Pen. sec.",
+    "topFreeThrowShooters": "Best free-throw rate",
+    "colFreeThrows": "FT",
+    "colFreeThrowPct": "FT%"
   },
   "final": {
     "empty": "No final data available yet.",
@@ -331,5 +335,10 @@
     },
     "placementMatch": "Match for place {{from}}",
     "placementRound": "Placement round {{from}}–{{to}}"
+  },
+  "freeThrows": {
+    "title": "Free throw",
+    "next": "Throw {{current}} of {{total}}",
+    "result": "{{made}} of {{total}} made"
   }
 }

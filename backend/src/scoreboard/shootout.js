@@ -1,4 +1,4 @@
-import { getState, notifySubscribers, snapshotState } from './stateStore.js';
+import { getState, notifySubscribers, snapshotState, applyFreeThrowToStats } from './stateStore.js';
 import { addPoints } from './scoring.js';
 import { evaluateShootout } from './shootoutRules.js';
 
@@ -64,6 +64,7 @@ export function recordShootoutAttempt({ team, playerId = null, hit }) {
     hit: Boolean(hit),
     at: new Date().toISOString()
   });
+  applyFreeThrowToStats(teamKey, numericPlayerId, Boolean(hit));
   if (hit) {
     return addPoints(teamKey, 1, { playerId: numericPlayerId, shotType: 'free', description: SHOOTOUT_DESCRIPTION, type: 'shootout' });
   }
@@ -78,6 +79,7 @@ export function undoShootoutAttempt() {
   if (!last) {
     throw new ShootoutError('SHOOTOUT_NO_ATTEMPTS', 'Es gibt keinen Wurf zum Zurücknehmen.');
   }
+  applyFreeThrowToStats(last.team, last.playerId, last.hit, -1);
   if (last.hit) {
     return addPoints(last.team, -1, { playerId: last.playerId, shotType: 'free', description: SHOOTOUT_DESCRIPTION, type: 'shootout' });
   }

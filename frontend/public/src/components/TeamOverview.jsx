@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { formatStageLabelI18n } from '../utils/stageLabels.js';
+import { formatFreeThrowPct } from '../utils/freeThrows.js';
 
 const gridStyle = {
   display: 'grid',
@@ -50,6 +51,15 @@ function TeamCard({ team, entry, roster, t }) {
           <span>{t('teamOverview.points', { count: entry.points })}</span>
           <span>{t('teamOverview.record', { wins: entry.wins, draws: entry.draws, losses: entry.losses })}</span>
           <span>{t('teamOverview.baskets', { scored: entry.goalsFor, conceded: entry.goalsAgainst })}</span>
+          {(entry.freeThrowsAttempted ?? 0) > 0 ? (
+            <span>
+              {t('teamOverview.freeThrows', {
+                pct: formatFreeThrowPct(entry.freeThrowPct),
+                made: entry.freeThrowsMade,
+                attempted: entry.freeThrowsAttempted
+              })}
+            </span>
+          ) : null}
         </div>
       ) : null}
       {roster.length > 0 ? (

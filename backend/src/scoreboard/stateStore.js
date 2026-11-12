@@ -81,6 +81,8 @@ function createEmptyStat(descriptor = {}, teamKey) {
     },
     penalties: 0,
     penaltySeconds: 0,
+    freeThrowsAttempted: 0,
+    freeThrowsMade: 0,
     lastScoreAt: null,
     isTeamTotal: Boolean(descriptor.isTeamTotal),
     isUnknown: Boolean(descriptor.isUnknown)
@@ -170,6 +172,7 @@ function createDefaultState(overrides = {}) {
     scoringLog: [],
     penaltyLog: [],
     shootout: null,
+    freeThrows: null,
     isFinished: false,
     savedGameId: null,
     savedSignature: null,
@@ -365,6 +368,18 @@ function applyPenaltyToStats(teamKey, playerId, durationSeconds) {
   playerEntry.penaltySeconds += durationSeconds;
 }
 
+// direction 1 = Wurf erfassen, -1 = Wurf zurücknehmen
+export function applyFreeThrowToStats(teamKey, playerId, hit, direction = 1) {
+  const normalizedTeamKey = TEAM_KEYS.includes(teamKey) ? teamKey : 'a';
+  const normalizedPlayerId = playerId === null || playerId === undefined || playerId === '' ? null : Number(playerId);
+  [ensureTeamTotalsEntry(normalizedTeamKey), getOrCreatePlayerStats(normalizedTeamKey, normalizedPlayerId)].forEach((entry) => {
+    entry.freeThrowsAttempted = clampNonNegative((entry.freeThrowsAttempted ?? 0) + direction);
+    if (hit) {
+      entry.freeThrowsMade = clampNonNegative((entry.freeThrowsMade ?? 0) + direction);
+    }
+  });
+}
+
 function findPlayerName(teamKey, playerId) {
   if (playerId == null) return null;
   const roster = state.players[teamKey] ?? [];
@@ -376,7 +391,7 @@ function inferShotType(points) {
   const abs = Math.abs(points);
   if (abs === 3) return 'three';
   if (abs === 2) return 'field';
-  if (abs === 1) return 'free';
+  if (abs === 1) return 'single';
   return 'custom';
 }
 
@@ -424,6 +439,8 @@ export function setTeamPlayers(teamKey, roster = [], { teamName, resetStats = tr
         },
         penalties: previous.penalties ?? 0,
         penaltySeconds: previous.penaltySeconds ?? 0,
+        freeThrowsAttempted: previous.freeThrowsAttempted ?? 0,
+        freeThrowsMade: previous.freeThrowsMade ?? 0,
         games: previous.games ?? 0,
         lastScoreAt: previous.lastScoreAt ?? null
       };
@@ -530,7 +547,8 @@ function resultSignature() {
     state.scoreB,
     state.scoringLog.length,
     state.penaltyLog.length,
-    state.shootout?.attempts?.length ?? 0
+    state.shootout?.attempts?.length ?? 0,
+    TEAM_KEYS.map((teamKey) => state.playerStats?.[teamKey]?.[TEAM_TOTAL_KEY]?.freeThrowsAttempted ?? 0)
   ]);
 }
 
@@ -561,6 +579,17 @@ export function snapshotState() {
           ...state.shootout,
           attempts: state.shootout.attempts.map((attempt) => ({ ...attempt })),
           status: evaluateShootout(state.shootout)
+        }
+      : null,
+    freeThrows: state.freeThrows
+      ? {
+          ...state.freeThrows,
+          attempts: state.freeThrows.attempts.map((attempt) => ({ ...attempt })),
+          status: {
+            taken: state.freeThrows.attempts.length,
+            made: state.freeThrows.attempts.filter((attempt) => attempt.hit).length,
+            done: state.freeThrows.attempts.length >= state.freeThrows.total
+          }
         }
       : null
   };

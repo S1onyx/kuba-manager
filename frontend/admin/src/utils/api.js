@@ -170,7 +170,8 @@ export function addPenalty(team, name, seconds, options = {}) {
     name,
     seconds,
     ...(options.playerId != null && options.playerId !== '' && { playerId: options.playerId }),
-    ...(options.description && { description: options.description })
+    ...(options.description && { description: options.description }),
+    ...(options.freeThrows && { freeThrows: options.freeThrows })
   };
   return request('/scoreboard/penalties', {
     method: 'POST',
@@ -489,4 +490,29 @@ export function undoShootoutAttempt() {
 
 export function cancelShootout() {
   return request('/scoreboard/shootout/cancel', { method: 'POST' });
+}
+
+const toPlayerId = (playerId) => (playerId ? Number(playerId) : null);
+
+export function startFreeThrows({ team, playerId, total }) {
+  return request('/scoreboard/freethrows/start', {
+    method: 'POST',
+    body: JSON.stringify({ team, total: Number(total), playerId: toPlayerId(playerId) })
+  });
+}
+
+export function setFreeThrowShooter(playerId) {
+  return request('/scoreboard/freethrows/shooter', { method: 'POST', body: JSON.stringify({ playerId: toPlayerId(playerId) }) });
+}
+
+export function recordFreeThrow(hit) {
+  return request('/scoreboard/freethrows/attempt', { method: 'POST', body: JSON.stringify({ hit }) });
+}
+
+export function undoFreeThrow() {
+  return request('/scoreboard/freethrows/undo', { method: 'POST' });
+}
+
+export function closeFreeThrows() {
+  return request('/scoreboard/freethrows/close', { method: 'POST' });
 }

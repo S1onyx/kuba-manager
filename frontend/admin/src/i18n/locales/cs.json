@@ -200,7 +200,9 @@
       "reset": "Resetovat",
       "savedButton": "Uloženo ✓",
       "sidebarUnsaved": "⚠ Neuloženo",
-      "sidebarSaved": "✓ Uloženo"
+      "sidebarSaved": "✓ Uloženo",
+      "freeThrowsOpenTitle": "Otevřené trestné hody",
+      "freeThrowsOpenText": "Uložit lze až po provedení všech trestných hodů (karta trestných hodů)."
     },
     "shootout": {
       "title": "Rozstřel trestnými hody",
@@ -259,7 +261,29 @@
       "none": "Žádné aktivní časové tresty",
       "expired": "vypršel",
       "remaining": "zbývá {{time}}",
-      "remove": "Odebrat"
+      "remove": "Odebrat",
+      "freeThrows": "Trestné hody pro soupeře"
+    },
+    "freeThrows": {
+      "title": "Trestné hody",
+      "description": "Spustit sérii trestných hodů: vybrat tým, střelce a počet hodů. Čas se při startu zastaví a po posledním hodu se automaticky rozběhne.",
+      "fromPenalty": "Vytvořeno po časovém trestu – vyberte střelce.",
+      "team": "Tým",
+      "shooter": "Střelec",
+      "wholeTeam": "Tým (bez hráče)",
+      "count": "Počet",
+      "countOption1": "1 trestný hod",
+      "countOption2": "2 trestné hody",
+      "start": "Spustit trestné hody",
+      "titleRunning": "Trestné hody {{team}} · {{made}}/{{total}}",
+      "next": "Hod {{current}} z {{total}}",
+      "done": "Hotovo: proměněno {{made}} z {{total}}",
+      "hit": "Koš",
+      "miss": "Vedle",
+      "undo": "Vrátit poslední hod",
+      "cancel": "Zrušit trestné hody",
+      "close": "Skrýt",
+      "failed": "Akce trestného hodu se nezdařila."
     }
   },
   "schedule": {
@@ -681,7 +705,8 @@
     "soundTriggerFailed": "Zvuk se nepodařilo spustit.",
     "timerCuesSaved": "Nastavení časomíry uložena.",
     "timerCuesSaveFailed": "Nastavení časomíry se nepodařilo uložit.",
-    "audioLoadFailed": "Zvuková data se nepodařilo načíst."
+    "audioLoadFailed": "Zvuková data se nepodařilo načíst.",
+    "penaltyFreeThrowsSkipped": "Časový trest přidán týmu {{team}} – trestné hody nevytvořeny, protože je ještě otevřená série."
   },
   "error": {
     "generic": "Došlo k chybě. Zkuste to prosím znovu.",
@@ -801,7 +826,14 @@
     "TRIGGER_NOT_FOUND": "Spouštěč nebyl nalezen.",
     "TRIGGER_PLAY_FAILED": "Spouštěč se nepodařilo přehrát.",
     "TRIGGER_UPDATE_FAILED": "Zvukový spouštěč se nepodařilo aktualizovat.",
-    "UNSUPPORTED_POSTER_FILE_TYPE": "Podporovány jsou pouze obrázky a soubory PDF."
+    "UNSUPPORTED_POSTER_FILE_TYPE": "Podporovány jsou pouze obrázky a soubory PDF.",
+    "FREE_THROWS_OPEN": "Trestné hody už probíhají.",
+    "FREE_THROWS_INVALID_TOTAL": "Možné jsou jen 1 nebo 2 trestné hody.",
+    "FREE_THROWS_DONE": "Všechny trestné hody už byly provedeny.",
+    "FREE_THROWS_HAS_ATTEMPTS": "Nejprve proveďte nebo vraťte všechny trestné hody.",
+    "FREE_THROWS_SHOOTER_LOCKED": "Po prvním hodu už nelze střelce změnit.",
+    "FREE_THROWS_NO_ATTEMPTS": "Není žádný trestný hod k vrácení.",
+    "FREE_THROWS_NOT_ACTIVE": "Neprobíhají žádné trestné hody."
   },
   "export": {
     "title": "Export PDF / Tisk",

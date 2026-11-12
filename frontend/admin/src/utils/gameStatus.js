@@ -12,6 +12,7 @@ export function getSaveStatus(scoreboard) {
   if (!ended) return 'running';
   const tied = (scoreboard.scoreA ?? 0) === (scoreboard.scoreB ?? 0);
   const shootoutOpen = scoreboard.shootout && !scoreboard.shootout.status?.decided;
+  if (scoreboard.freeThrows && !scoreboard.freeThrows.status?.done) return 'freeThrowsOpen';
   if (shootoutOpen || (KNOCKOUT_PHASES.includes(scoreboard.stageType) && tied)) return 'blocked';
   return 'needsSave';
 }

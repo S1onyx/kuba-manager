@@ -132,31 +132,37 @@ const subListStyle = {
   gap: '0.3rem'
 };
 
+const imageStyle = {
+  display: 'block',
+  width: '100%',
+  maxWidth: '640px',
+  height: 'auto',
+  margin: '0 auto',
+  borderRadius: '12px',
+  background: '#fff'
+};
+
+function renderListItems(items) {
+  return items.map((item, index) => {
+    if (typeof item === 'string') {
+      return <li key={index}>{item}</li>;
+    }
+    if (item && typeof item === 'object') {
+      return (
+        <li key={index}>
+          {item.text}
+          {Array.isArray(item.subItems) && item.subItems.length > 0 ? (
+            <ul style={subListStyle}>{renderListItems(item.subItems)}</ul>
+          ) : null}
+        </li>
+      );
+    }
+    return null;
+  });
+}
+
 function renderList(items) {
-  return (
-    <ul style={listStyle}>
-      {items.map((item, index) => {
-        if (typeof item === 'string') {
-          return <li key={index}>{item}</li>;
-        }
-        if (item && typeof item === 'object') {
-          return (
-            <li key={index}>
-              {item.text}
-              {Array.isArray(item.subItems) && item.subItems.length > 0 ? (
-                <ul style={subListStyle}>
-                  {item.subItems.map((subItem, subIndex) => (
-                    <li key={subIndex}>{subItem}</li>
-                  ))}
-                </ul>
-              ) : null}
-            </li>
-          );
-        }
-        return null;
-      })}
-    </ul>
-  );
+  return <ul style={listStyle}>{renderListItems(items)}</ul>;
 }
 
 function renderBody(body) {
@@ -170,6 +176,18 @@ function renderBody(body) {
     }
     if (block.type === 'list' && Array.isArray(block.items)) {
       return <div key={index}>{renderList(block.items)}</div>;
+    }
+    if (block.type === 'image' && block.src) {
+      return (
+        <figure key={index} style={{ margin: 0, display: 'grid', gap: '0.4rem' }}>
+          <img src={block.src} alt={block.alt ?? ''} loading="lazy" style={imageStyle} />
+          {block.caption ? (
+            <figcaption style={{ ...paragraphStyle, fontSize: '0.85rem', textAlign: 'center', opacity: 0.7 }}>
+              {block.caption}
+            </figcaption>
+          ) : null}
+        </figure>
+      );
     }
     return null;
   });

@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import ShootoutView from './ShootoutView.jsx';
+import FreeThrowView from './FreeThrowView.jsx';
+import useVisibleFreeThrows from '../hooks/useVisibleFreeThrows.js';
 
 const cardStyle = {
   display: 'grid',
@@ -187,6 +189,7 @@ export default function CurrentMatchCard({ scoreboard }) {
   const extraTime = (scoreboard?.extraSeconds ?? 0) > 0 ? formatTime(scoreboard.extraSeconds) : null;
   const penaltiesA = scoreboard?.penalties?.a?.length ?? 0;
   const penaltiesB = scoreboard?.penalties?.b?.length ?? 0;
+  const freeThrows = useVisibleFreeThrows(scoreboard?.freeThrows);
 
   return (
     <>
@@ -237,6 +240,7 @@ export default function CurrentMatchCard({ scoreboard }) {
             </div>
 
             {scoreboard.shootout ? <ShootoutView shootout={scoreboard.shootout} teamAName={scoreboard.teamAName} teamBName={scoreboard.teamBName} /> : null}
+            {!scoreboard.shootout && freeThrows ? <FreeThrowView freeThrows={freeThrows} teamAName={scoreboard.teamAName} teamBName={scoreboard.teamBName} /> : null}
 
             <div className="current-card__info" style={infoMetaStyle}>
               <span>{t('currentMatch.time', { time: timer })}</span>

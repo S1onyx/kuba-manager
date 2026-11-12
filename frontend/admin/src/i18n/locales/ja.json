@@ -194,7 +194,9 @@
       "reset": "リセット",
       "savedButton": "保存済み ✓",
       "sidebarUnsaved": "⚠ 未保存",
-      "sidebarSaved": "✓ 保存済み"
+      "sidebarSaved": "✓ 保存済み",
+      "freeThrowsOpenTitle": "フリースロー未完了",
+      "freeThrowsOpenText": "すべてのフリースローが終わるまで保存できません(フリースローカード)。"
     },
     "shootout": {
       "title": "フリースロー戦",
@@ -253,7 +255,29 @@
       "none": "有効なタイムペナルティはありません",
       "expired": "終了",
       "remaining": "残り {{time}}",
-      "remove": "削除"
+      "remove": "削除",
+      "freeThrows": "相手チームにフリースロー"
+    },
+    "freeThrows": {
+      "title": "フリースロー",
+      "description": "フリースローを開始:チーム、シューター、本数を選択します。開始時に時計が止まり、最後の1本の後に自動で再開します。",
+      "fromPenalty": "退場から作成されました。シューターを選んでください。",
+      "team": "チーム",
+      "shooter": "シューター",
+      "wholeTeam": "チーム(選手指定なし)",
+      "count": "本数",
+      "countOption1": "フリースロー1本",
+      "countOption2": "フリースロー2本",
+      "start": "フリースロー開始",
+      "titleRunning": "フリースロー {{team}} · {{made}}/{{total}}",
+      "next": "{{total}}本中{{current}}本目",
+      "done": "終了:{{total}}本中{{made}}本成功",
+      "hit": "成功",
+      "miss": "失敗",
+      "undo": "最後の1本を取り消す",
+      "cancel": "フリースローを中止",
+      "close": "非表示",
+      "failed": "フリースローの操作に失敗しました。"
     }
   },
   "schedule": {
@@ -654,7 +678,8 @@
     "soundTriggerFailed": "サウンドを発動できませんでした。",
     "timerCuesSaved": "タイマー設定を保存しました。",
     "timerCuesSaveFailed": "タイマー設定を保存できませんでした。",
-    "audioLoadFailed": "音声データを読み込めませんでした。"
+    "audioLoadFailed": "音声データを読み込めませんでした。",
+    "penaltyFreeThrowsSkipped": "チーム {{team}} にタイムペナルティを追加しました。未完了のフリースローがあるため、新しいフリースローは作成されませんでした。"
   },
   "error": {
     "generic": "エラーが発生しました。もう一度お試しください。",
@@ -774,7 +799,14 @@
     "TRIGGER_NOT_FOUND": "トリガーが見つかりませんでした。",
     "TRIGGER_PLAY_FAILED": "トリガーを再生できませんでした。",
     "TRIGGER_UPDATE_FAILED": "音声トリガーを更新できませんでした。",
-    "UNSUPPORTED_POSTER_FILE_TYPE": "画像および PDF ファイルのみサポートされています。"
+    "UNSUPPORTED_POSTER_FILE_TYPE": "画像および PDF ファイルのみサポートされています。",
+    "FREE_THROWS_OPEN": "フリースローはすでに進行中です。",
+    "FREE_THROWS_INVALID_TOTAL": "フリースローは1本または2本のみです。",
+    "FREE_THROWS_DONE": "すべてのフリースローが終了しています。",
+    "FREE_THROWS_HAS_ATTEMPTS": "先にすべてのフリースローを投げるか取り消してください。",
+    "FREE_THROWS_SHOOTER_LOCKED": "1本目の後はシューターを変更できません。",
+    "FREE_THROWS_NO_ATTEMPTS": "取り消せるフリースローはありません。",
+    "FREE_THROWS_NOT_ACTIVE": "進行中のフリースローはありません。"
   },
   "export": {
     "title": "PDFエクスポート / 印刷",

@@ -124,5 +124,10 @@
     "loadStandings": "Le classement n'a pas pu être chargé.",
     "loadStructure": "La structure du tournoi n'a pas pu être chargée.",
     "loadSummary": "L'aperçu du tournoi n'a pas pu être chargé."
+  },
+  "freeThrows": {
+    "title": "Lancer franc",
+    "next": "Lancer {{current}} sur {{total}}",
+    "result": "{{made}} sur {{total}} réussis"
   }
 }

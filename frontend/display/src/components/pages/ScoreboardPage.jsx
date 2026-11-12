@@ -3,6 +3,8 @@ import Scoreboard from '../Scoreboard.jsx';
 import Timer from '../Timer.jsx';
 import PenaltiesSection from '../scoreboard/PenaltiesSection.jsx';
 import ShootoutPanel from '../scoreboard/ShootoutPanel.jsx';
+import FreeThrowPanel from '../scoreboard/FreeThrowPanel.jsx';
+import useVisibleFreeThrows from '../../hooks/useVisibleFreeThrows.js';
 import StandingsSection from '../scoreboard/StandingsSection.jsx';
 import TournamentSummaryView from '../summary/TournamentSummaryView.jsx';
 import useLocalTimer from '../../hooks/useLocalTimer.js';
@@ -24,6 +26,7 @@ export default function ScoreboardPage({
   const isCompact = useMediaQuery('(max-width: 1100px)');
   const isMobile = useMediaQuery('(max-width: 720px)');
   const { remainingSeconds, extraElapsedSeconds, halftimePauseRemaining } = useLocalTimer(scoreboard);
+  const freeThrows = useVisibleFreeThrows(scoreboard?.freeThrows);
   const score = {
     teamA: scoreboard?.scoreA ?? 0,
     teamB: scoreboard?.scoreB ?? 0
@@ -153,6 +156,7 @@ export default function ScoreboardPage({
         <ShootoutPanel shootout={scoreboard.shootout} teamNames={teamNames} />
       ) : (
         <>
+          <FreeThrowPanel freeThrows={freeThrows} teamNames={teamNames} />
           <Timer
             time={formattedRemaining}
             isRunning={Boolean(scoreboard?.isRunning)}

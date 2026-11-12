@@ -16,7 +16,12 @@ export default {
             {
               type: 'paragraph',
               text:
-                'Kunstrad Basketball wird uf Kunsträder i de Steuerrohrstiiger-Position gspilt, mit zwei Teams à vier Spiler. Ziel isch, Chörb z’erziele und Gägeträffer z’verhindere. Schiri und Spilleitig lueged uf s’Spil; d’Mannschaft mit de meischte Pünkt noch Ablauf vo de Spilziit gwünnt.'
+                'Kunstrad Basketball wird uf Kunsträder i de Steuerrohrstiiger-Position gspilt, mit zwei Mannschafte à vier Spiler. Jedi Mannschaft wott de Ball in gägnerische Chorb wärfe – und di anderi Mannschaft dra hindere.'
+            },
+            {
+              type: 'paragraph',
+              text:
+                'Zwei Schiris und d’Spilleitig lueged uf s’Spil. Für jede Chorb gits e bestimmti Aazahl Pünkt. Gwunne hät d’Mannschaft mit de meischte Pünkt, wänn d’Spilziit ume isch.'
             }
           ]
         },
@@ -26,9 +31,9 @@ export default {
             {
               type: 'list',
               items: [
-                'Es Team beschtoht us maximal föif Spiler.',
-                'Pro Team stönd maximal vier Spiler gliichziitig ufem Fäld. Z’vil Spiler ufem Fäld wärded mit 2 Minute Ziitstrof ahndet.',
-                'Spilerwächsel gschehnd flügend und usschliesslich über d’eigeni Coaching Zone.'
+                'Es Team bestaht us maximal föif Spiler.',
+                'Pro Team sind maximal vier Spiler uf em Fäld und spiled aktiv mit.',
+                'Gwächslet wird während em Spil ohni Freigab vom Schiri, aber nur über d’Ändlinie vo de Coaching Zone. D’Mannschaft mues drauf luege, dass nie meh als vier Spiler uf em Fäld sind. Wer das missachtet, chunnt für ein Spiler 2 Minute Ziitstraf über – und s’Team spilt mit eim weniger wiiter.'
               ]
             }
           ]
@@ -39,24 +44,36 @@ export default {
             {
               type: 'list',
               items: [
-                'S’ganze Spil wird im Steuerrohrstiiger uf eme Kunstrad oder Radballrad gemäss UCI-Reglement absolviert; d’Position wird i de Coaching Zone iignoh.',
-                'Bim Abstiige, bi Ziitstrof oder ähnliche Situatione isch s’Spilfäld sofort z’verloo und dörf ersch i Steuerrohrstiiger-Position us de Coaching Zone wieder befahre wärde.'
+                'S’ganze Spil wird im Steuerrohrstiiger uf emne Kunstrad oder Radballrad nach UCI-Reglement gfahre – die Position nimmt mer i de Coaching Zone ii.',
+                'Bim Abstiige, ere Ziitstraf oder ähnlichem mues mer s’Fäld sofort verlah und darf erscht im Steuerrohrstiiger us de Coaching Zone wieder ine.'
               ]
             }
           ]
         },
         {
-          heading: '1.4 Spilfäld & Pünktwärtig',
+          heading: '1.4 Spilfäld & Pünkt',
           body: [
             {
               type: 'list',
               items: [
-                'Jeds Team het e eigeni Coaching Zone, wo sich d’Uswechselspiler ufhalte.',
-                'Noch eme erfolgriiche Chorwurf fangt s’Team, wo kasiert het, mit Iiwurf vo de eigene Grundlinie aa.',
+                'Jedes Team hät sini eigeti Coaching Zone, wo d’Uswächselspiler mönd bliibe.',
                 {
-                  text: 'D’Pünktwärtig entschpricht em Basketball:',
-                  subItems: ['1 Pungt – Friiwurf', '2 Pünkt – Fäldwurf', '3 Pünkt – Wurf hinter de Drüü-Pünkt-Linie']
+                  text: 'D’Pünkt gönd wie im Basketball:',
+                  subItems: ['1 Punkt – Freiwurf', '2 Pünkt – normale Wurf us em Spil', '3 Pünkt – Wurf hinder de Drüpunkt-Linie']
                 }
+              ]
+            },
+            {
+              type: 'image',
+              src: '/reglement/spielfeld.png',
+              alt: 'Spilfäld mit Freiwurfzone, Drüpunkt-Linie und Coaching Zones',
+              caption: 'Spilfäld – d’Freiwurfzone isch dunkelgrau.'
+            },
+            {
+              type: 'list',
+              items: [
+                'D’Freiwurfzone isch dunkelgrau iizeichnet.',
+                'Nach emne Chorb wächslet de Ball; s’Team fangt a de Chorbuslinie aa.'
               ]
             }
           ]
@@ -67,15 +84,21 @@ export default {
       title: '2. Spilablauf',
       subsections: [
         {
-          heading: '2.1 Spilduür, Aafang & Änd',
+          heading: '2.1 Spildauer, Aafang & Änd',
           body: [
             {
               type: 'list',
               items: [
-                'Spilduür: 2×5 Minute mit 1 Minute Halbziitpause; d’Uhr lauft ohni Underbrächig.',
-                'Vor Spilaafang entscheidet es Zuefallsprinzip (z. B. Müenzwurf), weles Team de Ballbsitz überchunnt.',
-                'S’Aaspil erfolgt i de eigene Helfti; beidi Teams starte i ihrer Helfti und s’Spil fangt mit eme Pfiff vom Schiri aa.',
-                'D’Spilleitig überwacht d’Ziit und signalisiert s’Änd mit eme Pfiff.'
+                '2 × 5 Minute mit Siitewächsel – 1 Minute Halbziitpause.',
+                'Grundsätzlich lauft d’Uhr dure. Gstoppt wird si nur, wänn de Schiri pfiift und s’passende Handzeiche macht (lueg 3.2). Gründ chönd e Verwarnig, es Foul, de Ball im Uus oder suscht öppis sii, wo d’Schiris für richtig findet.',
+                {
+                  text: 'Bi K.-o.-Spil entscheidet de Zuefall (Münzwurf vom Schiri), wer aafange darf. I de Vorrundi fangt d’Mannschaft aa, wo zerscht gnännt isch.',
+                  subItems: [
+                    'Aagspilt wird i de eigete Hälfti a de Chorbuslinie; jedi Mannschaft startet i ihrere Hälfti.',
+                    'S’Spil gaht mit emne Pfiff vom Schiri und em Aazeigton los.'
+                  ]
+                },
+                'D’Spilziit überwacht d’Spilleitig; s’Änd wird mit Pfiff und Aazeigton gmeldet.'
               ]
             }
           ]
@@ -86,11 +109,22 @@ export default {
             {
               type: 'list',
               items: [
-                'Mit Ball i de Hand sind maximal drüü Pedalumdrehige erlaubt.',
-                'Spötischtens noch drüü Pedalumdrehige muess gbrällt oder abgspilt wärde. Doppeldribbling – Ball ufneh und nomol brälle – isch verbotte.',
-                'Bi meh als drüü Pedalumdrehige ohni Abspil oder Brälle gits Ballwächsel ans gägnerisch Team.',
-                'Cha es Team de Ball nid ufneh, ohni d’Steuerrohrstiiger-Position z’verloo, überchunnt s’gägnerisch Team Ballbsitz; de Schiri hebt de Ball uf, damit s’gägnerisch Team ne cha überneh.',
-                'Verloht de Ball s’Spilfäld, überchunnt au s’gägnerisch Team a dere Stell de Ball, wo de Schiri frügitt.'
+                'Mit em Ball i de Hand dörf mer maximal drü Pedalumdrehige fahre.',
+                {
+                  text: 'Spöötischtens nach drü Pedalumdrehige mues prellt oder abgspilt wärde.',
+                  subItems: [
+                    'Doppeldribbling isch verbote: Häsch de Ball zum zweite Mal ufgno, chasch au mit nomal Prelle nöd meh als drü Pedalumdrehige fahre – nach em zweite Ufneh mues de Ball abgspilt oder gworfe wärde.',
+                    'Wer sich nöd dra hebt, git de Ball de Gägner.'
+                  ]
+                },
+                {
+                  text: 'Landet de Ball uf em Bode und cha nöd ufgno wärde, ohni d’Steuerrohrstiiger-Position z’verlah, überchunnt d’Gägner de Ball.',
+                  subItems: ['De Schiri hebt de Ball a dere Stell i d’Luft; s’gägnerische Team mues ne sich hole.']
+                },
+                {
+                  text: 'Gaht de Ball is Uus, überchunnt s’gägnerische Team a dere Stell de Ball.',
+                  subItems: ['De Schiri hebt de Ball a dere Stell a de Uuslinie i d’Luft; s’gägnerische Team mues ne sich hole.']
+                }
               ]
             }
           ]
@@ -101,111 +135,159 @@ export default {
             {
               type: 'list',
               items: [
-                'D’Vorrundi wird i eiere oder mehrere Gruppe ustreit.',
-                'Pünktvergab: Siig 3 Pünkt, Unentschide 1 Pungt, Niderlag 0 Pünkt.',
-                'I de Ändrundi wird im K.-o.-Modus gspilt. Bi Unentschide noch regulärer Spilziit gits e Verlängerig über d’halb Spilziit.',
-                'Blibts dezue unentschide, gits es Friiwurf-Shootout: Beidi Teams wärfed abwächslend föifmol hinter de Drüü-Pünkt-Linie — jede Spiler muess mindischtens eimol wärfe. Falls wiiterhi kei Siiger feschtstoht, wird de Ablauf wiederholt, bis es Team gwünnt.'
+                'I de Vorrundi spiled d’Teams i einere oder mehrere Gruppe gägenand.',
+                'Sieg: 3 Pünkt, Unentschide: 1 Punkt, Niederlag: 0 Pünkt.',
+                {
+                  text: 'Ab de Ändrundi wird im K.-o.-Modus gspilt.',
+                  subItems: [
+                    'Stahts nach Ablauf vo de Ziit unentschide, gits e Verlängerig mit de halbe Spilziit (5 Minute).',
+                    'Isch es nach de Verlängerig immer no glich, wärfed beidi Teams föifmal frei – jede Spiler mues mindischtens eimal wärfe.',
+                    'Isch dänn immer no niemer vorne, wird abwächslungswiis je eimal wiitergworfe, bis eis gwinnt.'
+                  ]
+                }
               ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      title: '3. Vergeh & Fouls',
-      subsections: [
-        {
-          heading: '3.1 Verloo vo de Steuerrohrstiiger-Position',
-          body: [
-            {
-              type: 'paragraph',
-              text:
-                'Wär d’Steuerrohrstiiger-Position verloht oder schtürzt, muess umgehend zur nögschte Ussemarkierig fahre, s’Spilfäld verloo und noch em Wieder-iineh vo de Position i de eigene Coaching Zone wieder iistiige. De Spilverlauf dörf debi nid biinträchtigt wärde.'
             }
           ]
         },
         {
-          heading: '3.2 Technischs Foul, Berüehrig & regelwidrig Blocke',
+          heading: '2.4 Freiwurfzone',
           body: [
             {
               type: 'list',
               items: [
-                'Umfasst under anderem Abeschubsle, regelwidrig Blocke bi höcherer Gschwindigkeit, absichtlichs Aafahre oder Wäg-Abgschniide (Quärstelle vor eme fahrende Spiler ohni Brämsabstand).',
-                'Unvermidlichi Chörperberüehrig ohni Iifluss uf de Spilverlauf gilt nid als Foul.',
-                'Bi Zämeschtöss entscheidet de Schiri über d’Schuudfrog; bi Unklarheit überchömed beidi Spiler e Ziitstrof.',
+                'I de eigete wie i de gägnerische Freiwurfzone dörf en Spiler maximal drü Pändelbewegige uf de Stell bliibe (pändle). Dänn mues er sofort use.',
                 {
-                  text: 'Ziitstrofe-Katalog:',
-                  subItems: ['Liichts Foul: 1 Minute', 'Schtarchs Foul: 2 Minute', 'Unsportlichs oder gfährdends Foul: Spilverwiis']
-                },
-                'D’Wärtig vo de Foul-Schwäri liit elei bim Schiri.',
-                {
-                  text: 'Wiederholti Verstöss chönd verschärft ahndet wärde:',
+                  text: 'Strafe:',
                   subItems: [
-                    'Höcheri Ziitstrof bi wiederholte liichte Fouls',
-                    'Spilverwiis bi wiederholte schtarche Fouls',
-                    'Turnierusschluss vo Spiler oder Team bi Spilverwiis(e)'
+                    'Wird bi emne Verstoss i de eigete Freiwurfzone (Abwehr) en gägnerische Aagriff behinderet, überchunnt d’Gägner zwei Freiwürf.',
+                    'Bi emne Verstoss i de gägnerische Freiwurfzone (Aagriff) wird de Aagriff abpfiffe und d’Gägner überchunnt de Ball.'
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          heading: '2.5 Steuerrohrstiiger-Position verlah',
+          body: [
+            {
+              type: 'paragraph',
+              text:
+                'Wer d’Steuerrohrstiiger-Position verlaht oder uf de Bode gheit, mues s’Fäld sofort Richtig nöchschti Usse-Markierig verlah, ohni s’Spil z’störe. Wänn er i de eigete Coaching Zone wieder im Steuerrohrstiiger isch, darf er vo dört us wieder ine und wiiterspile.'
+            }
+          ]
+        },
+        {
+          heading: '2.6 Technischs Foul, Berüerig & regelwidrigs Blocke',
+          body: [
+            {
+              type: 'list',
+              items: [
+                {
+                  text: 'Da drunder fallt z. B. Abeschupfe, regelwidrigs Blocke bi hohem Tämpo, absichtlichs „Aafahre“ oder em Gägner de Wäg abschniide. Liechte, unvermiidbare Körper- oder Radkontakt isch erlaubt.',
+                  subItems: [
+                    {
+                      text: 'Regelkonforms Blocke',
+                      subItems: ['Erlaubt isch robusts Stellungsspil Rad a Rad. Entscheidend isch d’Richtig vom Kontakt: Druck näbed em Gägner bi paralleler Fahrt isch erlaubt.']
+                    },
+                    {
+                      text: 'Regelwidrigs Blocke',
+                      subItems: [
+                        'Nöd erlaubt isch, em Gägner quer i d’Fahrlinie z’fahre oder ihm diräkt devor de Wäg abzschniide – vor allem us emne stiile Winkel (~90°), so dass er abrupt mues brämse oder uswiiche oder gar nümm cha uswiiche. Au aktivs Iinelänke oder Beschlünige in Gägner oder sis Rad isch verbote.'
+                      ]
+                    }
                   ]
                 },
-                'S’Spil wird underbroche und mit Ballbsitz für s’gägnerisch Team fortgsetzt, usser de gfoulti Spiler behaltet Vorteil und cha wiiter aagriife.'
+                {
+                  text: 'Ziitstrafe für Fouls:',
+                  subItems: [
+                    'Liechts Foul: Ball für de Gägner, kei Ziitstraf',
+                    'Mittelschwärs Foul: Ball für de Gägner, 1 Minute Ziitstraf',
+                    'Schwärs Foul: Ball für de Gägner, 2 Minute Ziitstraf',
+                    'Grob unsportlichs Verhalte oder gsundheitsgfährdends Foul: Ball für de Gägner, Spilverwiis',
+                    'Während ere Ziitstraf spilt s’bestrafte Team in Unterzahl. Für de bestrafte Spiler darf niemer iigwächslet wärde.',
+                    'Wie schwär es Foul isch, entscheidet de Schiri.'
+                  ]
+                },
+                {
+                  text: 'Wiederholti Verstöss:',
+                  subItems: [
+                    'Wiederholti liechti Verstöss chönd zu ere höchere Ziitstraf füere.',
+                    'Wiederholti schwäri Verstöss chönd zum Spilverwiis füere.',
+                    'Ein oder mehreri Spilverwiis chönd zum Turnierusschluss vo einzelne Spiler oder vom ganze Team füere.'
+                  ]
+                },
+                {
+                  text: 'Vorteilregle:',
+                  subItems: ['Cha de gfoulti Spiler sin Spilzug trotzdem fertig mache, wird s’Spil nöd unterbroche.']
+                }
               ]
             }
           ]
         },
         {
-          heading: '3.3 Foul i de Drüü-Pünkt-Zone',
+          heading: '2.7 Foul i de Freiwurfzone',
+          body: [{ type: 'paragraph', text: 'Es Foul i de Freiwurfzone git Ziitstraf und Freiwurf.' }]
+        },
+        {
+          heading: '2.8 Änd vo de Ziitstraf',
           body: [
             {
               type: 'paragraph',
-              text: 'Zuesätzlich zur Ziitstrof überchunnt s’gfoulte Team en Friiwurf.'
+              text: 'Wänn e Ziitstraf ume isch, seit d’Spilleitig aa. Erscht nach dere Freigab darf de Spiler wieder ufs Fäld.'
             }
           ]
         },
         {
-          heading: '3.4 Änd vo de Ziitstrof',
-          body: [
-            {
-              type: 'paragraph',
-              text:
-                'D’Spilleitig signalisiert s’Änd vo de Strof; ersch noch dere Frügab dörf de Spiler s’Spilfäld wieder betrete.'
-            }
-          ]
-        },
-        {
-          heading: '3.5 Friiwurf',
+          heading: '2.9 Freiwurf',
           body: [
             {
               type: 'list',
               items: [
-                'Friiwürf wärded hinter de Drüü-Pünkt-Linie usgfiert.',
-                'De wärfend Spiler het drüü Pedalumdrehige Ziit für de Friiwurf.',
-                'Gägnerischi Spiler müend während em Friiwurf usserhalb vo de Drüü-Pünkt-Zone bliibe.',
-                'Trifft de Friiwurf, git s’gägnerisch Team vo de Grundlinie ii.'
+                'D’Uhr wird aaghalte; grundsätzlich gits zwei Freiwürf.',
+                'De Ball wird unverteidiget vo de Freiwurflinie gworfe. Mit- und Gägespiler mönd usserhalb vom Freiwurffäld bliibe. En Träffer zellt 1 Punkt.',
+                'Nach em zweite Freiwurf lauft d’Uhr wiiter.'
               ]
             }
           ]
         },
         {
-          heading: '3.6 Ziitspil',
+          heading: '2.10 Ziitspil',
           body: [
             {
               type: 'paragraph',
               text:
-                'Passivi Spilwiis ohni Chorversuech gilt als Regelverstoss. De Schiri hebt d’Hand, underbricht gegebenefalls s’Spil und überträit de Ballbsitz ans andere Team.'
+                'Wer s’Spil nöd aktiv verfolgt, also gar nöd probiert en Chorb z’mache, verstosst gäge d’Regle. De Schiri hebt d’Hand (lueg 3.2) und unterbricht nach wiitere 10 Sekunde Passivspil. D’Gägner überchunnt de Ball.'
             }
           ]
         }
       ]
     },
     {
-      title: '4. Stellig vo Schiri & Spilleitig',
+      title: '3. Schiris',
       subsections: [
         {
-          heading: '4.1 Verantwortlichkeite',
+          heading: '3.1 Stellig vo Schiri & Spilleitig',
           body: [
             {
               type: 'paragraph',
               text:
-                'Situatione, wo nid usdrücklich greglet sind, wärded vom Schiriteam und de Spilleitig entschide. Si leged au d’Herti vo Fouls, d’Längi vo Ziitstrofe und d’Anerkennig vo Pünkt fescht. Fairness, sportliche Wättchampf und d’Gsundheit vo alle Teilnehmende stönd im Vordergrund.'
+                'Was nöd extra greglet isch, entscheidet s’Schiriteam zäme mit de Spilleitig. Wie hert es Foul gsi isch, wie lang e Ziitstraf gaht oder öb en Punkt zellt – das entscheidet s’Schiriteam.'
+            },
+            {
+              type: 'paragraph',
+              text: 'Fair und sportlich sölls zuegah – und d’Gsundheit vo allne gaht vor!'
+            }
+          ]
+        },
+        {
+          heading: '3.2 Handzeiche vo de Schiris',
+          body: [
+            {
+              type: 'image',
+              src: '/reglement/handsignale.png',
+              alt: 'Schiri-Zeiche: Uhr lauft, Uhr stopp, 1/2/3 Pünkt, Pedalfähler, Ball uus/Ballwächsel, Time-Out, Ziitspil, Aagriffsrichtig',
+              caption: 'Aagriffsrichtig: nach jedere Unterbrechig mit gstrecktem Arm i d’Aagriffsrichtig vom Team mit em Ball.'
             }
           ]
         }

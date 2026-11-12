@@ -196,7 +196,9 @@
       "reset": "Reset",
       "savedButton": "Saved ✓",
       "sidebarUnsaved": "⚠ Not saved",
-      "sidebarSaved": "✓ Saved"
+      "sidebarSaved": "✓ Saved",
+      "freeThrowsOpenTitle": "Free throws pending",
+      "freeThrowsOpenText": "Saving is possible once all free throws have been taken (free-throw card)."
     },
     "shootout": {
       "title": "Free-throw shootout",
@@ -255,7 +257,29 @@
       "none": "No active time penalties",
       "expired": "expired",
       "remaining": "{{time}} remaining",
-      "remove": "Remove"
+      "remove": "Remove",
+      "freeThrows": "Free throws for opponent"
+    },
+    "freeThrows": {
+      "title": "Free throws",
+      "description": "Start a free-throw series: pick team, shooter and number of throws. The clock stops on start and resumes automatically after the last throw.",
+      "fromPenalty": "Created from a time penalty – please pick the shooter.",
+      "team": "Team",
+      "shooter": "Shooter",
+      "wholeTeam": "Team (no player)",
+      "count": "Throws",
+      "countOption1": "1 free throw",
+      "countOption2": "2 free throws",
+      "start": "Start free throws",
+      "titleRunning": "Free throws {{team}} · {{made}}/{{total}}",
+      "next": "Throw {{current}} of {{total}}",
+      "done": "Done: {{made}} of {{total}} made",
+      "hit": "Made",
+      "miss": "Missed",
+      "undo": "Undo last throw",
+      "cancel": "Cancel free throws",
+      "close": "Hide",
+      "failed": "Free-throw action failed."
     }
   },
   "schedule": {
@@ -663,7 +687,8 @@
     "soundTriggerFailed": "The sound could not be triggered.",
     "timerCuesSaved": "Timer settings saved.",
     "timerCuesSaveFailed": "The timer settings could not be saved.",
-    "audioLoadFailed": "The audio data could not be loaded."
+    "audioLoadFailed": "The audio data could not be loaded.",
+    "penaltyFreeThrowsSkipped": "Time penalty added for team {{team}} – free throws not created because a series is still open."
   },
   "error": {
     "generic": "An error occurred. Please try again.",
@@ -783,7 +808,14 @@
     "TRIGGER_NOT_FOUND": "The trigger was not found.",
     "TRIGGER_PLAY_FAILED": "The trigger could not be played.",
     "TRIGGER_UPDATE_FAILED": "The audio trigger could not be updated.",
-    "UNSUPPORTED_POSTER_FILE_TYPE": "Only image and PDF files are supported."
+    "UNSUPPORTED_POSTER_FILE_TYPE": "Only image and PDF files are supported.",
+    "FREE_THROWS_OPEN": "Free throws are already in progress.",
+    "FREE_THROWS_INVALID_TOTAL": "Only 1 or 2 free throws are allowed.",
+    "FREE_THROWS_DONE": "All free throws have already been taken.",
+    "FREE_THROWS_HAS_ATTEMPTS": "Please take or undo all free throws first.",
+    "FREE_THROWS_SHOOTER_LOCKED": "The shooter cannot be changed after the first throw.",
+    "FREE_THROWS_NO_ATTEMPTS": "There is no free throw to undo.",
+    "FREE_THROWS_NOT_ACTIVE": "No free throws in progress."
   },
   "export": {
     "title": "PDF Export / Print",

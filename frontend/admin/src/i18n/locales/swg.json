@@ -196,7 +196,9 @@
       "reset": "Zrücksetza",
       "savedButton": "Gspeichert ✓",
       "sidebarUnsaved": "⚠ Ned gspeichert",
-      "sidebarSaved": "✓ Gspeichert"
+      "sidebarSaved": "✓ Gspeichert",
+      "freeThrowsOpenTitle": "Freiwürf offa",
+      "freeThrowsOpenText": "Speichera goht erscht, wenn alle Freiwürf gworfa sen (Freiwurf-Karte)."
     },
     "shootout": {
       "title": "Freiwurf-Stecha",
@@ -255,7 +257,29 @@
       "none": "Koi aktive Zeitstrafe",
       "expired": "abglaufe",
       "remaining": "{{time}} verbleibend",
-      "remove": "Entferna"
+      "remove": "Entferna",
+      "freeThrows": "Freiwürf fir da Gegner"
+    },
+    "freeThrows": {
+      "title": "Freiwürf",
+      "description": "Freiwurf-Serie starta: Team, Werfer ond Azahl aussucha. D'Uhr hält beim Start a ond lauft noch em letzta Wurf von alloi weiter.",
+      "fromPenalty": "Noch ra Zeitstraf aglegt – bitte Werfer aussucha.",
+      "team": "Team",
+      "shooter": "Werfer",
+      "wholeTeam": "Team (ohne Schbieler)",
+      "count": "Azahl",
+      "countOption1": "1 Freiwurf",
+      "countOption2": "2 Freiwürf",
+      "start": "Freiwürf starta",
+      "titleRunning": "Freiwürf {{team}} · {{made}}/{{total}}",
+      "next": "Wurf {{current}} vo {{total}}",
+      "done": "Fertig: {{made}} vo {{total}} troffa",
+      "hit": "Troffa",
+      "miss": "Danaba",
+      "undo": "Letzta Wurf zrucknemma",
+      "cancel": "Freiwürf abbrecha",
+      "close": "Ausblenda",
+      "failed": "Freiwurf-Aktion hot ned klappt."
     }
   },
   "schedule": {
@@ -663,7 +687,8 @@
     "soundTriggerFailed": "Sound hot net ausglöst werda könna.",
     "timerCuesSaved": "Timer-Eistellunge gsichert.",
     "timerCuesSaveFailed": "Timer-Eistellunge hen net gsichert werda könna.",
-    "audioLoadFailed": "Audiodatä hen net gladä werda könna."
+    "audioLoadFailed": "Audiodatä hen net gladä werda könna.",
+    "penaltyFreeThrowsSkipped": "Zeitstraf für Team {{team}} dazua gdo – Freiwürf ned aglegt, weil no a Serie offa isch."
   },
   "error": {
     "generic": "A Fehler isch passiert. Bittschön versuch's nomol.",
@@ -783,7 +808,14 @@
     "TRIGGER_NOT_FOUND": "Dr Trigger isch net gfunde worde.",
     "TRIGGER_PLAY_FAILED": "Dr Trigger hot net abgspielt werda könna.",
     "TRIGGER_UPDATE_FAILED": "Dr Audio-Trigger hot net aktualisiert werda könna.",
-    "UNSUPPORTED_POSTER_FILE_TYPE": "S'wern nur Bild- ond PDF-Dateie unterstützt."
+    "UNSUPPORTED_POSTER_FILE_TYPE": "S'wern nur Bild- ond PDF-Dateie unterstützt.",
+    "FREE_THROWS_OPEN": "S'laufet scho Freiwürf.",
+    "FREE_THROWS_INVALID_TOTAL": "S'gibt bloß 1 oder 2 Freiwürf.",
+    "FREE_THROWS_DONE": "Alle Freiwürf sen scho gworfa.",
+    "FREE_THROWS_HAS_ATTEMPTS": "Bitte zerscht alle Freiwürf werfa oder zrucknemma.",
+    "FREE_THROWS_SHOOTER_LOCKED": "Noch em erschta Wurf ka dr Werfer nemme gwechselt werra.",
+    "FREE_THROWS_NO_ATTEMPTS": "S'gibt koin Freiwurf zom Zrucknemma.",
+    "FREE_THROWS_NOT_ACTIVE": "S'laufet koine Freiwürf."
   },
   "export": {
     "title": "PDF-Export / Drucker",

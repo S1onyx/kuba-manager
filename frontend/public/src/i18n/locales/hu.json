@@ -52,7 +52,8 @@
     "baskets": "Kosarak {{scored}}:{{conceded}}",
     "playerPoints": "{{count}} pont",
     "noRoster": "A keret később",
-    "empty": "Még nincs jelentkezett csapat."
+    "empty": "Még nincs jelentkezett csapat.",
+    "freeThrows": "BD {{pct}} ({{made}}/{{attempted}})"
   },
   "tabs": {
     "live": "Élő",
@@ -257,7 +258,10 @@
     "colGames": "Mérkőzések",
     "colPointsPerGame": "Pont/mérkőzés",
     "colPenalties": "Büntetések",
-    "colPenaltySeconds": "Bünt. mp."
+    "colPenaltySeconds": "Bünt. mp.",
+    "topFreeThrowShooters": "Legjobb büntetőhatékonyság",
+    "colFreeThrows": "BD",
+    "colFreeThrowPct": "BD%"
   },
   "final": {
     "empty": "Még nincsenek záró adatok.",
@@ -331,5 +335,10 @@
     },
     "placementMatch": "Mérkőzés a(z) {{from}}. helyért",
     "placementRound": "Helyosztó kör {{from}}–{{to}}"
+  },
+  "freeThrows": {
+    "title": "Büntetődobás",
+    "next": "{{current}}. dobás / {{total}}",
+    "result": "{{total}}-ből {{made}} sikeres"
   }
 }

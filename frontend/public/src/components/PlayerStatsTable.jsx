@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDateLocale } from '../i18n/index.js';
+import { formatFreeThrowPct } from '../utils/freeThrows.js';
 
 const gridLayout = {
   display: 'grid',
@@ -94,7 +95,7 @@ const sortButtonStyle = {
   width: '100%'
 };
 
-const SORTABLE_KEYS = ['name', 'teamName', 'points', 'games', 'pointsPerGame', 'penalties', 'penaltySeconds'];
+const SORTABLE_KEYS = ['name', 'teamName', 'points', 'games', 'pointsPerGame', 'freeThrowsMade', 'freeThrowPct', 'penalties', 'penaltySeconds'];
 
 const getSortableValue = (player, key) => {
   if (key === 'name') {
@@ -102,6 +103,9 @@ const getSortableValue = (player, key) => {
   }
   if (key === 'teamName') {
     return String(player.teamName ?? '').toLowerCase();
+  }
+  if (key === 'freeThrowPct') {
+    return player.freeThrowPct ?? -1;
   }
   return Number(player[key] ?? 0);
 };
@@ -118,12 +122,14 @@ export default function PlayerStatsTable({ stats }) {
   const topScorers = stats.leaders?.topScorers ?? [];
   const mostPenalized = stats.leaders?.mostPenalized ?? [];
   const topThreePointers = stats.leaders?.topThreePointers ?? [];
+  const topFreeThrowShooters = stats.leaders?.topFreeThrowShooters ?? [];
   const allPlayers = stats.players ?? [];
 
   if (
     topScorers.length === 0 &&
     mostPenalized.length === 0 &&
     topThreePointers.length === 0 &&
+    topFreeThrowShooters.length === 0 &&
     allPlayers.length === 0
   ) {
     return <p style={{ opacity: 0.75 }}>{t('playerStats.empty')}</p>;
@@ -210,11 +216,17 @@ export default function PlayerStatsTable({ stats }) {
           valueLabel={(entry) => t('playerStats.threes', { count: entry.breakdown?.['3'] ?? 0 })}
           teamFallback={t('playerStats.teamFallback')}
         />
+        <LeaderList
+          title={t('playerStats.topFreeThrowShooters')}
+          entries={topFreeThrowShooters}
+          valueLabel={(entry) => `${formatFreeThrowPct(entry.freeThrowPct)} (${entry.freeThrowsMade ?? 0}/${entry.freeThrowsAttempted ?? 0})`}
+          teamFallback={t('playerStats.teamFallback')}
+        />
       </div>
 
       {tableEntries.length > 0 ? (
         <div style={{ overflowX: 'auto', borderRadius: '12px', background: 'rgba(0,0,0,0.18)' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '560px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '720px' }}>
             <thead>
               <tr style={{ textAlign: 'left', opacity: 0.75, fontSize: '0.85rem' }}>
                 <th style={{ padding: '0.75rem 1rem' }}>
@@ -271,6 +283,26 @@ export default function PlayerStatsTable({ stats }) {
                   <button
                     type="button"
                     className="player-sort-button"
+                    style={buildSortButtonStyle('freeThrowsMade', 'right')}
+                    onClick={() => handleSortChange('freeThrowsMade')}
+                  >
+                    {t('playerStats.colFreeThrows')} {renderSortIndicator('freeThrowsMade')}
+                  </button>
+                </th>
+                <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
+                  <button
+                    type="button"
+                    className="player-sort-button"
+                    style={buildSortButtonStyle('freeThrowPct', 'right')}
+                    onClick={() => handleSortChange('freeThrowPct')}
+                  >
+                    {t('playerStats.colFreeThrowPct')} {renderSortIndicator('freeThrowPct')}
+                  </button>
+                </th>
+                <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
+                  <button
+                    type="button"
+                    className="player-sort-button"
                     style={buildSortButtonStyle('penalties', 'right')}
                     onClick={() => handleSortChange('penalties')}
                   >
@@ -302,6 +334,10 @@ export default function PlayerStatsTable({ stats }) {
                   <td style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
                     {(player.pointsPerGame ?? 0).toFixed(1)}
                   </td>
+                  <td style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
+                    {player.freeThrowsMade ?? 0}/{player.freeThrowsAttempted ?? 0}
+                  </td>
+                  <td style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>{formatFreeThrowPct(player.freeThrowPct)}</td>
                   <td style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>{player.penalties ?? 0}</td>
                   <td style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>{player.penaltySeconds ?? 0}</td>
                 </tr>

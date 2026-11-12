@@ -124,5 +124,10 @@
     "loadStandings": "A tabella nem tölthető be.",
     "loadStructure": "A tornastruktúra nem tölthető be.",
     "loadSummary": "A torna áttekintése nem tölthető be."
+  },
+  "freeThrows": {
+    "title": "Büntetődobás",
+    "next": "{{current}}. dobás / {{total}}",
+    "result": "{{total}}-ből {{made}} sikeres"
   }
 }

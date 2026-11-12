@@ -120,5 +120,10 @@
     "loadStandings": "无法加载积分榜。",
     "loadStructure": "无法加载赛事结构。",
     "loadSummary": "无法加载赛事概览。"
+  },
+  "freeThrows": {
+    "title": "罚球",
+    "next": "第 {{current}} 罚,共 {{total}} 罚",
+    "result": "{{total}} 罚中 {{made}}"
   }
 }
