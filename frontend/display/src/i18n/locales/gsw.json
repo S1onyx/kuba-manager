@@ -146,6 +146,32 @@
     "loading": "Lad Tippspiel …",
     "loadError": "Tippspiel het nöd chönne glade werde.",
     "notEnabled": "Für das Turnier isch kei Tippspiel aktiv.",
-    "noTournament": "Kei Turnier fürs Tippspiel gwählt."
+    "noTournament": "Kei Turnier fürs Tippspiel gwählt.",
+    "final": {
+      "badge": "Turnier fertig",
+      "title": "Ändstand Tippspiel",
+      "subtitle": "{{name}} · {{count}} Tipper",
+      "points": "{{points}} Pkt.",
+      "categories": "Kategorie-Sieger",
+      "specials": "Sonderwette – Uflösig",
+      "category": {
+        "matches": "Spiel",
+        "specials": "Sonderwette",
+        "exact": "Exakt-König",
+        "underdog": "Underdog-König",
+        "group": "Gruppephase",
+        "ko": "KO-Phase"
+      },
+      "types": {
+        "winner": "Turniersieger",
+        "top_scorer": "Topscorer",
+        "most_penalty_seconds": "Meischti Strafsekunde",
+        "total_baskets": "Gsamtpünkt"
+      },
+      "groupWinner": "Sieger {{group}}",
+      "thanks": "Merci fürs Mittippe!",
+      "hitBy_one": "{{count}}× troffe",
+      "hitBy_other": "{{count}}× troffe"
+    }
   }
 }

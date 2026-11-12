@@ -14,6 +14,7 @@ import StatsPage from './StatsPage.jsx';
 import MatchStatsPage from './MatchStatsPage.jsx';
 import ProfilePage from './ProfilePage.jsx';
 import RulesPage from './RulesPage.jsx';
+import FinalPage from './FinalPage.jsx';
 
 function JoinCard({ id, info, onJoined }) {
   const { t } = useTranslation();
@@ -109,6 +110,8 @@ export default function TournamentShell({ route }) {
     );
   } else if (tab === 'regeln') {
     content = <RulesPage info={info.data} />;
+  } else if (info.data.finished) {
+    content = <FinalPage id={id} />;
   } else {
     content = <TipsPage id={id} matches={matches} joined={joined} joinCard={joinCard} />;
   }
@@ -118,7 +121,7 @@ export default function TournamentShell({ route }) {
       <TopBar subtitle={name} profileHref={`/t/${id}/ich`} />
       {content}
       <MainSiteLink />
-      <BottomNav tournamentId={id} activeTab={tab} openCount={joined ? matches.data?.openCount ?? 0 : 0} />
+      <BottomNav tournamentId={id} activeTab={tab} openCount={joined && !info.data?.finished ? matches.data?.openCount ?? 0 : 0} finished={Boolean(info.data?.finished)} />
     </>
   );
 }

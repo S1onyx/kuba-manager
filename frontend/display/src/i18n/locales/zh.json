@@ -141,6 +141,31 @@
     "loading": "正在加载竞猜游戏 …",
     "loadError": "无法加载竞猜游戏。",
     "notEnabled": "该赛事没有启用竞猜游戏。",
-    "noTournament": "尚未为竞猜游戏选择赛事。"
+    "noTournament": "尚未为竞猜游戏选择赛事。",
+    "final": {
+      "badge": "赛事已结束",
+      "title": "竞猜最终排名",
+      "subtitle": "{{name}} · {{count}} 名玩家",
+      "points": "{{points}} 分",
+      "categories": "各项冠军",
+      "specials": "特别竞猜——揭晓",
+      "category": {
+        "matches": "比赛",
+        "specials": "特别竞猜",
+        "exact": "精准之王",
+        "underdog": "冷门之王",
+        "group": "小组赛",
+        "ko": "淘汰赛"
+      },
+      "types": {
+        "winner": "冠军",
+        "top_scorer": "得分王",
+        "most_penalty_seconds": "罚时最多",
+        "total_baskets": "总得分"
+      },
+      "groupWinner": "{{group}} 第一名",
+      "thanks": "感谢参与竞猜!",
+      "hitBy_other": "{{count}} 人猜中"
+    }
   }
 }

@@ -50,7 +50,8 @@
     "stats": "Statistik",
     "me": "Ich",
     "mainSite": "Zur Hauptsiite",
-    "mainSiteLong": "Live-Resultat, Spielplan & Tabälle uf kunstradbasketball.de"
+    "mainSiteLong": "Live-Resultat, Spielplan & Tabälle uf kunstradbasketball.de",
+    "final": "Ändstand"
   },
   "auth": {
     "login": "Aamälde",
@@ -315,5 +316,24 @@
   },
   "time": {
     "daysHours": "{{days}} T {{hours}} h"
+  },
+  "final": {
+    "badge": "Turnier fertig",
+    "title": "Ändstand Tippspiel",
+    "subtitle": "{{name}} · {{count}} Tipper",
+    "pendingSpecials_one": "{{count}} Sonderwett isch no nöd definitiv usgwärtet – d Turnierleitig prüeft no.",
+    "pendingSpecials_other": "{{count}} Sonderwette sind no nöd definitiv usgwärtet – d Turnierleitig prüeft no.",
+    "points": "{{points}} Pkt.",
+    "yourResult": "Dis Resultat",
+    "categories": "Kategorie-Sieger",
+    "specials": "Sonderwette – Uflösig",
+    "hitBy": "Troffe ({{count}} vo {{total}})",
+    "nobody": "niemer",
+    "highlights": "Highlights",
+    "matches": "Spiel",
+    "mostExactMatch": "Meischti exakti Träffer",
+    "surprise": "Gröschti Überraschig",
+    "ranking": "Ändstand",
+    "toStats": "Alli Statistike"
   }
 }

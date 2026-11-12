@@ -51,7 +51,8 @@
     "stats": "Statistika",
     "me": "Já",
     "mainSite": "Hlavní stránka",
-    "mainSiteLong": "Živé výsledky, rozpis a tabulky na kunstradbasketball.de"
+    "mainSiteLong": "Živé výsledky, rozpis a tabulky na kunstradbasketball.de",
+    "final": "Konečné"
   },
   "auth": {
     "login": "Přihlásit",
@@ -344,5 +345,26 @@
   },
   "time": {
     "daysHours": "{{days}} d {{hours}} h"
+  },
+  "final": {
+    "badge": "Turnaj skončil",
+    "title": "Konečné pořadí tipovačky",
+    "subtitle": "{{name}} · {{count}} tipérů",
+    "pendingSpecials_one": "{{count}} speciální sázka ještě není konečná – pořadatelé kontrolují.",
+    "pendingSpecials_few": "{{count}} speciální sázky ještě nejsou konečné – pořadatelé kontrolují.",
+    "pendingSpecials_many": "{{count}} speciálních sázek ještě není konečných – pořadatelé kontrolují.",
+    "pendingSpecials_other": "{{count}} speciálních sázek ještě není konečných – pořadatelé kontrolují.",
+    "points": "{{points}} b.",
+    "yourResult": "Tvůj výsledek",
+    "categories": "Vítězové kategorií",
+    "specials": "Speciální sázky – výsledky",
+    "hitBy": "Trefili ({{count}} z {{total}})",
+    "nobody": "nikdo",
+    "highlights": "Zajímavosti",
+    "matches": "Zápasy",
+    "mostExactMatch": "Nejvíc přesných tipů",
+    "surprise": "Největší překvapení",
+    "ranking": "Konečné pořadí",
+    "toStats": "Všechny statistiky"
   }
 }

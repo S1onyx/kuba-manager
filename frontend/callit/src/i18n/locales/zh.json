@@ -49,7 +49,8 @@
     "stats": "统计",
     "me": "我的",
     "mainSite": "返回主站",
-    "mainSiteLong": "在 kunstradbasketball.de 查看实时比分、赛程和积分榜"
+    "mainSiteLong": "在 kunstradbasketball.de 查看实时比分、赛程和积分榜",
+    "final": "最终排名"
   },
   "auth": {
     "login": "登录",
@@ -300,5 +301,23 @@
   },
   "time": {
     "daysHours": "{{days}}天{{hours}}小时"
+  },
+  "final": {
+    "badge": "赛事已结束",
+    "title": "竞猜最终排名",
+    "subtitle": "{{name}} · {{count}} 名玩家",
+    "pendingSpecials_other": "还有 {{count}} 项特别竞猜未最终结算——主办方正在核实。",
+    "points": "{{points}} 分",
+    "yourResult": "你的成绩",
+    "categories": "各项冠军",
+    "specials": "特别竞猜——揭晓",
+    "hitBy": "猜中({{count}} / {{total}})",
+    "nobody": "无人猜中",
+    "highlights": "精彩看点",
+    "matches": "比赛",
+    "mostExactMatch": "完全猜中最多的比赛",
+    "surprise": "最大冷门",
+    "ranking": "最终排名",
+    "toStats": "全部统计"
   }
 }

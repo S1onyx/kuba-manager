@@ -50,7 +50,8 @@
     "stats": "Statistik",
     "me": "I",
     "mainSite": "Zur Hauptseit",
-    "mainSiteLong": "Live-Ergebnis, Schbielplan & Tabella uff kunstradbasketball.de"
+    "mainSiteLong": "Live-Ergebnis, Schbielplan & Tabella uff kunstradbasketball.de",
+    "final": "Endschdand"
   },
   "auth": {
     "login": "Aamelda",
@@ -315,5 +316,24 @@
   },
   "time": {
     "daysHours": "{{days}} T {{hours}} h"
+  },
+  "final": {
+    "badge": "Turnier rum",
+    "title": "Endschdand Tippschbiel",
+    "subtitle": "{{name}} · {{count}} Tipper",
+    "pendingSpecials_one": "{{count}} Sonderwett isch no net endgültig ausgwertet – d Turnierleitung guckt no.",
+    "pendingSpecials_other": "{{count}} Sonderwetta send no net endgültig ausgwertet – d Turnierleitung guckt no.",
+    "points": "{{points}} Pkt.",
+    "yourResult": "Dei Ergebnis",
+    "categories": "Kategorie-Sieger",
+    "specials": "Sonderwetta – Auflösung",
+    "hitBy": "Troffa ({{count}} vo {{total}})",
+    "nobody": "koiner",
+    "highlights": "Highlights",
+    "matches": "Schbiel",
+    "mostExactMatch": "Meischde exakte Treffer",
+    "surprise": "Gröschde Überraschung",
+    "ranking": "Endschdand",
+    "toStats": "Älle Statistika"
   }
 }

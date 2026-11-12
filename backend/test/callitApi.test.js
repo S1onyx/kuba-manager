@@ -302,3 +302,15 @@ test('Eigenes Konto löschen entfernt Tipps', async () => {
   const ranking = await call('GET', `/callit/tournaments/${TID}/ranking`);
   assert.equal(ranking.body.rows.some((row) => row.nickname === 'Mitläufer'), false);
 });
+
+test('Endübersicht: Podest, Kategorien und Sonderwetten', async () => {
+  const res = await call('GET', `/callit/tournaments/${TID}/final`);
+  assert.equal(res.status, 200);
+  assert.equal(typeof res.body.finished, 'boolean');
+  assert.ok(Array.isArray(res.body.ranking));
+  assert.ok(res.body.podium.every((row) => row.rank <= 3));
+  assert.ok(res.body.specials.some((bet) => bet.betKey === 'winner'));
+  assert.ok(res.body.categoryWinners.every((entry) => entry.winners.length > 0));
+  const info = await call('GET', `/callit/tournaments/${TID}`);
+  assert.equal(info.body.finished, false);
+});

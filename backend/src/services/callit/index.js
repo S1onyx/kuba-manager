@@ -190,7 +190,9 @@ export async function loadTournamentState(tournamentId, now = Date.now()) {
   };
   const outcomes = deriveSpecialOutcomes({ tournament, summary: base.summary, matches, groups: base.groups, overrides, resolveKey: base.resolveKey });
   const bets = specialBetsFor(base, settings).map((bet) => ({ ...bet, locked: specialLocked(bet.type) }));
-  return { config, settings, tournament, base, matches, liveCode, outcomes, bets, overrides, now };
+  // Turnier fertig: als abgeschlossen markiert oder jedes Spiel hat ein gespeichertes Ergebnis.
+  const finished = Boolean(tournament.is_completed) || (matches.length > 0 && matches.every((match) => match.result?.saved));
+  return { config, settings, tournament, base, matches, liveCode, outcomes, bets, overrides, now, finished };
 }
 
 function publicMatch(match) {
@@ -240,7 +242,8 @@ export async function getTournamentInfo(tournamentId, user) {
     settings: publicSettings(state.settings),
     participantCount: participants.length,
     participant: participant ? { joined: true, disqualified: Boolean(participant.is_disqualified), joinedAt: participant.joined_at } : null,
-    liveCode: state.liveCode
+    liveCode: state.liveCode,
+    finished: state.finished
   };
 }
 
