@@ -52,7 +52,8 @@
     "baskets": "Paniers {{scored}}:{{conceded}}",
     "playerPoints": "{{count}} pts",
     "noRoster": "Effectif à venir",
-    "empty": "Aucune équipe inscrite pour le moment."
+    "empty": "Aucune équipe inscrite pour le moment.",
+    "freeThrows": "LF {{pct}} ({{made}}/{{attempted}})"
   },
   "tabs": {
     "live": "Live",
@@ -257,7 +258,10 @@
     "colGames": "Matchs",
     "colPointsPerGame": "Points/match",
     "colPenalties": "Pénalités",
-    "colPenaltySeconds": "Sec. de pén."
+    "colPenaltySeconds": "Sec. de pén.",
+    "topFreeThrowShooters": "Meilleur taux aux lancers francs",
+    "colFreeThrows": "LF",
+    "colFreeThrowPct": "LF %"
   },
   "final": {
     "empty": "Aucune donnée finale disponible pour le moment.",
@@ -331,5 +335,10 @@
     },
     "placementMatch": "Match pour la place {{from}}",
     "placementRound": "Tour de classement {{from}}–{{to}}"
+  },
+  "freeThrows": {
+    "title": "Lancer franc",
+    "next": "Lancer {{current}} sur {{total}}",
+    "result": "{{made}} sur {{total}} réussis"
   }
 }

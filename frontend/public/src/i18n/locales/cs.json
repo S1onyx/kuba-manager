@@ -52,7 +52,8 @@
     "baskets": "Koše {{scored}}:{{conceded}}",
     "playerPoints": "{{count}} b.",
     "noRoster": "Soupiska bude doplněna",
-    "empty": "Zatím nejsou přihlášeny žádné týmy."
+    "empty": "Zatím nejsou přihlášeny žádné týmy.",
+    "freeThrows": "TH {{pct}} ({{made}}/{{attempted}})"
   },
   "tabs": {
     "live": "Živě",
@@ -261,7 +262,10 @@
     "colGames": "Zápasy",
     "colPointsPerGame": "Body/zápas",
     "colPenalties": "Tresty",
-    "colPenaltySeconds": "Trest. sek."
+    "colPenaltySeconds": "Trest. sek.",
+    "topFreeThrowShooters": "Nejlepší úspěšnost trestných hodů",
+    "colFreeThrows": "TH",
+    "colFreeThrowPct": "TH %"
   },
   "final": {
     "empty": "Zatím nejsou k dispozici žádná závěrečná data.",
@@ -340,5 +344,10 @@
     },
     "placementMatch": "Zápas o {{from}}. místo",
     "placementRound": "Kolo o umístění {{from}}–{{to}}"
+  },
+  "freeThrows": {
+    "title": "Trestný hod",
+    "next": "Hod {{current}} z {{total}}",
+    "result": "Proměněno {{made}} z {{total}}"
   }
 }
