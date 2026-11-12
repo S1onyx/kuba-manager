@@ -254,7 +254,7 @@ export default function useScoreboardCore({ updateMessage }) {
       }
 
       if (points > 0) {
-        payload.shotType = points === 3 ? 'three' : points === 2 ? 'field' : 'free';
+        payload.shotType = points === 3 ? 'three' : points === 2 ? 'field' : 'single';
       } else if (!selected) {
         payload.affectStats = false;
       }
