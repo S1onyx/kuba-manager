@@ -116,7 +116,7 @@ export default function ProfilePage({ id, userId, self = false, joined = true })
             </span>
           ) : null}
 
-          {data.timeline.length > 1 ? (
+          {data.timeline.length > 1 && data.timeline.some((entry) => entry.cumulative > 0) ? (
             <div className="card stack" style={{ gap: 6 }}>
               <strong>{t('me.timeline')}</strong>
               <Sparkline points={data.timeline.map((entry) => entry.cumulative)} />

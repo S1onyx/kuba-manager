@@ -70,12 +70,12 @@ export function Heatmap({ cells, result, homeLabel, awayLabel }) {
       <div className="heatmap" style={{ gridTemplateColumns: `18px repeat(${size}, 1fr)` }} role="img" aria-label={t('stats.heatmap')}>
         <span />
         {Array.from({ length: size }, (_, away) => (
-          <span key={`h${away}`} className="heatmap__cell dim">
+          <span key={`h${away}`} className="heatmap__label dim">
             {away === maxScore && maxScore >= 12 ? `${away}+` : away}
           </span>
         ))}
         {Array.from({ length: size }, (_, home) => [
-          <span key={`r${home}`} className="heatmap__cell dim">
+          <span key={`r${home}`} className="heatmap__label dim">
             {home === maxScore && maxScore >= 12 ? `${home}+` : home}
           </span>,
           ...Array.from({ length: size }, (_, away) => {
@@ -105,7 +105,7 @@ export function Heatmap({ cells, result, homeLabel, awayLabel }) {
 }
 
 export function Sparkline({ points }) {
-  if (!points || points.length < 2) return null;
+  if (!points || points.length < 2 || Math.max(...points) <= 0) return null;
   const width = 300;
   const height = 80;
   const max = Math.max(1, ...points);

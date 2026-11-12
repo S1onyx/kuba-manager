@@ -17,8 +17,8 @@ function Stepper({ value, onStep, label }) {
       <button type="button" onClick={() => onStep(-1)} aria-label={t('tips.minus', { team: label })}>
         −
       </button>
-      <span className="stepper__value" aria-live="polite">
-        {value === null || value === undefined ? '–' : value}
+      <span className={`stepper__value${value === null || value === undefined ? ' dim' : ''}`} aria-live="polite">
+        {value === null || value === undefined ? '?' : value}
       </span>
       <button type="button" onClick={() => onStep(1)} aria-label={t('tips.plus', { team: label })}>
         +

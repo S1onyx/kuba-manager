@@ -745,6 +745,14 @@ select.input {
   min-width: 0;
 }
 
+.heatmap__label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 2px 0;
+}
+
 .list-plain {
   list-style: none;
   margin: 0;
