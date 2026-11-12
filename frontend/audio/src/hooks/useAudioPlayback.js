@@ -2,8 +2,27 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BACKEND_URL } from '../config.js';
 import { DEFAULT_VOLUME_SETTINGS } from '../constants/volume.js';
+import { normalizationGain } from '../utils/loudnessGain.js';
 
 const CATEGORY_DEFAULT = 'events';
+
+// Audio-Element → Verstärkung (Lautheitsausgleich × Kategorie-Lautstärke) → Limiter bei -1 dB → Ausgabe.
+// Nur wenn der AudioContext ein Ausgabegerät wählen kann; sonst bleibt es beim direkten Abspielen über das Element.
+function buildNormalizationGraph(context, audioEl) {
+  if (typeof context.setSinkId !== 'function') {
+    return null;
+  }
+  const source = context.createMediaElementSource(audioEl);
+  const gain = context.createGain();
+  const limiter = context.createDynamicsCompressor();
+  limiter.threshold.value = -1;
+  limiter.knee.value = 0;
+  limiter.ratio.value = 20;
+  limiter.attack.value = 0.001;
+  limiter.release.value = 0.1;
+  source.connect(gain).connect(limiter).connect(context.destination);
+  return { context, gain };
+}
 
 function clampVolume(value) {
   const numeric = Number(value);
@@ -34,19 +53,35 @@ export default function useAudioPlayback(volumeSettings = DEFAULT_VOLUME_SETTING
   const pendingQueueRef = useRef([]);
   const readyRef = useRef(false);
   const volumeSettingsRef = useRef(DEFAULT_VOLUME_SETTINGS);
+  const audioGraphRef = useRef(null);
+  const normalizationRef = useRef(1);
 
   const [audioReady, setAudioReady] = useState(false);
   const [playbackError, setPlaybackError] = useState('');
 
-  useEffect(() => {
-    volumeSettingsRef.current = { ...DEFAULT_VOLUME_SETTINGS, ...volumeSettings };
+  const applyOutputVolume = useCallback((category) => {
     const audioEl = audioElementRef.current;
-    if (audioEl) {
-      const currentCategory = audioEl.dataset?.playbackCategory || CATEGORY_DEFAULT;
-      const volume = clampVolume(volumeSettingsRef.current[currentCategory] ?? volumeSettingsRef.current[CATEGORY_DEFAULT]);
+    if (!audioEl) {
+      return;
+    }
+    const volume = clampVolume(
+      volumeSettingsRef.current[category] ??
+        volumeSettingsRef.current[CATEGORY_DEFAULT] ??
+        DEFAULT_VOLUME_SETTINGS[CATEGORY_DEFAULT]
+    );
+    const graph = audioGraphRef.current;
+    if (graph) {
+      audioEl.volume = 1;
+      graph.gain.gain.value = volume * normalizationRef.current;
+    } else {
       audioEl.volume = volume;
     }
-  }, [volumeSettings]);
+  }, []);
+
+  useEffect(() => {
+    volumeSettingsRef.current = { ...DEFAULT_VOLUME_SETTINGS, ...volumeSettings };
+    applyOutputVolume(audioElementRef.current?.dataset?.playbackCategory || CATEGORY_DEFAULT);
+  }, [volumeSettings, applyOutputVolume]);
 
   const playAudioPayload = useCallback(async (payload, categoryOverride = null) => {
     const fileUrl = payload?.file?.url;
@@ -58,24 +93,21 @@ export default function useAudioPlayback(volumeSettings = DEFAULT_VOLUME_SETTING
     const resolvedUrl = fileUrl.startsWith('http') ? fileUrl : `${BACKEND_URL}${fileUrl}`;
 
     const category = categoryOverride ?? resolveCategoryFromPayload(payload);
-    const volume =
-      volumeSettingsRef.current[category] ??
-      volumeSettingsRef.current[CATEGORY_DEFAULT] ??
-      DEFAULT_VOLUME_SETTINGS[CATEGORY_DEFAULT];
 
     try {
       audioEl.dataset.playbackCategory = category;
       audioEl.pause();
       audioEl.currentTime = 0;
       audioEl.src = resolvedUrl;
-      audioEl.volume = clampVolume(volume);
+      normalizationRef.current = normalizationGain(payload?.file?.loudness_lufs);
+      applyOutputVolume(category);
       await audioEl.play();
       setPlaybackError('');
     } catch (error) {
       console.error('Sound konnte nicht abgespielt werden:', error);
       setPlaybackError(t('errors.playbackFailed'));
     }
-  }, [t]);
+  }, [t, applyOutputVolume]);
 
   const stopPlayback = useCallback(() => {
     pendingQueueRef.current = [];
@@ -124,6 +156,10 @@ export default function useAudioPlayback(volumeSettings = DEFAULT_VOLUME_SETTING
         if (audioContextRef.current?.state === 'suspended') {
           await audioContextRef.current.resume();
         }
+
+        if (audioContextRef.current && audioElementRef.current && !audioGraphRef.current) {
+          audioGraphRef.current = buildNormalizationGraph(audioContextRef.current, audioElementRef.current);
+        }
       }
     } catch (error) {
       console.warn('AudioContext konnte nicht aktiviert werden:', error);
@@ -140,6 +176,7 @@ export default function useAudioPlayback(volumeSettings = DEFAULT_VOLUME_SETTING
 
   return {
     audioElementRef,
+    audioGraphRef,
     audioReady,
     setAudioReady,
     playbackError,

@@ -5,6 +5,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test": "node --test 'test/*.test.mjs'",
     "i18n:check": "node scripts/check-i18n.mjs"
   },
   "dependencies": {
