@@ -47,6 +47,34 @@ test('Start hält laufende Uhr an, nach letztem Wurf läuft sie weiter', () => {
   assert.throws(() => ft.recordFreeThrow({ hit: true }), (error) => error.code === 'FREE_THROWS_DONE');
 });
 
+test('Letzten Wurf zurücknehmen nach Auto-Start: Uhr hält an und springt auf alte Zeit, Strafe auch', () => {
+  freshGame();
+  addPenalty('a', 'Foul', 60);
+  startTimer();
+  ft.startFreeThrows({ team: 'b', playerId: 2 });
+  ft.recordFreeThrow({ hit: false });
+  const resumed = ft.recordFreeThrow({ hit: true });
+  assert.deepEqual([resumed.isRunning, 'clockBeforeResume' in resumed.freeThrows], [true, false]);
+  // Uhr lief weiter: 7 Sekunden vergehen, Strafe läuft mit
+  const live = getState();
+  live.remainingSeconds -= 7;
+  live.penalties.a[0].remainingSeconds -= 7;
+  const state = ft.undoFreeThrow();
+  assert.deepEqual([state.isRunning, state.remainingSeconds, state.penalties.a[0].remainingSeconds, state.scoreB], [false, 400, 60, 0]);
+  assert.deepEqual([state.freeThrows.status.done, state.freeThrows.completedAt], [false, null]);
+  // Erneut werfen: Uhr läuft wieder an
+  assert.equal(ft.recordFreeThrow({ hit: true }).isRunning, true);
+});
+
+test('Zurücknehmen ohne vorherigen Auto-Start ändert die Uhr nicht', () => {
+  freshGame();
+  ft.startFreeThrows({ team: 'b' });
+  ft.recordFreeThrow({ hit: true });
+  getState().remainingSeconds = 390;
+  const state = ft.undoFreeThrow();
+  assert.deepEqual([state.isRunning, state.remainingSeconds], [false, 390]);
+});
+
 test('Keine Restzeit und keine Nachspielzeit: Uhr bleibt nach letztem Wurf aus', () => {
   freshGame({ remainingSeconds: 0, extraSeconds: 0 });
   ft.startFreeThrows({ team: 'a', total: 1 });

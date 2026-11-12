@@ -558,6 +558,11 @@ export function markGameSaved(gameId) {
   notifySubscribers();
 }
 
+// Interner Uhr-Merker der Freiwurf-Serie gehört nicht in Clients oder gespeicherte Spiele.
+function omitClockBackup({ clockBeforeResume, ...series }) {
+  return series;
+}
+
 export function snapshotState() {
   const saveState = !state.savedGameId ? 'unsaved' : state.savedSignature === resultSignature() ? 'saved' : 'changed';
   return {
@@ -583,7 +588,7 @@ export function snapshotState() {
       : null,
     freeThrows: state.freeThrows
       ? {
-          ...state.freeThrows,
+          ...omitClockBackup(state.freeThrows),
           attempts: state.freeThrows.attempts.map((attempt) => ({ ...attempt })),
           status: {
             taken: state.freeThrows.attempts.length,

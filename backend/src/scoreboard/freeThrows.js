@@ -1,6 +1,6 @@
-import { getState, notifySubscribers, snapshotState, applyFreeThrowToStats } from './stateStore.js';
+import { getState, notifySubscribers, snapshotState, applyFreeThrowToStats, updatePenaltyEvent } from './stateStore.js';
 import { addPoints } from './scoring.js';
-import { pauseTimer, startTimer } from './timer.js';
+import { pauseTimer, startTimer, stopTicker } from './timer.js';
 import { triggerAudioEvent } from '../audio/dispatcher.js';
 
 export class FreeThrowError extends Error {
@@ -115,10 +115,36 @@ export function recordFreeThrow({ hit, playerId } = {}) {
     notifySubscribers();
   }
   if (series.completedAt && !state.isRunning && !state.isHalftimeBreak && hasPlayTimeLeft(state)) {
+    series.clockBeforeResume = captureClock(state);
     // Ohne Startton, damit der Freiwurf-Sound nicht abgeschnitten wird.
     return startTimer({ silent: true });
   }
   return snapshotState();
+}
+
+const CLOCK_FIELDS = ['remainingSeconds', 'extraElapsedSeconds', 'isExtraTime', 'currentHalf', 'halftimeTriggered', 'isHalftimeBreak', 'halftimePauseRemaining', 'isFinished'];
+const PENALTY_CLOCK_FIELDS = ['remainingSeconds', 'isExpired', 'expiredAt'];
+const pick = (source, fields) => Object.fromEntries(fields.map((field) => [field, source[field]]));
+
+// Uhr- und Strafenstand im Moment des Auto-Starts, um ihn beim Zurücknehmen wiederherzustellen.
+function captureClock(state) {
+  return {
+    ...pick(state, CLOCK_FIELDS),
+    penalties: ['a', 'b'].flatMap((team) => state.penalties[team].map((penalty) => ({ team, id: penalty.id, ...pick(penalty, PENALTY_CLOCK_FIELDS) })))
+  };
+}
+
+// Still anhalten (kein Pause-Ton) – auch wenn inzwischen Halbzeitpause oder Spielende eingetreten ist.
+function restoreClock(state, saved) {
+  state.isRunning = false;
+  stopTicker();
+  Object.assign(state, pick(saved, CLOCK_FIELDS));
+  saved.penalties.forEach(({ team, id, ...fields }) => {
+    const penalty = state.penalties[team].find((entry) => entry.id === id);
+    if (!penalty) return;
+    Object.assign(penalty, fields);
+    updatePenaltyEvent(id, (entry) => ({ ...entry, ...fields }));
+  });
 }
 
 export function undoFreeThrow() {
@@ -129,6 +155,10 @@ export function undoFreeThrow() {
     throw new FreeThrowError('FREE_THROWS_NO_ATTEMPTS', 'Es gibt keinen Freiwurf zum Zurücknehmen.');
   }
   series.completedAt = null;
+  if (series.clockBeforeResume) {
+    restoreClock(state, series.clockBeforeResume);
+    series.clockBeforeResume = null;
+  }
   Object.assign(series, { playerId: last.playerId ?? null, playerName: last.playerName ?? null });
   applyFreeThrowToStats(series.team, last.playerId, last.hit, -1);
   if (last.hit) {
