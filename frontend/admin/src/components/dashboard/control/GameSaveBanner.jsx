@@ -6,6 +6,7 @@ const TONES = {
   needsSave: { border: '#f97316', background: 'rgba(249,115,22,0.16)', accent: '#fdba74' },
   changed: { border: '#f97316', background: 'rgba(249,115,22,0.16)', accent: '#fdba74' },
   blocked: { border: '#facc15', background: 'rgba(250,204,21,0.12)', accent: '#fde68a' },
+  freeThrowsOpen: { border: '#facc15', background: 'rgba(250,204,21,0.12)', accent: '#fde68a' },
   saved: { border: '#4ade80', background: 'rgba(74,222,128,0.12)', accent: '#86efac' }
 };
 

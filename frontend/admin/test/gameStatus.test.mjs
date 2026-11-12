@@ -14,4 +14,6 @@ test('Speicherstatus für Live-Steuerung', () => {
   assert.equal(getSaveStatus({ ...base, isFinished: true, saveState: 'changed' }), 'changed');
   assert.equal(getSaveStatus({ ...base, isFinished: true, stageType: 'knockout', scoreB: 4 }), 'blocked');
   assert.equal(getSaveStatus({ ...base, isFinished: true, shootout: { status: { decided: false } } }), 'blocked');
+  assert.equal(getSaveStatus({ ...base, isFinished: true, freeThrows: { status: { done: false } } }), 'freeThrowsOpen');
+  assert.equal(getSaveStatus({ ...base, isFinished: true, freeThrows: { status: { done: true } } }), 'needsSave');
 });

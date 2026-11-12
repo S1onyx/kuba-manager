@@ -196,7 +196,9 @@
       "reset": "Réinitialiser",
       "savedButton": "Enregistré ✓",
       "sidebarUnsaved": "⚠ Non enregistré",
-      "sidebarSaved": "✓ Enregistré"
+      "sidebarSaved": "✓ Enregistré",
+      "freeThrowsOpenTitle": "Lancers francs en cours",
+      "freeThrowsOpenText": "L'enregistrement n'est possible qu'une fois tous les lancers francs effectués (carte lancers francs)."
     },
     "shootout": {
       "title": "Séance de lancers francs",
@@ -255,7 +257,29 @@
       "none": "Aucune pénalité de temps active",
       "expired": "expirée",
       "remaining": "{{time}} restantes",
-      "remove": "Retirer"
+      "remove": "Retirer",
+      "freeThrows": "Lancers francs pour l'adversaire"
+    },
+    "freeThrows": {
+      "title": "Lancers francs",
+      "description": "Lancer une série : choisir l'équipe, le tireur et le nombre de lancers. Le chrono s'arrête au début et repart automatiquement après le dernier lancer.",
+      "fromPenalty": "Créée suite à une pénalité – veuillez choisir le tireur.",
+      "team": "Équipe",
+      "shooter": "Tireur",
+      "wholeTeam": "Équipe (sans joueur)",
+      "count": "Nombre",
+      "countOption1": "1 lancer franc",
+      "countOption2": "2 lancers francs",
+      "start": "Démarrer les lancers francs",
+      "titleRunning": "Lancers francs {{team}} · {{made}}/{{total}}",
+      "next": "Lancer {{current}} sur {{total}}",
+      "done": "Terminé : {{made}} sur {{total}} réussis",
+      "hit": "Réussi",
+      "miss": "Manqué",
+      "undo": "Annuler le dernier lancer",
+      "cancel": "Annuler les lancers francs",
+      "close": "Masquer",
+      "failed": "L'action de lancer franc a échoué."
     }
   },
   "schedule": {
@@ -663,7 +687,8 @@
     "soundTriggerFailed": "Le son n'a pas pu être déclenché.",
     "timerCuesSaved": "Paramètres du chronomètre enregistrés.",
     "timerCuesSaveFailed": "Les paramètres du chronomètre n'ont pas pu être enregistrés.",
-    "audioLoadFailed": "Les données audio n'ont pas pu être chargées."
+    "audioLoadFailed": "Les données audio n'ont pas pu être chargées.",
+    "penaltyFreeThrowsSkipped": "Pénalité ajoutée pour l'équipe {{team}} – lancers francs non créés car une série est encore ouverte."
   },
   "error": {
     "generic": "Une erreur s'est produite. Veuillez réessayer.",
@@ -783,7 +808,14 @@
     "TRIGGER_NOT_FOUND": "Le déclencheur est introuvable.",
     "TRIGGER_PLAY_FAILED": "Le déclencheur n'a pas pu être lu.",
     "TRIGGER_UPDATE_FAILED": "Le déclencheur audio n'a pas pu être mis à jour.",
-    "UNSUPPORTED_POSTER_FILE_TYPE": "Seuls les fichiers image et PDF sont pris en charge."
+    "UNSUPPORTED_POSTER_FILE_TYPE": "Seuls les fichiers image et PDF sont pris en charge.",
+    "FREE_THROWS_OPEN": "Des lancers francs sont déjà en cours.",
+    "FREE_THROWS_INVALID_TOTAL": "Seuls 1 ou 2 lancers francs sont possibles.",
+    "FREE_THROWS_DONE": "Tous les lancers francs ont déjà été effectués.",
+    "FREE_THROWS_HAS_ATTEMPTS": "Veuillez d'abord effectuer ou annuler tous les lancers francs.",
+    "FREE_THROWS_SHOOTER_LOCKED": "Le tireur ne peut plus être modifié après le premier lancer.",
+    "FREE_THROWS_NO_ATTEMPTS": "Aucun lancer franc à annuler.",
+    "FREE_THROWS_NOT_ACTIVE": "Aucun lancer franc en cours."
   },
   "export": {
     "title": "Export PDF / Impression",

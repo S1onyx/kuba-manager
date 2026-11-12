@@ -196,7 +196,9 @@
       "reset": "Zurücksetzen",
       "savedButton": "Gespeichert ✓",
       "sidebarUnsaved": "⚠ Nicht gespeichert",
-      "sidebarSaved": "✓ Gespeichert"
+      "sidebarSaved": "✓ Gespeichert",
+      "freeThrowsOpenTitle": "Freiwürfe offen",
+      "freeThrowsOpenText": "Speichern geht erst, wenn alle Freiwürfe geworfen sind (Freiwurf-Karte)."
     },
     "shootout": {
       "title": "Freiwurf-Stechen",
@@ -255,7 +257,29 @@
       "none": "Keine aktiven Zeitstrafen",
       "expired": "abgelaufen",
       "remaining": "{{time}} verbleibend",
-      "remove": "Entfernen"
+      "remove": "Entfernen",
+      "freeThrows": "Freiwürfe für Gegner"
+    },
+    "freeThrows": {
+      "title": "Freiwürfe",
+      "description": "Freiwurf-Serie starten: Team, Werfer und Anzahl wählen. Die Uhr hält beim Start an und läuft nach dem letzten Wurf automatisch weiter.",
+      "fromPenalty": "Nach Zeitstrafe angelegt – bitte Werfer wählen.",
+      "team": "Team",
+      "shooter": "Werfer",
+      "wholeTeam": "Team (ohne Spieler)",
+      "count": "Anzahl",
+      "countOption1": "1 Freiwurf",
+      "countOption2": "2 Freiwürfe",
+      "start": "Freiwürfe starten",
+      "titleRunning": "Freiwürfe {{team}} · {{made}}/{{total}}",
+      "next": "Wurf {{current}} von {{total}}",
+      "done": "Fertig: {{made}} von {{total}} getroffen",
+      "hit": "Treffer",
+      "miss": "Daneben",
+      "undo": "Letzten Wurf zurücknehmen",
+      "cancel": "Freiwürfe abbrechen",
+      "close": "Ausblenden",
+      "failed": "Freiwurf-Aktion fehlgeschlagen."
     }
   },
   "schedule": {
@@ -663,7 +687,8 @@
     "soundTriggerFailed": "Sound konnte nicht ausgelöst werden.",
     "timerCuesSaved": "Timer-Einstellungen gespeichert.",
     "timerCuesSaveFailed": "Timer-Einstellungen konnten nicht gespeichert werden.",
-    "audioLoadFailed": "Audiodaten konnten nicht geladen werden."
+    "audioLoadFailed": "Audiodaten konnten nicht geladen werden.",
+    "penaltyFreeThrowsSkipped": "Zeitstrafe für Team {{team}} hinzugefügt – Freiwürfe nicht angelegt, weil noch eine Serie offen ist."
   },
   "error": {
     "generic": "Ein Fehler ist aufgetreten. Bitte versuche es erneut.",
@@ -783,7 +808,14 @@
     "TRIGGER_NOT_FOUND": "Der Trigger wurde nicht gefunden.",
     "TRIGGER_PLAY_FAILED": "Der Trigger konnte nicht abgespielt werden.",
     "TRIGGER_UPDATE_FAILED": "Der Audio-Trigger konnte nicht aktualisiert werden.",
-    "UNSUPPORTED_POSTER_FILE_TYPE": "Es werden nur Bild- und PDF-Dateien unterstützt."
+    "UNSUPPORTED_POSTER_FILE_TYPE": "Es werden nur Bild- und PDF-Dateien unterstützt.",
+    "FREE_THROWS_OPEN": "Es laufen bereits Freiwürfe.",
+    "FREE_THROWS_INVALID_TOTAL": "Es sind nur 1 oder 2 Freiwürfe möglich.",
+    "FREE_THROWS_DONE": "Alle Freiwürfe wurden bereits geworfen.",
+    "FREE_THROWS_HAS_ATTEMPTS": "Bitte zuerst alle Freiwürfe werfen oder zurücknehmen.",
+    "FREE_THROWS_SHOOTER_LOCKED": "Der Werfer kann nach dem ersten Wurf nicht mehr geändert werden.",
+    "FREE_THROWS_NO_ATTEMPTS": "Es gibt keinen Freiwurf zum Zurücknehmen.",
+    "FREE_THROWS_NOT_ACTIVE": "Es laufen keine Freiwürfe."
   },
   "export": {
     "title": "PDF-Export / Drucken",

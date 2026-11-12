@@ -196,7 +196,9 @@
       "reset": "Zruggsetze",
       "savedButton": "Gspicheret ✓",
       "sidebarUnsaved": "⚠ Nöd gspicheret",
-      "sidebarSaved": "✓ Gspicheret"
+      "sidebarSaved": "✓ Gspicheret",
+      "freeThrowsOpenTitle": "Freiwürf offe",
+      "freeThrowsOpenText": "Speichere gaht erscht, wänn alli Freiwürf gworfe sind (Freiwurf-Charte)."
     },
     "shootout": {
       "title": "Freiwurf-Stäche",
@@ -255,7 +257,29 @@
       "none": "Kei aktivi Zytstrafe",
       "expired": "abgloffe",
       "remaining": "{{time}} verblibend",
-      "remove": "Entfärne"
+      "remove": "Entfärne",
+      "freeThrows": "Freiwürf für de Gägner"
+    },
+    "freeThrows": {
+      "title": "Freiwürf",
+      "description": "Freiwurf-Serie starte: Team, Wärfer und Aazahl uswähle. D'Uhr haltet bim Start aa und lauft nach em letschte Wurf automatisch wiiter.",
+      "fromPenalty": "Nach ere Zytstraaf aagleit – bitte Wärfer uswähle.",
+      "team": "Team",
+      "shooter": "Wärfer",
+      "wholeTeam": "Team (ohni Spiler)",
+      "count": "Aazahl",
+      "countOption1": "1 Freiwurf",
+      "countOption2": "2 Freiwürf",
+      "start": "Freiwürf starte",
+      "titleRunning": "Freiwürf {{team}} · {{made}}/{{total}}",
+      "next": "Wurf {{current}} vo {{total}}",
+      "done": "Fertig: {{made}} vo {{total}} troffe",
+      "hit": "Träffer",
+      "miss": "Dänebe",
+      "undo": "Letschte Wurf zruggneh",
+      "cancel": "Freiwürf abbräche",
+      "close": "Usblände",
+      "failed": "Freiwurf-Aktion hät nöd klappet."
     }
   },
   "schedule": {
@@ -663,7 +687,8 @@
     "soundTriggerFailed": "Sound het nid chöne usglöst werde.",
     "timerCuesSaved": "Timer-Istellige gspeicheret.",
     "timerCuesSaveFailed": "Timer-Istellige hend nid chöne gspeicheret werde.",
-    "audioLoadFailed": "Audiodate hend nid chöne glade werde."
+    "audioLoadFailed": "Audiodate hend nid chöne glade werde.",
+    "penaltyFreeThrowsSkipped": "Zytstraaf für Team {{team}} dezue taa – Freiwürf nöd aagleit, will no e Serie offe isch."
   },
   "error": {
     "generic": "Es isch en Fähler passiert. Bitte versuech's nomol.",
@@ -783,7 +808,14 @@
     "TRIGGER_NOT_FOUND": "De Trigger isch nid gfunde worde.",
     "TRIGGER_PLAY_FAILED": "De Trigger het nid chöne abgspilt werde.",
     "TRIGGER_UPDATE_FAILED": "De Audio-Trigger het nid chöne aktualisiert werde.",
-    "UNSUPPORTED_POSTER_FILE_TYPE": "S'werde nur Bild- und PDF-Dateie unterstützt."
+    "UNSUPPORTED_POSTER_FILE_TYPE": "S'werde nur Bild- und PDF-Dateie unterstützt.",
+    "FREE_THROWS_OPEN": "Es laufed scho Freiwürf.",
+    "FREE_THROWS_INVALID_TOTAL": "Es git nur 1 oder 2 Freiwürf.",
+    "FREE_THROWS_DONE": "Alli Freiwürf sind scho gworfe.",
+    "FREE_THROWS_HAS_ATTEMPTS": "Bitte zerscht alli Freiwürf wärfe oder zruggneh.",
+    "FREE_THROWS_SHOOTER_LOCKED": "Nach em erschte Wurf cha de Wärfer nümm gwächslet wärde.",
+    "FREE_THROWS_NO_ATTEMPTS": "Es git kei Freiwurf zum Zruggneh.",
+    "FREE_THROWS_NOT_ACTIVE": "Es laufed kei Freiwürf."
   },
   "export": {
     "title": "PDF-Export / Drucken",

@@ -553,7 +553,7 @@ export default function useScheduleManager({
         (scoreboard?.scoreA ?? 0) + (scoreboard?.scoreB ?? 0) > 0 ||
         (scoreboard?.remainingSeconds ?? 0) < (scoreboard?.durationSeconds ?? 0);
       const unsavedResult =
-        ['needsSave', 'changed', 'blocked'].includes(currentStatus) || (currentStatus === 'running' && currentHasProgress);
+        ['needsSave', 'changed', 'blocked', 'freeThrowsOpen'].includes(currentStatus) || (currentStatus === 'running' && currentHasProgress);
       if (unsavedResult && selectedCode !== scoreboard?.scheduleCode && !window.confirm(t('feedback.confirmReplaceUnsavedGame'))) {
         return false;
       }

@@ -100,6 +100,29 @@ export default function PenaltyManagerCard() {
                     />
                   ) : null}
                 </div>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <label style={{ display: 'flex', gap: '0.45rem', alignItems: 'center' }}>
+                    <input
+                      type="checkbox"
+                      checked={form.freeThrows}
+                      onChange={(event) => handlePenaltyFormChange(teamKey, 'freeThrows', event.target.checked)}
+                    />
+                    {t('control.penalties.freeThrows')}
+                  </label>
+                  {form.freeThrows ? (
+                    <select
+                      value={form.freeThrowCount}
+                      onChange={(event) => handlePenaltyFormChange(teamKey, 'freeThrowCount', event.target.value)}
+                      aria-label={t('control.freeThrows.count')}
+                    >
+                      {['1', '2'].map((count) => (
+                        <option key={count} value={count}>
+                          {t('control.freeThrows.countOption', { count: Number(count) })}
+                        </option>
+                      ))}
+                    </select>
+                  ) : null}
+                </div>
                 <button type="submit">{t('control.penalties.add')}</button>
               </form>
 

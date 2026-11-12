@@ -20,7 +20,7 @@ import {
   updateTeams,
   fetchScoreboard
 } from '../utils/api.js';
-import { createPenaltyForms } from '../utils/forms.js';
+import { createPenaltyForm, createPenaltyForms } from '../utils/forms.js';
 import { formatTime, parseTimerInput } from '../utils/formatters.js';
 import { formatApiError } from '../utils/apiError.js';
 
@@ -347,14 +347,18 @@ export default function useScoreboardCore({ updateMessage }) {
       }
 
       try {
-        await addPenalty(teamKey, form.name, seconds, {
-          playerId: form.playerId ? Number(form.playerId) : undefined
+        const result = await addPenalty(teamKey, form.name, seconds, {
+          playerId: form.playerId ? Number(form.playerId) : undefined,
+          freeThrows: form.freeThrows ? Number(form.freeThrowCount) : 0
         });
         setPenaltyForms((prev) => ({
           ...prev,
-          [teamKey]: { name: '', preset: '60', custom: '', playerId: '' }
+          [teamKey]: createPenaltyForm()
         }));
-        updateMessage('info', t('feedback.penaltyAdded', { team: teamKey.toUpperCase() }));
+        updateMessage(
+          result?.freeThrowsSkipped ? 'error' : 'info',
+          t(result?.freeThrowsSkipped ? 'feedback.penaltyFreeThrowsSkipped' : 'feedback.penaltyAdded', { team: teamKey.toUpperCase() })
+        );
         return true;
       } catch (err) {
         console.error(err);

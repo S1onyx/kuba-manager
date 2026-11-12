@@ -194,7 +194,9 @@
       "reset": "重置",
       "savedButton": "已保存 ✓",
       "sidebarUnsaved": "⚠ 未保存",
-      "sidebarSaved": "✓ 已保存"
+      "sidebarSaved": "✓ 已保存",
+      "freeThrowsOpenTitle": "罚球未完成",
+      "freeThrowsOpenText": "所有罚球完成后才能保存(罚球卡片)。"
     },
     "shootout": {
       "title": "罚球决胜",
@@ -253,7 +255,29 @@
       "none": "没有进行中的限时处罚",
       "expired": "已结束",
       "remaining": "剩余 {{time}}",
-      "remove": "移除"
+      "remove": "移除",
+      "freeThrows": "为对方判罚球"
+    },
+    "freeThrows": {
+      "title": "罚球",
+      "description": "开始罚球:选择球队、罚球队员和次数。开始时计时暂停,最后一罚后自动继续。",
+      "fromPenalty": "由罚时创建——请选择罚球队员。",
+      "team": "球队",
+      "shooter": "罚球队员",
+      "wholeTeam": "球队(不指定队员)",
+      "count": "次数",
+      "countOption1": "1 次罚球",
+      "countOption2": "2 次罚球",
+      "start": "开始罚球",
+      "titleRunning": "罚球 {{team}} · {{made}}/{{total}}",
+      "next": "第 {{current}} 罚,共 {{total}} 罚",
+      "done": "完成:{{total}} 罚中 {{made}}",
+      "hit": "命中",
+      "miss": "未中",
+      "undo": "撤销上一罚",
+      "cancel": "取消罚球",
+      "close": "隐藏",
+      "failed": "罚球操作失败。"
     }
   },
   "schedule": {
@@ -654,7 +678,8 @@
     "soundTriggerFailed": "无法触发音效。",
     "timerCuesSaved": "计时器设置已保存。",
     "timerCuesSaveFailed": "无法保存计时器设置。",
-    "audioLoadFailed": "无法加载音频数据。"
+    "audioLoadFailed": "无法加载音频数据。",
+    "penaltyFreeThrowsSkipped": "已为团队 {{team}} 添加罚时——仍有未完成的罚球,未创建新罚球。"
   },
   "error": {
     "generic": "发生错误。请重试。",
@@ -774,7 +799,14 @@
     "TRIGGER_NOT_FOUND": "未找到触发器。",
     "TRIGGER_PLAY_FAILED": "无法播放触发器。",
     "TRIGGER_UPDATE_FAILED": "无法更新音频触发器。",
-    "UNSUPPORTED_POSTER_FILE_TYPE": "仅支持图片和 PDF 文件。"
+    "UNSUPPORTED_POSTER_FILE_TYPE": "仅支持图片和 PDF 文件。",
+    "FREE_THROWS_OPEN": "罚球已在进行中。",
+    "FREE_THROWS_INVALID_TOTAL": "只能罚 1 次或 2 次。",
+    "FREE_THROWS_DONE": "所有罚球已完成。",
+    "FREE_THROWS_HAS_ATTEMPTS": "请先完成或撤销所有罚球。",
+    "FREE_THROWS_SHOOTER_LOCKED": "第一罚后不能更换罚球队员。",
+    "FREE_THROWS_NO_ATTEMPTS": "没有可撤销的罚球。",
+    "FREE_THROWS_NOT_ACTIVE": "当前没有罚球。"
   },
   "export": {
     "title": "PDF导出 / 打印",
