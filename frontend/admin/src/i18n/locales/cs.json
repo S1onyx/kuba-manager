@@ -55,11 +55,13 @@
     "players": "Hráči",
     "teams": "Týmy",
     "tournaments": "Turnaje",
-    "export": "Export PDF / Tisk"
+    "export": "Export PDF / Tisk",
+    "callit": "Tipovačka"
   },
   "displayViews": {
     "scoreboard": "Živý stav",
-    "bracket": "Turnajový strom"
+    "bracket": "Turnajový strom",
+    "callit": "Pořadí tipovačky"
   },
   "penaltyPresets": {
     "minutes_one": "{{count}} minuta",
@@ -126,7 +128,8 @@
       "description": "Přepínejte mezi živým stavem a turnajovým stromem na projektoru.",
       "bracketHint": "Pro pavouka nejprve vyberte turnaj:",
       "chooseTournament": "Vybrat turnaj …",
-      "updating": "Aktualizuji zobrazení..."
+      "updating": "Aktualizuji zobrazení...",
+      "callitHint": "Zobrazit pořadí tipovačky tohoto turnaje:"
     },
     "context": {
       "title": "Kontext zápasu",
@@ -706,7 +709,8 @@
     "timerCuesSaved": "Nastavení časomíry uložena.",
     "timerCuesSaveFailed": "Nastavení časomíry se nepodařilo uložit.",
     "audioLoadFailed": "Zvuková data se nepodařilo načíst.",
-    "penaltyFreeThrowsSkipped": "Časový trest přidán týmu {{team}} – trestné hody nevytvořeny, protože je ještě otevřená série."
+    "penaltyFreeThrowsSkipped": "Časový trest přidán týmu {{team}} – trestné hody nevytvořeny, protože je ještě otevřená série.",
+    "displayNowCallit": "Projektor nyní zobrazuje pořadí tipovačky."
   },
   "error": {
     "generic": "Došlo k chybě. Zkuste to prosím znovu.",
@@ -908,5 +912,128 @@
     "emptyHint": "Vyberte turnaj pro zobrazeni tiskovych sablon",
     "collapse": "Sbalit",
     "expand": "Rozbalit"
+  },
+  "callit": {
+    "title": "Tipovačka CallIt",
+    "description": "Řízení tipovačky pro každý turnaj: aktivace, body, zámky, speciální sázky a účastníci.",
+    "active": "aktivní",
+    "loading": "Načítám tipovačku …",
+    "statusTitle": "Stav",
+    "statusOn": "Tipovačka je aktivní · {{count}} účastníků",
+    "statusOff": "Tipovačka je pro tento turnaj vypnutá.",
+    "enable": "Aktivovat tipovačku",
+    "disable": "Vypnout tipovačku",
+    "notPublic": "Turnaj je soukromý – odkaz na hlavní stránce se objeví, až bude turnaj veřejný.",
+    "registrationOpen": "Přihlášky otevřené",
+    "joinCode": "Přístupový kód (volitelně)",
+    "joinCodePlaceholder": "prázdné = bez kódu",
+    "saveJoinCode": "Uložit kód",
+    "copyLink": "Kopírovat odkaz",
+    "copied": "Odkaz zkopírován.",
+    "beamerOn": "Pořadí na projektor",
+    "beamerOff": "Projektor zpět na skóre",
+    "exportCsv": "Export CSV",
+    "refresh": "Obnovit",
+    "saved": "Uloženo.",
+    "loadFailed": "Tipovačku se nepodařilo načíst.",
+    "actionFailed": "Akce se nezdařila.",
+    "settings": {
+      "title": "Pravidla a body",
+      "description": "Všechny hodnoty platí okamžitě – body se přepočítávají živě.",
+      "points": "Body za zápas",
+      "exact": "Přesně",
+      "diff": "Správný rozdíl",
+      "tendency": "Správná tendence",
+      "koAdvance": "Postupující v KO (bonus)",
+      "multipliers": "Násobitele",
+      "phase": {
+        "group": "Skupina",
+        "knockout": "KO",
+        "placement": "O umístění",
+        "final": "Finále"
+      },
+      "jokerEnabled": "Žolík aktivní",
+      "jokerPerPhase": "Žolíků za fázi",
+      "underdogEnabled": "Bonus za outsidera aktivní",
+      "underdogThreshold": "Práh (%)",
+      "underdogMinTips": "Minimální počet tipů",
+      "underdogBonus": "Bonusové body",
+      "lockAtScheduled": "Zamykat i v plánovaný čas (jinak až při výkopu)",
+      "specials": "Speciální sázky",
+      "specialPoints": "Body",
+      "deadline": "Uzávěrka (volitelně)",
+      "deadlineHint": "Bez uzávěrky se speciální sázky uzavřou prvním výkopem turnaje.",
+      "rulesText": "Poznámky / ceny (vidí je tipéři)"
+    },
+    "specialTypes": {
+      "winner": "Vítěz turnaje",
+      "top_scorer": "Nejlepší střelec",
+      "most_penalty_seconds": "Nejvíc trestných sekund",
+      "group_winner": "Vítěz skupiny",
+      "group_winner_label": "Vítěz {{group}}",
+      "total_baskets": "Celkem bodů"
+    },
+    "matches": {
+      "title": "Zápasy a zámky",
+      "description": "Zápasy se zamykají automaticky při výkopu. Ruční zamčení/odemčení má přednost (např. špatný kód zápasu).",
+      "match": "Zápas",
+      "time": "Čas",
+      "status": "Stav",
+      "tips": "Tipy",
+      "actions": "Akce",
+      "lock": "Zamknout",
+      "unlock": "Odemknout",
+      "auto": "Automaticky",
+      "locked": "Zápas zamčen.",
+      "unlocked": "Zápas odemčen."
+    },
+    "status": {
+      "pending": "Týmy otevřené",
+      "open": "Otevřený",
+      "locked": "Zamčený",
+      "live": "Živě",
+      "finished": "Skončený"
+    },
+    "lockReason": {
+      "kickoff": "výkop",
+      "manual": "ručně",
+      "unlocked": "ručně odemčeno"
+    },
+    "specials": {
+      "title": "Výsledky speciálních sázek",
+      "description": "Určují se automaticky z dat turnaje. V případě potřeby zde přepište.",
+      "none": "Žádné aktivní speciální sázky.",
+      "locked": "uzavřeno",
+      "open": "otevřeno",
+      "result": "Výsledek",
+      "provisional": "předběžně",
+      "overridePlaceholder": "Zadat hodnotu",
+      "saveOverride": "Nastavit výsledek",
+      "resetOverride": "Automaticky",
+      "overrideActive": "Ruční výsledek aktivní.",
+      "overrideHint": "Možný vícenásobný výběr (shoda)."
+    },
+    "participants": {
+      "title": "Účastníci",
+      "description": "Moderovat přezdívky, resetovat hesla, vylučovat účastníky.",
+      "search": "Hledat přezdívku …",
+      "empty": "Zatím žádní účastníci.",
+      "banned": "zablokován",
+      "disqualified": "vyloučen",
+      "meta": "{{points}} b. · {{tips}} tipů · poslední přihlášení {{login}}",
+      "rename": "Přejmenovat",
+      "renamePrompt": "Nová přezdívka:",
+      "resetPassword": "Resetovat heslo",
+      "resetConfirm": "Resetovat heslo uživatele {{name}}? Všechna přihlášení budou ukončena.",
+      "resetResult": "Dočasné heslo pro {{name}} (viditelné jen teď):",
+      "disqualify": "Vyloučit",
+      "requalify": "Znovu připustit",
+      "ban": "Zablokovat účet",
+      "unban": "Odblokovat účet",
+      "remove": "Odebrat z tipovačky",
+      "removeConfirm": "Odebrat {{name}} i s tipy z této tipovačky?",
+      "deleteAccount": "Smazat účet",
+      "deleteConfirm": "Trvale smazat účet {{name}} se všemi tipy ve všech turnajích?"
+    }
   }
 }

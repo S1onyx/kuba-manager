@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { fetchTournamentDetail } from '../../api.js';
 import { useDateLocale } from '../../i18n/index.js';
 import { navigateTo } from '../../hooks/useHashRoute.js';
+import CallitPromo from '../CallitPromo.jsx';
 
 const responsiveStyles = `
   @media (max-width: 768px) {
@@ -139,6 +140,8 @@ export default function TournamentDetailPage({ tournamentId }) {
               {t('tournamentDetail.registerNow')}
             </button>
           </div>
+
+          <CallitPromo tournamentId={tournament.id} />
 
           <div className="tournament-detail__info-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
             {formattedDate && (

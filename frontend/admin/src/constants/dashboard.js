@@ -2,7 +2,8 @@ export const POINT_OPTIONS = [1, 2, 3];
 
 export const DISPLAY_VIEW_OPTIONS = [
   { id: 'scoreboard', labelKey: 'displayViews.scoreboard' },
-  { id: 'bracket', labelKey: 'displayViews.bracket' }
+  { id: 'bracket', labelKey: 'displayViews.bracket' },
+  { id: 'callit', labelKey: 'displayViews.callit' }
 ];
 
 export const PENALTY_PRESETS = [
@@ -19,6 +20,7 @@ export const CONTROL_TABS = [
   { id: 'players', labelKey: 'tabs.players' },
   { id: 'teams', labelKey: 'tabs.teams' },
   { id: 'tournaments', labelKey: 'tabs.tournaments' },
+  { id: 'callit', labelKey: 'tabs.callit' },
   { id: 'export', labelKey: 'tabs.export' }
 ];
 

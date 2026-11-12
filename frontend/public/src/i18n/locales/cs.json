@@ -349,5 +349,17 @@
     "title": "Trestný hod",
     "next": "Hod {{current}} z {{total}}",
     "result": "Proměněno {{made}} z {{total}}"
+  },
+  "callit": {
+    "badge": "Tipovačka",
+    "title": "Tipuj a poraz celou halu!",
+    "text": "Tipuj výsledky, uzavírej speciální sázky, sleduj živé pořadí – zdarma, jen s přezdívkou.",
+    "cta": "Tipovat",
+    "participants_one": "{{count}} tipér",
+    "participants_few": "{{count}} tipéři",
+    "participants_many": "{{count}} tipérů",
+    "participants_other": "{{count}} tipérů",
+    "leaders": "Aktuálně v čele",
+    "points": "{{points}} b."
   }
 }

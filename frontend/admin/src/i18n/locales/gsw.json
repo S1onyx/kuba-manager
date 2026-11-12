@@ -55,11 +55,13 @@
     "players": "Spieler",
     "teams": "Teams",
     "tournaments": "Turnier",
-    "export": "PDF-Export / Drucken"
+    "export": "PDF-Export / Drucken",
+    "callit": "Tippspiel"
   },
   "displayViews": {
     "scoreboard": "Live-Spielstand",
-    "bracket": "Turnierboum"
+    "bracket": "Turnierboum",
+    "callit": "Tippspiel-Ranking"
   },
   "penaltyPresets": {
     "minutes_one": "{{count}} Minute",
@@ -122,7 +124,8 @@
       "description": "Wächsel zwüschem Live-Spielstand und em Turnierboum uf em Beamer.",
       "bracketHint": "Für de Turnierbaum zerscht s'Turnier wähle:",
       "chooseTournament": "Turnier wähle …",
-      "updating": "Aazeig wird aktualisiert..."
+      "updating": "Aazeig wird aktualisiert...",
+      "callitHint": "Tippspiel-Ranking für das Turnier zeige:"
     },
     "context": {
       "title": "Match-Kontext",
@@ -688,7 +691,8 @@
     "timerCuesSaved": "Timer-Istellige gspeicheret.",
     "timerCuesSaveFailed": "Timer-Istellige hend nid chöne gspeicheret werde.",
     "audioLoadFailed": "Audiodate hend nid chöne glade werde.",
-    "penaltyFreeThrowsSkipped": "Zytstraaf für Team {{team}} dezue taa – Freiwürf nöd aagleit, will no e Serie offe isch."
+    "penaltyFreeThrowsSkipped": "Zytstraaf für Team {{team}} dezue taa – Freiwürf nöd aagleit, will no e Serie offe isch.",
+    "displayNowCallit": "De Beamer zeigt jetzt s Tippspiel-Ranking."
   },
   "error": {
     "generic": "Es isch en Fähler passiert. Bitte versuech's nomol.",
@@ -890,5 +894,128 @@
     "emptyHint": "Turnier uswaehle zum Druckvorlaage aazluege",
     "collapse": "Iiklappe",
     "expand": "Ufklappe"
+  },
+  "callit": {
+    "title": "Tippspiel CallIt",
+    "description": "Tippspiel pro Turnier stüüre: Freischaltig, Pünkt, Sperre, Sonderwette und Teilnehmer.",
+    "active": "aktiv",
+    "loading": "Lad Tippspiel …",
+    "statusTitle": "Status",
+    "statusOn": "Tippspiel isch aktiv · {{count}} Teilnehmer",
+    "statusOff": "Tippspiel isch für das Turnier us.",
+    "enable": "Tippspiel aktiviere",
+    "disable": "Tippspiel deaktiviere",
+    "notPublic": "S Turnier isch privat – de Link uf de Hauptsiite chunnt erscht, wänn s Turnier öffentlich isch.",
+    "registrationOpen": "Aamäldig offe",
+    "joinCode": "Bitrittscode (optional)",
+    "joinCodePlaceholder": "läär = ohni Code",
+    "saveJoinCode": "Code speichere",
+    "copyLink": "Link kopiere",
+    "copied": "Link kopiert.",
+    "beamerOn": "Ranking uf de Beamer",
+    "beamerOff": "Beamer zrugg zum Scoreboard",
+    "exportCsv": "CSV-Export",
+    "refresh": "Aktualisiere",
+    "saved": "Gspeicheret.",
+    "loadFailed": "Tippspiel het nöd chönne glade werde.",
+    "actionFailed": "Aktion isch schiefgange.",
+    "settings": {
+      "title": "Regle & Pünkt",
+      "description": "Alli Wärt gälted sofort – d Pünkt wärded live neu grächnet.",
+      "points": "Spielpünkt",
+      "exact": "Exakt",
+      "diff": "Richtigi Differänz",
+      "tendency": "Richtigi Tendänz",
+      "koAdvance": "KO-Wiiterchömer (Bonus)",
+      "multipliers": "Multiplikatore",
+      "phase": {
+        "group": "Grupp",
+        "knockout": "KO",
+        "placement": "Platzierig",
+        "final": "Final"
+      },
+      "jokerEnabled": "Joker aktiv",
+      "jokerPerPhase": "Joker pro Phase",
+      "underdogEnabled": "Underdog-Bonus aktiv",
+      "underdogThreshold": "Schwälle (%)",
+      "underdogMinTips": "Mindestaazahl Tipps",
+      "underdogBonus": "Bonuspünkt",
+      "lockAtScheduled": "Spiel au zur planete Ziit sperre (susch erscht bim Aapfiff)",
+      "specials": "Sonderwette",
+      "specialPoints": "Pünkt",
+      "deadline": "Frischt (optional)",
+      "deadlineHint": "Ohni Frischt gönd Sonderwette bim erschte Aapfiff vom Turnier zue.",
+      "rulesText": "Hiiwiis / Priis (für Tipper sichtbar)"
+    },
+    "specialTypes": {
+      "winner": "Turniersieger",
+      "top_scorer": "Topscorer",
+      "most_penalty_seconds": "Meischti Strafsekunde",
+      "group_winner": "Gruppesieger",
+      "group_winner_label": "Gruppesieger {{group}}",
+      "total_baskets": "Gsamtpünkt"
+    },
+    "matches": {
+      "title": "Spiel & Sperre",
+      "description": "Spiel sperred automatisch bim Aapfiff. Manuell sperre/entsperre gaht vor (z. B. falsche Spielcode).",
+      "match": "Spiel",
+      "time": "Ziit",
+      "status": "Status",
+      "tips": "Tipps",
+      "actions": "Aktione",
+      "lock": "Sperre",
+      "unlock": "Entsperre",
+      "auto": "Automatik",
+      "locked": "Spiel gsperrt.",
+      "unlocked": "Spiel entsperrt."
+    },
+    "status": {
+      "pending": "Teams no offe",
+      "open": "Offe",
+      "locked": "Gsperrt",
+      "live": "Live",
+      "finished": "Fertig"
+    },
+    "lockReason": {
+      "kickoff": "Aapfiff",
+      "manual": "manuell",
+      "unlocked": "manuell entsperrt"
+    },
+    "specials": {
+      "title": "Sonderwette-Resultat",
+      "description": "Wärded automatisch us de Turnierdate ermittlet. Wänn nötig, da überschriibe.",
+      "none": "Kei Sonderwette aktiv.",
+      "locked": "zue",
+      "open": "offe",
+      "result": "Resultat",
+      "provisional": "vorläufig",
+      "overridePlaceholder": "Wärt iiträge",
+      "saveOverride": "Resultat feschtlege",
+      "resetOverride": "Automatik",
+      "overrideActive": "Manuells Resultat aktiv.",
+      "overrideHint": "Mehrfachuswahl möglich (Gliichstand)."
+    },
+    "participants": {
+      "title": "Teilnehmer",
+      "description": "Nicknames moderiere, Passwörter zruggsetze, Teilnehmer usschliesse.",
+      "search": "Nickname sueche …",
+      "empty": "No kei Teilnehmer.",
+      "banned": "gsperrt",
+      "disqualified": "usgschlosse",
+      "meta": "{{points}} Pkt. · {{tips}} Tipps · letschte Login {{login}}",
+      "rename": "Umbenänne",
+      "renamePrompt": "Neue Nickname:",
+      "resetPassword": "Passwort zruggsetze",
+      "resetConfirm": "Passwort vo {{name}} zruggsetze? Alli Sitzige wärded beändet.",
+      "resetResult": "Temporärs Passwort für {{name}} (nur jetzt sichtbar):",
+      "disqualify": "Usschliesse",
+      "requalify": "Wieder zuelaa",
+      "ban": "Konto sperre",
+      "unban": "Konto entsperre",
+      "remove": "Us em Tippspiel neh",
+      "removeConfirm": "{{name}} mitsamt Tipps us dem Tippspiel neh?",
+      "deleteAccount": "Konto lösche",
+      "deleteConfirm": "Konto {{name}} mit allne Tipps i allne Turnier definitiv lösche?"
+    }
   }
 }

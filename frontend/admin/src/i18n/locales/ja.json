@@ -55,11 +55,13 @@
     "players": "選手",
     "teams": "チーム",
     "tournaments": "大会",
-    "export": "PDFエクスポート / 印刷"
+    "export": "PDFエクスポート / 印刷",
+    "callit": "予想ゲーム"
   },
   "displayViews": {
     "scoreboard": "ライブスコア",
-    "bracket": "トーナメント表"
+    "bracket": "トーナメント表",
+    "callit": "予想ランキング"
   },
   "penaltyPresets": {
     "minutes_other": "{{count}} 分",
@@ -120,7 +122,8 @@
       "description": "プロジェクター上でライブスコアとトーナメント表を切り替えます。",
       "bracketHint": "トーナメント表のために先に大会を選択してください：",
       "chooseTournament": "大会を選択 …",
-      "updating": "表示を更新中..."
+      "updating": "表示を更新中...",
+      "callitHint": "この大会の予想ランキングを表示:"
     },
     "context": {
       "title": "マッチコンテキスト",
@@ -679,7 +682,8 @@
     "timerCuesSaved": "タイマー設定を保存しました。",
     "timerCuesSaveFailed": "タイマー設定を保存できませんでした。",
     "audioLoadFailed": "音声データを読み込めませんでした。",
-    "penaltyFreeThrowsSkipped": "チーム {{team}} にタイムペナルティを追加しました。未完了のフリースローがあるため、新しいフリースローは作成されませんでした。"
+    "penaltyFreeThrowsSkipped": "チーム {{team}} にタイムペナルティを追加しました。未完了のフリースローがあるため、新しいフリースローは作成されませんでした。",
+    "displayNowCallit": "プロジェクターに予想ランキングが表示されています。"
   },
   "error": {
     "generic": "エラーが発生しました。もう一度お試しください。",
@@ -881,5 +885,128 @@
     "emptyHint": "印刷テンプレートを表示するにはトーナメントを選択してください",
     "collapse": "折りたたむ",
     "expand": "展開"
+  },
+  "callit": {
+    "title": "予想ゲーム CallIt",
+    "description": "大会ごとに予想ゲームを管理:有効化、ポイント、ロック、特別予想、参加者。",
+    "active": "有効",
+    "loading": "予想ゲームを読み込み中 …",
+    "statusTitle": "ステータス",
+    "statusOn": "予想ゲームは有効 · 参加者 {{count}}人",
+    "statusOff": "この大会の予想ゲームはオフです。",
+    "enable": "予想ゲームを有効化",
+    "disable": "予想ゲームを無効化",
+    "notPublic": "大会は非公開です。大会を公開するとトップページにリンクが表示されます。",
+    "registrationOpen": "参加受付中",
+    "joinCode": "参加コード(任意)",
+    "joinCodePlaceholder": "空欄 = コードなし",
+    "saveJoinCode": "コードを保存",
+    "copyLink": "リンクをコピー",
+    "copied": "リンクをコピーしました。",
+    "beamerOn": "ランキングをプロジェクターへ",
+    "beamerOff": "プロジェクターをスコアボードに戻す",
+    "exportCsv": "CSVエクスポート",
+    "refresh": "更新",
+    "saved": "保存しました。",
+    "loadFailed": "予想ゲームを読み込めませんでした。",
+    "actionFailed": "操作に失敗しました。",
+    "settings": {
+      "title": "ルールとポイント",
+      "description": "すべての値は即時反映され、ポイントはライブで再計算されます。",
+      "points": "試合ポイント",
+      "exact": "完全的中",
+      "diff": "点差的中",
+      "tendency": "勝敗的中",
+      "koAdvance": "トーナメント勝ち上がり(ボーナス)",
+      "multipliers": "倍率",
+      "phase": {
+        "group": "グループ",
+        "knockout": "トーナメント",
+        "placement": "順位決定",
+        "final": "決勝"
+      },
+      "jokerEnabled": "ジョーカー有効",
+      "jokerPerPhase": "フェーズごとのジョーカー数",
+      "underdogEnabled": "大穴ボーナス有効",
+      "underdogThreshold": "しきい値(%)",
+      "underdogMinTips": "最小予想数",
+      "underdogBonus": "ボーナスポイント",
+      "lockAtScheduled": "予定時刻でも試合をロック(通常はキックオフ時のみ)",
+      "specials": "特別予想",
+      "specialPoints": "ポイント",
+      "deadline": "締切(任意)",
+      "deadlineHint": "締切がない場合、特別予想は大会最初のキックオフで締め切られます。",
+      "rulesText": "お知らせ / 賞品(参加者に表示)"
+    },
+    "specialTypes": {
+      "winner": "大会優勝",
+      "top_scorer": "得点王",
+      "most_penalty_seconds": "最多ペナルティ秒数",
+      "group_winner": "グループ1位",
+      "group_winner_label": "{{group}} 1位",
+      "total_baskets": "総得点"
+    },
+    "matches": {
+      "title": "試合とロック",
+      "description": "試合はキックオフ時に自動でロックされます。手動ロック/解除が優先されます(例:試合コードの誤り)。",
+      "match": "試合",
+      "time": "時刻",
+      "status": "ステータス",
+      "tips": "予想",
+      "actions": "操作",
+      "lock": "ロック",
+      "unlock": "解除",
+      "auto": "自動",
+      "locked": "試合をロックしました。",
+      "unlocked": "試合のロックを解除しました。"
+    },
+    "status": {
+      "pending": "チーム未定",
+      "open": "受付中",
+      "locked": "ロック",
+      "live": "ライブ",
+      "finished": "終了"
+    },
+    "lockReason": {
+      "kickoff": "キックオフ",
+      "manual": "手動",
+      "unlocked": "手動で解除"
+    },
+    "specials": {
+      "title": "特別予想の結果",
+      "description": "大会データから自動で判定されます。必要に応じてここで上書きできます。",
+      "none": "有効な特別予想はありません。",
+      "locked": "締切",
+      "open": "受付中",
+      "result": "結果",
+      "provisional": "暫定",
+      "overridePlaceholder": "値を入力",
+      "saveOverride": "結果を確定",
+      "resetOverride": "自動",
+      "overrideActive": "手動の結果が有効です。",
+      "overrideHint": "複数選択可(同率)。"
+    },
+    "participants": {
+      "title": "参加者",
+      "description": "ニックネームの管理、パスワードのリセット、参加者の除外。",
+      "search": "ニックネームを検索 …",
+      "empty": "まだ参加者がいません。",
+      "banned": "停止中",
+      "disqualified": "除外",
+      "meta": "{{points}}pt · 予想 {{tips}}件 · 最終ログイン {{login}}",
+      "rename": "名前変更",
+      "renamePrompt": "新しいニックネーム:",
+      "resetPassword": "パスワードをリセット",
+      "resetConfirm": "{{name}} のパスワードをリセットしますか?すべてのセッションが終了します。",
+      "resetResult": "{{name}} の一時パスワード(今だけ表示):",
+      "disqualify": "除外",
+      "requalify": "復帰",
+      "ban": "アカウント停止",
+      "unban": "停止解除",
+      "remove": "ゲームから削除",
+      "removeConfirm": "{{name}} とその予想をこのゲームから削除しますか?",
+      "deleteAccount": "アカウント削除",
+      "deleteConfirm": "{{name}} のアカウントを全大会の予想とともに完全に削除しますか?"
+    }
   }
 }

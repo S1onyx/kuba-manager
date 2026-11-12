@@ -3,6 +3,7 @@ import { usePublicApp } from '../../context/PublicAppContext.jsx';
 import NoticeBox from '../common/NoticeBox.jsx';
 import TournamentSection from '../tournaments/TournamentSection.jsx';
 import SummarySection from '../summary/SummarySection.jsx';
+import CallitPromo from '../CallitPromo.jsx';
 
 export default function OverviewView() {
   const { t } = useTranslation();
@@ -24,6 +25,7 @@ export default function OverviewView() {
         </NoticeBox>
       ) : null}
 
+      <CallitPromo />
       <TournamentSection />
       {selectedId ? <SummarySection /> : null}
     </>

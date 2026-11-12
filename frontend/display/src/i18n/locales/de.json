@@ -129,5 +129,23 @@
     "title": "Freiwurf",
     "next": "Wurf {{current}} von {{total}}",
     "result": "{{made}} von {{total}} getroffen"
+  },
+  "callit": {
+    "title": "Tippspiel-Ranking",
+    "live": "LIVE",
+    "liveMatch": "Läuft: {{home}} {{score}} {{away}} – Punkte zählen vorläufig",
+    "join": "Jetzt mittippen!",
+    "participants_one": "{{count}} Tipper",
+    "participants_other": "{{count}} Tipper",
+    "rowDetail": "{{exact}}× exakt · {{diff}}× Differenz · {{tendency}}× Tendenz",
+    "livePlus": "live +{{points}}",
+    "exactKing": "Exakt-König",
+    "underdogKing": "Underdog-König",
+    "climber": "Aufsteiger",
+    "empty": "Noch keine Tipper – scannen und mitmachen!",
+    "loading": "Lade Tippspiel …",
+    "loadError": "Tippspiel konnte nicht geladen werden.",
+    "notEnabled": "Für dieses Turnier ist kein Tippspiel aktiv.",
+    "noTournament": "Kein Turnier für das Tippspiel gewählt."
   }
 }

@@ -61,7 +61,7 @@ async function requireEnabled(tournamentId) {
 
 export async function listEnabledTournaments() {
   const rows = await queryAll(
-    `SELECT c.tournament_id, t.name, t.status, t.is_completed, t.planned_at, t.location,
+    `SELECT c.tournament_id, t.name, t.status, t.is_completed, t.is_public, t.planned_at, t.location,
        (SELECT COUNT(*) FROM callit_participants p WHERE p.tournament_id = c.tournament_id AND p.is_disqualified = 0) AS participant_count
      FROM callit_tournaments c JOIN tournaments t ON t.id = c.tournament_id
      WHERE c.enabled = 1
@@ -72,6 +72,7 @@ export async function listEnabledTournaments() {
     name: row.name,
     status: row.status ?? 'active',
     isCompleted: Boolean(row.is_completed),
+    isPublic: Boolean(row.is_public),
     plannedAt: row.planned_at ?? null,
     location: row.location ?? null,
     participantCount: Number(row.participant_count ?? 0)

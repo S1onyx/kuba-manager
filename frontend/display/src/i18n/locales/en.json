@@ -129,5 +129,23 @@
     "title": "Free throw",
     "next": "Throw {{current}} of {{total}}",
     "result": "{{made}} of {{total}} made"
+  },
+  "callit": {
+    "title": "Prediction ranking",
+    "live": "LIVE",
+    "liveMatch": "Now: {{home}} {{score}} {{away}} – points count provisionally",
+    "join": "Join the game!",
+    "participants_one": "{{count}} player",
+    "participants_other": "{{count}} players",
+    "rowDetail": "{{exact}}× exact · {{diff}}× difference · {{tendency}}× outcome",
+    "livePlus": "live +{{points}}",
+    "exactKing": "Exact king",
+    "underdogKing": "Underdog king",
+    "climber": "Top climber",
+    "empty": "No players yet – scan and join!",
+    "loading": "Loading prediction game …",
+    "loadError": "Prediction game could not be loaded.",
+    "notEnabled": "No prediction game is active for this tournament.",
+    "noTournament": "No tournament selected for the prediction game."
   }
 }

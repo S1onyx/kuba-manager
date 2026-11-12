@@ -340,5 +340,15 @@
     "title": "Lancer franc",
     "next": "Lancer {{current}} sur {{total}}",
     "result": "{{made}} sur {{total}} réussis"
+  },
+  "callit": {
+    "badge": "Pronostics",
+    "title": "Pronostique et bats toute la salle !",
+    "text": "Pronostique les scores, fais des paris spéciaux, suis le classement en direct – gratuit, juste avec un pseudo.",
+    "cta": "Pronostiquer maintenant",
+    "participants_one": "{{count}} joueur inscrit",
+    "participants_other": "{{count}} joueurs inscrits",
+    "leaders": "En tête",
+    "points": "{{points}} pts"
   }
 }

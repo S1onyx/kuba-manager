@@ -18,3 +18,7 @@ services:
   audio-frontend:
     build:
       context: ./frontend/audio
+
+  callit-frontend:
+    build:
+      context: ./frontend/callit

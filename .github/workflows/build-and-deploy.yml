@@ -47,6 +47,10 @@ jobs:
             context: frontend/audio
             dockerfile: frontend/audio/Dockerfile
             image: kuba-audio
+          - component: callit
+            context: frontend/callit
+            dockerfile: frontend/callit/Dockerfile
+            image: kuba-callit
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6.0.3

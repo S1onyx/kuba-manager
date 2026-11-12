@@ -7,6 +7,7 @@ DOMAINS=(
   "display.kunstradbasketball.de"
   "admin.kunstradbasketball.de"
   "audio.kunstradbasketball.de"
+  "callit.kunstradbasketball.de"
   "dashboard.kunstradbasketball.de"
 )
 

@@ -55,11 +55,13 @@
     "players": "Players",
     "teams": "Teams",
     "tournaments": "Tournaments",
-    "export": "PDF Export / Print"
+    "export": "PDF Export / Print",
+    "callit": "Prediction game"
   },
   "displayViews": {
     "scoreboard": "Live Score",
-    "bracket": "Bracket"
+    "bracket": "Bracket",
+    "callit": "Prediction ranking"
   },
   "penaltyPresets": {
     "minutes_one": "{{count}} minute",
@@ -122,7 +124,8 @@
       "description": "Switch between live score and bracket on the projector.",
       "bracketHint": "Choose the tournament for the bracket first:",
       "chooseTournament": "Choose tournament …",
-      "updating": "Updating display..."
+      "updating": "Updating display...",
+      "callitHint": "Show the prediction ranking for this tournament:"
     },
     "context": {
       "title": "Match Context",
@@ -688,7 +691,8 @@
     "timerCuesSaved": "Timer settings saved.",
     "timerCuesSaveFailed": "The timer settings could not be saved.",
     "audioLoadFailed": "The audio data could not be loaded.",
-    "penaltyFreeThrowsSkipped": "Time penalty added for team {{team}} – free throws not created because a series is still open."
+    "penaltyFreeThrowsSkipped": "Time penalty added for team {{team}} – free throws not created because a series is still open.",
+    "displayNowCallit": "The projector now shows the prediction ranking."
   },
   "error": {
     "generic": "An error occurred. Please try again.",
@@ -890,5 +894,128 @@
     "emptyHint": "Select a tournament to see print templates",
     "collapse": "Collapse",
     "expand": "Expand"
+  },
+  "callit": {
+    "title": "Prediction game CallIt",
+    "description": "Control the prediction game per tournament: activation, points, locks, special bets and participants.",
+    "active": "active",
+    "loading": "Loading prediction game …",
+    "statusTitle": "Status",
+    "statusOn": "Prediction game is active · {{count}} participants",
+    "statusOff": "Prediction game is off for this tournament.",
+    "enable": "Activate prediction game",
+    "disable": "Deactivate prediction game",
+    "notPublic": "Tournament is private – the link on the main page only appears once the tournament is public.",
+    "registrationOpen": "Registration open",
+    "joinCode": "Join code (optional)",
+    "joinCodePlaceholder": "empty = no code",
+    "saveJoinCode": "Save code",
+    "copyLink": "Copy link",
+    "copied": "Link copied.",
+    "beamerOn": "Ranking on projector",
+    "beamerOff": "Projector back to scoreboard",
+    "exportCsv": "CSV export",
+    "refresh": "Refresh",
+    "saved": "Saved.",
+    "loadFailed": "Prediction game could not be loaded.",
+    "actionFailed": "Action failed.",
+    "settings": {
+      "title": "Rules & points",
+      "description": "All values apply immediately – points are recalculated live.",
+      "points": "Game points",
+      "exact": "Exact",
+      "diff": "Correct difference",
+      "tendency": "Correct outcome",
+      "koAdvance": "Knockout qualifier (bonus)",
+      "multipliers": "Multipliers",
+      "phase": {
+        "group": "Group",
+        "knockout": "Knockout",
+        "placement": "Placement",
+        "final": "Final"
+      },
+      "jokerEnabled": "Joker active",
+      "jokerPerPhase": "Jokers per phase",
+      "underdogEnabled": "Underdog bonus active",
+      "underdogThreshold": "Threshold (%)",
+      "underdogMinTips": "Minimum predictions",
+      "underdogBonus": "Bonus points",
+      "lockAtScheduled": "Also lock games at the scheduled time (otherwise only at kick-off)",
+      "specials": "Special bets",
+      "specialPoints": "Points",
+      "deadline": "Deadline (optional)",
+      "deadlineHint": "Without a deadline, special bets close at the tournament's first kick-off.",
+      "rulesText": "Notes / prizes (visible to players)"
+    },
+    "specialTypes": {
+      "winner": "Tournament winner",
+      "top_scorer": "Top scorer",
+      "most_penalty_seconds": "Most penalty seconds",
+      "group_winner": "Group winner",
+      "group_winner_label": "Group winner {{group}}",
+      "total_baskets": "Total points"
+    },
+    "matches": {
+      "title": "Games & locks",
+      "description": "Games lock automatically at kick-off. Manual lock/unlock overrides this (e.g. wrong game code).",
+      "match": "Game",
+      "time": "Time",
+      "status": "Status",
+      "tips": "Predictions",
+      "actions": "Actions",
+      "lock": "Lock",
+      "unlock": "Unlock",
+      "auto": "Automatic",
+      "locked": "Game locked.",
+      "unlocked": "Game unlocked."
+    },
+    "status": {
+      "pending": "Teams TBD",
+      "open": "Open",
+      "locked": "Locked",
+      "live": "Live",
+      "finished": "Finished"
+    },
+    "lockReason": {
+      "kickoff": "kick-off",
+      "manual": "manual",
+      "unlocked": "manually unlocked"
+    },
+    "specials": {
+      "title": "Special bet results",
+      "description": "Determined automatically from tournament data. Override here if needed.",
+      "none": "No special bets active.",
+      "locked": "closed",
+      "open": "open",
+      "result": "Result",
+      "provisional": "provisional",
+      "overridePlaceholder": "Enter value",
+      "saveOverride": "Set result",
+      "resetOverride": "Automatic",
+      "overrideActive": "Manual result active.",
+      "overrideHint": "Multiple selection possible (tie)."
+    },
+    "participants": {
+      "title": "Participants",
+      "description": "Moderate nicknames, reset passwords, exclude participants.",
+      "search": "Search nickname …",
+      "empty": "No participants yet.",
+      "banned": "blocked",
+      "disqualified": "excluded",
+      "meta": "{{points}} pts · {{tips}} predictions · last login {{login}}",
+      "rename": "Rename",
+      "renamePrompt": "New nickname:",
+      "resetPassword": "Reset password",
+      "resetConfirm": "Reset the password of {{name}}? All sessions will be ended.",
+      "resetResult": "Temporary password for {{name}} (only visible now):",
+      "disqualify": "Exclude",
+      "requalify": "Re-admit",
+      "ban": "Block account",
+      "unban": "Unblock account",
+      "remove": "Remove from game",
+      "removeConfirm": "Remove {{name}} and their predictions from this game?",
+      "deleteAccount": "Delete account",
+      "deleteConfirm": "Permanently delete account {{name}} with all predictions in all tournaments?"
+    }
   }
 }

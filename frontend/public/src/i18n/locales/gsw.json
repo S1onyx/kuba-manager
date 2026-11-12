@@ -340,5 +340,15 @@
     "title": "Freiwurf",
     "next": "Wurf {{current}} vo {{total}}",
     "result": "{{made}} vo {{total}} troffe"
+  },
+  "callit": {
+    "badge": "Tippspiel",
+    "title": "Tipp mit und schlag d Halle!",
+    "text": "Spielständ tippe, Sonderwette abgäh, live im Ranking mitfiebere – gratis, nur mit Nickname.",
+    "cta": "Jetzt mittippe",
+    "participants_one": "{{count}} Tipper debii",
+    "participants_other": "{{count}} Tipper debii",
+    "leaders": "Aktuell vorne",
+    "points": "{{points}} Pkt."
   }
 }

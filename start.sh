@@ -27,6 +27,7 @@ echo "Installiere Abhängigkeiten und starte Entwicklungsserver..."
 (cd "$ROOT_DIR/frontend/display" && npm install --no-audit) &
 (cd "$ROOT_DIR/frontend/public" && npm install --no-audit) &
 (cd "$ROOT_DIR/frontend/audio" && npm install --no-audit) &
+(cd "$ROOT_DIR/frontend/callit" && npm install --no-audit) &
 wait
 
 # Re-sign native binaries (macOS Team ID fix)
@@ -38,5 +39,6 @@ find "$ROOT_DIR/frontend" -name "*.node" -exec codesign --force --sign - {} \; 2
 (cd "$ROOT_DIR/frontend/display" && npm run dev) &
 (cd "$ROOT_DIR/frontend/public" && npm run dev) &
 (cd "$ROOT_DIR/frontend/audio" && npm run dev) &
+(cd "$ROOT_DIR/frontend/callit" && npm run dev) &
 
 wait

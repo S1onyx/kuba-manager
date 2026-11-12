@@ -340,5 +340,15 @@
     "title": "Freiwurf",
     "next": "Wurf {{current}} vo {{total}}",
     "result": "{{made}} vo {{total}} troffa"
+  },
+  "callit": {
+    "badge": "Tippschbiel",
+    "title": "Tipp mit ond schlag d Halle!",
+    "text": "Schbielschdänd tippa, Sonderwetta abgeba, live im Ranking mitfiebra – koschdalos, bloß mit Nickname.",
+    "cta": "Jetzt mittippa",
+    "participants_one": "{{count}} Tipper dabei",
+    "participants_other": "{{count}} Tipper dabei",
+    "leaders": "Aktuell vorna",
+    "points": "{{points}} Pkt."
   }
 }

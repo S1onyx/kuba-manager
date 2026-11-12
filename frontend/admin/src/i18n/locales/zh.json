@@ -55,11 +55,13 @@
     "players": "球员",
     "teams": "团队",
     "tournaments": "锦标赛",
-    "export": "PDF导出 / 打印"
+    "export": "PDF导出 / 打印",
+    "callit": "竞猜游戏"
   },
   "displayViews": {
     "scoreboard": "实时比分",
-    "bracket": "淘汰赛对阵图"
+    "bracket": "淘汰赛对阵图",
+    "callit": "竞猜排行榜"
   },
   "penaltyPresets": {
     "minutes_other": "{{count}} 分钟",
@@ -120,7 +122,8 @@
       "description": "在投影仪上切换实时比分和淘汰赛对阵图。",
       "bracketHint": "请先为对阵图选择锦标赛：",
       "chooseTournament": "选择锦标赛 …",
-      "updating": "正在更新显示..."
+      "updating": "正在更新显示...",
+      "callitHint": "显示该赛事的竞猜排行榜:"
     },
     "context": {
       "title": "比赛上下文",
@@ -679,7 +682,8 @@
     "timerCuesSaved": "计时器设置已保存。",
     "timerCuesSaveFailed": "无法保存计时器设置。",
     "audioLoadFailed": "无法加载音频数据。",
-    "penaltyFreeThrowsSkipped": "已为团队 {{team}} 添加罚时——仍有未完成的罚球,未创建新罚球。"
+    "penaltyFreeThrowsSkipped": "已为团队 {{team}} 添加罚时——仍有未完成的罚球,未创建新罚球。",
+    "displayNowCallit": "投影仪现在显示竞猜排行榜。"
   },
   "error": {
     "generic": "发生错误。请重试。",
@@ -881,5 +885,128 @@
     "emptyHint": "选择比赛以查看打印模板",
     "collapse": "收起",
     "expand": "展开"
+  },
+  "callit": {
+    "title": "CallIt 竞猜游戏",
+    "description": "按赛事管理竞猜游戏:启用、积分、锁定、特别竞猜和参与者。",
+    "active": "已启用",
+    "loading": "正在加载竞猜游戏 …",
+    "statusTitle": "状态",
+    "statusOn": "竞猜游戏已启用 · {{count}} 名参与者",
+    "statusOff": "该赛事的竞猜游戏已关闭。",
+    "enable": "启用竞猜游戏",
+    "disable": "关闭竞猜游戏",
+    "notPublic": "赛事为私密——赛事公开后,主页上才会显示链接。",
+    "registrationOpen": "开放报名",
+    "joinCode": "加入码(可选)",
+    "joinCodePlaceholder": "留空 = 无需加入码",
+    "saveJoinCode": "保存加入码",
+    "copyLink": "复制链接",
+    "copied": "链接已复制。",
+    "beamerOn": "在投影仪上显示排行榜",
+    "beamerOff": "投影仪切回比分板",
+    "exportCsv": "CSV 导出",
+    "refresh": "刷新",
+    "saved": "已保存。",
+    "loadFailed": "无法加载竞猜游戏。",
+    "actionFailed": "操作失败。",
+    "settings": {
+      "title": "规则与积分",
+      "description": "所有设置立即生效——积分实时重新计算。",
+      "points": "比赛积分",
+      "exact": "比分完全正确",
+      "diff": "分差正确",
+      "tendency": "胜负正确",
+      "koAdvance": "淘汰赛晋级(奖励)",
+      "multipliers": "倍数",
+      "phase": {
+        "group": "小组赛",
+        "knockout": "淘汰赛",
+        "placement": "排位赛",
+        "final": "决赛"
+      },
+      "jokerEnabled": "启用加倍卡",
+      "jokerPerPhase": "每阶段加倍卡数",
+      "underdogEnabled": "启用冷门奖励",
+      "underdogThreshold": "阈值(%)",
+      "underdogMinTips": "最少竞猜数",
+      "underdogBonus": "奖励分",
+      "lockAtScheduled": "在计划时间也锁定比赛(否则仅在开赛时锁定)",
+      "specials": "特别竞猜",
+      "specialPoints": "积分",
+      "deadline": "截止时间(可选)",
+      "deadlineHint": "未设截止时间时,特别竞猜在赛事首场开赛时截止。",
+      "rulesText": "说明 / 奖品(玩家可见)"
+    },
+    "specialTypes": {
+      "winner": "冠军",
+      "top_scorer": "得分王",
+      "most_penalty_seconds": "罚时最多",
+      "group_winner": "小组第一",
+      "group_winner_label": "{{group}} 第一名",
+      "total_baskets": "总得分"
+    },
+    "matches": {
+      "title": "比赛与锁定",
+      "description": "比赛在开赛时自动锁定。手动锁定/解锁优先(例如比赛代码错误)。",
+      "match": "比赛",
+      "time": "时间",
+      "status": "状态",
+      "tips": "竞猜",
+      "actions": "操作",
+      "lock": "锁定",
+      "unlock": "解锁",
+      "auto": "自动",
+      "locked": "比赛已锁定。",
+      "unlocked": "比赛已解锁。"
+    },
+    "status": {
+      "pending": "球队待定",
+      "open": "开放",
+      "locked": "已锁定",
+      "live": "直播",
+      "finished": "已结束"
+    },
+    "lockReason": {
+      "kickoff": "开赛",
+      "manual": "手动",
+      "unlocked": "手动解锁"
+    },
+    "specials": {
+      "title": "特别竞猜结果",
+      "description": "根据赛事数据自动确定。如有需要可在此覆盖。",
+      "none": "没有启用的特别竞猜。",
+      "locked": "已截止",
+      "open": "开放",
+      "result": "结果",
+      "provisional": "暂定",
+      "overridePlaceholder": "输入数值",
+      "saveOverride": "设定结果",
+      "resetOverride": "自动",
+      "overrideActive": "已启用手动结果。",
+      "overrideHint": "可多选(并列)。"
+    },
+    "participants": {
+      "title": "参与者",
+      "description": "管理昵称、重置密码、移除参与者。",
+      "search": "搜索昵称 …",
+      "empty": "还没有参与者。",
+      "banned": "已封禁",
+      "disqualified": "已取消资格",
+      "meta": "{{points}} 分 · {{tips}} 次竞猜 · 上次登录 {{login}}",
+      "rename": "改名",
+      "renamePrompt": "新昵称:",
+      "resetPassword": "重置密码",
+      "resetConfirm": "重置 {{name}} 的密码?所有登录会话将被终止。",
+      "resetResult": "{{name}} 的临时密码(仅此一次可见):",
+      "disqualify": "取消资格",
+      "requalify": "恢复资格",
+      "ban": "封禁账户",
+      "unban": "解封账户",
+      "remove": "移出竞猜游戏",
+      "removeConfirm": "将 {{name}} 及其竞猜从本游戏中移除?",
+      "deleteAccount": "删除账户",
+      "deleteConfirm": "永久删除 {{name}} 的账户及其在所有赛事中的竞猜?"
+    }
   }
 }

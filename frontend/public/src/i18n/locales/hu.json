@@ -340,5 +340,15 @@
     "title": "Büntetődobás",
     "next": "{{current}}. dobás / {{total}}",
     "result": "{{total}}-ből {{made}} sikeres"
+  },
+  "callit": {
+    "badge": "Tippjáték",
+    "title": "Tippelj és győzd le a csarnokot!",
+    "text": "Tippeld meg az eredményeket, köss különfogadásokat, kövesd élőben a rangsort – ingyen, csak becenévvel.",
+    "cta": "Tippelek",
+    "participants_one": "{{count}} tippelő",
+    "participants_other": "{{count}} tippelő",
+    "leaders": "Az élen",
+    "points": "{{points}} pont"
   }
 }

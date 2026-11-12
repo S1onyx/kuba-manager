@@ -29,8 +29,7 @@ export default function ScoreboardSummary({
     ? `${scoreboard.tournamentName}${stageSuffix ? ` · ${stageSuffix}` : ''}`
     : t('summary.noTournament');
 
-  const displayViewLabel =
-    scoreboard.displayView === 'bracket' ? t('displayViews.bracket') : t('displayViews.scoreboard');
+  const displayViewLabel = t(`displayViews.${scoreboard.displayView === 'bracket' || scoreboard.displayView === 'callit' ? scoreboard.displayView : 'scoreboard'}`);
 
   return (
     <PanelCard
@@ -107,7 +106,7 @@ export default function ScoreboardSummary({
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
           <button
             type="button"
-            onClick={() => onToggleDisplayView?.(scoreboard.displayView === 'bracket' ? 'scoreboard' : 'bracket')}
+            onClick={() => onToggleDisplayView?.(scoreboard.displayView === 'scoreboard' ? 'bracket' : 'scoreboard')}
             disabled={!onToggleDisplayView || displayViewPending}
             style={{
               borderRadius: '999px',
@@ -122,7 +121,7 @@ export default function ScoreboardSummary({
           >
             {displayViewPending
               ? t('summary.switching')
-              : scoreboard.displayView === 'bracket'
+              : scoreboard.displayView !== 'scoreboard'
                 ? t('summary.showLive')
                 : t('summary.showBracket')}
           </button>

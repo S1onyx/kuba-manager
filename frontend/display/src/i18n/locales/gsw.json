@@ -129,5 +129,23 @@
     "title": "Freiwurf",
     "next": "Wurf {{current}} vo {{total}}",
     "result": "{{made}} vo {{total}} troffe"
+  },
+  "callit": {
+    "title": "Tippspiel-Ranking",
+    "live": "LIVE",
+    "liveMatch": "Lauft: {{home}} {{score}} {{away}} – Pünkt zälled vorläufig",
+    "join": "Jetzt mittippe!",
+    "participants_one": "{{count}} Tipper",
+    "participants_other": "{{count}} Tipper",
+    "rowDetail": "{{exact}}× exakt · {{diff}}× Differänz · {{tendency}}× Tendänz",
+    "livePlus": "live +{{points}}",
+    "exactKing": "Exakt-König",
+    "underdogKing": "Underdog-König",
+    "climber": "Ufstiiger",
+    "empty": "No kei Tipper – scanne und mitmache!",
+    "loading": "Lad Tippspiel …",
+    "loadError": "Tippspiel het nöd chönne glade werde.",
+    "notEnabled": "Für das Turnier isch kei Tippspiel aktiv.",
+    "noTournament": "Kei Turnier fürs Tippspiel gwählt."
   }
 }
