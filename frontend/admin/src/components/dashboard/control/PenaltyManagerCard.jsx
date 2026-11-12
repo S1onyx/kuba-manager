@@ -117,7 +117,7 @@ export default function PenaltyManagerCard() {
                     >
                       {['1', '2'].map((count) => (
                         <option key={count} value={count}>
-                          {t('control.freeThrows.countOption', { count: Number(count) })}
+                          {t(`control.freeThrows.countOption${count}`)}
                         </option>
                       ))}
                     </select>
