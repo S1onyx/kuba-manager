@@ -81,7 +81,7 @@ Basispunkte (nicht kumulativ, höchste zutreffende Stufe zählt):
 | Falsch | 0 |
 
 Zusätze:
-- **KO-Weiterkommer** (nur KO-/Platzierungsspiele, nur bei Unentschieden-Tipp): +1, wenn gewähltes Team tatsächlich weiterkommt/gewinnt (Sieger inkl. Stechen).
+- **KO-Weiterkommer** (nur KO-/Platzierungsspiele, nur bei Unentschieden-Tipp und tatsächlichem Remis nach regulärer Zeit): +1, wenn gewähltes Team weiterkommt/gewinnt (Sieger inkl. Stechen).
 - **Phasen-Multiplikator**: Default Gruppe ×1, KO ×1, Platzierung ×1, Finale ×2. Finale = Spiel der letzten KO-Runde um Platz 1.
 - **Joker**: Default 1 Joker pro Phasengruppe (Gruppenphase; KO inkl. Platzierung). Verdoppelt die Spielpunkte. Setzen/Umsetzen nur solange das betroffene Spiel (und das bisherige Joker-Spiel) nicht gesperrt ist.
 - **Underdog-Bonus**: +1, wenn Tendenz richtig und höchstens 25 % aller Tipps dieses Spiels dieselbe Tendenz hatten. Nur wenn das Spiel mindestens 5 Tipps hat (kleine Stichproben verzerren).
@@ -127,7 +127,7 @@ Ein Spiel ist gesperrt, sobald eine der Bedingungen eintritt (serverseitig gepr�
 3. **Geplante Zeit** (optional, Default **aus**, weil Turniere Verzug haben): `scheduled_at` erreicht.
 4. **Manuell** durch Admin.
 
-Admin kann ein Spiel entsperren (z. B. falscher Code geladen); das wird als Override gespeichert und überschreibt Regel 1 bis zur nächsten manuellen Sperre.
+Admin kann ein Spiel entsperren (z. B. falscher Code geladen); das Override hebt Anpfiff-, Live- und Uhrzeit-Sperre auf und gilt, bis das Scoreboard ein anderes Spiel lädt. Ein gespeichertes Ergebnis sperrt immer. Zusätzlich wird bei jedem Tipp synchron geprüft, ob die Uhr für dieses Spiel gerade läuft.
 
 Tippbar nur wenn: Tippspiel für Turnier aktiv, Nutzer Teilnehmer und nicht gesperrt, beide Teams des Spiels aufgelöst, Spiel nicht gesperrt.
 
