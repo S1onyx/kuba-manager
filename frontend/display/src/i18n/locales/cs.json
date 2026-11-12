@@ -152,6 +152,34 @@
     "loading": "Načítám tipovačku …",
     "loadError": "Tipovačku se nepodařilo načíst.",
     "notEnabled": "Pro tento turnaj není tipovačka aktivní.",
-    "noTournament": "Pro tipovačku není vybrán turnaj."
+    "noTournament": "Pro tipovačku není vybrán turnaj.",
+    "final": {
+      "badge": "Turnaj skončil",
+      "title": "Konečné pořadí tipovačky",
+      "subtitle": "{{name}} · {{count}} tipérů",
+      "points": "{{points}} b.",
+      "categories": "Vítězové kategorií",
+      "specials": "Speciální sázky – výsledky",
+      "category": {
+        "matches": "Zápasy",
+        "specials": "Speciální sázky",
+        "exact": "Král přesnosti",
+        "underdog": "Král outsiderů",
+        "group": "Skupiny",
+        "ko": "Vyřazovací fáze"
+      },
+      "types": {
+        "winner": "Vítěz turnaje",
+        "top_scorer": "Nejlepší střelec",
+        "most_penalty_seconds": "Nejvíc trestných sekund",
+        "total_baskets": "Celkem bodů"
+      },
+      "groupWinner": "Vítěz {{group}}",
+      "thanks": "Díky za tipování!",
+      "hitBy_one": "trefil {{count}}",
+      "hitBy_few": "trefili {{count}}",
+      "hitBy_many": "trefilo {{count}}",
+      "hitBy_other": "trefilo {{count}}"
+    }
   }
 }

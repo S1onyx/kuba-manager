@@ -50,7 +50,8 @@
     "stats": "Stats",
     "me": "Me",
     "mainSite": "Main site",
-    "mainSiteLong": "Live scores, schedule & tables on kunstradbasketball.de"
+    "mainSiteLong": "Live scores, schedule & tables on kunstradbasketball.de",
+    "final": "Final"
   },
   "auth": {
     "login": "Log in",
@@ -315,5 +316,24 @@
   },
   "time": {
     "daysHours": "{{days}}d {{hours}}h"
+  },
+  "final": {
+    "badge": "Tournament finished",
+    "title": "Final standings",
+    "subtitle": "{{name}} · {{count}} players",
+    "pendingSpecials_one": "{{count}} special bet is not final yet – the organisers are still checking.",
+    "pendingSpecials_other": "{{count}} special bets are not final yet – the organisers are still checking.",
+    "points": "{{points}} pts",
+    "yourResult": "Your result",
+    "categories": "Category winners",
+    "specials": "Special bets – results",
+    "hitBy": "Hit ({{count}} of {{total}})",
+    "nobody": "nobody",
+    "highlights": "Highlights",
+    "matches": "Games",
+    "mostExactMatch": "Most exact hits",
+    "surprise": "Biggest surprise",
+    "ranking": "Final ranking",
+    "toStats": "All stats"
   }
 }

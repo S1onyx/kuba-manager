@@ -146,6 +146,32 @@
     "loading": "Tippjáték betöltése …",
     "loadError": "A tippjáték nem tölthető be.",
     "notEnabled": "Ennél a tornánál nincs aktív tippjáték.",
-    "noTournament": "Nincs kiválasztott torna a tippjátékhoz."
+    "noTournament": "Nincs kiválasztott torna a tippjátékhoz.",
+    "final": {
+      "badge": "Torna vége",
+      "title": "Tippjáték végeredmény",
+      "subtitle": "{{name}} · {{count}} tippelő",
+      "points": "{{points}} pont",
+      "categories": "Kategóriagyőztesek",
+      "specials": "Különfogadások – eredmények",
+      "category": {
+        "matches": "Meccsek",
+        "specials": "Különfogadások",
+        "exact": "Pontos király",
+        "underdog": "Esélytelen-király",
+        "group": "Csoportkör",
+        "ko": "Kieséses szakasz"
+      },
+      "types": {
+        "winner": "Tornagyőztes",
+        "top_scorer": "Gólkirály",
+        "most_penalty_seconds": "Legtöbb büntetőmásodperc",
+        "total_baskets": "Összes pont"
+      },
+      "groupWinner": "{{group}} győztese",
+      "thanks": "Köszönjük, hogy tippeltél!",
+      "hitBy_one": "{{count}} találat",
+      "hitBy_other": "{{count}} találat"
+    }
   }
 }

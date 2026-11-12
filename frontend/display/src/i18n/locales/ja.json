@@ -141,6 +141,31 @@
     "loading": "予想ゲームを読み込み中 …",
     "loadError": "予想ゲームを読み込めませんでした。",
     "notEnabled": "この大会では予想ゲームは有効になっていません。",
-    "noTournament": "予想ゲームの大会が選択されていません。"
+    "noTournament": "予想ゲームの大会が選択されていません。",
+    "final": {
+      "badge": "大会終了",
+      "title": "予想ゲーム最終結果",
+      "subtitle": "{{name}} · {{count}}人",
+      "points": "{{points}}pt",
+      "categories": "部門別トップ",
+      "specials": "特別予想 – 結果発表",
+      "category": {
+        "matches": "試合",
+        "specials": "特別予想",
+        "exact": "完全的中王",
+        "underdog": "大穴キング",
+        "group": "グループ",
+        "ko": "トーナメント"
+      },
+      "types": {
+        "winner": "大会優勝",
+        "top_scorer": "得点王",
+        "most_penalty_seconds": "最多ペナルティ秒数",
+        "total_baskets": "総得点"
+      },
+      "groupWinner": "{{group}} 1位",
+      "thanks": "ご参加ありがとうございました!",
+      "hitBy_other": "{{count}}人的中"
+    }
   }
 }

@@ -50,7 +50,8 @@
     "stats": "Stats",
     "me": "Moi",
     "mainSite": "Site principal",
-    "mainSiteLong": "Résultats live, programme et classements sur kunstradbasketball.de"
+    "mainSiteLong": "Résultats live, programme et classements sur kunstradbasketball.de",
+    "final": "Final"
   },
   "auth": {
     "login": "Connexion",
@@ -315,5 +316,24 @@
   },
   "time": {
     "daysHours": "{{days}} j {{hours}} h"
+  },
+  "final": {
+    "badge": "Tournoi terminé",
+    "title": "Classement final",
+    "subtitle": "{{name}} · {{count}} joueurs",
+    "pendingSpecials_one": "{{count}} pari spécial n'est pas encore définitif – l'organisation vérifie.",
+    "pendingSpecials_other": "{{count}} paris spéciaux ne sont pas encore définitifs – l'organisation vérifie.",
+    "points": "{{points}} pts",
+    "yourResult": "Ton résultat",
+    "categories": "Vainqueurs par catégorie",
+    "specials": "Paris spéciaux – résultats",
+    "hitBy": "Trouvé ({{count}} sur {{total}})",
+    "nobody": "personne",
+    "highlights": "Temps forts",
+    "matches": "Matchs",
+    "mostExactMatch": "Le plus de pronos exacts",
+    "surprise": "Plus grosse surprise",
+    "ranking": "Classement final",
+    "toStats": "Toutes les stats"
   }
 }

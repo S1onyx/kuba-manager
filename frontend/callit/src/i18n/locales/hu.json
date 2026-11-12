@@ -50,7 +50,8 @@
     "stats": "Statisztika",
     "me": "Én",
     "mainSite": "Főoldal",
-    "mainSiteLong": "Élő eredmények, menetrend és tabellák: kunstradbasketball.de"
+    "mainSiteLong": "Élő eredmények, menetrend és tabellák: kunstradbasketball.de",
+    "final": "Végeredmény"
   },
   "auth": {
     "login": "Belépés",
@@ -315,5 +316,24 @@
   },
   "time": {
     "daysHours": "{{days}} nap {{hours}} ó"
+  },
+  "final": {
+    "badge": "Torna vége",
+    "title": "Tippjáték végeredmény",
+    "subtitle": "{{name}} · {{count}} tippelő",
+    "pendingSpecials_one": "{{count}} különfogadás még nincs véglegesítve – a szervezők ellenőrzik.",
+    "pendingSpecials_other": "{{count}} különfogadás még nincs véglegesítve – a szervezők ellenőrzik.",
+    "points": "{{points}} pont",
+    "yourResult": "Az eredményed",
+    "categories": "Kategóriagyőztesek",
+    "specials": "Különfogadások – eredmények",
+    "hitBy": "Eltalálta ({{count}} / {{total}})",
+    "nobody": "senki",
+    "highlights": "Kiemelések",
+    "matches": "Meccsek",
+    "mostExactMatch": "Legtöbb pontos tipp",
+    "surprise": "Legnagyobb meglepetés",
+    "ranking": "Végső rangsor",
+    "toStats": "Összes statisztika"
   }
 }

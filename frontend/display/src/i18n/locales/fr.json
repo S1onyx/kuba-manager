@@ -146,6 +146,32 @@
     "loading": "Chargement du jeu …",
     "loadError": "Impossible de charger le jeu.",
     "notEnabled": "Aucun jeu de pronostics actif pour ce tournoi.",
-    "noTournament": "Aucun tournoi choisi pour le jeu."
+    "noTournament": "Aucun tournoi choisi pour le jeu.",
+    "final": {
+      "badge": "Tournoi terminé",
+      "title": "Classement final",
+      "subtitle": "{{name}} · {{count}} joueurs",
+      "points": "{{points}} pts",
+      "categories": "Vainqueurs par catégorie",
+      "specials": "Paris spéciaux – résultats",
+      "category": {
+        "matches": "Matchs",
+        "specials": "Paris spéciaux",
+        "exact": "Roi de l'exact",
+        "underdog": "Roi des outsiders",
+        "group": "Phase de groupes",
+        "ko": "Phase finale"
+      },
+      "types": {
+        "winner": "Vainqueur du tournoi",
+        "top_scorer": "Meilleur marqueur",
+        "most_penalty_seconds": "Le plus de secondes de pénalité",
+        "total_baskets": "Total des points"
+      },
+      "groupWinner": "Vainqueur {{group}}",
+      "thanks": "Merci d'avoir joué !",
+      "hitBy_one": "trouvé par {{count}}",
+      "hitBy_other": "trouvé par {{count}}"
+    }
   }
 }

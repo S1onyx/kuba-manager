@@ -146,6 +146,32 @@
     "loading": "Loading prediction game …",
     "loadError": "Prediction game could not be loaded.",
     "notEnabled": "No prediction game is active for this tournament.",
-    "noTournament": "No tournament selected for the prediction game."
+    "noTournament": "No tournament selected for the prediction game.",
+    "final": {
+      "badge": "Tournament finished",
+      "title": "Final standings",
+      "subtitle": "{{name}} · {{count}} players",
+      "points": "{{points}} pts",
+      "categories": "Category winners",
+      "specials": "Special bets – results",
+      "category": {
+        "matches": "Games",
+        "specials": "Special bets",
+        "exact": "Exact king",
+        "underdog": "Underdog king",
+        "group": "Group stage",
+        "ko": "Knockout"
+      },
+      "types": {
+        "winner": "Tournament winner",
+        "top_scorer": "Top scorer",
+        "most_penalty_seconds": "Most penalty seconds",
+        "total_baskets": "Total points"
+      },
+      "groupWinner": "Winner {{group}}",
+      "thanks": "Thanks for playing!",
+      "hitBy_one": "hit by {{count}}",
+      "hitBy_other": "hit by {{count}}"
+    }
   }
 }

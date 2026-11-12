@@ -24,7 +24,7 @@ import {
   submitSpecialTip,
   submitTip
 } from '../services/callit/index.js';
-import { getMatchStats, getOverviewStats, getProfile } from '../services/callit/stats.js';
+import { getFinalOverview, getMatchStats, getOverviewStats, getProfile } from '../services/callit/stats.js';
 import { RANKING_CATEGORIES } from '../services/callit/scoring.js';
 
 const router = express.Router();
@@ -188,6 +188,11 @@ router.get(
 router.get(
   '/tournaments/:id/stats',
   handle(async (req, res) => res.json(await getOverviewStats(tournamentIdParam(req))))
+);
+
+router.get(
+  '/tournaments/:id/final',
+  handle(async (req, res) => res.json(await getFinalOverview(tournamentIdParam(req))))
 );
 
 router.get(

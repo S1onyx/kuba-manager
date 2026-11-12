@@ -1,6 +1,6 @@
 import { CallitError } from './db.js';
 import { computeRanking, listSpecialsForUser } from './index.js';
-import { scoreMatchTip, tendency, tipLevel, validTipsByMatch } from './scoring.js';
+import { scoreMatchTip, scoreSpecials, tendency, tipLevel, validTipsByMatch } from './scoring.js';
 
 const round = (value, digits = 2) => Math.round(value * 10 ** digits) / 10 ** digits;
 const quote = (share) => (share > 0 ? round(1 / share) : null);
@@ -99,7 +99,7 @@ export async function getOverviewStats(tournamentId) {
   buckets.forEach(({ match, tips: matchTips, shares }) => {
     if (!match.locked) return;
     const summary = describeMatchStats(match, matchTips, shares, state.settings, nicknames);
-    matchSummaries.push({ ...summary, status: match.status, scheduledAt: match.scheduledAt });
+    matchSummaries.push({ ...summary, status: match.status, scheduledAt: match.scheduledAt, result: match.result ? { home: match.result.home, away: match.result.away } : null });
     if (!match.result || match.result.live) return;
     matchTips.forEach((tip) => {
       const entry = perUser.get(tip.userId);
@@ -238,5 +238,77 @@ export async function getProfile(tournamentId, userId, viewer) {
     tips: tipList,
     specials,
     specialTipsCount: specialTips.filter((tip) => tip.userId === userId).length
+  };
+}
+
+const FINAL_CATEGORIES = ['matches', 'specials', 'exact', 'underdog', 'group', 'ko'];
+
+// Abschlussübersicht: Podest, Endstand, Kategorie-Sieger, aufgelöste Sonderwetten und Highlights.
+export async function getFinalOverview(tournamentId) {
+  const ranking = await computeRanking(tournamentId, 'total');
+  const { state, specialTips, participants } = ranking;
+  const activeIds = new Set(participants.map((participant) => participant.userId));
+  const nicknames = new Map(participants.map((participant) => [participant.userId, participant.nickname]));
+  const hasKo = state.matches.some((match) => match.phase !== 'group');
+  const hasGroup = state.matches.some((match) => match.phase === 'group');
+
+  const categoryWinners = [];
+  for (const category of FINAL_CATEGORIES) {
+    if ((category === 'ko' && !hasKo) || (category === 'group' && !hasGroup)) continue;
+    const rows = (await computeRanking(tournamentId, category)).rows;
+    const winners = rows.filter((row) => row.rank === 1 && row.value > 0);
+    if (winners.length) categoryWinners.push({ category, value: winners[0].value, winners: winners.map(({ userId, nickname }) => ({ userId, nickname })) });
+  }
+
+  const specialScores = scoreSpecials(specialTips.filter((tip) => activeIds.has(tip.userId)), state.outcomes, state.settings);
+  const specials = (await listSpecialsForUser(tournamentId, null)).map((bet) => {
+    const hitters = [];
+    specialScores.forEach((entry, userId) => {
+      if ((entry.bets[bet.betKey]?.points ?? 0) > 0) hitters.push(nicknames.get(userId));
+    });
+    return {
+      betKey: bet.betKey,
+      type: bet.type,
+      groupLabel: bet.groupLabel,
+      points: bet.points,
+      outcome: bet.outcome,
+      tipCount: specialTips.filter((tip) => tip.betKey === bet.betKey && activeIds.has(tip.userId)).length,
+      hitters: hitters.filter(Boolean).sort((a, b) => a.localeCompare(b, 'de', { sensitivity: 'base' }))
+    };
+  });
+
+  const overview = await getOverviewStats(tournamentId);
+  const mostExact = overview.matches
+    .filter((match) => match.hits?.exact > 0)
+    .sort((a, b) => b.hits.exact - a.hits.exact)[0];
+
+  return {
+    finished: state.finished,
+    tournament: { id: state.tournament.id, name: state.tournament.name },
+    participantCount: participants.length,
+    podium: ranking.rows.filter((row) => row.rank <= 3 && row.total > 0).map(({ userId, nickname, rank, total, exact }) => ({ userId, nickname, rank, total, exact })),
+    ranking: ranking.rows.map(({ userId, nickname, rank, total, matchPoints, specialPoints, exact, diff, tendency, underdogHits }) => ({
+      userId,
+      nickname,
+      rank,
+      total,
+      matchPoints,
+      specialPoints,
+      exact,
+      diff,
+      tendency,
+      underdogHits
+    })),
+    categoryWinners,
+    specials,
+    pendingSpecials: specials.filter((bet) => !bet.outcome?.final).length,
+    highlights: {
+      tipsTotal: overview.tipsTotal,
+      matchesFinished: overview.matchesFinished,
+      crowdHitRate: overview.crowdHitRate,
+      bestHitRate: overview.leaders.hitRate[0] ?? null,
+      surprise: overview.surprises[0] ?? null,
+      mostExact: mostExact ? { code: mostExact.code, label: mostExact.label, result: mostExact.result ?? null, exact: mostExact.hits.exact, nicknames: mostExact.exactNicknames } : null
+    }
   };
 }

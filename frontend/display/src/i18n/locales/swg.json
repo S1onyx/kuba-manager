@@ -146,6 +146,32 @@
     "loading": "Lad Tippschbiel …",
     "loadError": "Tippschbiel hot net glada werra könna.",
     "notEnabled": "Für des Turnier isch koi Tippschbiel aktiv.",
-    "noTournament": "Koi Turnier fürs Tippschbiel gwählt."
+    "noTournament": "Koi Turnier fürs Tippschbiel gwählt.",
+    "final": {
+      "badge": "Turnier rum",
+      "title": "Endschdand Tippschbiel",
+      "subtitle": "{{name}} · {{count}} Tipper",
+      "points": "{{points}} Pkt.",
+      "categories": "Kategorie-Sieger",
+      "specials": "Sonderwetta – Auflösung",
+      "category": {
+        "matches": "Schbiel",
+        "specials": "Sonderwetta",
+        "exact": "Exakt-Keenig",
+        "underdog": "Underdog-Keenig",
+        "group": "Gruppaphase",
+        "ko": "KO-Phase"
+      },
+      "types": {
+        "winner": "Turniersieger",
+        "top_scorer": "Topscorer",
+        "most_penalty_seconds": "Meischde Schdrofsekonda",
+        "total_baskets": "Gsamtpunkt"
+      },
+      "groupWinner": "Sieger {{group}}",
+      "thanks": "Dankschee fürs Mittippa!",
+      "hitBy_one": "{{count}}× troffa",
+      "hitBy_other": "{{count}}× troffa"
+    }
   }
 }

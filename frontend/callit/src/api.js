@@ -77,6 +77,7 @@ export const api = {
   saveSpecial: (id, betKey, value) => request(`${tid(id)}/specials/${encodeURIComponent(betKey)}`, { method: 'PUT', body: { value } }),
   ranking: (id, category) => request(`${tid(id)}/ranking?category=${encodeURIComponent(category)}`),
   stats: (id) => request(`${tid(id)}/stats`),
+  final: (id) => request(`${tid(id)}/final`),
   matchStats: (id, code) => request(`${tid(id)}/matches/${encodeURIComponent(code)}/stats`),
   profile: (id, userId) => request(`${tid(id)}/users/${encodeURIComponent(userId)}`)
 };

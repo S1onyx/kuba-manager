@@ -49,7 +49,8 @@
     "stats": "統計",
     "me": "マイページ",
     "mainSite": "メインサイトへ",
-    "mainSiteLong": "ライブスコア・日程・順位表は kunstradbasketball.de へ"
+    "mainSiteLong": "ライブスコア・日程・順位表は kunstradbasketball.de へ",
+    "final": "最終結果"
   },
   "auth": {
     "login": "ログイン",
@@ -300,5 +301,23 @@
   },
   "time": {
     "daysHours": "{{days}}日{{hours}}時間"
+  },
+  "final": {
+    "badge": "大会終了",
+    "title": "予想ゲーム最終結果",
+    "subtitle": "{{name}} · {{count}}人",
+    "pendingSpecials_other": "特別予想{{count}}件はまだ確定していません。運営が確認中です。",
+    "points": "{{points}}pt",
+    "yourResult": "あなたの結果",
+    "categories": "部門別トップ",
+    "specials": "特別予想 – 結果発表",
+    "hitBy": "的中({{count}} / {{total}})",
+    "nobody": "なし",
+    "highlights": "ハイライト",
+    "matches": "試合",
+    "mostExactMatch": "完全的中が最も多かった試合",
+    "surprise": "最大の番狂わせ",
+    "ranking": "最終順位",
+    "toStats": "すべての統計"
   }
 }

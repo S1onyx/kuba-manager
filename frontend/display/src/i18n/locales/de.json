@@ -146,6 +146,32 @@
     "loading": "Lade Tippspiel …",
     "loadError": "Tippspiel konnte nicht geladen werden.",
     "notEnabled": "Für dieses Turnier ist kein Tippspiel aktiv.",
-    "noTournament": "Kein Turnier für das Tippspiel gewählt."
+    "noTournament": "Kein Turnier für das Tippspiel gewählt.",
+    "final": {
+      "badge": "Turnier beendet",
+      "title": "Endstand Tippspiel",
+      "subtitle": "{{name}} · {{count}} Tipper",
+      "points": "{{points}} Pkt.",
+      "categories": "Kategorie-Sieger",
+      "specials": "Sonderwetten – Auflösung",
+      "category": {
+        "matches": "Spiele",
+        "specials": "Sonderwetten",
+        "exact": "Exakt-König",
+        "underdog": "Underdog-König",
+        "group": "Gruppenphase",
+        "ko": "KO-Phase"
+      },
+      "types": {
+        "winner": "Turniersieger",
+        "top_scorer": "Topscorer",
+        "most_penalty_seconds": "Meiste Strafsekunden",
+        "total_baskets": "Gesamtpunkte"
+      },
+      "groupWinner": "Sieger {{group}}",
+      "thanks": "Danke fürs Mittippen!",
+      "hitBy_one": "{{count}}× getroffen",
+      "hitBy_other": "{{count}}× getroffen"
+    }
   }
 }

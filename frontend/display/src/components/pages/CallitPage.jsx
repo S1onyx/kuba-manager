@@ -36,11 +36,11 @@ function QrCode({ value, size = 260 }) {
 }
 
 function useCallitRanking(tournamentId) {
-  const [state, setState] = useState({ ranking: null, info: null, error: null });
+  const [state, setState] = useState({ ranking: null, info: null, final: null, error: null });
 
   useEffect(() => {
     if (!tournamentId) {
-      setState({ ranking: null, info: null, error: null });
+      setState({ ranking: null, info: null, final: null, error: null });
       return undefined;
     }
     let cancelled = false;
@@ -51,7 +51,8 @@ function useCallitRanking(tournamentId) {
           fetchJson(`/callit/tournaments/${tournamentId}/ranking?category=total`),
           fetchJson(`/callit/tournaments/${tournamentId}`)
         ]);
-        if (!cancelled) setState({ ranking, info, error: null });
+        const final = info?.finished ? await fetchJson(`/callit/tournaments/${tournamentId}/final`) : null;
+        if (!cancelled) setState({ ranking, info, final, error: null });
       } catch (error) {
         if (!cancelled) setState((prev) => ({ ...prev, error }));
       }
@@ -98,7 +99,7 @@ const rankColor = (rank) => (rank === 1 ? '#facc15' : rank === 2 ? '#e5e7eb' : r
 export default function CallitPage({ scoreboard }) {
   const { t, i18n } = useTranslation();
   const tournamentId = scoreboard?.displayCallitTournamentId ?? scoreboard?.tournamentId ?? null;
-  const { ranking, info, error } = useCallitRanking(tournamentId);
+  const { ranking, info, final, error } = useCallitRanking(tournamentId);
   const joinUrl = tournamentId ? `${CALLIT_URL}/#/t/${tournamentId}` : CALLIT_URL;
   const rows = ranking?.rows ?? [];
   const top = rows.slice(0, TOP_COUNT);
@@ -106,6 +107,8 @@ export default function CallitPage({ scoreboard }) {
   const underdogKing = rows.filter((row) => row.underdogHits > 0).sort((a, b) => b.underdogHits - a.underdogHits)[0];
   const climber = rows.filter((row) => row.delta > 0).sort((a, b) => b.delta - a.delta)[0];
   const live = ranking?.liveMatch;
+
+  if (final) return <FinalBoard final={final} />;
 
   let body;
   if (!tournamentId) {
@@ -195,6 +198,91 @@ export default function CallitPage({ scoreboard }) {
               </div>
             ))}
         </div>
+      </aside>
+    </div>
+  );
+}
+
+const PODIUM = [
+  { rank: 2, height: 190, color: '#e5e7eb' },
+  { rank: 1, height: 250, color: '#facc15' },
+  { rank: 3, height: 150, color: '#fdba74' }
+];
+
+const specialTitle = (t, bet) =>
+  bet.type === 'group_winner' ? t('callit.final.groupWinner', { group: bet.groupLabel ?? '' }) : t(`callit.final.types.${bet.type}`);
+
+// Abschlussansicht nach Turnierende: Podest, Plätze 4–10, Kategorie-Sieger und aufgelöste Sonderwetten.
+function FinalBoard({ final }) {
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
+  const rest = final.ranking.filter((row) => row.rank > 3).slice(0, 7);
+  return (
+    <div style={{ width: '100%', display: 'grid', gridTemplateColumns: 'minmax(0, 1.25fr) minmax(0, 1fr)', gap: '2rem', padding: '1.5rem 2rem', boxSizing: 'border-box', color: '#fff' }}>
+      <section style={{ display: 'grid', gap: '1.2rem', alignContent: 'start', minWidth: 0 }}>
+        <header>
+          <div style={{ fontSize: '1.1rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#facc15', fontWeight: 800 }}>{t('callit.final.badge')}</div>
+          <h1 style={{ margin: '0.2rem 0 0', fontSize: '3rem' }}>{t('callit.final.title')}</h1>
+          <div style={{ fontSize: '1.3rem', opacity: 0.7 }}>{t('callit.final.subtitle', { name: final.tournament.name, count: final.participantCount })}</div>
+        </header>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '1rem', alignItems: 'end' }}>
+          {PODIUM.map(({ rank, height, color }) => {
+            const rows = final.podium.filter((row) => row.rank === rank);
+            return (
+              <div key={rank} style={{ display: 'grid', gap: '0.6rem', justifyItems: 'center', textAlign: 'center', minWidth: 0 }}>
+                {rows.map((row) => (
+                  <div key={row.userId} style={{ minWidth: 0, maxWidth: '100%' }}>
+                    <div style={{ fontSize: `${Math.max(18, Math.min(rank === 1 ? 36 : 28, Math.floor(230 / (row.nickname.length * 0.62))))}px`, fontWeight: 900, lineHeight: 1.15, overflowWrap: 'anywhere' }}>{row.nickname}</div>
+                    <div style={{ fontSize: '1.3rem', opacity: 0.8 }}>{t('callit.final.points', { points: formatPoints(row.total, lang) })}</div>
+                  </div>
+                ))}
+                <div style={{ width: '100%', height, borderRadius: '20px 20px 6px 6px', background: `linear-gradient(180deg, ${color}66, ${color}14)`, border: `2px solid ${color}aa`, display: 'flex', justifyContent: 'center', paddingTop: '0.8rem', fontSize: '4rem', fontWeight: 900, color }}>
+                  {rank}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        {rest.length ? (
+          <ol style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem 1.5rem' }}>
+            {rest.map((row) => (
+              <li key={row.userId} style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', fontSize: '1.35rem', padding: '0.4rem 0.8rem', borderRadius: 12, background: 'rgba(255,255,255,0.06)' }}>
+                <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <strong>{row.rank}.</strong> {row.nickname}
+                </span>
+                <strong>{formatPoints(row.total, lang)}</strong>
+              </li>
+            ))}
+          </ol>
+        ) : null}
+      </section>
+      <aside style={{ display: 'grid', gap: '1rem', alignContent: 'start', minWidth: 0 }}>
+        {final.categoryWinners.length ? (
+          <div style={{ display: 'grid', gap: '0.5rem', padding: '1rem 1.2rem', borderRadius: 18, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ fontSize: '1rem', letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.65 }}>{t('callit.final.categories')}</div>
+            {final.categoryWinners.map((entry) => (
+              <div key={entry.category} style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', fontSize: '1.25rem' }}>
+                <span style={{ opacity: 0.75 }}>{t(`callit.final.category.${entry.category}`)}</span>
+                <strong style={{ textAlign: 'right' }}>{entry.winners.map((winner) => winner.nickname).join(', ')}</strong>
+              </div>
+            ))}
+          </div>
+        ) : null}
+        {final.specials.length ? (
+          <div style={{ display: 'grid', gap: '0.5rem', padding: '1rem 1.2rem', borderRadius: 18, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ fontSize: '1rem', letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.65 }}>{t('callit.final.specials')}</div>
+            {final.specials.map((bet) => (
+              <div key={bet.betKey} style={{ display: 'grid', gap: '0.1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', fontSize: '1.2rem' }}>
+                  <span style={{ opacity: 0.75 }}>{specialTitle(t, bet)}</span>
+                  <strong style={{ textAlign: 'right' }}>{bet.outcome ? bet.outcome.labels.join(', ') : '–'}</strong>
+                </div>
+                <div style={{ fontSize: '0.95rem', opacity: 0.6, textAlign: 'right' }}>{t('callit.final.hitBy', { count: bet.hitters.length })}</div>
+              </div>
+            ))}
+          </div>
+        ) : null}
+        <div style={{ fontSize: '1.4rem', fontWeight: 800, textAlign: 'center', marginTop: '0.5rem' }}>{t('callit.final.thanks')}</div>
       </aside>
     </div>
   );

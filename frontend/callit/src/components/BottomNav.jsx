@@ -8,9 +8,10 @@ const ITEMS = [
   { tab: 'ich', icon: IconUser, labelKey: 'nav.me' }
 ];
 
-export default function BottomNav({ tournamentId, activeTab, openCount = 0 }) {
+export default function BottomNav({ tournamentId, activeTab, openCount = 0, finished = false }) {
   const { t } = useTranslation();
   const active = activeTab === 'match' ? 'stats' : activeTab === 'user' ? 'ranking' : activeTab === 'regeln' ? 'tippen' : activeTab;
+  // Nach Turnierende wird „Tippen“ zum Endstand
   return (
     <nav className="bottom-nav" aria-label={t('nav.label')}>
       {ITEMS.map(({ tab, icon: Icon, labelKey }) => (
@@ -22,7 +23,7 @@ export default function BottomNav({ tournamentId, activeTab, openCount = 0 }) {
           style={{ textDecoration: 'none' }}
         >
           <Icon />
-          <span>{t(labelKey)}</span>
+          <span>{t(finished && tab === 'tippen' ? 'nav.final' : labelKey)}</span>
           {tab === 'tippen' && openCount > 0 ? <span className="nav-badge">{openCount}</span> : null}
         </a>
       ))}

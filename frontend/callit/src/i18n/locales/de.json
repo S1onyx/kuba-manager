@@ -50,7 +50,8 @@
     "stats": "Statistik",
     "me": "Ich",
     "mainSite": "Zur Hauptseite",
-    "mainSiteLong": "Live-Ergebnisse, Spielplan & Tabellen auf kunstradbasketball.de"
+    "mainSiteLong": "Live-Ergebnisse, Spielplan & Tabellen auf kunstradbasketball.de",
+    "final": "Endstand"
   },
   "auth": {
     "login": "Anmelden",
@@ -315,5 +316,24 @@
   },
   "time": {
     "daysHours": "{{days}} T {{hours}} h"
+  },
+  "final": {
+    "badge": "Turnier beendet",
+    "title": "Endstand Tippspiel",
+    "subtitle": "{{name}} · {{count}} Tipper",
+    "pendingSpecials_one": "{{count}} Sonderwette ist noch nicht endgültig ausgewertet – die Turnierleitung prüft noch.",
+    "pendingSpecials_other": "{{count}} Sonderwetten sind noch nicht endgültig ausgewertet – die Turnierleitung prüft noch.",
+    "points": "{{points}} Pkt.",
+    "yourResult": "Dein Ergebnis",
+    "categories": "Kategorie-Sieger",
+    "specials": "Sonderwetten – Auflösung",
+    "hitBy": "Getroffen ({{count}} von {{total}})",
+    "nobody": "niemand",
+    "highlights": "Highlights",
+    "matches": "Spiele",
+    "mostExactMatch": "Meiste exakte Treffer",
+    "surprise": "Größte Überraschung",
+    "ranking": "Endstand",
+    "toStats": "Alle Statistiken"
   }
 }
