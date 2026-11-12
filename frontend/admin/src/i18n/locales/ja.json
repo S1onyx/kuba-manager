@@ -367,14 +367,7 @@
     "noFilterResults": "条件に合う音声ファイルがありません。",
     "filterTriggersPlaceholder": "イベントやチームで絞り込み...",
     "filterTournament": "大会",
-    "filterAllTournaments": "すべての大会",
-    "loudness": {
-      "hint": "オーディオ画面ですべてのサウンドを自動的に −14 LUFS にそろえます。新しいファイルは自動で測定されます。",
-      "measuring": "ラウドネスを測定中 … {{done}}/{{total}}",
-      "remeasure": "ラウドネスを再測定",
-      "missing": "ラウドネス未測定",
-      "value": "{{lufs}} LUFS"
-    }
+    "filterAllTournaments": "すべての大会"
   },
   "history": {
     "title": "履歴",
@@ -686,8 +679,7 @@
     "timerCuesSaved": "タイマー設定を保存しました。",
     "timerCuesSaveFailed": "タイマー設定を保存できませんでした。",
     "audioLoadFailed": "音声データを読み込めませんでした。",
-    "penaltyFreeThrowsSkipped": "チーム {{team}} にタイムペナルティを追加しました。未完了のフリースローがあるため、新しいフリースローは作成されませんでした。",
-    "loudnessFailed": "「{{name}}」のラウドネスを測定できませんでした。"
+    "penaltyFreeThrowsSkipped": "チーム {{team}} にタイムペナルティを追加しました。未完了のフリースローがあるため、新しいフリースローは作成されませんでした。"
   },
   "error": {
     "generic": "エラーが発生しました。もう一度お試しください。",

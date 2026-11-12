@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 const DEFAULT_DEVICE_ID = 'default';
 
-export default function useAudioDevices(audioElementRef, audioGraphRef) {
+export default function useAudioDevices(audioElementRef) {
   const { t } = useTranslation();
   const [audioDevices, setAudioDevices] = useState([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState(DEFAULT_DEVICE_ID);
@@ -25,18 +25,6 @@ export default function useAudioDevices(audioElementRef, audioGraphRef) {
 
   const applyDevice = useCallback(
     async (deviceId) => {
-      // Läuft der Ton über die Lautheits-Kette, gibt der AudioContext aus – dort das Gerät setzen.
-      const graph = audioGraphRef?.current;
-      if (graph) {
-        try {
-          await graph.context.setSinkId(deviceId === DEFAULT_DEVICE_ID ? '' : deviceId);
-        } catch (error) {
-          console.error('Ausgabegerät konnte nicht gesetzt werden:', error);
-          setDeviceError(t('errors.sinkFailed'));
-        }
-        return;
-      }
-
       const audioEl = audioElementRef.current;
       if (!audioEl) {
         return;
@@ -56,7 +44,7 @@ export default function useAudioDevices(audioElementRef, audioGraphRef) {
         setDeviceError(t('errors.sinkFailed'));
       }
     },
-    [audioElementRef, audioGraphRef, t]
+    [audioElementRef, t]
   );
 
   const selectDevice = useCallback(

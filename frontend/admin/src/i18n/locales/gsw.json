@@ -370,14 +370,7 @@
     "noFilterResults": "Nüt gfunde mit dem Filter.",
     "filterTriggersPlaceholder": "Noch Ereignis oder Team filtere...",
     "filterTournament": "Turnier",
-    "filterAllTournaments": "Alli Turnier",
-    "loudness": {
-      "hint": "Alli Sounds wärded im Audio-Frontend automatisch uf −14 LUFS aagliche. Neui Dateie wärded sälber gmässe.",
-      "measuring": "Luutheit wird gmässe … {{done}}/{{total}}",
-      "remeasure": "Luutheit neu mässe",
-      "missing": "Luutheit no nöd gmässe",
-      "value": "{{lufs}} LUFS"
-    }
+    "filterAllTournaments": "Alli Turnier"
   },
   "history": {
     "title": "Historie",
@@ -695,8 +688,7 @@
     "timerCuesSaved": "Timer-Istellige gspeicheret.",
     "timerCuesSaveFailed": "Timer-Istellige hend nid chöne gspeicheret werde.",
     "audioLoadFailed": "Audiodate hend nid chöne glade werde.",
-    "penaltyFreeThrowsSkipped": "Zytstraaf für Team {{team}} dezue taa – Freiwürf nöd aagleit, will no e Serie offe isch.",
-    "loudnessFailed": "D'Luutheit vo „{{name}}“ hät nöd chönne gmässe wärde."
+    "penaltyFreeThrowsSkipped": "Zytstraaf für Team {{team}} dezue taa – Freiwürf nöd aagleit, will no e Serie offe isch."
   },
   "error": {
     "generic": "Es isch en Fähler passiert. Bitte versuech's nomol.",

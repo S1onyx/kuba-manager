@@ -63,7 +63,5 @@ export {
   ensureScoreTriggerForTeam,
   initTimerCueSettings,
   getTimerCueSettings,
-  updateTimerCueSettings,
-  setAudioFileLoudness,
-  AudioLoudnessError
+  updateTimerCueSettings
 } from './audio/index.js';

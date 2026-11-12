@@ -370,14 +370,7 @@
     "noFilterResults": "Nincs találat a szűrésre.",
     "filterTriggersPlaceholder": "Szűrés esemény vagy csapat szerint...",
     "filterTournament": "Verseny",
-    "filterAllTournaments": "Összes verseny",
-    "loudness": {
-      "hint": "Az audio-felület minden hangot automatikusan −14 LUFS-ra igazít. Az új fájlokat automatikusan megméri.",
-      "measuring": "Hangosság mérése … {{done}}/{{total}}",
-      "remeasure": "Hangosság újramérése",
-      "missing": "Hangosság még nincs mérve",
-      "value": "{{lufs}} LUFS"
-    }
+    "filterAllTournaments": "Összes verseny"
   },
   "history": {
     "title": "Előzmények",
@@ -695,8 +688,7 @@
     "timerCuesSaved": "Időzítő-beállítások mentve.",
     "timerCuesSaveFailed": "Az időzítő-beállítások mentése nem sikerült.",
     "audioLoadFailed": "A hangadatok betöltése nem sikerült.",
-    "penaltyFreeThrowsSkipped": "Kiállítás hozzáadva a(z) {{team}} csapathoz – büntetődobások nem jöttek létre, mert még nyitott egy sorozat.",
-    "loudnessFailed": "„{{name}}” hangosságát nem sikerült megmérni."
+    "penaltyFreeThrowsSkipped": "Kiállítás hozzáadva a(z) {{team}} csapathoz – büntetődobások nem jöttek létre, mert még nyitott egy sorozat."
   },
   "error": {
     "generic": "Hiba történt. Kérjük, próbálja újra.",
