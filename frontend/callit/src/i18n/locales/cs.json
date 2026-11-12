@@ -49,7 +49,9 @@
     "tips": "Tipovat",
     "ranking": "Pořadí",
     "stats": "Statistika",
-    "me": "Já"
+    "me": "Já",
+    "mainSite": "Hlavní stránka",
+    "mainSiteLong": "Živé výsledky, rozpis a tabulky na kunstradbasketball.de"
   },
   "auth": {
     "login": "Přihlásit",
@@ -159,7 +161,11 @@
     "empty": "Teď není co tipovat.",
     "advanceNeeded": "Vyber postupujícího",
     "jokerShort": "Žolík",
-    "underdogShort": "Outsider"
+    "underdogShort": "Outsider",
+    "pendingCount_one": "Další {{count}} zápas půjde tipovat, až budou známé týmy",
+    "pendingCount_few": "Další {{count}} zápasy půjde tipovat, až budou známé týmy",
+    "pendingCount_many": "Dalších {{count}} zápasů půjde tipovat, až budou známé týmy",
+    "pendingCount_other": "Dalších {{count}} zápasů půjde tipovat, až budou známé týmy"
   },
   "specials": {
     "title": "Speciální sázky",
@@ -186,7 +192,12 @@
       "most_penalty_seconds": "Kdo nasbírá nejvíc trestných sekund?",
       "group_winner": "Kdo vyhraje skupinu?",
       "total_baskets": "Kolik bodů padne celkem (řádná hrací doba)? Vyhrává nejbližší tip."
-    }
+    },
+    "doneTitle_one": "{{count}} speciální sázka podána",
+    "doneTitle_few": "{{count}} speciální sázky podány",
+    "doneTitle_many": "{{count}} speciálních sázek podáno",
+    "doneTitle_other": "{{count}} speciálních sázek podáno",
+    "doneHint": "Do prvního výkopu je ještě můžeš změnit."
   },
   "ranking": {
     "title": "Pořadí",

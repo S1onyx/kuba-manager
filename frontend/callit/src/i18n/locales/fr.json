@@ -48,7 +48,9 @@
     "tips": "Pronos",
     "ranking": "Classement",
     "stats": "Stats",
-    "me": "Moi"
+    "me": "Moi",
+    "mainSite": "Site principal",
+    "mainSiteLong": "Résultats live, programme et classements sur kunstradbasketball.de"
   },
   "auth": {
     "login": "Connexion",
@@ -146,7 +148,9 @@
     "empty": "Rien à pronostiquer pour l'instant.",
     "advanceNeeded": "Choisis le qualifié",
     "jokerShort": "Joker",
-    "underdogShort": "Outsider"
+    "underdogShort": "Outsider",
+    "pendingCount_one": "{{count}} autre match s'ouvre dès que les équipes sont connues",
+    "pendingCount_other": "{{count}} autres matchs s'ouvrent dès que les équipes sont connues"
   },
   "specials": {
     "title": "Paris spéciaux",
@@ -173,7 +177,10 @@
       "most_penalty_seconds": "Qui récolte le plus de secondes de pénalité ?",
       "group_winner": "Qui termine premier du groupe ?",
       "total_baskets": "Combien de points au total (temps réglementaire) ? Le plus proche gagne."
-    }
+    },
+    "doneTitle_one": "{{count}} pari spécial placé",
+    "doneTitle_other": "{{count}} paris spéciaux placés",
+    "doneHint": "Tu peux encore les modifier jusqu'au premier coup d'envoi."
   },
   "ranking": {
     "title": "Classement",

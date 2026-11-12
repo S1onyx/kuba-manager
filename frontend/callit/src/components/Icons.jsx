@@ -59,3 +59,10 @@ export const IconInfo = (props) => (
     <path d="M12 16v-4M12 8h.01" />
   </svg>
 );
+
+export const IconHome = (props) => (
+  <svg {...base} {...props}>
+    <path d="M3 11l9-8 9 8" />
+    <path d="M5 10v10h5v-6h4v6h5V10" />
+  </svg>
+);

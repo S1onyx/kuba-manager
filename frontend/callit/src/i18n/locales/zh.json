@@ -47,7 +47,9 @@
     "tips": "竞猜",
     "ranking": "排行榜",
     "stats": "统计",
-    "me": "我的"
+    "me": "我的",
+    "mainSite": "返回主站",
+    "mainSiteLong": "在 kunstradbasketball.de 查看实时比分、赛程和积分榜"
   },
   "auth": {
     "login": "登录",
@@ -139,7 +141,8 @@
     "empty": "目前没有可竞猜的比赛。",
     "advanceNeeded": "请选择晋级队",
     "jokerShort": "加倍",
-    "underdogShort": "冷门"
+    "underdogShort": "冷门",
+    "pendingCount_other": "还有 {{count}} 场比赛将在球队确定后开放竞猜"
   },
   "specials": {
     "title": "特别竞猜",
@@ -166,7 +169,9 @@
       "most_penalty_seconds": "谁的罚时最多?",
       "group_winner": "谁会获得小组第一?",
       "total_baskets": "全部比赛(常规时间)总共会得多少分?最接近者获胜。"
-    }
+    },
+    "doneTitle_other": "已完成 {{count}} 项特别竞猜",
+    "doneHint": "首场开赛前仍可修改。"
   },
   "ranking": {
     "title": "排行榜",

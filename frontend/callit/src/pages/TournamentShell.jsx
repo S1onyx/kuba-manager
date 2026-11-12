@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../api.js';
-import TopBar from '../components/TopBar.jsx';
+import TopBar, { MainSiteLink } from '../components/TopBar.jsx';
 import BottomNav from '../components/BottomNav.jsx';
 import { ErrorBox, Spinner } from '../components/Feedback.jsx';
 import useCallitData from '../hooks/useCallitData.js';
@@ -117,6 +117,7 @@ export default function TournamentShell({ route }) {
     <>
       <TopBar subtitle={name} profileHref={`/t/${id}/ich`} />
       {content}
+      <MainSiteLink />
       <BottomNav tournamentId={id} activeTab={tab} openCount={joined ? matches.data?.openCount ?? 0 : 0} />
     </>
   );

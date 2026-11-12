@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { api } from '../api.js';
-import TopBar from '../components/TopBar.jsx';
+import TopBar, { MainSiteLink } from '../components/TopBar.jsx';
 import { ErrorBox, Spinner } from '../components/Feedback.jsx';
 import { IconChevron } from '../components/Icons.jsx';
 import useCallitData from '../hooks/useCallitData.js';
@@ -72,9 +72,7 @@ export default function HomePage() {
           <div className="stack">{past.map(renderCard)}</div>
         </>
       ) : null}
-      <p className="dim small" style={{ textAlign: 'center', marginTop: 24 }}>
-        <a href="https://kunstradbasketball.de" style={{ color: 'inherit' }}>kunstradbasketball.de</a>
-      </p>
+      <MainSiteLink />
     </>
   );
 }

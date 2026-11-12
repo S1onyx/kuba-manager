@@ -48,7 +48,9 @@
     "tips": "Tippe",
     "ranking": "Ranking",
     "stats": "Statistik",
-    "me": "Ich"
+    "me": "Ich",
+    "mainSite": "Zur Hauptsiite",
+    "mainSiteLong": "Live-Resultat, Spielplan & Tabälle uf kunstradbasketball.de"
   },
   "auth": {
     "login": "Aamälde",
@@ -146,7 +148,9 @@
     "empty": "Grad gits nüt zum Tippe.",
     "advanceNeeded": "Wiiterchömer wähle",
     "jokerShort": "Joker",
-    "underdogShort": "Underdog"
+    "underdogShort": "Underdog",
+    "pendingCount_one": "{{count}} wiiters Spiel wird tippbar, sobald d Teams feschtstönd",
+    "pendingCount_other": "{{count}} wiiteri Spiel wärded tippbar, sobald d Teams feschtstönd"
   },
   "specials": {
     "title": "Sonderwette",
@@ -173,7 +177,10 @@
       "most_penalty_seconds": "Wer sammlet di meischte Strafsekunde?",
       "group_winner": "Wer wird Gruppeerschte?",
       "total_baskets": "Wie vill Pünkt gits insgesamt (reguläri Spielziit)? Wer am nächschte draa isch, gwünnt."
-    }
+    },
+    "doneTitle_one": "{{count}} Sonderwett tippt",
+    "doneTitle_other": "{{count}} Sonderwette tippt",
+    "doneHint": "Bis zum erschte Aapfiff chasch si no ändere."
   },
   "ranking": {
     "title": "Ranking",

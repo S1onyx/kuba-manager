@@ -48,7 +48,9 @@
     "tips": "Tippelés",
     "ranking": "Rangsor",
     "stats": "Statisztika",
-    "me": "Én"
+    "me": "Én",
+    "mainSite": "Főoldal",
+    "mainSiteLong": "Élő eredmények, menetrend és tabellák: kunstradbasketball.de"
   },
   "auth": {
     "login": "Belépés",
@@ -146,7 +148,9 @@
     "empty": "Most nincs mit tippelni.",
     "advanceNeeded": "Válaszd a továbbjutót",
     "jokerShort": "Joker",
-    "underdogShort": "Esélytelen"
+    "underdogShort": "Esélytelen",
+    "pendingCount_one": "Még {{count}} meccs tippelhető lesz, amint a csapatok ismertek",
+    "pendingCount_other": "Még {{count}} meccs tippelhető lesz, amint a csapatok ismertek"
   },
   "specials": {
     "title": "Különfogadások",
@@ -173,7 +177,10 @@
       "most_penalty_seconds": "Ki gyűjti a legtöbb büntetőmásodpercet?",
       "group_winner": "Ki lesz a csoport első?",
       "total_baskets": "Hány pont születik összesen (rendes játékidő)? A legközelebbi tipp nyer."
-    }
+    },
+    "doneTitle_one": "{{count}} különfogadás leadva",
+    "doneTitle_other": "{{count}} különfogadás leadva",
+    "doneHint": "Az első kezdésig még módosíthatod őket."
   },
   "ranking": {
     "title": "Rangsor",
