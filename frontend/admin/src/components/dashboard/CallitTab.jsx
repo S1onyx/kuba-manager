@@ -4,9 +4,10 @@ import PanelCard from '../common/PanelCard.jsx';
 import { useDashboard } from '../../context/DashboardContext.jsx';
 import { callitAdmin } from '../../utils/api.js';
 import { formatApiError } from '../../utils/apiError.js';
+import { DISPLAY_SLOTS } from '../../constants/dashboard.js';
 
 const CALLIT_URL = 'https://callit.kunstradbasketball.de';
-const SPECIAL_TYPES = ['winner', 'top_scorer', 'most_penalty_seconds', 'group_winner', 'total_baskets'];
+const SPECIAL_TYPES = ['winner', 'top_scorer', 'most_penalty_seconds', 'group_winner', 'total_baskets', 'final_kickoff'];
 
 const toLocalInput = (iso) => {
   if (!iso) return '';
@@ -121,10 +122,22 @@ function SettingsForm({ config, onSave, saving }) {
   );
 }
 
+const pad = (number) => String(number).padStart(2, '0');
+const minutesToClock = (minutes) => (Number.isInteger(minutes) ? `${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}` : '');
+
+function overrideValue(type, value, keys) {
+  if (type === 'final_kickoff') {
+    const [hours, minutes] = String(value).split(':').map(Number);
+    return value === '' ? null : { value: hours * 60 + minutes };
+  }
+  if (type === 'total_baskets') return value === '' ? null : { value: Number(value) };
+  return keys.length ? { keys } : null;
+}
+
 function SpecialOverride({ bet, onSave }) {
   const { t } = useTranslation();
   const [keys, setKeys] = useState(bet.override?.keys ?? []);
-  const [value, setValue] = useState(bet.override?.value ?? '');
+  const [value, setValue] = useState(bet.type === 'final_kickoff' ? minutesToClock(bet.override?.value) : (bet.override?.value ?? ''));
   const title = bet.type === 'group_winner' ? t('callit.specialTypes.group_winner_label', { group: bet.groupLabel }) : t(`callit.specialTypes.${bet.type}`);
   return (
     <article className="card-item">
@@ -135,7 +148,9 @@ function SpecialOverride({ bet, onSave }) {
           {bet.outcome ? ` · ${bet.outcome.final ? t('callit.specials.result') : t('callit.specials.provisional')}: ${bet.outcome.labels.join(', ')}` : ''}
         </span>
       </div>
-      {bet.type === 'total_baskets' ? (
+      {bet.type === 'final_kickoff' ? (
+        <input type="time" step={60} value={value} onChange={(event) => setValue(event.target.value)} />
+      ) : bet.type === 'total_baskets' ? (
         <input type="number" min={0} value={value} onChange={(event) => setValue(event.target.value)} placeholder={t('callit.specials.overridePlaceholder')} />
       ) : (
         <select multiple value={keys} onChange={(event) => setKeys(Array.from(event.target.selectedOptions).map((option) => option.value))} style={{ minHeight: '6rem' }}>
@@ -150,7 +165,7 @@ function SpecialOverride({ bet, onSave }) {
       <div className="btn-row">
         <button
           type="button"
-          onClick={() => onSave(bet.betKey, bet.type === 'total_baskets' ? (value === '' ? null : { value: Number(value) }) : keys.length ? { keys } : null)}
+          onClick={() => onSave(bet.betKey, overrideValue(bet.type, value, keys))}
         >
           {t('callit.specials.saveOverride')}
         </button>
@@ -258,7 +273,7 @@ export default function CallitTab() {
 
   const config = overview?.config;
   const url = selectedId ? `${CALLIT_URL}/#/t/${selectedId}` : CALLIT_URL;
-  const onBeamer = scoreboard?.displayView === 'callit' && scoreboard?.displayCallitTournamentId === selectedId;
+  const onDisplay = (slot) => scoreboard?.displays?.[slot] === 'callit' && scoreboard?.displayCallitTournamentId === selectedId;
   const dateFormat = (iso) => (iso ? new Date(iso).toLocaleString(i18n.language, { dateStyle: 'short', timeStyle: 'short' }) : '–');
 
   return (
@@ -308,13 +323,20 @@ export default function CallitTab() {
             </button>
           </div>
           <div className="btn-row">
-            <button
-              type="button"
-              onClick={() => (onBeamer ? handleDisplayViewChange('scoreboard') : handleDisplayViewChange('callit', { callitTournamentId: selectedId }))}
-              disabled={!config.enabled}
-            >
-              {onBeamer ? t('callit.beamerOff') : t('callit.beamerOn')}
-            </button>
+            {DISPLAY_SLOTS.map((slot) => (
+              <button
+                key={slot}
+                type="button"
+                onClick={() =>
+                  onDisplay(slot)
+                    ? handleDisplayViewChange('scoreboard', { display: slot })
+                    : handleDisplayViewChange('callit', { display: slot, callitTournamentId: selectedId })
+                }
+                disabled={!config.enabled}
+              >
+                {onDisplay(slot) ? t('callit.beamerOff', { slot }) : t('callit.beamerOn', { slot })}
+              </button>
+            ))}
             <button type="button" onClick={() => callitAdmin.exportCsv(selectedId).catch((error) => fail(error, 'callit.actionFailed'))} disabled={!config.enabled}>
               {t('callit.exportCsv')}
             </button>

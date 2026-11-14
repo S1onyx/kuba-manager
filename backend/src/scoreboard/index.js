@@ -23,6 +23,7 @@ import {
 import { addPenalty, removePenalty } from './penalties.js';
 import { clearGame, resetGame } from './reset.js';
 import { startShootout, recordShootoutAttempt, undoShootoutAttempt, cancelShootout, ShootoutError } from './shootout.js';
+import { startOvertime, cancelOvertime, OvertimeError } from './overtime.js';
 import {
   startFreeThrows,
   setFreeThrowShooter,
@@ -66,6 +67,9 @@ export {
   undoShootoutAttempt,
   cancelShootout,
   ShootoutError,
+  startOvertime,
+  cancelOvertime,
+  OvertimeError,
   startFreeThrows,
   setFreeThrowShooter,
   recordFreeThrow,

@@ -4,9 +4,9 @@ import PanelCard from '../../common/PanelCard.jsx';
 import { useDashboard } from '../../../context/DashboardContext.jsx';
 import { cancelShootout, recordShootoutAttempt, startShootout, undoShootoutAttempt } from '../../../utils/api.js';
 import { formatApiError } from '../../../utils/apiError.js';
+import { canStartShootout } from '../../../utils/gameStatus.js';
 
 const REGULAR_ATTEMPTS = 5;
-const KNOCKOUT_PHASES = ['knockout', 'placement'];
 
 function AttemptDots({ attempts, team }) {
   const own = attempts.filter((attempt) => attempt.team === team);
@@ -40,13 +40,7 @@ export default function ShootoutCard() {
 
   if (!scoreboard) return null;
   const shootout = scoreboard.shootout;
-  const tied = (scoreboard.scoreA ?? 0) === (scoreboard.scoreB ?? 0);
-  const timePlayed =
-    (scoreboard.remainingSeconds ?? 0) === 0 ||
-    (scoreboard.remainingSeconds ?? 0) < (scoreboard.durationSeconds ?? 0) ||
-    (scoreboard.scoreA ?? 0) > 0;
-  const canStart = KNOCKOUT_PHASES.includes(scoreboard.stageType) && tied && timePlayed && !scoreboard.isRunning;
-  if (!shootout && !canStart) return null;
+  if (!shootout && !canStartShootout(scoreboard)) return null;
 
   const teamName = (team) => (team === 'a' ? scoreboard.teamAName : scoreboard.teamBName);
   const run = async (action) => {

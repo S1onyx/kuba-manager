@@ -28,7 +28,8 @@ export default function Timer({
   extraTime,
   extraElapsed,
   isHalftimeBreak,
-  halftimeBreakRemaining
+  halftimeBreakRemaining,
+  breakLabel
 }) {
   const { t } = useTranslation();
   const isCompact = useMediaQuery('(max-width: 1100px)');
@@ -108,7 +109,7 @@ export default function Timer({
               opacity: 0.7
             }}
           >
-            {t('scoreboard.halftimeBreak')}
+            {breakLabel ?? t('scoreboard.halftimeBreak')}
           </span>
           {(() => {
             const [hm, hs] = splitColon(halftimeBreakRemaining);

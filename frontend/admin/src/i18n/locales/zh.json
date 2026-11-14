@@ -97,7 +97,10 @@
     "extraTime": "补时",
     "extraTimePaused": "补时（暂停）",
     "running": "进行中",
-    "paused": "已暂停"
+    "paused": "已暂停",
+    "overtime": "加时赛进行中",
+    "overtimePaused": "加时赛（暂停）",
+    "overtimeBreak": "加时赛前休息"
   },
   "dashboard": {
     "loading": "正在加载记分牌..."
@@ -112,18 +115,17 @@
     "tournamentStatus": "锦标赛状态：{{status}}",
     "statusCompleted": "已结束",
     "statusRunning": "进行中",
-    "switching": "正在切换...",
-    "showLive": "显示实时比分",
-    "showBracket": "显示淘汰赛对阵图"
+    "displaySlot": "屏{{slot}}：{{view}}"
   },
   "control": {
     "display": {
       "title": "投影显示",
-      "description": "在投影仪上切换实时比分和淘汰赛对阵图。",
+      "description": "设置显示屏 1、2、3 显示的内容。在每块屏幕上用按钮选择它是哪个显示屏。",
       "bracketHint": "请先为对阵图选择锦标赛：",
       "chooseTournament": "选择锦标赛 …",
       "updating": "正在更新显示...",
-      "callitHint": "显示该赛事的竞猜排行榜:"
+      "callitHint": "显示该赛事的竞猜排行榜:",
+      "slot": "显示屏 {{slot}}"
     },
     "context": {
       "title": "比赛上下文",
@@ -189,7 +191,7 @@
       "changedTitle": "⚠ 保存后已更改",
       "changedText": "保存后比分已更改。再次保存将替换已保存的结果。",
       "blockedTitle": "淘汰赛战平",
-      "blockedText": "需先完成罚球决胜才能保存（见下方卡片）。",
+      "blockedText": "只有在加时赛或罚球决胜后才能保存（见下方卡片）。",
       "savedTitle": "✓ 已保存——结果有效",
       "savedText": "下一场比赛：先重置，然后从赛程中载入下一场。",
       "save": "立即保存",
@@ -203,11 +205,11 @@
     },
     "shootout": {
       "title": "罚球决胜",
-      "drawHint": "淘汰赛战平——通过罚球决胜：每队5次，之后突然死亡。每次命中为比分加1分。",
+      "drawHint": "加时赛后仍打平 – 以罚球决胜：每队5次，之后突然死亡。每次命中为比分加1分。",
       "firstTeam": "谁先投？",
       "start": "开始罚球决胜",
       "titleRunning": "罚球决胜 {{a}}:{{b}}",
-      "regularScore": "常规时间比分：{{a}}:{{b}}",
+      "regularScore": "加时赛后比分：{{a}}:{{b}}",
       "decided": "已决出：{{team}}赢得罚球决胜 {{a}}:{{b}}——请结束并保存比赛。",
       "suddenDeath": "突然死亡——下一个投篮：{{team}}",
       "next": "下一个投篮：{{team}}",
@@ -230,7 +232,7 @@
       "extraTimeInfo": "补时计划 {{planned}} · 已进行 {{elapsed}}",
       "start": "开始",
       "pause": "暂停",
-      "autoStartSecondHalf": "自动开始下半场",
+      "autoStartSecondHalf": "休息后自动开始（下半场、加时赛）",
       "newRemaining": "新的剩余时间",
       "timerPlaceholder": "例如 10:00 或 600",
       "setTime": "设置时间",
@@ -243,7 +245,8 @@
       "extraTimePlaceholder": "例如 02:00",
       "finishGame": "结束比赛",
       "saveGame": "保存比赛",
-      "newGame": "重置（不保存）"
+      "newGame": "重置（不保存）",
+      "overtimeBreakRunning": "加时赛前休息进行中 · 剩余：{{remaining}}（{{mode}}）"
     },
     "penalties": {
       "title": "限时处罚",
@@ -281,6 +284,17 @@
       "cancel": "取消罚球",
       "close": "隐藏",
       "failed": "罚球操作失败。"
+    },
+    "overtime": {
+      "title": "加时赛",
+      "drawHint": "常规时间结束打平 – 休息{{pause}}后进行{{duration}}加时赛。若仍打平，则以罚球决胜。",
+      "start": "开始加时赛",
+      "breakTitle": "加时赛前休息 · {{remaining}}",
+      "breakAuto": "之后加时赛（{{duration}}）将自动开始。",
+      "breakManual": "之后请手动开始加时赛（{{duration}}）。",
+      "startNow": "立即开始加时赛",
+      "cancel": "取消加时赛",
+      "failed": "操作失败。"
     }
   },
   "schedule": {
@@ -584,8 +598,6 @@
     "confirmResetGame": "重置比赛？队伍、得分和时间将被清除。如果比赛尚未保存，结果将丢失。",
     "confirmReplaceUnsavedGame": "当前比赛尚未保存。仍要载入新比赛吗？当前结果将丢失。",
     "newGameFailed": "比赛无法重置。",
-    "displayNowScoreboard": "投影仪现在显示实时比分。",
-    "displayNowBracket": "投影仪现在显示淘汰赛对阵图。",
     "displayUpdateFailed": "无法更新显示模式。",
     "tournamentRequired": "请先在比赛上下文中选择一个锦标赛。",
     "invalidDateTime": "请选择有效的日期/时间。",
@@ -683,7 +695,7 @@
     "timerCuesSaveFailed": "无法保存计时器设置。",
     "audioLoadFailed": "无法加载音频数据。",
     "penaltyFreeThrowsSkipped": "已为团队 {{team}} 添加罚时——仍有未完成的罚球,未创建新罚球。",
-    "displayNowCallit": "投影仪现在显示竞猜排行榜。"
+    "displaySet": "显示屏 {{display}} 现在显示：{{view}}。"
   },
   "error": {
     "generic": "发生错误。请重试。",
@@ -779,7 +791,7 @@
     "AUTH_REQUIRED": "会话已过期，请重新登录。",
     "TOURNAMENT_REQUIRED": "请先选择锦标赛。",
     "GROUP_RESULTS_EXIST": "小组赛已有比赛结果——无法再交换队伍。",
-    "KNOCKOUT_DRAW": "淘汰赛战平——请先进行罚球决胜。",
+    "KNOCKOUT_DRAW": "淘汰赛打平 – 请先进行加时赛或罚球决胜。",
     "SHOOTOUT_UNDECIDED": "罚球决胜尚未决出胜负。",
     "TEAM_OTHER_TOURNAMENT": "球员只能在同一锦标赛内更换队伍。",
     "TOURNAMENT_CREATE_FAILED": "无法创建锦标赛。",
@@ -816,7 +828,13 @@
     "CALLIT_NOT_AVAILABLE": "该赛事未启用竞猜游戏。",
     "CALLIT_INVALID_VALUE": "数值无效。",
     "CALLIT_MATCH_NOT_FOUND": "未找到比赛。",
-    "CALLIT_USER_NOT_FOUND": "未找到用户。"
+    "CALLIT_USER_NOT_FOUND": "未找到用户。",
+    "SHOOTOUT_NEEDS_OVERTIME": "罚球决胜须在加时赛之后进行。",
+    "OVERTIME_ALREADY_STARTED": "加时赛已开始。",
+    "OVERTIME_NOT_KNOCKOUT": "只有淘汰赛才有加时赛。",
+    "OVERTIME_NOT_TIED": "只有打平时才能进行加时赛。",
+    "OVERTIME_CLOCK_NOT_OVER": "常规时间尚未结束。",
+    "OVERTIME_IN_PROGRESS": "加时赛已在进行中。"
   },
   "export": {
     "title": "PDF导出 / 打印",
@@ -891,7 +909,8 @@
     "groupLabel": "{{group}}组",
     "emptyHint": "选择比赛以查看打印模板",
     "collapse": "收起",
-    "expand": "展开"
+    "expand": "展开",
+    "overtimeShort": "加时"
   },
   "callit": {
     "title": "CallIt 竞猜游戏",
@@ -910,8 +929,8 @@
     "saveJoinCode": "保存加入码",
     "copyLink": "复制链接",
     "copied": "链接已复制。",
-    "beamerOn": "在投影仪上显示排行榜",
-    "beamerOff": "投影仪切回比分板",
+    "beamerOn": "排名显示到显示屏 {{slot}}",
+    "beamerOff": "显示屏 {{slot}} 返回比分",
     "exportCsv": "CSV 导出",
     "refresh": "刷新",
     "saved": "已保存。",
@@ -951,7 +970,8 @@
       "most_penalty_seconds": "罚时最多",
       "group_winner": "小组第一",
       "group_winner_label": "{{group}} 第一名",
-      "total_baskets": "总得分"
+      "total_baskets": "总得分",
+      "final_kickoff": "决赛开始时间"
     },
     "matches": {
       "title": "比赛与锁定",

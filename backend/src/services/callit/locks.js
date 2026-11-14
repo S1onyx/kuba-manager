@@ -6,6 +6,7 @@ import { invalidateTournamentContext } from './context.js';
 const enabledTournaments = new Set();
 const lockedKeys = new Set();
 const unlockedKeys = new Set();
+const kickoffKeys = new Set();
 let lastRunningKey = null;
 let lastSignature = null;
 let lastTournamentId = null;
@@ -21,6 +22,22 @@ export async function refreshEnabledTournaments() {
 export async function loadLocks(tournamentId) {
   const rows = await queryAll('SELECT schedule_code, state, reason, changed_at FROM callit_locks WHERE tournament_id = ?', [tournamentId]);
   return new Map(rows.map((row) => [row.schedule_code, { state: row.state, reason: row.reason, changedAt: row.changed_at }]));
+}
+
+export async function loadKickoffs(tournamentId) {
+  const rows = await queryAll('SELECT schedule_code, started_at FROM callit_kickoffs WHERE tournament_id = ?', [tournamentId]);
+  return new Map(rows.map((row) => [row.schedule_code, row.started_at]));
+}
+
+// Erster Uhr-Start eines Spiels = tatsächliche Anpfiffzeit (z. B. für die Sonderwette Finale-Startzeit).
+async function recordKickoff(tournamentId, code) {
+  const key = lockKey(tournamentId, code);
+  if (kickoffKeys.has(key)) return;
+  kickoffKeys.add(key);
+  await write([
+    'INSERT OR IGNORE INTO callit_kickoffs (tournament_id, schedule_code, started_at) VALUES (?, ?, ?)',
+    [tournamentId, code, new Date().toISOString()]
+  ]);
 }
 
 export async function setLock(tournamentId, code, state, reason) {
@@ -76,6 +93,7 @@ export async function handleScoreboardState(state) {
   }
   const kickoff = runningKey && runningKey !== lastRunningKey;
   lastRunningKey = runningKey;
+  if (kickoff) await recordKickoff(tournamentId, state.scheduleCode);
 
   const signature = [
     tournamentId,
@@ -110,6 +128,7 @@ export async function handleScoreboardState(state) {
 export function resetLockTracking() {
   lockedKeys.clear();
   unlockedKeys.clear();
+  kickoffKeys.clear();
   lastRunningKey = null;
   lastSignature = null;
   lastTournamentId = null;
@@ -123,6 +142,8 @@ export async function registerCallitScoreboardHook() {
     if (row.state === 'locked') lockedKeys.add(key);
     if (row.state === 'unlocked') unlockedKeys.add(key);
   });
+  const kickoffs = await queryAll('SELECT tournament_id, schedule_code FROM callit_kickoffs');
+  kickoffs.forEach((row) => kickoffKeys.add(lockKey(row.tournament_id, row.schedule_code)));
   addSubscriber((state) => {
     handleScoreboardState(state).catch((error) => console.error('[callit] Sperre bei Anpfiff fehlgeschlagen:', error));
   });

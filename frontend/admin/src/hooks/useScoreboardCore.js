@@ -592,21 +592,17 @@ export default function useScoreboardCore({ updateMessage }) {
   );
 
   const handleDisplayViewChange = useCallback(
-    async (targetView, { callitTournamentId } = {}) => {
+    async (targetView, { display = '1', callitTournamentId } = {}) => {
       const normalized = typeof targetView === 'string' ? targetView : '';
       const callitChanged = callitTournamentId && scoreboard?.displayCallitTournamentId !== Number(callitTournamentId);
-      if (!normalized || (scoreboard?.displayView === normalized && !callitChanged)) {
+      if (!normalized || (scoreboard?.displays?.[display] === normalized && !callitChanged)) {
         return;
       }
 
       setDisplayViewPending(true);
       try {
-        await setDisplayView(normalized, { callitTournamentId });
-        updateMessage('info', normalized === 'scoreboard'
-          ? t('feedback.displayNowScoreboard')
-          : normalized === 'callit'
-            ? t('feedback.displayNowCallit')
-            : t('feedback.displayNowBracket'));
+        await setDisplayView(normalized, { display, callitTournamentId });
+        updateMessage('info', t('feedback.displaySet', { display, view: t(`displayViews.${normalized}`) }));
       } catch (err) {
         console.error(err);
         updateMessage('error', formatApiError(err, t, 'feedback.displayUpdateFailed'));
@@ -614,7 +610,7 @@ export default function useScoreboardCore({ updateMessage }) {
         setDisplayViewPending(false);
       }
     },
-    [scoreboard?.displayView, scoreboard?.displayCallitTournamentId, updateMessage, t]
+    [scoreboard?.displays, scoreboard?.displayCallitTournamentId, updateMessage, t]
   );
 
 
@@ -652,16 +648,20 @@ export default function useScoreboardCore({ updateMessage }) {
     [scoreboard?.remainingSeconds]
   );
 
+  const isOvertime = Boolean(scoreboard?.overtime);
+
   const statusLabel = useMemo(() => {
-    if (scoreboard?.isHalftimeBreak) return t('status.halftimeBreak');
+    if (scoreboard?.isHalftimeBreak) return t(isOvertime ? 'status.overtimeBreak' : 'status.halftimeBreak');
     if (scoreboard?.isExtraTime) return scoreboard?.isRunning ? t('status.extraTime') : t('status.extraTimePaused');
+    if (isOvertime) return scoreboard?.isRunning ? t('status.overtime') : t('status.overtimePaused');
     return scoreboard?.isRunning ? t('status.running') : t('status.paused');
-  }, [scoreboard?.isHalftimeBreak, scoreboard?.isExtraTime, scoreboard?.isRunning, t]);
+  }, [scoreboard?.isHalftimeBreak, scoreboard?.isExtraTime, scoreboard?.isRunning, isOvertime, t]);
 
   const liveStateLabel = useMemo(() => {
-    if (scoreboard?.isHalftimeBreak) return t('status.halftimeBreak');
+    if (scoreboard?.isHalftimeBreak) return t(isOvertime ? 'status.overtimeBreak' : 'status.halftimeBreak');
+    if (isOvertime) return scoreboard?.isRunning ? t('status.overtime') : t('status.overtimePaused');
     return scoreboard?.isRunning ? t('status.running') : t('status.paused');
-  }, [scoreboard?.isHalftimeBreak, scoreboard?.isRunning, t]);
+  }, [scoreboard?.isHalftimeBreak, scoreboard?.isRunning, isOvertime, t]);
 
   return {
     scoreboard,

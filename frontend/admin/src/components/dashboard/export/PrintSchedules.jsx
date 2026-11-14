@@ -48,7 +48,11 @@ function ScoreBoxes({ match, t }) {
       <span className="sheet-score__box">{hasResult ? match.result.scoreA ?? 0 : ''}</span>
       <span className="sheet-score__sep">:</span>
       <span className="sheet-score__box">{hasResult ? match.result.scoreB ?? 0 : ''}</span>
-      {match.result?.shootout ? <small className="sheet-score__note">{t('export.shootoutShort')}</small> : null}
+      {match.result?.shootout ? (
+        <small className="sheet-score__note">{t('export.shootoutShort')}</small>
+      ) : match.result?.overtime ? (
+        <small className="sheet-score__note">{t('export.overtimeShort')}</small>
+      ) : null}
     </span>
   );
 }

@@ -229,13 +229,16 @@ export function setRemainingSeconds(seconds) {
   }
 
   const sanitized = Math.max(0, Math.trunc(parsed));
-  state.durationSeconds = sanitized;
   state.remainingSeconds = sanitized;
   state.isRunning = false;
-  state.halftimeTriggered = false;
   state.isHalftimeBreak = false;
-  state.currentHalf = 1;
   state.halftimePauseRemaining = state.halftimePauseSeconds;
+  // In der Verlängerung nur die Restzeit korrigieren, Spieldauer und Halbzeit bleiben.
+  if (!state.overtime) {
+    state.durationSeconds = sanitized;
+    state.halftimeTriggered = false;
+    state.currentHalf = 1;
+  }
   state.extraElapsedSeconds = 0;
   state.isExtraTime = false;
   stopTicker();
@@ -252,7 +255,7 @@ export function setHalftimeSeconds(seconds) {
 
   const sanitized = Math.max(0, Math.trunc(parsed));
   state.halftimeSeconds = sanitized;
-  state.halftimeTriggered = false;
+  state.halftimeTriggered = Boolean(state.overtime);
   state.isHalftimeBreak = false;
   if (state.currentHalf < 2) {
     state.currentHalf = 1;
@@ -292,6 +295,17 @@ export function setExtraSeconds(seconds) {
   state.isExtraTime = sanitized > 0 ? state.isExtraTime : false;
   notifySubscribers();
 
+  return snapshotState();
+}
+
+// Pause mit Countdown (z. B. vor der Verlängerung); danach Auto-Start wie nach der Halbzeitpause.
+export function startBreak(seconds) {
+  const state = getState();
+  state.isRunning = false;
+  state.isHalftimeBreak = true;
+  state.halftimePauseRemaining = Math.max(0, Math.trunc(seconds));
+  ensureTicker();
+  notifySubscribers();
   return snapshotState();
 }
 

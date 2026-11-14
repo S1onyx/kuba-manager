@@ -97,7 +97,10 @@
     "extraTime": "追加時間",
     "extraTimePaused": "追加時間（一時停止）",
     "running": "進行中",
-    "paused": "一時停止中"
+    "paused": "一時停止中",
+    "overtime": "延長戦進行中",
+    "overtimePaused": "延長戦（一時停止）",
+    "overtimeBreak": "延長戦前の休憩"
   },
   "dashboard": {
     "loading": "スコアボードを読み込み中..."
@@ -112,18 +115,17 @@
     "tournamentStatus": "大会ステータス: {{status}}",
     "statusCompleted": "終了",
     "statusRunning": "進行中",
-    "switching": "切り替え中...",
-    "showLive": "ライブを表示",
-    "showBracket": "トーナメント表を表示"
+    "displaySlot": "D{{slot}}：{{view}}"
   },
   "control": {
     "display": {
       "title": "プロジェクター表示",
-      "description": "プロジェクター上でライブスコアとトーナメント表を切り替えます。",
+      "description": "ディスプレイ1〜3の表示内容を設定します。各画面ではボタンでどのディスプレイかを選びます。",
       "bracketHint": "トーナメント表のために先に大会を選択してください：",
       "chooseTournament": "大会を選択 …",
       "updating": "表示を更新中...",
-      "callitHint": "この大会の予想ランキングを表示:"
+      "callitHint": "この大会の予想ランキングを表示:",
+      "slot": "ディスプレイ{{slot}}"
     },
     "context": {
       "title": "マッチコンテキスト",
@@ -189,7 +191,7 @@
       "changedTitle": "⚠ 保存後に変更されました",
       "changedText": "保存後にスコアが変更されました。再保存すると保存済みの結果が置き換わります。",
       "blockedTitle": "ノックアウト戦が同点",
-      "blockedText": "フリースロー戦の後でのみ保存できます（下のカード）。",
+      "blockedText": "保存は延長戦またはフリースロー戦の後にのみ可能です（下のカード）。",
       "savedTitle": "✓ 保存済み – 結果が反映されています",
       "savedText": "次の試合：リセットしてから日程から次の試合を読み込んでください。",
       "save": "今すぐ保存",
@@ -203,11 +205,11 @@
     },
     "shootout": {
       "title": "フリースロー戦",
-      "drawHint": "ノックアウト戦が同点です。フリースロー戦で決着：各5本、その後サドンデス。成功ごとに結果に1点加算されます。",
+      "drawHint": "延長戦後も同点 – フリースロー戦で決着：各5本、その後サドンデス。成功1本ごとにスコアに1点加算。",
       "firstTeam": "どちらが先に投げますか？",
       "start": "フリースロー戦を開始",
       "titleRunning": "フリースロー戦 {{a}}:{{b}}",
-      "regularScore": "規定時間終了時のスコア：{{a}}:{{b}}",
+      "regularScore": "延長戦終了時のスコア：{{a}}:{{b}}",
       "decided": "決着：{{team}}がフリースロー戦に勝利 {{a}}:{{b}}。試合を終了して保存してください。",
       "suddenDeath": "サドンデス – 次に投げる：{{team}}",
       "next": "次に投げる：{{team}}",
@@ -230,7 +232,7 @@
       "extraTimeInfo": "追加時間 予定 {{planned}} · 経過 {{elapsed}}",
       "start": "開始",
       "pause": "一時停止",
-      "autoStartSecondHalf": "後半を自動で開始",
+      "autoStartSecondHalf": "休憩後に自動で開始（後半・延長戦）",
       "newRemaining": "新しい残り時間",
       "timerPlaceholder": "例: 10:00 または 600",
       "setTime": "時間を設定",
@@ -243,7 +245,8 @@
       "extraTimePlaceholder": "例: 02:00",
       "finishGame": "試合を終了",
       "saveGame": "試合を保存",
-      "newGame": "リセット（保存しない）"
+      "newGame": "リセット（保存しない）",
+      "overtimeBreakRunning": "延長戦前の休憩中 · 残り: {{remaining}}（{{mode}}）"
     },
     "penalties": {
       "title": "タイムペナルティ",
@@ -281,6 +284,17 @@
       "cancel": "フリースローを中止",
       "close": "非表示",
       "failed": "フリースローの操作に失敗しました。"
+    },
+    "overtime": {
+      "title": "延長戦",
+      "drawHint": "規定時間終了時に同点 – {{pause}}の休憩後、{{duration}}の延長戦を行います。それでも同点の場合はフリースロー戦で決着します。",
+      "start": "延長戦を開始",
+      "breakTitle": "延長戦前の休憩 · {{remaining}}",
+      "breakAuto": "その後、延長戦（{{duration}}）が自動で始まります。",
+      "breakManual": "その後、延長戦（{{duration}}）を手動で開始してください。",
+      "startNow": "今すぐ延長戦を開始",
+      "cancel": "延長戦を取り消す",
+      "failed": "操作に失敗しました。"
     }
   },
   "schedule": {
@@ -584,8 +598,6 @@
     "confirmResetGame": "試合をリセットしますか？チーム・得点・時間が消去されます。保存していない場合、結果は失われます。",
     "confirmReplaceUnsavedGame": "現在の試合は保存されていません。それでも新しい試合を読み込みますか？現在の結果は失われます。",
     "newGameFailed": "試合をリセットできませんでした。",
-    "displayNowScoreboard": "プロジェクターにライブスコアが表示されています。",
-    "displayNowBracket": "プロジェクターにトーナメント表が表示されています。",
     "displayUpdateFailed": "表示モードを更新できませんでした。",
     "tournamentRequired": "まずマッチコンテキストで大会を選択してください。",
     "invalidDateTime": "有効な日付/時刻を選択してください。",
@@ -683,7 +695,7 @@
     "timerCuesSaveFailed": "タイマー設定を保存できませんでした。",
     "audioLoadFailed": "音声データを読み込めませんでした。",
     "penaltyFreeThrowsSkipped": "チーム {{team}} にタイムペナルティを追加しました。未完了のフリースローがあるため、新しいフリースローは作成されませんでした。",
-    "displayNowCallit": "プロジェクターに予想ランキングが表示されています。"
+    "displaySet": "ディスプレイ{{display}}の表示：{{view}}"
   },
   "error": {
     "generic": "エラーが発生しました。もう一度お試しください。",
@@ -779,7 +791,7 @@
     "AUTH_REQUIRED": "セッションの有効期限が切れました。再度ログインしてください。",
     "TOURNAMENT_REQUIRED": "先に大会を選択してください。",
     "GROUP_RESULTS_EXIST": "グループステージにはすでに結果があるため、チームを入れ替えられません。",
-    "KNOCKOUT_DRAW": "ノックアウト戦が同点です。先にフリースロー戦を行ってください。",
+    "KNOCKOUT_DRAW": "ノックアウト戦で同点 – 先に延長戦またはフリースロー戦を行ってください。",
     "SHOOTOUT_UNDECIDED": "フリースロー戦はまだ決着していません。",
     "TEAM_OTHER_TOURNAMENT": "選手は同じ大会内でのみチームを移動できます。",
     "TOURNAMENT_CREATE_FAILED": "大会を作成できませんでした。",
@@ -816,7 +828,13 @@
     "CALLIT_NOT_AVAILABLE": "この大会では予想ゲームが有効になっていません。",
     "CALLIT_INVALID_VALUE": "無効な値です。",
     "CALLIT_MATCH_NOT_FOUND": "試合が見つかりません。",
-    "CALLIT_USER_NOT_FOUND": "ユーザーが見つかりません。"
+    "CALLIT_USER_NOT_FOUND": "ユーザーが見つかりません。",
+    "SHOOTOUT_NEEDS_OVERTIME": "フリースロー戦は延長戦の後に行います。",
+    "OVERTIME_ALREADY_STARTED": "延長戦はすでに開始されています。",
+    "OVERTIME_NOT_KNOCKOUT": "延長戦はノックアウト戦のみです。",
+    "OVERTIME_NOT_TIED": "延長戦は同点の場合のみ可能です。",
+    "OVERTIME_CLOCK_NOT_OVER": "規定時間がまだ終了していません。",
+    "OVERTIME_IN_PROGRESS": "延長戦はすでに進行中です。"
   },
   "export": {
     "title": "PDFエクスポート / 印刷",
@@ -891,7 +909,8 @@
     "groupLabel": "グループ{{group}}",
     "emptyHint": "印刷テンプレートを表示するにはトーナメントを選択してください",
     "collapse": "折りたたむ",
-    "expand": "展開"
+    "expand": "展開",
+    "overtimeShort": "延長"
   },
   "callit": {
     "title": "予想ゲーム CallIt",
@@ -910,8 +929,8 @@
     "saveJoinCode": "コードを保存",
     "copyLink": "リンクをコピー",
     "copied": "リンクをコピーしました。",
-    "beamerOn": "ランキングをプロジェクターへ",
-    "beamerOff": "プロジェクターをスコアボードに戻す",
+    "beamerOn": "ランキングをディスプレイ{{slot}}へ",
+    "beamerOff": "ディスプレイ{{slot}}をスコアに戻す",
     "exportCsv": "CSVエクスポート",
     "refresh": "更新",
     "saved": "保存しました。",
@@ -951,7 +970,8 @@
       "most_penalty_seconds": "最多ペナルティ秒数",
       "group_winner": "グループ1位",
       "group_winner_label": "{{group}} 1位",
-      "total_baskets": "総得点"
+      "total_baskets": "総得点",
+      "final_kickoff": "決勝の開始時刻"
     },
     "matches": {
       "title": "試合とロック",

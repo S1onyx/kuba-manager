@@ -1,5 +1,6 @@
 import { CallitError } from './db.js';
-import { computeRanking, listSpecialsForUser } from './index.js';
+import { computeRanking, formatNearest, listSpecialsForUser } from './index.js';
+import { NEAREST_BET_TYPES } from './settings.js';
 import { scoreMatchTip, scoreSpecials, tendency, tipLevel, validTipsByMatch } from './scoring.js';
 
 const round = (value, digits = 2) => Math.round(value * 10 ** digits) / 10 ** digits;
@@ -138,29 +139,32 @@ export async function getOverviewStats(tournamentId) {
       return { betKey: bet.betKey, type: bet.type, groupLabel: bet.groupLabel, hidden: true, tipCount: specialTips.filter((tip) => tip.betKey === bet.betKey && activeIds.has(tip.userId)).length };
     }
     const betTips = specialTips.filter((tip) => tip.betKey === bet.betKey && activeIds.has(tip.userId));
+    const nearest = NEAREST_BET_TYPES.includes(bet.type);
     const counts = new Map();
     betTips.forEach((tip) => {
-      const key = bet.type === 'total_baskets' ? String(tip.value?.value) : String(tip.value?.key);
+      const key = nearest ? String(tip.value?.value) : String(tip.value?.key);
       counts.set(key, (counts.get(key) ?? 0) + 1);
     });
     const distribution = Array.from(counts.entries())
       .map(([key, count]) => ({
         key,
-        label: bet.type === 'total_baskets' ? key : bet.options.find((option) => option.key === key)?.label ?? key,
+        label: nearest ? formatNearest(bet.type, Number(key)) : bet.options.find((option) => option.key === key)?.label ?? key,
         count,
         pct: round((count / betTips.length) * 100, 1),
         quote: quote(count / betTips.length)
       }))
       .sort((a, b) => b.count - a.count);
     const values = betTips.map((tip) => Number(tip.value?.value)).filter(Number.isFinite);
+    const average = nearest && values.length ? round(values.reduce((s, v) => s + v, 0) / values.length, 1) : null;
     return {
       betKey: bet.betKey,
       type: bet.type,
       groupLabel: bet.groupLabel,
       hidden: false,
       tipCount: betTips.length,
-      distribution: bet.type === 'total_baskets' ? distribution.slice(0, 10) : distribution,
-      average: bet.type === 'total_baskets' && values.length ? round(values.reduce((s, v) => s + v, 0) / values.length, 1) : null,
+      distribution: nearest ? distribution.slice(0, 10) : distribution,
+      average,
+      averageLabel: bet.type === 'final_kickoff' && average !== null ? formatNearest(bet.type, Math.round(average)) : null,
       outcome: bet.outcome
     };
   });

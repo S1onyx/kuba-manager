@@ -3,7 +3,7 @@
     "title": "Freiwurf-Stäche",
     "suddenDeath": "Sudden Death",
     "winner": "Sieger: {{team}}",
-    "regular": "nach de reguläre Spiilziit {{a}}:{{b}}",
+    "regular": "nach de Verlängerig {{a}}:{{b}}",
     "short": "n.F.",
     "next": "Als Nächschts wirft: {{team}}",
     "throwing": "wirft",
@@ -12,8 +12,7 @@
     "miss": "dernäbe"
   },
   "app": {
-    "mirrorStandard": "Display 1 (Standard)",
-    "mirrorInverted": "Display 2 (umgechehrt)"
+    "displaySlot": "Display {{slot}}"
   },
   "controls": {
     "fullscreenEnter": "Vollbild",
@@ -166,12 +165,18 @@
         "winner": "Turniersieger",
         "top_scorer": "Topscorer",
         "most_penalty_seconds": "Meischti Strafsekunde",
-        "total_baskets": "Gsamtpünkt"
+        "total_baskets": "Gsamtpünkt",
+        "final_kickoff": "Aafangsziit Final"
       },
       "groupWinner": "Sieger {{group}}",
       "thanks": "Merci fürs Mittippe!",
       "hitBy_one": "{{count}}× troffe",
       "hitBy_other": "{{count}}× troffe"
     }
+  },
+  "overtime": {
+    "title": "Verlängerig",
+    "break": "Pausä vor de Verlängerig",
+    "short": "n.V."
   }
 }

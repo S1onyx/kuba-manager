@@ -1,10 +1,11 @@
 import { getScoreboardState } from '../../scoreboard/index.js';
 import { getTournament } from '../tournaments/base.js';
 import { CallitError, parseJson, queryAll, queryOne, write } from './db.js';
-import { DEFAULT_SETTINGS, SPECIAL_BET_TYPES, normalizeSettings, specialTypeOf } from './settings.js';
+import { DEFAULT_SETTINGS, NEAREST_BET_TYPES, SPECIAL_BET_TYPES, normalizeSettings, specialTypeOf } from './settings.js';
+import { formatClock, isMinuteOfDay } from './time.js';
 import { computeStandings, isTipValidForMatch, phaseGroupOf, rankRows, scoreMatchTip, scoreSpecials, validTipsByMatch, tendency } from './scoring.js';
 import { applyLiveState, deriveSpecialOutcomes, invalidateTournamentContext, loadTournamentBase } from './context.js';
-import { isMatchLocked, isRunningOnScoreboard, loadLocks, refreshEnabledTournaments } from './locks.js';
+import { isMatchLocked, isRunningOnScoreboard, loadKickoffs, loadLocks, refreshEnabledTournaments } from './locks.js';
 import { emitCallitUpdate, tournamentVersion } from './events.js';
 
 const MAX_SCORE = 99;
@@ -147,6 +148,8 @@ function specialBetsFor(base, settings) {
   if (enabled('top_scorer')) bets.push({ betKey: 'top_scorer', type: 'top_scorer' });
   if (enabled('most_penalty_seconds')) bets.push({ betKey: 'most_penalty_seconds', type: 'most_penalty_seconds' });
   if (enabled('total_baskets')) bets.push({ betKey: 'total_baskets', type: 'total_baskets' });
+  const finalMatch = base.matches.find((match) => match.isFinal);
+  if (enabled('final_kickoff') && finalMatch) bets.push({ betKey: 'final_kickoff', type: 'final_kickoff', scheduledAt: finalMatch.scheduledAt });
   return bets;
 }
 
@@ -156,7 +159,7 @@ function optionsFor(bet, base) {
   if (bet.type === 'group_winner') {
     return bet.group.teamKeys.map((key) => ({ key, label: teamByKey.get(key)?.name ?? key.replace(/^name:/, '') }));
   }
-  if (bet.type === 'total_baskets') return [];
+  if (NEAREST_BET_TYPES.includes(bet.type)) return [];
   return base.players.map((player) => ({
     key: player.key,
     label: player.name,
@@ -167,7 +170,12 @@ function optionsFor(bet, base) {
 // Kompletter, konsistenter Stand eines Turniers: Spielplan + Live-Stand + Sperren + Sonderwetten.
 export async function loadTournamentState(tournamentId, now = Date.now()) {
   const { config, tournament } = await requireEnabled(tournamentId);
-  const [base, locks, overrides] = await Promise.all([loadTournamentBase(tournamentId, now), loadLocks(tournamentId), loadOverrides(tournamentId)]);
+  const [base, locks, overrides, kickoffs] = await Promise.all([
+    loadTournamentBase(tournamentId, now),
+    loadLocks(tournamentId),
+    loadOverrides(tournamentId),
+    loadKickoffs(tournamentId)
+  ]);
   const { settings } = config;
   const scoreboardState = getScoreboardState();
   const { matches: liveMatches, liveCode } = applyLiveState(base.matches, scoreboardState, tournamentId, base.resolveKey);
@@ -188,7 +196,7 @@ export async function loadTournamentState(tournamentId, now = Date.now()) {
     if (deadline) return Date.parse(deadline) <= now;
     return started;
   };
-  const outcomes = deriveSpecialOutcomes({ tournament, summary: base.summary, matches, groups: base.groups, overrides, resolveKey: base.resolveKey });
+  const outcomes = deriveSpecialOutcomes({ tournament, summary: base.summary, matches, groups: base.groups, kickoffs, overrides, resolveKey: base.resolveKey });
   const bets = specialBetsFor(base, settings).map((bet) => ({ ...bet, locked: specialLocked(bet.type) }));
   // Turnier fertig: als abgeschlossen markiert oder jedes Spiel hat ein gespeichertes Ergebnis.
   const finished = Boolean(tournament.is_completed) || (matches.length > 0 && matches.every((match) => match.result?.saved));
@@ -369,15 +377,18 @@ export async function deleteTip(tournamentId, user, code) {
   emitCallitUpdate(tournamentId, 'tips');
 }
 
+// Zahlenwert-Wetten als Text: Gesamtpunkte als Zahl, Finale-Startzeit als HH:MM.
+const formatNearest = (type, value) => (type === 'final_kickoff' ? formatClock(value) : String(value));
+
 function describeValue(bet, value, base) {
   if (!value) return null;
-  if (bet.type === 'total_baskets') return String(value.value);
+  if (NEAREST_BET_TYPES.includes(bet.type)) return formatNearest(bet.type, value.value);
   return optionsFor(bet, base).find((option) => option.key === String(value.key))?.label ?? null;
 }
 
 function describeOutcome(bet, outcome, base) {
   if (!outcome) return null;
-  if (bet.type === 'total_baskets') return { value: outcome.value, final: outcome.final, labels: [String(outcome.value)] };
+  if (NEAREST_BET_TYPES.includes(bet.type)) return { value: outcome.value, final: outcome.final, labels: [formatNearest(bet.type, outcome.value)] };
   const options = optionsFor(bet, base);
   return {
     keys: outcome.keys,
@@ -397,6 +408,7 @@ export async function listSpecialsForUser(tournamentId, user) {
       betKey: bet.betKey,
       type: bet.type,
       groupLabel: bet.group?.label ?? null,
+      ...(bet.type === 'final_kickoff' ? { scheduledAt: bet.scheduledAt ?? null } : {}),
       points: config.points,
       deadline: config.deadline,
       locked: bet.locked,
@@ -419,6 +431,10 @@ export async function submitSpecialTip(tournamentId, user, betKey, value) {
   if (bet.type === 'total_baskets') {
     const numeric = Number(value?.value);
     if (!Number.isInteger(numeric) || numeric < 0 || numeric > MAX_TOTAL_BASKETS) throw new CallitError('CALLIT_INVALID_VALUE', 'Bitte eine ganze Zahl eingeben.');
+    normalized = { value: numeric };
+  } else if (bet.type === 'final_kickoff') {
+    const numeric = Number(value?.value);
+    if (!isMinuteOfDay(numeric)) throw new CallitError('CALLIT_INVALID_VALUE', 'Bitte eine Uhrzeit (HH:MM) eingeben.');
     normalized = { value: numeric };
   } else {
     const key = String(value?.key ?? '');
@@ -486,4 +502,4 @@ export async function getRanking(tournamentId, category = 'total') {
   return { ...ranking, updatedAt: new Date().toISOString() };
 }
 
-export { tendency, SPECIAL_BET_TYPES };
+export { tendency, SPECIAL_BET_TYPES, formatNearest };

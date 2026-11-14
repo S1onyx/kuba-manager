@@ -99,7 +99,10 @@
     "extraTime": "Temps additionnel",
     "extraTimePaused": "Temps additionnel (pause)",
     "running": "en cours",
-    "paused": "en pause"
+    "paused": "en pause",
+    "overtime": "Prolongation en cours",
+    "overtimePaused": "Prolongation (en pause)",
+    "overtimeBreak": "Pause avant la prolongation"
   },
   "dashboard": {
     "loading": "Chargement du scoreboard..."
@@ -114,18 +117,17 @@
     "tournamentStatus": "Statut du tournoi : {{status}}",
     "statusCompleted": "terminé",
     "statusRunning": "en cours",
-    "switching": "Changement...",
-    "showLive": "Afficher le score en direct",
-    "showBracket": "Afficher le tableau"
+    "displaySlot": "É{{slot}} : {{view}}"
   },
   "control": {
     "display": {
       "title": "Affichage vidéoprojecteur",
-      "description": "Basculez entre le score en direct et le tableau du tournoi sur le vidéoprojecteur.",
+      "description": "Choisissez ce qu'affichent les écrans 1, 2 et 3. Sur chaque écran, le bouton indique de quel écran il s'agit.",
       "bracketHint": "Choisissez d'abord le tournoi pour le tableau :",
       "chooseTournament": "Choisir un tournoi …",
       "updating": "Mise à jour de l'affichage...",
-      "callitHint": "Afficher le classement des pronostics de ce tournoi :"
+      "callitHint": "Afficher le classement des pronostics de ce tournoi :",
+      "slot": "Écran {{slot}}"
     },
     "context": {
       "title": "Contexte du match",
@@ -191,7 +193,7 @@
       "changedTitle": "⚠ Modifié après l'enregistrement",
       "changedText": "Le score a changé après l'enregistrement. Enregistrer à nouveau remplace le résultat.",
       "blockedTitle": "Match à élimination à égalité",
-      "blockedText": "L'enregistrement n'est possible qu'après la séance de lancers francs (carte ci-dessous).",
+      "blockedText": "L'enregistrement n'est possible qu'après la prolongation ou la séance de lancers francs (carte ci-dessous).",
       "savedTitle": "✓ Enregistré – le résultat compte",
       "savedText": "Pour le match suivant : réinitialiser puis charger le prochain match du programme.",
       "save": "Enregistrer maintenant",
@@ -205,11 +207,11 @@
     },
     "shootout": {
       "title": "Séance de lancers francs",
-      "drawHint": "Match à élimination à égalité – décision aux lancers francs : 5 tirs chacun, puis mort subite. Chaque réussite ajoute 1 point au score.",
+      "drawHint": "Toujours à égalité après la prolongation – décision par séance de lancers francs : 5 tirs chacun, puis mort subite. Chaque réussite ajoute 1 point au score.",
       "firstTeam": "Qui tire en premier ?",
       "start": "Démarrer la séance",
       "titleRunning": "Lancers francs {{a}}:{{b}}",
-      "regularScore": "Score à la fin du temps réglementaire : {{a}}:{{b}}",
+      "regularScore": "Score après la prolongation : {{a}}:{{b}}",
       "decided": "Décidé : {{team}} remporte la séance {{a}}:{{b}} – terminez et enregistrez le match.",
       "suddenDeath": "Mort subite – prochain tireur : {{team}}",
       "next": "Prochain tireur : {{team}}",
@@ -232,7 +234,7 @@
       "extraTimeInfo": "Temps additionnel prévu {{planned}} · écoulé {{elapsed}}",
       "start": "Démarrer",
       "pause": "Pause",
-      "autoStartSecondHalf": "Démarrer la 2e mi-temps automatiquement",
+      "autoStartSecondHalf": "Démarrer automatiquement après la pause (2e mi-temps, prolongation)",
       "newRemaining": "Nouveau temps restant",
       "timerPlaceholder": "p. ex. 10:00 ou 600",
       "setTime": "Définir le temps",
@@ -245,7 +247,8 @@
       "extraTimePlaceholder": "p. ex. 02:00",
       "finishGame": "Terminer le match",
       "saveGame": "Enregistrer le match",
-      "newGame": "Réinitialiser (sans enregistrer)"
+      "newGame": "Réinitialiser (sans enregistrer)",
+      "overtimeBreakRunning": "Pause avant la prolongation en cours · reste : {{remaining}} ({{mode}})"
     },
     "penalties": {
       "title": "Pénalités de temps",
@@ -283,6 +286,17 @@
       "cancel": "Annuler les lancers francs",
       "close": "Masquer",
       "failed": "L'action de lancer franc a échoué."
+    },
+    "overtime": {
+      "title": "Prolongation",
+      "drawHint": "Égalité à la fin du temps réglementaire – prolongation de {{duration}} après une pause de {{pause}}. En cas d'égalité persistante, séance de lancers francs.",
+      "start": "Lancer la prolongation",
+      "breakTitle": "Pause avant la prolongation · {{remaining}}",
+      "breakAuto": "La prolongation ({{duration}}) démarre ensuite automatiquement.",
+      "breakManual": "Lancez ensuite la prolongation ({{duration}}) manuellement.",
+      "startNow": "Lancer la prolongation maintenant",
+      "cancel": "Annuler la prolongation",
+      "failed": "Action échouée."
     }
   },
   "schedule": {
@@ -590,8 +604,6 @@
     "confirmResetGame": "Réinitialiser le match ? Équipes, points et temps seront effacés. Si le match n'a pas été enregistré, le résultat sera perdu.",
     "confirmReplaceUnsavedGame": "Le match en cours n'est pas enregistré. Charger quand même le nouveau match ? Le résultat actuel sera perdu.",
     "newGameFailed": "Le match n'a pas pu être réinitialisé.",
-    "displayNowScoreboard": "Le vidéoprojecteur affiche désormais le score en direct.",
-    "displayNowBracket": "Le vidéoprojecteur affiche désormais le tableau du tournoi.",
     "displayUpdateFailed": "Le mode d'affichage n'a pas pu être mis à jour.",
     "tournamentRequired": "Veuillez d'abord sélectionner un tournoi dans le contexte du match.",
     "invalidDateTime": "Veuillez sélectionner une date/heure valide.",
@@ -692,7 +704,7 @@
     "timerCuesSaveFailed": "Les paramètres du chronomètre n'ont pas pu être enregistrés.",
     "audioLoadFailed": "Les données audio n'ont pas pu être chargées.",
     "penaltyFreeThrowsSkipped": "Pénalité ajoutée pour l'équipe {{team}} – lancers francs non créés car une série est encore ouverte.",
-    "displayNowCallit": "Le projecteur affiche maintenant le classement des pronostics."
+    "displaySet": "Écran {{display}} affiche maintenant : {{view}}."
   },
   "error": {
     "generic": "Une erreur s'est produite. Veuillez réessayer.",
@@ -788,7 +800,7 @@
     "AUTH_REQUIRED": "Session expirée. Veuillez vous reconnecter.",
     "TOURNAMENT_REQUIRED": "Veuillez d'abord choisir un tournoi.",
     "GROUP_RESULTS_EXIST": "La phase de groupes a déjà des résultats – les équipes ne peuvent plus être échangées.",
-    "KNOCKOUT_DRAW": "Match à élimination à égalité – veuillez d'abord faire la séance de lancers francs.",
+    "KNOCKOUT_DRAW": "Match nul en phase à élimination directe – veuillez d'abord jouer la prolongation ou la séance de lancers francs.",
     "SHOOTOUT_UNDECIDED": "La séance de lancers francs n'est pas encore décidée.",
     "TEAM_OTHER_TOURNAMENT": "Un joueur ne peut changer d'équipe qu'au sein du même tournoi.",
     "TOURNAMENT_CREATE_FAILED": "Le tournoi n'a pas pu être créé.",
@@ -825,7 +837,13 @@
     "CALLIT_NOT_AVAILABLE": "Le jeu de pronostics n'est pas actif pour ce tournoi.",
     "CALLIT_INVALID_VALUE": "Valeur invalide.",
     "CALLIT_MATCH_NOT_FOUND": "Match introuvable.",
-    "CALLIT_USER_NOT_FOUND": "Utilisateur introuvable."
+    "CALLIT_USER_NOT_FOUND": "Utilisateur introuvable.",
+    "SHOOTOUT_NEEDS_OVERTIME": "La séance de lancers francs n'a lieu qu'après la prolongation.",
+    "OVERTIME_ALREADY_STARTED": "La prolongation a déjà été lancée.",
+    "OVERTIME_NOT_KNOCKOUT": "La prolongation n'existe qu'en phase à élimination directe.",
+    "OVERTIME_NOT_TIED": "La prolongation n'est possible qu'en cas d'égalité.",
+    "OVERTIME_CLOCK_NOT_OVER": "Le temps réglementaire n'est pas encore écoulé.",
+    "OVERTIME_IN_PROGRESS": "La prolongation est déjà en cours."
   },
   "export": {
     "title": "Export PDF / Impression",
@@ -900,7 +918,8 @@
     "groupLabel": "Groupe {{group}}",
     "emptyHint": "Selectionnez un tournoi pour voir les modeles",
     "collapse": "Reduire",
-    "expand": "Developper"
+    "expand": "Developper",
+    "overtimeShort": "a.p."
   },
   "callit": {
     "title": "Jeu de pronostics CallIt",
@@ -919,8 +938,8 @@
     "saveJoinCode": "Enregistrer le code",
     "copyLink": "Copier le lien",
     "copied": "Lien copié.",
-    "beamerOn": "Classement au projecteur",
-    "beamerOff": "Projecteur : retour au score",
+    "beamerOn": "Classement sur écran {{slot}}",
+    "beamerOff": "Écran {{slot}} : retour au score",
     "exportCsv": "Export CSV",
     "refresh": "Actualiser",
     "saved": "Enregistré.",
@@ -960,7 +979,8 @@
       "most_penalty_seconds": "Le plus de secondes de pénalité",
       "group_winner": "Vainqueur de groupe",
       "group_winner_label": "Vainqueur {{group}}",
-      "total_baskets": "Total des points"
+      "total_baskets": "Total des points",
+      "final_kickoff": "Heure de début de la finale"
     },
     "matches": {
       "title": "Matchs et verrouillages",

@@ -3,7 +3,7 @@
     "title": "Free-throw shootout",
     "suddenDeath": "Sudden death",
     "winner": "Winner: {{team}}",
-    "regular": "after regular time {{a}}:{{b}}",
+    "regular": "after overtime {{a}}:{{b}}",
     "short": "a.s.",
     "next": "Next to throw: {{team}}",
     "throwing": "throwing",
@@ -350,5 +350,12 @@
     "participants_other": "{{count}} players joined",
     "leaders": "Current leaders",
     "points": "{{points}} pts"
+  },
+  "overtime": {
+    "title": "Overtime",
+    "break": "Break before overtime",
+    "short": "OT",
+    "running": "Overtime · running",
+    "paused": "Overtime · paused"
   }
 }

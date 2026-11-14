@@ -3,7 +3,7 @@
     "title": "罚球决胜",
     "suddenDeath": "突然死亡",
     "winner": "胜者：{{team}}",
-    "regular": "常规时间 {{a}}:{{b}}",
+    "regular": "加时赛后 {{a}}:{{b}}",
     "short": "罚球胜",
     "next": "下一个投篮：{{team}}",
     "throwing": "投篮中",
@@ -344,5 +344,12 @@
     "participants_other": "已有 {{count}} 名玩家",
     "leaders": "当前领先",
     "points": "{{points}} 分"
+  },
+  "overtime": {
+    "title": "加时赛",
+    "break": "加时赛前休息",
+    "short": "加时",
+    "running": "加时赛 · 进行中",
+    "paused": "加时赛 · 暂停"
   }
 }

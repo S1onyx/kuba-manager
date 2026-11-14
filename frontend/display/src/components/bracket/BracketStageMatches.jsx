@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import useMediaQuery from '../../hooks/useMediaQuery.js';
 import { useDateLocale } from '../../i18n/index.js';
-import { formatStageLabelI18n } from '../../utils/formatting.js';
+import { formatStageLabelI18n, resultSuffix } from '../../utils/formatting.js';
 
 function resolveParticipantName(entry, fallback) {
   if (!entry) {
@@ -145,7 +145,7 @@ export default function BracketStageMatches({ title, stages }) {
                 const awayName = resolveParticipantName(match.away, match.away_label);
                 const hasResult = match.result?.hasResult;
                 const scoreDisplay = hasResult
-                  ? `${match.result.scoreA ?? 0}:${match.result.scoreB ?? 0}${match.result.shootout ? ` ${t('shootout.short')}` : ''}`
+                  ? `${match.result.scoreA ?? 0}:${match.result.scoreB ?? 0}${resultSuffix(match.result, t)}`
                   : 'vs';
 
                 const scheduledLabel = formatMatchDateTime(match.scheduled_at, scheduleFormatter, t);

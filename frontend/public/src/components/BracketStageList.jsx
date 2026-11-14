@@ -71,7 +71,7 @@ const matchTimeStyle = {
 function renderMatch(match, index, formatDateTime) {
   const labelKey = match.id || `${match.stage_label}-${index}`;
   const hasResult = Boolean(match.result?.hasResult);
-  const scoreText = hasResult ? formatResultScore(match.result.scoreA, match.result.scoreB, match.result.shootout) : 'vs';
+  const scoreText = hasResult ? formatResultScore(match.result.scoreA, match.result.scoreB, match.result) : 'vs';
   const scheduledLabel = formatDateTime ? formatDateTime(match.scheduled_at) : null;
   return (
     <article key={labelKey} className="bracket-stage__match" style={matchStyle}>

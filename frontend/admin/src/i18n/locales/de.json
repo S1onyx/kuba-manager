@@ -99,7 +99,10 @@
     "extraTime": "Nachspielzeit",
     "extraTimePaused": "Nachspielzeit (Pause)",
     "running": "läuft",
-    "paused": "pausiert"
+    "paused": "pausiert",
+    "overtime": "Verlängerung läuft",
+    "overtimePaused": "Verlängerung (Pause)",
+    "overtimeBreak": "Pause vor der Verlängerung"
   },
   "dashboard": {
     "loading": "Lade Scoreboard..."
@@ -114,18 +117,17 @@
     "tournamentStatus": "Turnierstatus: {{status}}",
     "statusCompleted": "abgeschlossen",
     "statusRunning": "läuft",
-    "switching": "Wechsle...",
-    "showLive": "Live anzeigen",
-    "showBracket": "Turnierbaum anzeigen"
+    "displaySlot": "D{{slot}}: {{view}}"
   },
   "control": {
     "display": {
       "title": "Beameranzeige",
-      "description": "Wechsle zwischen Live-Spielstand und Turnierbaum auf dem Beamer.",
+      "description": "Lege fest, was Display 1, 2 und 3 zeigen. Am Bildschirm selbst wählst du per Knopf, welches Display er ist.",
       "bracketHint": "Für den Turnierbaum zuerst das Turnier wählen:",
       "chooseTournament": "Turnier wählen …",
       "updating": "Anzeige wird aktualisiert...",
-      "callitHint": "Tippspiel-Ranking für dieses Turnier zeigen:"
+      "callitHint": "Tippspiel-Ranking für dieses Turnier zeigen:",
+      "slot": "Display {{slot}}"
     },
     "context": {
       "title": "Match-Kontext",
@@ -191,7 +193,7 @@
       "changedTitle": "⚠ Nach dem Speichern geändert",
       "changedText": "Der Spielstand wurde nach dem Speichern verändert. Erneut speichern ersetzt das gespeicherte Ergebnis.",
       "blockedTitle": "Unentschieden im KO-Spiel",
-      "blockedText": "Speichern geht erst nach dem Freiwurf-Stechen (Karte unten).",
+      "blockedText": "Speichern geht erst nach Verlängerung bzw. Freiwurf-Stechen (Karte unten).",
       "savedTitle": "✓ Gespeichert – das Ergebnis zählt",
       "savedText": "Für das nächste Spiel: Zurücksetzen und dann das nächste Spiel aus dem Spielplan übernehmen.",
       "save": "Jetzt speichern",
@@ -205,11 +207,11 @@
     },
     "shootout": {
       "title": "Freiwurf-Stechen",
-      "drawHint": "Unentschieden im KO-Spiel – Entscheidung per Freiwurf-Stechen: je 5 Würfe, danach Sudden Death. Jeder Treffer zählt 1 Punkt zum Ergebnis.",
+      "drawHint": "Auch nach der Verlängerung unentschieden – Entscheidung per Freiwurf-Stechen: je 5 Würfe, danach Sudden Death. Jeder Treffer zählt 1 Punkt zum Ergebnis.",
       "firstTeam": "Wer wirft zuerst?",
       "start": "Stechen starten",
       "titleRunning": "Freiwurf-Stechen {{a}}:{{b}}",
-      "regularScore": "Stand nach regulärer Spielzeit: {{a}}:{{b}}",
+      "regularScore": "Stand nach der Verlängerung: {{a}}:{{b}}",
       "decided": "Entschieden: {{team}} gewinnt das Stechen {{a}}:{{b}} – jetzt Spiel beenden und speichern.",
       "suddenDeath": "Sudden Death – als Nächstes wirft: {{team}}",
       "next": "Als Nächstes wirft: {{team}}",
@@ -232,7 +234,7 @@
       "extraTimeInfo": "Nachspielzeit geplant {{planned}} · gelaufen {{elapsed}}",
       "start": "Start",
       "pause": "Pause",
-      "autoStartSecondHalf": "2. Halbzeit automatisch starten",
+      "autoStartSecondHalf": "Nach der Pause automatisch starten (2. Halbzeit, Verlängerung)",
       "newRemaining": "Neue Restzeit",
       "timerPlaceholder": "z.B. 10:00 oder 600",
       "setTime": "Zeit setzen",
@@ -245,7 +247,8 @@
       "extraTimePlaceholder": "z.B. 02:00",
       "finishGame": "Spiel beenden",
       "saveGame": "Spiel speichern",
-      "newGame": "Zurücksetzen (ohne Speichern)"
+      "newGame": "Zurücksetzen (ohne Speichern)",
+      "overtimeBreakRunning": "Pause vor der Verlängerung läuft · Rest: {{remaining}} ({{mode}})"
     },
     "penalties": {
       "title": "Zeitstrafen",
@@ -283,6 +286,17 @@
       "cancel": "Freiwürfe abbrechen",
       "close": "Ausblenden",
       "failed": "Freiwurf-Aktion fehlgeschlagen."
+    },
+    "overtime": {
+      "title": "Verlängerung",
+      "drawHint": "Unentschieden nach Ablauf der Spielzeit – es folgt eine Verlängerung über {{duration}} nach {{pause}} Pause. Steht es danach immer noch unentschieden, folgt das Freiwurf-Stechen.",
+      "start": "Verlängerung starten",
+      "breakTitle": "Pause vor der Verlängerung · {{remaining}}",
+      "breakAuto": "Danach startet die Verlängerung ({{duration}}) automatisch.",
+      "breakManual": "Danach die Verlängerung ({{duration}}) manuell anpfeifen.",
+      "startNow": "Verlängerung jetzt anpfeifen",
+      "cancel": "Verlängerung abbrechen",
+      "failed": "Aktion fehlgeschlagen."
     }
   },
   "schedule": {
@@ -590,8 +604,6 @@
     "confirmResetGame": "Spiel zurücksetzen? Teams, Punkte und Zeit werden gelöscht. Wurde das Spiel nicht gespeichert, geht das Ergebnis verloren.",
     "confirmReplaceUnsavedGame": "Das aktuelle Spiel ist noch nicht gespeichert. Trotzdem das neue Spiel übernehmen? Das bisherige Ergebnis geht verloren.",
     "newGameFailed": "Spiel konnte nicht zurückgesetzt werden.",
-    "displayNowScoreboard": "Beamer zeigt jetzt den Live-Spielstand.",
-    "displayNowBracket": "Beamer zeigt jetzt den Turnierbaum.",
     "displayUpdateFailed": "Anzeige-Modus konnte nicht aktualisiert werden.",
     "tournamentRequired": "Bitte zuerst ein Turnier im Match-Kontext auswählen.",
     "invalidDateTime": "Bitte ein gültiges Datum/Uhrzeit auswählen.",
@@ -692,7 +704,7 @@
     "timerCuesSaveFailed": "Timer-Einstellungen konnten nicht gespeichert werden.",
     "audioLoadFailed": "Audiodaten konnten nicht geladen werden.",
     "penaltyFreeThrowsSkipped": "Zeitstrafe für Team {{team}} hinzugefügt – Freiwürfe nicht angelegt, weil noch eine Serie offen ist.",
-    "displayNowCallit": "Beamer zeigt jetzt das Tippspiel-Ranking."
+    "displaySet": "Display {{display}} zeigt jetzt: {{view}}."
   },
   "error": {
     "generic": "Ein Fehler ist aufgetreten. Bitte versuche es erneut.",
@@ -788,7 +800,7 @@
     "AUTH_REQUIRED": "Sitzung abgelaufen. Bitte erneut anmelden.",
     "TOURNAMENT_REQUIRED": "Bitte zuerst ein Turnier wählen.",
     "GROUP_RESULTS_EXIST": "In der Gruppenphase gibt es schon Ergebnisse – Teams können nicht mehr getauscht werden.",
-    "KNOCKOUT_DRAW": "Unentschieden im KO-Spiel – bitte zuerst das Freiwurf-Stechen durchführen.",
+    "KNOCKOUT_DRAW": "Unentschieden im KO-Spiel – bitte zuerst Verlängerung bzw. Freiwurf-Stechen durchführen.",
     "SHOOTOUT_UNDECIDED": "Das Freiwurf-Stechen ist noch nicht entschieden.",
     "TEAM_OTHER_TOURNAMENT": "Spieler können nur innerhalb eines Turniers das Team wechseln.",
     "TOURNAMENT_CREATE_FAILED": "Das Turnier konnte nicht erstellt werden.",
@@ -825,7 +837,13 @@
     "CALLIT_NOT_AVAILABLE": "Tippspiel ist für dieses Turnier nicht aktiv.",
     "CALLIT_INVALID_VALUE": "Ungültiger Wert.",
     "CALLIT_MATCH_NOT_FOUND": "Spiel nicht gefunden.",
-    "CALLIT_USER_NOT_FOUND": "Nutzer nicht gefunden."
+    "CALLIT_USER_NOT_FOUND": "Nutzer nicht gefunden.",
+    "SHOOTOUT_NEEDS_OVERTIME": "Das Freiwurf-Stechen folgt erst nach der Verlängerung.",
+    "OVERTIME_ALREADY_STARTED": "Die Verlängerung wurde bereits gestartet.",
+    "OVERTIME_NOT_KNOCKOUT": "Eine Verlängerung gibt es nur in KO-Spielen.",
+    "OVERTIME_NOT_TIED": "Eine Verlängerung ist nur bei Gleichstand möglich.",
+    "OVERTIME_CLOCK_NOT_OVER": "Die reguläre Spielzeit ist noch nicht abgelaufen.",
+    "OVERTIME_IN_PROGRESS": "Die Verlängerung läuft bereits."
   },
   "export": {
     "title": "PDF-Export / Drucken",
@@ -900,7 +918,8 @@
     "groupLabel": "Gruppe {{group}}",
     "emptyHint": "Turnier auswaehlen um Druckvorlagen zu sehen",
     "collapse": "Einklappen",
-    "expand": "Aufklappen"
+    "expand": "Aufklappen",
+    "overtimeShort": "n.V."
   },
   "callit": {
     "title": "Tippspiel CallIt",
@@ -919,8 +938,8 @@
     "saveJoinCode": "Code speichern",
     "copyLink": "Link kopieren",
     "copied": "Link kopiert.",
-    "beamerOn": "Ranking auf Beamer",
-    "beamerOff": "Beamer zurück zum Scoreboard",
+    "beamerOn": "Ranking auf Display {{slot}}",
+    "beamerOff": "Display {{slot}} zurück zum Spielstand",
     "exportCsv": "CSV-Export",
     "refresh": "Aktualisieren",
     "saved": "Gespeichert.",
@@ -960,7 +979,8 @@
       "most_penalty_seconds": "Meiste Strafsekunden",
       "group_winner": "Gruppensieger",
       "group_winner_label": "Gruppensieger {{group}}",
-      "total_baskets": "Gesamtpunkte"
+      "total_baskets": "Gesamtpunkte",
+      "final_kickoff": "Startzeit Finale"
     },
     "matches": {
       "title": "Spiele & Sperren",

@@ -13,3 +13,20 @@ export function shootoutSummary(snapshot) {
     hitsB: hits.b
   };
 }
+
+export function overtimeSummary(snapshot) {
+  const overtime = snapshot?.overtime;
+  if (!overtime) {
+    return null;
+  }
+  return {
+    regularScoreA: overtime.regularScoreA ?? 0,
+    regularScoreB: overtime.regularScoreB ?? 0
+  };
+}
+
+// Kennzeichnung am Ergebnis: Stechen schlägt Verlängerung (ein Stechen folgt immer auf eine Verlängerung).
+export function resultSuffix(snapshot) {
+  if (shootoutSummary(snapshot)) return ' n.F.';
+  return overtimeSummary(snapshot) ? ' n.V.' : '';
+}

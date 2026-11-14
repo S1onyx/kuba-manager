@@ -103,7 +103,10 @@
     "extraTime": "Nastavení",
     "extraTimePaused": "Nastavení (pauza)",
     "running": "běží",
-    "paused": "pozastaveno"
+    "paused": "pozastaveno",
+    "overtime": "Prodloužení běží",
+    "overtimePaused": "Prodloužení (pozastaveno)",
+    "overtimeBreak": "Přestávka před prodloužením"
   },
   "dashboard": {
     "loading": "Načítám tabuli..."
@@ -118,18 +121,17 @@
     "tournamentStatus": "Stav turnaje: {{status}}",
     "statusCompleted": "ukončen",
     "statusRunning": "probíhá",
-    "switching": "Přepínám...",
-    "showLive": "Zobrazit živý stav",
-    "showBracket": "Zobrazit turnajový strom"
+    "displaySlot": "D{{slot}}: {{view}}"
   },
   "control": {
     "display": {
       "title": "Zobrazení na projektoru",
-      "description": "Přepínejte mezi živým stavem a turnajovým stromem na projektoru.",
+      "description": "Nastav, co zobrazují displeje 1, 2 a 3. Na samotné obrazovce tlačítkem zvolíš, který displej to je.",
       "bracketHint": "Pro pavouka nejprve vyberte turnaj:",
       "chooseTournament": "Vybrat turnaj …",
       "updating": "Aktualizuji zobrazení...",
-      "callitHint": "Zobrazit pořadí tipovačky tohoto turnaje:"
+      "callitHint": "Zobrazit pořadí tipovačky tohoto turnaje:",
+      "slot": "Displej {{slot}}"
     },
     "context": {
       "title": "Kontext zápasu",
@@ -195,7 +197,7 @@
       "changedTitle": "⚠ Změněno po uložení",
       "changedText": "Skóre bylo po uložení změněno. Nové uložení nahradí uložený výsledek.",
       "blockedTitle": "Vyřazovací zápas je nerozhodný",
-      "blockedText": "Uložit lze až po rozstřelu (karta níže).",
+      "blockedText": "Uložit lze až po prodloužení nebo rozstřelu trestných hodů (karta níže).",
       "savedTitle": "✓ Uloženo – výsledek platí",
       "savedText": "Pro další zápas: resetovat a načíst další zápas z rozpisu.",
       "save": "Uložit nyní",
@@ -209,11 +211,11 @@
     },
     "shootout": {
       "title": "Rozstřel trestnými hody",
-      "drawHint": "Vyřazovací zápas je nerozhodný – rozhodne rozstřel: 5 hodů každý, pak náhlá smrt. Každý zásah přidá 1 bod k výsledku.",
+      "drawHint": "Nerozhodně i po prodloužení – rozhodne rozstřel trestných hodů: každý tým 5 hodů, poté náhlá smrt. Každý zásah přidá 1 bod k výsledku.",
       "firstTeam": "Kdo hází první?",
       "start": "Spustit rozstřel",
       "titleRunning": "Rozstřel {{a}}:{{b}}",
-      "regularScore": "Stav po řádné hrací době: {{a}}:{{b}}",
+      "regularScore": "Stav po prodloužení: {{a}}:{{b}}",
       "decided": "Rozhodnuto: {{team}} vyhrává rozstřel {{a}}:{{b}} – nyní zápas ukončete a uložte.",
       "suddenDeath": "Náhlá smrt – další hází: {{team}}",
       "next": "Další hází: {{team}}",
@@ -236,7 +238,7 @@
       "extraTimeInfo": "Nastavení plánováno {{planned}} · odehráno {{elapsed}}",
       "start": "Start",
       "pause": "Pauza",
-      "autoStartSecondHalf": "Automaticky spustit 2. poločas",
+      "autoStartSecondHalf": "Po přestávce spustit automaticky (2. poločas, prodloužení)",
       "newRemaining": "Nový zbývající čas",
       "timerPlaceholder": "např. 10:00 nebo 600",
       "setTime": "Nastavit čas",
@@ -249,7 +251,8 @@
       "extraTimePlaceholder": "např. 02:00",
       "finishGame": "Ukončit zápas",
       "saveGame": "Uložit zápas",
-      "newGame": "Resetovat (bez uložení)"
+      "newGame": "Resetovat (bez uložení)",
+      "overtimeBreakRunning": "Přestávka před prodloužením běží · zbývá: {{remaining}} ({{mode}})"
     },
     "penalties": {
       "title": "Časové tresty",
@@ -287,6 +290,17 @@
       "cancel": "Zrušit trestné hody",
       "close": "Skrýt",
       "failed": "Akce trestného hodu se nezdařila."
+    },
+    "overtime": {
+      "title": "Prodloužení",
+      "drawHint": "Nerozhodně po řádné hrací době – po přestávce {{pause}} následuje prodloužení {{duration}}. Pokud je i poté nerozhodně, rozhodne rozstřel trestných hodů.",
+      "start": "Spustit prodloužení",
+      "breakTitle": "Přestávka před prodloužením · {{remaining}}",
+      "breakAuto": "Poté se prodloužení ({{duration}}) spustí automaticky.",
+      "breakManual": "Poté spusťte prodloužení ({{duration}}) ručně.",
+      "startNow": "Spustit prodloužení hned",
+      "cancel": "Zrušit prodloužení",
+      "failed": "Akce se nezdařila."
     }
   },
   "schedule": {
@@ -602,8 +616,6 @@
     "confirmResetGame": "Resetovat zápas? Týmy, body a čas budou smazány. Pokud zápas nebyl uložen, výsledek bude ztracen.",
     "confirmReplaceUnsavedGame": "Aktuální zápas není uložen. Přesto načíst nový zápas? Dosavadní výsledek bude ztracen.",
     "newGameFailed": "Zápas se nepodařilo resetovat.",
-    "displayNowScoreboard": "Projektor nyní zobrazuje živý stav.",
-    "displayNowBracket": "Projektor nyní zobrazuje turnajový strom.",
     "displayUpdateFailed": "Režim zobrazení se nepodařilo aktualizovat.",
     "tournamentRequired": "Nejprve vyberte turnaj v kontextu zápasu.",
     "invalidDateTime": "Vyberte platné datum/čas.",
@@ -710,7 +722,7 @@
     "timerCuesSaveFailed": "Nastavení časomíry se nepodařilo uložit.",
     "audioLoadFailed": "Zvuková data se nepodařilo načíst.",
     "penaltyFreeThrowsSkipped": "Časový trest přidán týmu {{team}} – trestné hody nevytvořeny, protože je ještě otevřená série.",
-    "displayNowCallit": "Projektor nyní zobrazuje pořadí tipovačky."
+    "displaySet": "Displej {{display}} nyní zobrazuje: {{view}}."
   },
   "error": {
     "generic": "Došlo k chybě. Zkuste to prosím znovu.",
@@ -806,7 +818,7 @@
     "AUTH_REQUIRED": "Relace vypršela. Přihlaste se znovu.",
     "TOURNAMENT_REQUIRED": "Nejprve vyberte turnaj.",
     "GROUP_RESULTS_EXIST": "Skupinová fáze už má výsledky – týmy už nelze prohodit.",
-    "KNOCKOUT_DRAW": "Vyřazovací zápas je nerozhodný – nejprve proveďte rozstřel.",
+    "KNOCKOUT_DRAW": "Remíza ve vyřazovacím zápase – nejprve odehrajte prodloužení nebo rozstřel trestných hodů.",
     "SHOOTOUT_UNDECIDED": "Rozstřel ještě není rozhodnut.",
     "TEAM_OTHER_TOURNAMENT": "Hráči mohou měnit tým jen v rámci jednoho turnaje.",
     "TOURNAMENT_CREATE_FAILED": "Turnaj se nepodařilo vytvořit.",
@@ -843,7 +855,13 @@
     "CALLIT_NOT_AVAILABLE": "Tipovačka není pro tento turnaj aktivní.",
     "CALLIT_INVALID_VALUE": "Neplatná hodnota.",
     "CALLIT_MATCH_NOT_FOUND": "Zápas nenalezen.",
-    "CALLIT_USER_NOT_FOUND": "Uživatel nenalezen."
+    "CALLIT_USER_NOT_FOUND": "Uživatel nenalezen.",
+    "SHOOTOUT_NEEDS_OVERTIME": "Rozstřel trestných hodů následuje až po prodloužení.",
+    "OVERTIME_ALREADY_STARTED": "Prodloužení již bylo spuštěno.",
+    "OVERTIME_NOT_KNOCKOUT": "Prodloužení existuje jen ve vyřazovacích zápasech.",
+    "OVERTIME_NOT_TIED": "Prodloužení je možné jen při nerozhodném stavu.",
+    "OVERTIME_CLOCK_NOT_OVER": "Řádná hrací doba ještě neuplynula.",
+    "OVERTIME_IN_PROGRESS": "Prodloužení už probíhá."
   },
   "export": {
     "title": "Export PDF / Tisk",
@@ -918,7 +936,8 @@
     "groupLabel": "Skupina {{group}}",
     "emptyHint": "Vyberte turnaj pro zobrazeni tiskovych sablon",
     "collapse": "Sbalit",
-    "expand": "Rozbalit"
+    "expand": "Rozbalit",
+    "overtimeShort": "po prodl."
   },
   "callit": {
     "title": "Tipovačka CallIt",
@@ -937,8 +956,8 @@
     "saveJoinCode": "Uložit kód",
     "copyLink": "Kopírovat odkaz",
     "copied": "Odkaz zkopírován.",
-    "beamerOn": "Pořadí na projektor",
-    "beamerOff": "Projektor zpět na skóre",
+    "beamerOn": "Pořadí na displej {{slot}}",
+    "beamerOff": "Displej {{slot}} zpět na skóre",
     "exportCsv": "Export CSV",
     "refresh": "Obnovit",
     "saved": "Uloženo.",
@@ -978,7 +997,8 @@
       "most_penalty_seconds": "Nejvíc trestných sekund",
       "group_winner": "Vítěz skupiny",
       "group_winner_label": "Vítěz {{group}}",
-      "total_baskets": "Celkem bodů"
+      "total_baskets": "Celkem bodů",
+      "final_kickoff": "Čas začátku finále"
     },
     "matches": {
       "title": "Zápasy a zámky",

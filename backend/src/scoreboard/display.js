@@ -3,18 +3,26 @@ import {
   notifySubscribers,
   snapshotState,
   DISPLAY_VIEWS,
-  DEFAULT_DISPLAY_VIEW
+  DEFAULT_DISPLAY_VIEW,
+  DISPLAY_SLOTS
 } from './stateStore.js';
 
-export function setDisplayView(view, { callitTournamentId } = {}) {
+function displayError(code, message) {
+  const error = new Error(message);
+  error.code = code;
+  return error;
+}
+
+// Ansicht für genau ein Display (1–3); ohne Angabe Display 1.
+export function setDisplayView(view, { display = '1', callitTournamentId } = {}) {
   const normalized = typeof view === 'string' ? view.toLowerCase().trim() : '';
   const target = DISPLAY_VIEWS.includes(normalized) ? normalized : null;
-
   if (!target) {
-    const allowed = DISPLAY_VIEWS.join(', ');
-    const error = new Error(`Ungültiger Anzeige-Modus. Erlaubt: ${allowed}`);
-    error.code = 'INVALID_DISPLAY_VIEW';
-    throw error;
+    throw displayError('INVALID_DISPLAY_VIEW', `Ungültiger Anzeige-Modus. Erlaubt: ${DISPLAY_VIEWS.join(', ')}`);
+  }
+  const slot = String(display ?? '1');
+  if (!DISPLAY_SLOTS.includes(slot)) {
+    throw displayError('INVALID_DISPLAY', `Ungültiges Display. Erlaubt: ${DISPLAY_SLOTS.join(', ')}`);
   }
 
   const state = getState();
@@ -23,19 +31,18 @@ export function setDisplayView(view, { callitTournamentId } = {}) {
     Number.isInteger(numericTournamentId) && numericTournamentId > 0
       ? numericTournamentId
       : state.displayCallitTournamentId ?? null;
-  if (state.displayView === target && state.displayCallitTournamentId === nextCallitTournamentId) {
+  if (state.displays[slot] === target && state.displayCallitTournamentId === nextCallitTournamentId) {
     return snapshotState();
   }
 
-  state.displayView = target;
+  state.displays = { ...state.displays, [slot]: target };
   state.displayCallitTournamentId = nextCallitTournamentId;
   notifySubscribers();
   return snapshotState();
 }
 
-export function getDisplayView() {
-  const state = getState();
-  return state.displayView ?? DEFAULT_DISPLAY_VIEW;
+export function getDisplayView(display = '1') {
+  return getState().displays?.[String(display)] ?? DEFAULT_DISPLAY_VIEW;
 }
 
 export { DISPLAY_VIEWS, DEFAULT_DISPLAY_VIEW };

@@ -30,7 +30,10 @@ test('+1 zählt nicht mehr als Freiwurf', async () => {
 
 test('Stechen-Würfe zählen in die Freiwurfquote, Zurücknehmen zieht ab', async () => {
   const { startShootout, recordShootoutAttempt, undoShootoutAttempt } = await import('../src/scoreboard/shootout.js');
-  await freshGame({ stageType: 'knockout', scoreA: 3, scoreB: 3 });
+  await freshGame({
+    stageType: 'knockout', scoreA: 3, scoreB: 3, remainingSeconds: 0,
+    overtime: { regularScoreA: 3, regularScoreB: 3, durationSeconds: 300 }
+  });
   startShootout({ firstTeam: 'a' });
   recordShootoutAttempt({ team: 'a', playerId: 1, hit: true });
   recordShootoutAttempt({ team: 'b', playerId: 2, hit: false });

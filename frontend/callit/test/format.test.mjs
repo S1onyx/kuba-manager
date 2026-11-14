@@ -2,9 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   canSaveTip,
+  clockToMinutes,
+  filterMatches,
+  formatVenueClock,
+  liveTipGap,
+  minutesToClock,
+  nextMatch,
   formatCountdown,
   formatQuote,
-  groupMatchesByStage,
   nextKickoff,
   stepDraft
 } from '../src/utils/format.js';
@@ -38,16 +43,31 @@ test('KO-Unentschieden braucht Weiterkommer', () => {
   assert.equal(canSaveTip(ko, { scoreHome: null, scoreAway: 1 }), false);
 });
 
-test('Spiele nach Runde gruppieren, Reihenfolge bleibt', () => {
-  const groups = groupMatchesByStage([
-    { code: '1', stageLabel: 'Gruppe A' },
-    { code: '2', stageLabel: 'Finale' },
-    { code: '3', stageLabel: 'Gruppe A' }
-  ]);
-  assert.deepEqual(groups.map((group) => [group.label, group.matches.map((m) => m.code)]), [
-    ['Gruppe A', ['1', '3']],
-    ['Finale', ['2']]
-  ]);
+const schedule = [
+  { code: '1', status: 'finished' },
+  { code: '2', status: 'finished' },
+  { code: '3', status: 'live' },
+  { code: '4', status: 'locked' },
+  { code: '5', status: 'open' },
+  { code: '6', status: 'pending' }
+];
+const codes = (list) => list.map((match) => match.code);
+
+test('Spielliste in Spielplan-Reihenfolge, Beendete nur unter Ergebnisse (neueste zuerst)', () => {
+  assert.deepEqual(codes(filterMatches(schedule, 'upcoming')), ['3', '4', '5', '6']);
+  assert.deepEqual(codes(filterMatches(schedule, 'open')), ['5']);
+  assert.deepEqual(codes(filterMatches(schedule, 'results')), ['2', '1']);
+});
+
+test('Als Nächstes: erstes Spiel nach dem laufenden, das noch nicht begonnen hat', () => {
+  assert.equal(nextMatch(schedule).code, '4');
+  assert.equal(nextMatch(schedule.slice(0, 3)), null);
+});
+
+test('Live: Abstand zwischen aktuellem Stand und Tipp je Team', () => {
+  assert.deepEqual(liveTipGap({ scoreHome: 5, scoreAway: 2 }, { home: 4, away: 3 }), { home: '+1', away: '−1', exact: false });
+  assert.deepEqual(liveTipGap({ scoreHome: 4, scoreAway: 3 }, { home: 4, away: 3 }), { home: '±0', away: '±0', exact: true });
+  assert.equal(liveTipGap(null, { home: 1, away: 0 }), null);
 });
 
 test('Nächster Anpfiff nur aus offenen, zukünftigen Spielen', () => {
@@ -62,4 +82,14 @@ test('Nächster Anpfiff nur aus offenen, zukünftigen Spielen', () => {
     now
   );
   assert.equal(next.code, 'd');
+});
+
+test('Finale-Startzeit: HH:MM <-> Minuten, Spielplanzeit in Ortszeit', () => {
+  assert.equal(clockToMinutes('17:05'), 17 * 60 + 5);
+  assert.equal(clockToMinutes('24:00'), null);
+  assert.equal(clockToMinutes(''), null);
+  assert.equal(minutesToClock(17 * 60 + 5), '17:05');
+  assert.equal(minutesToClock(undefined), '');
+  assert.equal(formatVenueClock('2026-11-14T16:30:00.000Z'), '17:30');
+  assert.equal(formatVenueClock(null), null);
 });

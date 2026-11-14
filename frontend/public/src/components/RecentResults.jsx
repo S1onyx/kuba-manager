@@ -96,7 +96,7 @@ export default function RecentResults({ games = [], nextMatch = null }) {
             <div className="recent-results__row" style={rowStyle}>
               <strong style={{ ...teamStyle, textAlign: 'left' }}>{game.teamA}</strong>
               <span className="recent-results__score" style={scoreStyle}>
-                {formatResultScore(game.scoreA, game.scoreB, game.shootout)}
+                {formatResultScore(game.scoreA, game.scoreB, game)}
               </span>
               <strong style={{ ...teamStyle, textAlign: 'right' }}>{game.teamB}</strong>
             </div>

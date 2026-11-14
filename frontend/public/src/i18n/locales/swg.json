@@ -3,7 +3,7 @@
     "title": "Freiwurf-Stecha",
     "suddenDeath": "Sudden Death",
     "winner": "Sieger: {{team}}",
-    "regular": "noch dr reguläre Spielzeit {{a}}:{{b}}",
+    "regular": "noch dr Verlängerung {{a}}:{{b}}",
     "short": "n.F.",
     "next": "Als Nächsts wirft: {{team}}",
     "throwing": "wirft",
@@ -350,5 +350,12 @@
     "participants_other": "{{count}} Tipper dabei",
     "leaders": "Aktuell vorna",
     "points": "{{points}} Pkt."
+  },
+  "overtime": {
+    "title": "Verlängerung",
+    "break": "Bause vor dr Verlängerung",
+    "short": "n.V.",
+    "running": "Verlängerung · lauft",
+    "paused": "Verlängerung · Bause"
   }
 }

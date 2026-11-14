@@ -142,16 +142,24 @@
     "jokerStatus": "Joker: Gruppe {{group}} · KO {{ko}}",
     "rulesLink": "Regeln",
     "filters": {
-      "open": "Offen",
-      "all": "Alle",
-      "done": "Gespielt"
+      "upcoming": "Anstehend",
+      "open": "Zu tippen",
+      "results": "Ergebnisse"
     },
-    "empty": "Hier gibt es gerade nichts zu tippen.",
+    "empty": {
+      "upcoming": "Keine anstehenden Spiele.",
+      "open": "Hier gibt es gerade nichts zu tippen.",
+      "results": "Noch keine Ergebnisse."
+    },
     "advanceNeeded": "Weiterkommer wählen",
     "jokerShort": "Joker",
     "underdogShort": "Underdog",
     "pendingCount_one": "{{count}} weiteres Spiel wird tippbar, sobald die Teams feststehen",
-    "pendingCount_other": "{{count}} weitere Spiele werden tippbar, sobald die Teams feststehen"
+    "pendingCount_other": "{{count}} weitere Spiele werden tippbar, sobald die Teams feststehen",
+    "nextMatch": "Als Nächstes",
+    "liveNow": "aktuell",
+    "liveGap": "Abstand zum Tipp",
+    "liveExact": "Aktueller Stand = dein Tipp!"
   },
   "specials": {
     "title": "Sonderwetten",
@@ -170,18 +178,21 @@
       "top_scorer": "Topscorer (meiste Punkte)",
       "most_penalty_seconds": "Meiste Strafsekunden",
       "group_winner": "Sieger {{group}}",
-      "total_baskets": "Gesamtpunkte im Turnier"
+      "total_baskets": "Gesamtpunkte im Turnier",
+      "final_kickoff": "Startzeit Finale"
     },
     "hints": {
       "winner": "Wer gewinnt das Turnier?",
       "top_scorer": "Welcher Spieler erzielt die meisten Punkte?",
       "most_penalty_seconds": "Wer sammelt die meisten Strafsekunden?",
       "group_winner": "Wer wird Gruppenerster?",
-      "total_baskets": "Wie viele Punkte fallen insgesamt (reguläre Spielzeit)? Wer am nächsten dran ist, gewinnt."
+      "total_baskets": "Wie viele Punkte fallen insgesamt (reguläre Spielzeit)? Wer am nächsten dran ist, gewinnt.",
+      "final_kickoff": "Um wie viel Uhr wird das Finale angepfiffen (Ortszeit)? Wer am nächsten dran ist (auf die Minute), gewinnt."
     },
     "doneTitle_one": "{{count}} Sonderwette getippt",
     "doneTitle_other": "{{count}} Sonderwetten getippt",
-    "doneHint": "Bis zum ersten Anpfiff kannst du sie noch ändern."
+    "doneHint": "Bis zum ersten Anpfiff kannst du sie noch ändern.",
+    "plannedAt": "Laut Spielplan: {{time}} Uhr"
   },
   "ranking": {
     "title": "Ranking",

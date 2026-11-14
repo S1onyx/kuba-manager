@@ -99,7 +99,10 @@
     "extraTime": "Extra time",
     "extraTimePaused": "Extra time (paused)",
     "running": "running",
-    "paused": "paused"
+    "paused": "paused",
+    "overtime": "Overtime running",
+    "overtimePaused": "Overtime (paused)",
+    "overtimeBreak": "Break before overtime"
   },
   "dashboard": {
     "loading": "Loading scoreboard..."
@@ -114,18 +117,17 @@
     "tournamentStatus": "Tournament status: {{status}}",
     "statusCompleted": "completed",
     "statusRunning": "in progress",
-    "switching": "Switching...",
-    "showLive": "Show live score",
-    "showBracket": "Show bracket"
+    "displaySlot": "D{{slot}}: {{view}}"
   },
   "control": {
     "display": {
       "title": "Projector Display",
-      "description": "Switch between live score and bracket on the projector.",
+      "description": "Choose what displays 1, 2 and 3 show. On each screen, pick which display it is with the button.",
       "bracketHint": "Choose the tournament for the bracket first:",
       "chooseTournament": "Choose tournament …",
       "updating": "Updating display...",
-      "callitHint": "Show the prediction ranking for this tournament:"
+      "callitHint": "Show the prediction ranking for this tournament:",
+      "slot": "Display {{slot}}"
     },
     "context": {
       "title": "Match Context",
@@ -191,7 +193,7 @@
       "changedTitle": "⚠ Changed after saving",
       "changedText": "The score was changed after saving. Saving again replaces the saved result.",
       "blockedTitle": "Knockout game tied",
-      "blockedText": "Saving is only possible after the free-throw shootout (card below).",
+      "blockedText": "Saving is only possible after overtime or the free-throw shoot-out (card below).",
       "savedTitle": "✓ Saved – the result counts",
       "savedText": "For the next game: reset, then load the next game from the schedule.",
       "save": "Save now",
@@ -205,11 +207,11 @@
     },
     "shootout": {
       "title": "Free-throw shootout",
-      "drawHint": "Knockout game is tied – decided by a free-throw shootout: 5 throws each, then sudden death. Each hit adds 1 point to the result.",
+      "drawHint": "Still tied after overtime – decided by free-throw shoot-out: 5 throws each, then sudden death. Every hit adds 1 point to the score.",
       "firstTeam": "Who throws first?",
       "start": "Start shootout",
       "titleRunning": "Free-throw shootout {{a}}:{{b}}",
-      "regularScore": "Score after regular time: {{a}}:{{b}}",
+      "regularScore": "Score after overtime: {{a}}:{{b}}",
       "decided": "Decided: {{team}} wins the shootout {{a}}:{{b}} – now finish and save the game.",
       "suddenDeath": "Sudden death – next to throw: {{team}}",
       "next": "Next to throw: {{team}}",
@@ -232,7 +234,7 @@
       "extraTimeInfo": "Extra time planned {{planned}} · elapsed {{elapsed}}",
       "start": "Start",
       "pause": "Pause",
-      "autoStartSecondHalf": "Start 2nd half automatically",
+      "autoStartSecondHalf": "Start automatically after the break (2nd half, overtime)",
       "newRemaining": "New remaining time",
       "timerPlaceholder": "e.g. 10:00 or 600",
       "setTime": "Set time",
@@ -245,7 +247,8 @@
       "extraTimePlaceholder": "e.g. 02:00",
       "finishGame": "Finish game",
       "saveGame": "Save game",
-      "newGame": "Reset (without saving)"
+      "newGame": "Reset (without saving)",
+      "overtimeBreakRunning": "Break before overtime running · remaining: {{remaining}} ({{mode}})"
     },
     "penalties": {
       "title": "Time Penalties",
@@ -283,6 +286,17 @@
       "cancel": "Cancel free throws",
       "close": "Hide",
       "failed": "Free-throw action failed."
+    },
+    "overtime": {
+      "title": "Overtime",
+      "drawHint": "Tied after regular time – overtime of {{duration}} follows after a {{pause}} break. If it is still tied afterwards, a free-throw shoot-out decides.",
+      "start": "Start overtime",
+      "breakTitle": "Break before overtime · {{remaining}}",
+      "breakAuto": "Overtime ({{duration}}) then starts automatically.",
+      "breakManual": "Then start overtime ({{duration}}) manually.",
+      "startNow": "Start overtime now",
+      "cancel": "Cancel overtime",
+      "failed": "Action failed."
     }
   },
   "schedule": {
@@ -590,8 +604,6 @@
     "confirmResetGame": "Reset the game? Teams, points and time will be cleared. If the game has not been saved, the result will be lost.",
     "confirmReplaceUnsavedGame": "The current game has not been saved. Load the new game anyway? The current result will be lost.",
     "newGameFailed": "Game could not be reset.",
-    "displayNowScoreboard": "The projector now shows the live score.",
-    "displayNowBracket": "The projector now shows the bracket.",
     "displayUpdateFailed": "The display mode could not be updated.",
     "tournamentRequired": "Please select a tournament in the match context first.",
     "invalidDateTime": "Please select a valid date/time.",
@@ -692,7 +704,7 @@
     "timerCuesSaveFailed": "The timer settings could not be saved.",
     "audioLoadFailed": "The audio data could not be loaded.",
     "penaltyFreeThrowsSkipped": "Time penalty added for team {{team}} – free throws not created because a series is still open.",
-    "displayNowCallit": "The projector now shows the prediction ranking."
+    "displaySet": "Display {{display}} now shows: {{view}}."
   },
   "error": {
     "generic": "An error occurred. Please try again.",
@@ -788,7 +800,7 @@
     "AUTH_REQUIRED": "Session expired. Please sign in again.",
     "TOURNAMENT_REQUIRED": "Please select a tournament first.",
     "GROUP_RESULTS_EXIST": "The group stage already has results – teams can no longer be swapped.",
-    "KNOCKOUT_DRAW": "Knockout game is tied – please run the free-throw shootout first.",
+    "KNOCKOUT_DRAW": "Draw in a knockout game – please play overtime or the free-throw shoot-out first.",
     "SHOOTOUT_UNDECIDED": "The free-throw shootout is not decided yet.",
     "TEAM_OTHER_TOURNAMENT": "Players can only change teams within the same tournament.",
     "TOURNAMENT_CREATE_FAILED": "The tournament could not be created.",
@@ -825,7 +837,13 @@
     "CALLIT_NOT_AVAILABLE": "Prediction game is not active for this tournament.",
     "CALLIT_INVALID_VALUE": "Invalid value.",
     "CALLIT_MATCH_NOT_FOUND": "Game not found.",
-    "CALLIT_USER_NOT_FOUND": "User not found."
+    "CALLIT_USER_NOT_FOUND": "User not found.",
+    "SHOOTOUT_NEEDS_OVERTIME": "The free-throw shoot-out only follows after overtime.",
+    "OVERTIME_ALREADY_STARTED": "Overtime has already been started.",
+    "OVERTIME_NOT_KNOCKOUT": "Overtime only exists in knockout games.",
+    "OVERTIME_NOT_TIED": "Overtime is only possible when tied.",
+    "OVERTIME_CLOCK_NOT_OVER": "Regular time has not run out yet.",
+    "OVERTIME_IN_PROGRESS": "Overtime is already under way."
   },
   "export": {
     "title": "PDF Export / Print",
@@ -900,7 +918,8 @@
     "groupLabel": "Group {{group}}",
     "emptyHint": "Select a tournament to see print templates",
     "collapse": "Collapse",
-    "expand": "Expand"
+    "expand": "Expand",
+    "overtimeShort": "OT"
   },
   "callit": {
     "title": "Prediction game CallIt",
@@ -919,8 +938,8 @@
     "saveJoinCode": "Save code",
     "copyLink": "Copy link",
     "copied": "Link copied.",
-    "beamerOn": "Ranking on projector",
-    "beamerOff": "Projector back to scoreboard",
+    "beamerOn": "Ranking on display {{slot}}",
+    "beamerOff": "Display {{slot}} back to live score",
     "exportCsv": "CSV export",
     "refresh": "Refresh",
     "saved": "Saved.",
@@ -960,7 +979,8 @@
       "most_penalty_seconds": "Most penalty seconds",
       "group_winner": "Group winner",
       "group_winner_label": "Group winner {{group}}",
-      "total_baskets": "Total points"
+      "total_baskets": "Total points",
+      "final_kickoff": "Final kick-off time"
     },
     "matches": {
       "title": "Games & locks",

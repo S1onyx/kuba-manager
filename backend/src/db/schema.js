@@ -74,6 +74,12 @@ function initializeCallitSchema(db) {
       updated_at TEXT DEFAULT (datetime('now')),
       PRIMARY KEY (tournament_id, bet_key)
     );
+    CREATE TABLE IF NOT EXISTS callit_kickoffs (
+      tournament_id INTEGER NOT NULL,
+      schedule_code TEXT NOT NULL,
+      started_at TEXT NOT NULL,
+      PRIMARY KEY (tournament_id, schedule_code)
+    );
   `);
 }
 

@@ -3,7 +3,7 @@
     "title": "Büntetődobás-párbaj",
     "suddenDeath": "Hirtelen halál",
     "winner": "Győztes: {{team}}",
-    "regular": "a rendes játékidő után {{a}}:{{b}}",
+    "regular": "a hosszabbítás után {{a}}:{{b}}",
     "short": "bünt. után",
     "next": "Következő dobó: {{team}}",
     "throwing": "dob",
@@ -350,5 +350,12 @@
     "participants_other": "{{count}} tippelő",
     "leaders": "Az élen",
     "points": "{{points}} pont"
+  },
+  "overtime": {
+    "title": "Hosszabbítás",
+    "break": "Szünet a hosszabbítás előtt",
+    "short": "hossz. után",
+    "running": "Hosszabbítás · folyamatban",
+    "paused": "Hosszabbítás · szünet"
   }
 }

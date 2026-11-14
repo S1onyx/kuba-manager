@@ -3,7 +3,7 @@
     "title": "Free-throw shootout",
     "suddenDeath": "Sudden death",
     "winner": "Winner: {{team}}",
-    "regular": "after regular time {{a}}:{{b}}",
+    "regular": "after overtime {{a}}:{{b}}",
     "short": "a.s.",
     "next": "Next to throw: {{team}}",
     "throwing": "throwing",
@@ -12,8 +12,7 @@
     "miss": "miss"
   },
   "app": {
-    "mirrorStandard": "Display 1 (standard)",
-    "mirrorInverted": "Display 2 (inverted)"
+    "displaySlot": "Display {{slot}}"
   },
   "controls": {
     "fullscreenEnter": "Fullscreen",
@@ -166,12 +165,18 @@
         "winner": "Tournament winner",
         "top_scorer": "Top scorer",
         "most_penalty_seconds": "Most penalty seconds",
-        "total_baskets": "Total points"
+        "total_baskets": "Total points",
+        "final_kickoff": "Final kick-off time"
       },
       "groupWinner": "Winner {{group}}",
       "thanks": "Thanks for playing!",
       "hitBy_one": "hit by {{count}}",
       "hitBy_other": "hit by {{count}}"
     }
+  },
+  "overtime": {
+    "title": "Overtime",
+    "break": "Break before overtime",
+    "short": "OT"
   }
 }

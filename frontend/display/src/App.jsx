@@ -13,6 +13,7 @@ import useScoreboardData from './hooks/useScoreboardData.js';
 import useStandingsData from './hooks/useStandingsData.js';
 import useStructureData from './hooks/useStructureData.js';
 import useTournamentSummaryData from './hooks/useTournamentSummaryData.js';
+import { nextDisplaySlot, resolveDisplaySlot, viewForDisplay } from './utils/displaySlot.js';
 
 function DocumentLanguageSync() {
   const { i18n } = useTranslation();
@@ -30,44 +31,29 @@ export default function App() {
   const isNarrowScreen = useMediaQuery('(max-width: 900px)');
 
   const { scoreboard, error: scoreboardError } = useScoreboardData();
-  const displayView = scoreboard?.displayView ?? 'scoreboard';
-  const [mirrorMode, setMirrorMode] = useState(false);
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
+  const [displaySlot, setDisplaySlot] = useState(() => {
     try {
-      const stored = window.localStorage.getItem('kuba-display-mirror');
-      setMirrorMode(stored === '1');
-    } catch (error) {
-      console.warn('Konnte Mirror-Mode nicht laden:', error);
+      return resolveDisplaySlot({
+        search: window.location.search,
+        stored: window.localStorage.getItem('kuba-display-slot'),
+        legacyMirror: window.localStorage.getItem('kuba-display-mirror')
+      });
+    } catch {
+      return resolveDisplaySlot({ search: window.location.search });
     }
-  }, []);
+  });
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
     try {
-      if (mirrorMode) {
-        window.localStorage.setItem('kuba-display-mirror', '1');
-      } else {
-        window.localStorage.removeItem('kuba-display-mirror');
-      }
+      window.localStorage.setItem('kuba-display-slot', displaySlot);
+      window.localStorage.removeItem('kuba-display-mirror');
     } catch (error) {
-      console.warn('Konnte Mirror-Mode nicht speichern:', error);
+      console.warn('Konnte Display-Nummer nicht speichern:', error);
     }
-  }, [mirrorMode]);
+  }, [displaySlot]);
+  const effectiveDisplayView = viewForDisplay(scoreboard, displaySlot);
   const [fullscreenActive, setFullscreenActive] = useState(() =>
     typeof document !== 'undefined' ? Boolean(document.fullscreenElement) : false
   );
-
-  const normalizedView = displayView === 'bracket' || displayView === 'callit' ? displayView : 'scoreboard';
-  const effectiveDisplayView =
-    mirrorMode && (normalizedView === 'bracket' || normalizedView === 'scoreboard')
-      ? normalizedView === 'bracket'
-        ? 'scoreboard'
-        : 'bracket'
-      : normalizedView;
 
   const {
     standings,
@@ -157,10 +143,10 @@ export default function App() {
         zIndex: 5
       }}
     >
-      <DisplayViewToggle displayView={displayView} />
+      <DisplayViewToggle displayView={effectiveDisplayView} display={displaySlot} />
       <button
         type="button"
-        onClick={() => setMirrorMode((prev) => !prev)}
+        onClick={() => setDisplaySlot(nextDisplaySlot)}
         style={{
           padding: '0.55rem 1rem',
           // Touch-Target mindestens 44px (Mobile)
@@ -171,7 +157,7 @@ export default function App() {
           justifyContent: 'center',
           borderRadius: '999px',
           border: '1px solid rgba(255,255,255,0.3)',
-          background: mirrorMode ? 'rgba(148, 77, 255, 0.4)' : 'rgba(0, 0, 0, 0.45)',
+          background: displaySlot === '1' ? 'rgba(0, 0, 0, 0.45)' : 'rgba(148, 77, 255, 0.4)',
           color: '#fff',
           fontSize: '0.85rem',
           letterSpacing: '0.04em',
@@ -179,7 +165,7 @@ export default function App() {
           backdropFilter: 'blur(6px)'
         }}
       >
-        {mirrorMode ? t('app.mirrorInverted') : t('app.mirrorStandard')}
+        {t('app.displaySlot', { slot: displaySlot })}
       </button>
       <FullscreenToggle
         auto={autoFullscreen}

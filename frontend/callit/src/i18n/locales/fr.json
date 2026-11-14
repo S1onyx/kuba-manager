@@ -142,16 +142,24 @@
     "jokerStatus": "Joker : groupe {{group}} · KO {{ko}}",
     "rulesLink": "Règles",
     "filters": {
-      "open": "Ouverts",
-      "all": "Tous",
-      "done": "Joués"
+      "upcoming": "À venir",
+      "open": "À pronostiquer",
+      "results": "Résultats"
     },
-    "empty": "Rien à pronostiquer pour l'instant.",
+    "empty": {
+      "upcoming": "Aucun match à venir.",
+      "open": "Rien à pronostiquer pour l'instant.",
+      "results": "Pas encore de résultats."
+    },
     "advanceNeeded": "Choisis le qualifié",
     "jokerShort": "Joker",
     "underdogShort": "Outsider",
     "pendingCount_one": "{{count}} autre match s'ouvre dès que les équipes sont connues",
-    "pendingCount_other": "{{count}} autres matchs s'ouvrent dès que les équipes sont connues"
+    "pendingCount_other": "{{count}} autres matchs s'ouvrent dès que les équipes sont connues",
+    "nextMatch": "Prochain match",
+    "liveNow": "actuellement",
+    "liveGap": "Écart avec ton pronostic",
+    "liveExact": "Score actuel = ton pronostic !"
   },
   "specials": {
     "title": "Paris spéciaux",
@@ -170,18 +178,21 @@
       "top_scorer": "Meilleur marqueur (plus de points)",
       "most_penalty_seconds": "Le plus de secondes de pénalité",
       "group_winner": "Vainqueur {{group}}",
-      "total_baskets": "Total des points du tournoi"
+      "total_baskets": "Total des points du tournoi",
+      "final_kickoff": "Heure de début de la finale"
     },
     "hints": {
       "winner": "Qui remporte le tournoi ?",
       "top_scorer": "Quel joueur marque le plus de points ?",
       "most_penalty_seconds": "Qui récolte le plus de secondes de pénalité ?",
       "group_winner": "Qui termine premier du groupe ?",
-      "total_baskets": "Combien de points au total (temps réglementaire) ? Le plus proche gagne."
+      "total_baskets": "Combien de points au total (temps réglementaire) ? Le plus proche gagne.",
+      "final_kickoff": "À quelle heure la finale débutera-t-elle (heure locale) ? Le pronostic le plus proche à la minute près gagne."
     },
     "doneTitle_one": "{{count}} pari spécial placé",
     "doneTitle_other": "{{count}} paris spéciaux placés",
-    "doneHint": "Tu peux encore les modifier jusqu'au premier coup d'envoi."
+    "doneHint": "Tu peux encore les modifier jusqu'au premier coup d'envoi.",
+    "plannedAt": "Prévu : {{time}}"
   },
   "ranking": {
     "title": "Classement",

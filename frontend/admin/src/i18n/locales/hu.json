@@ -99,7 +99,10 @@
     "extraTime": "Hosszabbítás",
     "extraTimePaused": "Hosszabbítás (szünet)",
     "running": "fut",
-    "paused": "szünetel"
+    "paused": "szünetel",
+    "overtime": "Hosszabbítás folyamatban",
+    "overtimePaused": "Hosszabbítás (szünetel)",
+    "overtimeBreak": "Szünet a hosszabbítás előtt"
   },
   "dashboard": {
     "loading": "Eredményjelző betöltése..."
@@ -114,18 +117,17 @@
     "tournamentStatus": "Torna állapota: {{status}}",
     "statusCompleted": "befejezett",
     "statusRunning": "folyamatban",
-    "switching": "Váltás...",
-    "showLive": "Élő állás megjelenítése",
-    "showBracket": "Tornatabla megjelenítése"
+    "displaySlot": "{{slot}}.: {{view}}"
   },
   "control": {
     "display": {
       "title": "Kivetítő megjelenítés",
-      "description": "Váltás az élő állás és a tornatabla között a kivetítőn.",
+      "description": "Állítsd be, mit mutasson az 1., 2. és 3. kijelző. Magán a képernyőn gombbal választod ki, melyik kijelző az.",
       "bracketHint": "Az ágrajzhoz először válaszd ki a tornát:",
       "chooseTournament": "Torna kiválasztása …",
       "updating": "Megjelenítés frissítése...",
-      "callitHint": "A torna tippjáték-rangsorának megjelenítése:"
+      "callitHint": "A torna tippjáték-rangsorának megjelenítése:",
+      "slot": "{{slot}}. kijelző"
     },
     "context": {
       "title": "Mérkőzés-kontextus",
@@ -191,7 +193,7 @@
       "changedTitle": "⚠ Mentés után módosítva",
       "changedText": "Az állás mentés után megváltozott. Az újramentés lecseréli a mentett eredményt.",
       "blockedTitle": "Döntetlen a kieséses mérkőzésen",
-      "blockedText": "Mentés csak a büntetődobás-párbaj után lehetséges (lenti kártya).",
+      "blockedText": "Mentés csak a hosszabbítás vagy a büntetődobás-párbaj után lehetséges (lenti kártya).",
       "savedTitle": "✓ Mentve – az eredmény számít",
       "savedText": "A következő mérkőzéshez: visszaállítás, majd a következő mérkőzés betöltése a menetrendből.",
       "save": "Mentés most",
@@ -205,11 +207,11 @@
     },
     "shootout": {
       "title": "Büntetődobás-párbaj",
-      "drawHint": "Döntetlen a kieséses mérkőzésen – büntetődobás-párbaj dönt: 5-5 dobás, utána hirtelen halál. Minden találat 1 ponttal növeli az eredményt.",
+      "drawHint": "A hosszabbítás után is döntetlen – büntetődobás-párbaj dönt: csapatonként 5 dobás, utána hirtelen halál. Minden találat 1 pontot ér az eredményben.",
       "firstTeam": "Ki dob először?",
       "start": "Párbaj indítása",
       "titleRunning": "Büntetődobás-párbaj {{a}}:{{b}}",
-      "regularScore": "Állás a rendes játékidő után: {{a}}:{{b}}",
+      "regularScore": "Állás a hosszabbítás után: {{a}}:{{b}}",
       "decided": "Eldőlt: {{team}} nyeri a párbajt {{a}}:{{b}} – most fejezd be és mentsd a mérkőzést.",
       "suddenDeath": "Hirtelen halál – következő dobó: {{team}}",
       "next": "Következő dobó: {{team}}",
@@ -232,7 +234,7 @@
       "extraTimeInfo": "Hosszabbítás tervezett {{planned}} · letelt {{elapsed}}",
       "start": "Indítás",
       "pause": "Szünet",
-      "autoStartSecondHalf": "2. félidő automatikus indítása",
+      "autoStartSecondHalf": "Szünet után automatikus indítás (2. félidő, hosszabbítás)",
       "newRemaining": "Új hátralévő idő",
       "timerPlaceholder": "pl. 10:00 vagy 600",
       "setTime": "Idő beállítása",
@@ -245,7 +247,8 @@
       "extraTimePlaceholder": "pl. 02:00",
       "finishGame": "Mérkőzés befejezése",
       "saveGame": "Mérkőzés mentése",
-      "newGame": "Visszaállítás (mentés nélkül)"
+      "newGame": "Visszaállítás (mentés nélkül)",
+      "overtimeBreakRunning": "Szünet a hosszabbítás előtt folyamatban · hátralévő: {{remaining}} ({{mode}})"
     },
     "penalties": {
       "title": "Időbüntetések",
@@ -283,6 +286,17 @@
       "cancel": "Büntetődobások megszakítása",
       "close": "Elrejtés",
       "failed": "A büntetődobás művelet sikertelen."
+    },
+    "overtime": {
+      "title": "Hosszabbítás",
+      "drawHint": "Döntetlen a rendes játékidő végén – {{pause}} szünet után {{duration}} hosszabbítás következik. Ha utána is döntetlen, büntetődobás-párbaj dönt.",
+      "start": "Hosszabbítás indítása",
+      "breakTitle": "Szünet a hosszabbítás előtt · {{remaining}}",
+      "breakAuto": "Ezután a hosszabbítás ({{duration}}) automatikusan indul.",
+      "breakManual": "Ezután a hosszabbítást ({{duration}}) kézzel kell indítani.",
+      "startNow": "Hosszabbítás indítása most",
+      "cancel": "Hosszabbítás megszakítása",
+      "failed": "A művelet sikertelen."
     }
   },
   "schedule": {
@@ -590,8 +604,6 @@
     "confirmResetGame": "Visszaállítod a mérkőzést? A csapatok, pontok és az idő törlődnek. Ha a mérkőzés nincs mentve, az eredmény elvész.",
     "confirmReplaceUnsavedGame": "Az aktuális mérkőzés nincs mentve. Mégis betöltöd az újat? Az eddigi eredmény elvész.",
     "newGameFailed": "A mérkőzést nem sikerült visszaállítani.",
-    "displayNowScoreboard": "A kivetítő mostantól az élő állást mutatja.",
-    "displayNowBracket": "A kivetítő mostantól a tornatablát mutatja.",
     "displayUpdateFailed": "A megjelenítési mód frissítése nem sikerült.",
     "tournamentRequired": "Először válasszon ki egy tornát a mérkőzés-kontextusban.",
     "invalidDateTime": "Kérjük, válasszon érvényes dátumot/időpontot.",
@@ -692,7 +704,7 @@
     "timerCuesSaveFailed": "Az időzítő-beállítások mentése nem sikerült.",
     "audioLoadFailed": "A hangadatok betöltése nem sikerült.",
     "penaltyFreeThrowsSkipped": "Kiállítás hozzáadva a(z) {{team}} csapathoz – büntetődobások nem jöttek létre, mert még nyitott egy sorozat.",
-    "displayNowCallit": "A kivetítő most a tippjáték rangsorát mutatja."
+    "displaySet": "A(z) {{display}}. kijelző most ezt mutatja: {{view}}."
   },
   "error": {
     "generic": "Hiba történt. Kérjük, próbálja újra.",
@@ -788,7 +800,7 @@
     "AUTH_REQUIRED": "A munkamenet lejárt. Jelentkezzen be újra.",
     "TOURNAMENT_REQUIRED": "Először válassz tornát.",
     "GROUP_RESULTS_EXIST": "A csoportkörben már vannak eredmények – a csapatok már nem cserélhetők.",
-    "KNOCKOUT_DRAW": "Döntetlen a kieséses mérkőzésen – előbb a büntetődobás-párbajt kell lejátszani.",
+    "KNOCKOUT_DRAW": "Döntetlen egyenes kieséses meccsen – előbb játsszátok le a hosszabbítást vagy a büntetődobás-párbajt.",
     "SHOOTOUT_UNDECIDED": "A büntetődobás-párbaj még nem dőlt el.",
     "TEAM_OTHER_TOURNAMENT": "Játékos csak ugyanazon a tornán belül válthat csapatot.",
     "TOURNAMENT_CREATE_FAILED": "A torna létrehozása nem sikerült.",
@@ -825,7 +837,13 @@
     "CALLIT_NOT_AVAILABLE": "A tippjáték nem aktív ennél a tornánál.",
     "CALLIT_INVALID_VALUE": "Érvénytelen érték.",
     "CALLIT_MATCH_NOT_FOUND": "A meccs nem található.",
-    "CALLIT_USER_NOT_FOUND": "A felhasználó nem található."
+    "CALLIT_USER_NOT_FOUND": "A felhasználó nem található.",
+    "SHOOTOUT_NEEDS_OVERTIME": "A büntetődobás-párbaj csak a hosszabbítás után következik.",
+    "OVERTIME_ALREADY_STARTED": "A hosszabbítás már elindult.",
+    "OVERTIME_NOT_KNOCKOUT": "Hosszabbítás csak egyenes kieséses meccseken van.",
+    "OVERTIME_NOT_TIED": "Hosszabbítás csak döntetlen állásnál lehetséges.",
+    "OVERTIME_CLOCK_NOT_OVER": "A rendes játékidő még nem telt le.",
+    "OVERTIME_IN_PROGRESS": "A hosszabbítás már folyamatban van."
   },
   "export": {
     "title": "PDF-export / Nyomtatás",
@@ -900,7 +918,8 @@
     "groupLabel": "{{group}} csoport",
     "emptyHint": "Valasszon tornait a nyomtatasi sablonok megtekintesehez",
     "collapse": "Osszecsukas",
-    "expand": "Kibontas"
+    "expand": "Kibontas",
+    "overtimeShort": "hossz. után"
   },
   "callit": {
     "title": "CallIt tippjáték",
@@ -919,8 +938,8 @@
     "saveJoinCode": "Kód mentése",
     "copyLink": "Link másolása",
     "copied": "Link kimásolva.",
-    "beamerOn": "Rangsor a kivetítőn",
-    "beamerOff": "Kivetítő vissza az eredményjelzőre",
+    "beamerOn": "Rangsor a(z) {{slot}}. kijelzőre",
+    "beamerOff": "A(z) {{slot}}. kijelző vissza az eredményre",
     "exportCsv": "CSV export",
     "refresh": "Frissítés",
     "saved": "Mentve.",
@@ -960,7 +979,8 @@
       "most_penalty_seconds": "Legtöbb büntetőmásodperc",
       "group_winner": "Csoportgyőztes",
       "group_winner_label": "{{group}} győztese",
-      "total_baskets": "Összes pont"
+      "total_baskets": "Összes pont",
+      "final_kickoff": "A döntő kezdési ideje"
     },
     "matches": {
       "title": "Meccsek és zárolások",

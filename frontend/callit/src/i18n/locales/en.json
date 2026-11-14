@@ -142,16 +142,24 @@
     "jokerStatus": "Joker: group {{group}} · KO {{ko}}",
     "rulesLink": "Rules",
     "filters": {
-      "open": "Open",
-      "all": "All",
-      "done": "Played"
+      "upcoming": "Upcoming",
+      "open": "To predict",
+      "results": "Results"
     },
-    "empty": "Nothing to predict right now.",
+    "empty": {
+      "upcoming": "No upcoming matches.",
+      "open": "Nothing to predict right now.",
+      "results": "No results yet."
+    },
     "advanceNeeded": "Pick who goes through",
     "jokerShort": "Joker",
     "underdogShort": "Underdog",
     "pendingCount_one": "{{count}} more game opens once its teams are known",
-    "pendingCount_other": "{{count}} more games open once their teams are known"
+    "pendingCount_other": "{{count}} more games open once their teams are known",
+    "nextMatch": "Up next",
+    "liveNow": "currently",
+    "liveGap": "Gap to your tip",
+    "liveExact": "Current score = your tip!"
   },
   "specials": {
     "title": "Special bets",
@@ -170,18 +178,21 @@
       "top_scorer": "Top scorer (most points)",
       "most_penalty_seconds": "Most penalty seconds",
       "group_winner": "Winner {{group}}",
-      "total_baskets": "Total points in the tournament"
+      "total_baskets": "Total points in the tournament",
+      "final_kickoff": "Final kick-off time"
     },
     "hints": {
       "winner": "Who wins the tournament?",
       "top_scorer": "Which player scores the most points?",
       "most_penalty_seconds": "Who collects the most penalty seconds?",
       "group_winner": "Who finishes first in the group?",
-      "total_baskets": "How many points are scored in total (regular time)? Closest guess wins."
+      "total_baskets": "How many points are scored in total (regular time)? Closest guess wins.",
+      "final_kickoff": "At what time will the final kick off (local time)? Closest guess to the minute wins."
     },
     "doneTitle_one": "{{count}} special bet placed",
     "doneTitle_other": "{{count}} special bets placed",
-    "doneHint": "You can still change them until the first kick-off."
+    "doneHint": "You can still change them until the first kick-off.",
+    "plannedAt": "Scheduled: {{time}}"
   },
   "ranking": {
     "title": "Ranking",

@@ -142,16 +142,24 @@
     "jokerStatus": "Joker: csoport {{group}} · kieséses {{ko}}",
     "rulesLink": "Szabályok",
     "filters": {
-      "open": "Nyitott",
-      "all": "Mind",
-      "done": "Lejátszott"
+      "upcoming": "Következő",
+      "open": "Tippelendő",
+      "results": "Eredmények"
     },
-    "empty": "Most nincs mit tippelni.",
+    "empty": {
+      "upcoming": "Nincs következő meccs.",
+      "open": "Most nincs mit tippelni.",
+      "results": "Még nincsenek eredmények."
+    },
     "advanceNeeded": "Válaszd a továbbjutót",
     "jokerShort": "Joker",
     "underdogShort": "Esélytelen",
     "pendingCount_one": "Még {{count}} meccs tippelhető lesz, amint a csapatok ismertek",
-    "pendingCount_other": "Még {{count}} meccs tippelhető lesz, amint a csapatok ismertek"
+    "pendingCount_other": "Még {{count}} meccs tippelhető lesz, amint a csapatok ismertek",
+    "nextMatch": "Következik",
+    "liveNow": "jelenleg",
+    "liveGap": "Eltérés a tippedtől",
+    "liveExact": "Jelenlegi állás = a tipped!"
   },
   "specials": {
     "title": "Különfogadások",
@@ -170,18 +178,21 @@
       "top_scorer": "Gólkirály (legtöbb pont)",
       "most_penalty_seconds": "Legtöbb büntetőmásodperc",
       "group_winner": "{{group}} győztese",
-      "total_baskets": "Összes pont a tornán"
+      "total_baskets": "Összes pont a tornán",
+      "final_kickoff": "A döntő kezdési ideje"
     },
     "hints": {
       "winner": "Ki nyeri a tornát?",
       "top_scorer": "Melyik játékos szerzi a legtöbb pontot?",
       "most_penalty_seconds": "Ki gyűjti a legtöbb büntetőmásodpercet?",
       "group_winner": "Ki lesz a csoport első?",
-      "total_baskets": "Hány pont születik összesen (rendes játékidő)? A legközelebbi tipp nyer."
+      "total_baskets": "Hány pont születik összesen (rendes játékidő)? A legközelebbi tipp nyer.",
+      "final_kickoff": "Hány órakor kezdődik a döntő (helyi idő)? A percre pontosan legközelebbi tipp nyer."
     },
     "doneTitle_one": "{{count}} különfogadás leadva",
     "doneTitle_other": "{{count}} különfogadás leadva",
-    "doneHint": "Az első kezdésig még módosíthatod őket."
+    "doneHint": "Az első kezdésig még módosíthatod őket.",
+    "plannedAt": "Menetrend szerint: {{time}}"
   },
   "ranking": {
     "title": "Rangsor",

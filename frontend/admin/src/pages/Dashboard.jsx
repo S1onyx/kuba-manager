@@ -183,8 +183,6 @@ export default function Dashboard() {
               scoreboard={scoreboardCtrl.scoreboard}
               formattedRemaining={scoreboardCtrl.formattedRemaining}
               liveStateLabel={scoreboardCtrl.liveStateLabel}
-              onToggleDisplayView={scoreboardCtrl.handleDisplayViewChange}
-              displayViewPending={scoreboardCtrl.displayViewPending}
             />
           ) : null
         }

@@ -163,10 +163,11 @@ function formatTime(seconds = 0) {
 function buildStatusLabel(scoreboard, t) {
   if (!scoreboard) return t('currentMatch.noData');
   if (scoreboard.shootout) return t('shootout.title');
-  if (scoreboard.isHalftimeBreak) return t('currentMatch.halftimeBreak');
+  if (scoreboard.isHalftimeBreak) return t(scoreboard.overtime ? 'overtime.break' : 'currentMatch.halftimeBreak');
   if (scoreboard.isExtraTime) {
     return scoreboard.isRunning ? t('currentMatch.extraTimeRunning') : t('currentMatch.extraTime');
   }
+  if (scoreboard.overtime) return scoreboard.isRunning ? t('overtime.running') : t('overtime.paused');
   return scoreboard.isRunning ? t('currentMatch.live') : t('currentMatch.pause');
 }
 
@@ -184,7 +185,11 @@ export default function CurrentMatchCard({ scoreboard }) {
   const { t } = useTranslation();
   const status = buildStatusLabel(scoreboard, t);
   const stageLabel = buildStageLabel(scoreboard, t);
-  const halfInfo = scoreboard?.currentHalf ? t('currentMatch.half', { half: scoreboard.currentHalf }) : '';
+  const halfInfo = scoreboard?.overtime
+    ? t('overtime.title')
+    : scoreboard?.currentHalf
+      ? t('currentMatch.half', { half: scoreboard.currentHalf })
+      : '';
   const timer = formatTime(scoreboard?.remainingSeconds ?? 0);
   const extraTime = (scoreboard?.extraSeconds ?? 0) > 0 ? formatTime(scoreboard.extraSeconds) : null;
   const penaltiesA = scoreboard?.penalties?.a?.length ?? 0;

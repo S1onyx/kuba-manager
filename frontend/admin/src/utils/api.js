@@ -324,10 +324,10 @@ export function updateMatchContext(payload) {
   });
 }
 
-export function setDisplayView(view, { callitTournamentId } = {}) {
+export function setDisplayView(view, { display = '1', callitTournamentId } = {}) {
   return request('/scoreboard/display', {
     method: 'POST',
-    body: JSON.stringify({ view, callitTournamentId })
+    body: JSON.stringify({ view, display, callitTournamentId })
   });
 }
 
@@ -490,6 +490,14 @@ export function undoShootoutAttempt() {
 
 export function cancelShootout() {
   return request('/scoreboard/shootout/cancel', { method: 'POST' });
+}
+
+export function startOvertime() {
+  return request('/scoreboard/overtime/start', { method: 'POST' });
+}
+
+export function cancelOvertime() {
+  return request('/scoreboard/overtime/cancel', { method: 'POST' });
 }
 
 const toPlayerId = (playerId) => (playerId ? Number(playerId) : null);

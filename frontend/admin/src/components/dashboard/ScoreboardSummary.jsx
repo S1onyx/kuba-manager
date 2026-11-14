@@ -1,13 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import PanelCard from '../common/PanelCard.jsx';
 import { useFormatStageLabel } from '../../utils/stageLabels.js';
+import { DISPLAY_SLOTS } from '../../constants/dashboard.js';
 
 export default function ScoreboardSummary({
   scoreboard,
   formattedRemaining,
-  liveStateLabel,
-  onToggleDisplayView,
-  displayViewPending = false
+  liveStateLabel
 }) {
   const { t } = useTranslation();
   const formatStageLabel = useFormatStageLabel();
@@ -29,7 +28,9 @@ export default function ScoreboardSummary({
     ? `${scoreboard.tournamentName}${stageSuffix ? ` · ${stageSuffix}` : ''}`
     : t('summary.noTournament');
 
-  const displayViewLabel = t(`displayViews.${scoreboard.displayView === 'bracket' || scoreboard.displayView === 'callit' ? scoreboard.displayView : 'scoreboard'}`);
+  const displayViewLabel = DISPLAY_SLOTS.map((slot) =>
+    t('summary.displaySlot', { slot, view: t(`displayViews.${scoreboard.displays?.[slot] ?? 'scoreboard'}`) })
+  ).join(' · ');
 
   return (
     <PanelCard
@@ -102,29 +103,6 @@ export default function ScoreboardSummary({
               })}
             </span>
           ) : null}
-        </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
-          <button
-            type="button"
-            onClick={() => onToggleDisplayView?.(scoreboard.displayView === 'scoreboard' ? 'bracket' : 'scoreboard')}
-            disabled={!onToggleDisplayView || displayViewPending}
-            style={{
-              borderRadius: '999px',
-              border: '1px solid rgba(255,255,255,0.35)',
-              background: 'transparent',
-              color: '#fff',
-              padding: '0.35rem 0.9rem',
-              fontSize: '0.85rem',
-              opacity: displayViewPending ? 0.6 : 1,
-              cursor: displayViewPending || !onToggleDisplayView ? 'not-allowed' : 'pointer'
-            }}
-          >
-            {displayViewPending
-              ? t('summary.switching')
-              : scoreboard.displayView !== 'scoreboard'
-                ? t('summary.showLive')
-                : t('summary.showBracket')}
-          </button>
         </div>
       </div>
     </PanelCard>

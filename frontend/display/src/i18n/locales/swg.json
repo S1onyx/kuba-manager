@@ -3,7 +3,7 @@
     "title": "Freiwurf-Stecha",
     "suddenDeath": "Sudden Death",
     "winner": "Sieger: {{team}}",
-    "regular": "noch dr reguläre Spielzeit {{a}}:{{b}}",
+    "regular": "noch dr Verlängerung {{a}}:{{b}}",
     "short": "n.F.",
     "next": "Als Nächsts wirft: {{team}}",
     "throwing": "wirft",
@@ -12,8 +12,7 @@
     "miss": "danebe"
   },
   "app": {
-    "mirrorStandard": "Display 1 (Standard)",
-    "mirrorInverted": "Display 2 (umgkehrt)"
+    "displaySlot": "Display {{slot}}"
   },
   "controls": {
     "fullscreenEnter": "Vollbild",
@@ -166,12 +165,18 @@
         "winner": "Turniersieger",
         "top_scorer": "Topscorer",
         "most_penalty_seconds": "Meischde Schdrofsekonda",
-        "total_baskets": "Gsamtpunkt"
+        "total_baskets": "Gsamtpunkt",
+        "final_kickoff": "Aafangszeit Finale"
       },
       "groupWinner": "Sieger {{group}}",
       "thanks": "Dankschee fürs Mittippa!",
       "hitBy_one": "{{count}}× troffa",
       "hitBy_other": "{{count}}× troffa"
     }
+  },
+  "overtime": {
+    "title": "Verlängerung",
+    "break": "Bause vor dr Verlängerung",
+    "short": "n.V."
   }
 }

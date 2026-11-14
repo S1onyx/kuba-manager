@@ -142,16 +142,24 @@
     "jokerStatus": "Joker: Grupp {{group}} · KO {{ko}}",
     "rulesLink": "Regle",
     "filters": {
-      "open": "Offe",
-      "all": "Alli",
-      "done": "Gspielt"
+      "upcoming": "Aaschtehend",
+      "open": "Z tippe",
+      "results": "Resultat"
     },
-    "empty": "Grad gits nüt zum Tippe.",
+    "empty": {
+      "upcoming": "Kei aaschtehendi Spiil.",
+      "open": "Grad gits nüt zum Tippe.",
+      "results": "No kei Resultat."
+    },
     "advanceNeeded": "Wiiterchömer wähle",
     "jokerShort": "Joker",
     "underdogShort": "Underdog",
     "pendingCount_one": "{{count}} wiiters Spiel wird tippbar, sobald d Teams feschtstönd",
-    "pendingCount_other": "{{count}} wiiteri Spiel wärded tippbar, sobald d Teams feschtstönd"
+    "pendingCount_other": "{{count}} wiiteri Spiel wärded tippbar, sobald d Teams feschtstönd",
+    "nextMatch": "Als Nächschts",
+    "liveNow": "aktuell",
+    "liveGap": "Abstand zum Tipp",
+    "liveExact": "Aktuelle Stand = din Tipp!"
   },
   "specials": {
     "title": "Sonderwette",
@@ -170,18 +178,21 @@
       "top_scorer": "Topscorer (meischti Pünkt)",
       "most_penalty_seconds": "Meischti Strafsekunde",
       "group_winner": "Sieger {{group}}",
-      "total_baskets": "Alli Pünkt im Turnier"
+      "total_baskets": "Alli Pünkt im Turnier",
+      "final_kickoff": "Aafangsziit Final"
     },
     "hints": {
       "winner": "Wer gwünnt s Turnier?",
       "top_scorer": "Wele Spieler macht di meischte Pünkt?",
       "most_penalty_seconds": "Wer sammlet di meischte Strafsekunde?",
       "group_winner": "Wer wird Gruppeerschte?",
-      "total_baskets": "Wie vill Pünkt gits insgesamt (reguläri Spielziit)? Wer am nächschte draa isch, gwünnt."
+      "total_baskets": "Wie vill Pünkt gits insgesamt (reguläri Spielziit)? Wer am nächschte draa isch, gwünnt.",
+      "final_kickoff": "Um wievill Uhr wird de Final aapfiffe (Ortsziit)? Wer uf d Minute am nächschte draa isch, gwünnt."
     },
     "doneTitle_one": "{{count}} Sonderwett tippt",
     "doneTitle_other": "{{count}} Sonderwette tippt",
-    "doneHint": "Bis zum erschte Aapfiff chasch si no ändere."
+    "doneHint": "Bis zum erschte Aapfiff chasch si no ändere.",
+    "plannedAt": "Laut Spiilplan: {{time}} Uhr"
   },
   "ranking": {
     "title": "Ranking",
