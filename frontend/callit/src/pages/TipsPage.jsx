@@ -1,17 +1,13 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../api.js';
-import MatchCard from '../components/MatchCard.jsx';
+import MatchCard, { KickoffInfo, PointsPill } from '../components/MatchCard.jsx';
 import SpecialBetCard from '../components/SpecialBetCard.jsx';
 import { ErrorBox, Spinner } from '../components/Feedback.jsx';
 import useCallitData from '../hooks/useCallitData.js';
 import useNow from '../hooks/useNow.js';
 import { useAuth } from '../hooks/useAuth.jsx';
-import { formatCountdown, groupMatchesByStage, nextKickoff, teamName } from '../utils/format.js';
-import { formatStageLabelI18n } from '../utils/stageLabels.js';
-
-const FILTERS = ['open', 'all', 'done'];
-
+import { MATCH_FILTERS, filterMatches, formatCountdown, nextKickoff, nextMatch, teamName } from '../utils/format.js';
 
 export default function TipsPage({ id, matches, joined, joinCard }) {
   const { t } = useTranslation();
@@ -22,19 +18,11 @@ export default function TipsPage({ id, matches, joined, joinCard }) {
 
   const list = matches.data?.matches ?? [];
   const openWithoutTip = list.filter((match) => match.status === 'open' && !match.myTip);
-  const activeFilter = filter ?? (joined && list.some((match) => match.status === 'open') ? 'open' : 'all');
-  const filtered = useMemo(
-    () =>
-      list.filter((match) => {
-        if (activeFilter === 'open') return match.status === 'open';
-        if (activeFilter === 'done') return match.status === 'finished' || match.status === 'locked' || match.status === 'live';
-        return true;
-      }),
-    [list, activeFilter]
-  );
-  const groups = groupMatchesByStage(filtered);
+  const activeFilter = filter ?? 'upcoming';
+  const filtered = useMemo(() => filterMatches(list, activeFilter), [list, activeFilter]);
   const next = nextKickoff(openWithoutTip, now);
   const live = list.find((match) => match.status === 'live');
+  const upNext = nextMatch(list);
   const specialList = specials.data ?? [];
   const openSpecials = specialList.filter((bet) => !bet.locked);
   // Oben nur, was noch fehlt – bereits getippte Sonderwetten wandern in einen zugeklappten Bereich.
@@ -55,8 +43,27 @@ export default function TipsPage({ id, matches, joined, joinCard }) {
           <span className="grow ellipsis">
             {teamName(live, 'home')} {live.result?.home ?? 0}:{live.result?.away ?? 0} {teamName(live, 'away')}
           </span>
-          <span className="small">{t('tips.liveRanking')}</span>
+          {live.myPoints ? <PointsPill points={live.myPoints} live /> : <span className="small">{t('tips.liveRanking')}</span>}
         </a>
+      ) : null}
+
+      {upNext ? (
+        <div className="banner">
+          <span className="grow">
+            <span className="small muted">{t('tips.nextMatch')} · <KickoffInfo match={upNext} now={now} /></span>
+            <br />
+            <strong>
+              {teamName(upNext, 'home')} – {teamName(upNext, 'away')}
+            </strong>
+          </span>
+          {upNext.myTip ? (
+            <span className="pill pill--saved">
+              {upNext.myTip.scoreHome}:{upNext.myTip.scoreAway}
+            </span>
+          ) : upNext.status === 'open' && joined ? (
+            <span className="pill pill--todo">{t('tips.todo')}</span>
+          ) : null}
+        </div>
       ) : null}
 
       {joined ? (
@@ -119,7 +126,7 @@ export default function TipsPage({ id, matches, joined, joinCard }) {
       ) : null}
 
       <div className="chips" role="tablist" style={{ marginTop: 8 }}>
-        {FILTERS.map((key) => (
+        {MATCH_FILTERS.map((key) => (
           <button key={key} type="button" role="tab" aria-selected={activeFilter === key} className={`chip${activeFilter === key ? ' chip--active' : ''}`} onClick={() => setFilter(key)}>
             {t(`tips.filters.${key}`)}
           </button>
@@ -128,21 +135,16 @@ export default function TipsPage({ id, matches, joined, joinCard }) {
 
       <ErrorBox error={matches.error} onRetry={matches.reload} />
       {matches.loading && !matches.data ? <Spinner /> : null}
-      {matches.data && filtered.length === 0 ? <div className="card muted">{t('tips.empty')}</div> : null}
+      {matches.data && filtered.length === 0 ? <div className="card muted">{t(`tips.empty.${activeFilter}`)}</div> : null}
 
-      {groups.map((group) => (
-        <section key={group.key} className="stack">
-          <h2 className="section-title">{formatStageLabelI18n(t, group.stageLabelI18n, group.label)}</h2>
-          {group.matches.map((match) => (
-            <MatchCard key={match.code} tournamentId={id} match={match} now={now} jokers={jokers} canTip={joined} onSaved={matches.reload} />
-          ))}
-        </section>
+      {filtered.map((match) => (
+        <MatchCard key={match.code} tournamentId={id} match={match} now={now} jokers={jokers} canTip={joined} onSaved={matches.reload} />
       ))}
 
       {activeFilter === 'open' && pendingCount > 0 ? (
-        <button type="button" className="link-row small" onClick={() => setFilter('all')}>
+        <button type="button" className="link-row small" onClick={() => setFilter('upcoming')}>
           <span className="muted">{t('tips.pendingCount', { count: pendingCount })}</span>
-          <span>{t('tips.filters.all')} →</span>
+          <span>{t('tips.filters.upcoming')} →</span>
         </button>
       ) : null}
 

@@ -1,4 +1,5 @@
-import { specialTypeOf } from './settings.js';
+import { NEAREST_BET_TYPES, specialTypeOf } from './settings.js';
+import { isMinuteOfDay } from './time.js';
 
 const round1 = (value) => Math.round(value * 10) / 10;
 
@@ -71,8 +72,9 @@ export function scoreMatchTip(tip, match, { settings, shares }) {
 
 function normalizeSpecialValue(type, value) {
   if (!value || typeof value !== 'object') return null;
-  if (type === 'total_baskets') {
+  if (NEAREST_BET_TYPES.includes(type)) {
     const numeric = Number(value.value);
+    if (type === 'final_kickoff') return isMinuteOfDay(numeric) ? numeric : null;
     return Number.isInteger(numeric) ? numeric : null;
   }
   return value.key === undefined || value.key === null ? null : String(value.key);
@@ -88,9 +90,10 @@ export function scoreSpecials(specialTips, outcomes, settings) {
 
   const nearestByBet = new Map();
   specialTips.forEach((tip) => {
-    if (specialTypeOf(tip.betKey) !== 'total_baskets') return;
+    const type = specialTypeOf(tip.betKey);
+    if (!NEAREST_BET_TYPES.includes(type)) return;
     const outcome = outcomes.get(tip.betKey);
-    const guess = normalizeSpecialValue('total_baskets', tip.value);
+    const guess = normalizeSpecialValue(type, tip.value);
     if (!outcome || guess === null) return;
     const distance = Math.abs(guess - outcome.value);
     nearestByBet.set(tip.betKey, Math.min(nearestByBet.get(tip.betKey) ?? Infinity, distance));
@@ -103,7 +106,7 @@ export function scoreSpecials(specialTips, outcomes, settings) {
     const value = type ? normalizeSpecialValue(type, tip.value) : null;
     if (!config?.enabled || !outcome || value === null) return;
     const hit =
-      type === 'total_baskets'
+      NEAREST_BET_TYPES.includes(type)
         ? Math.abs(value - outcome.value) === nearestByBet.get(tip.betKey)
         : (outcome.keys ?? []).map(String).includes(value);
     const points = hit ? config.points : 0;

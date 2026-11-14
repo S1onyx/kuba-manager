@@ -80,3 +80,9 @@ export function formatStageLabelI18n(t, descriptor, fallback = '') {
       return fallback;
   }
 }
+
+// " n.F." / " n.V." hinter dem Ergebnis; Stechen schlägt Verlängerung.
+export function resultSuffix(result, t) {
+  if (result?.shootout) return ` ${t('shootout.short')}`;
+  return result?.overtime ? ` ${t('overtime.short')}` : '';
+}

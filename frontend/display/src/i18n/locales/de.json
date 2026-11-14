@@ -3,7 +3,7 @@
     "title": "Freiwurf-Stechen",
     "suddenDeath": "Sudden Death",
     "winner": "Sieger: {{team}}",
-    "regular": "nach regulärer Spielzeit {{a}}:{{b}}",
+    "regular": "nach Verlängerung {{a}}:{{b}}",
     "short": "n.F.",
     "next": "Als Nächstes wirft: {{team}}",
     "throwing": "wirft",
@@ -12,8 +12,7 @@
     "miss": "daneben"
   },
   "app": {
-    "mirrorStandard": "Display 1 (Standard)",
-    "mirrorInverted": "Display 2 (invertiert)"
+    "displaySlot": "Display {{slot}}"
   },
   "controls": {
     "fullscreenEnter": "Vollbild",
@@ -166,12 +165,18 @@
         "winner": "Turniersieger",
         "top_scorer": "Topscorer",
         "most_penalty_seconds": "Meiste Strafsekunden",
-        "total_baskets": "Gesamtpunkte"
+        "total_baskets": "Gesamtpunkte",
+        "final_kickoff": "Startzeit Finale"
       },
       "groupWinner": "Sieger {{group}}",
       "thanks": "Danke fürs Mittippen!",
       "hitBy_one": "{{count}}× getroffen",
       "hitBy_other": "{{count}}× getroffen"
     }
+  },
+  "overtime": {
+    "title": "Verlängerung",
+    "break": "Pause vor der Verlängerung",
+    "short": "n.V."
   }
 }

@@ -3,7 +3,7 @@
     "title": "Freiwurf-Stechen",
     "suddenDeath": "Sudden Death",
     "winner": "Sieger: {{team}}",
-    "regular": "nach regulärer Spielzeit {{a}}:{{b}}",
+    "regular": "nach Verlängerung {{a}}:{{b}}",
     "short": "n.F.",
     "next": "Als Nächstes wirft: {{team}}",
     "throwing": "wirft",
@@ -350,5 +350,12 @@
     "participants_other": "{{count}} Tipper dabei",
     "leaders": "Aktuelle Spitze",
     "points": "{{points}} Pkt."
+  },
+  "overtime": {
+    "title": "Verlängerung",
+    "break": "Pause vor der Verlängerung",
+    "short": "n.V.",
+    "running": "Verlängerung · läuft",
+    "paused": "Verlängerung · Pause"
   }
 }

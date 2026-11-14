@@ -15,10 +15,10 @@ export async function fetchJson(endpoint, options) {
   return response.json();
 }
 
-export function updateDisplayView(view) {
+export function updateDisplayView(view, display) {
   return fetchJson('/scoreboard/display', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ view })
+    body: JSON.stringify({ view, display })
   });
 }

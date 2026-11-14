@@ -3,7 +3,7 @@
     "title": "Rozstřel",
     "suddenDeath": "Náhlá smrt",
     "winner": "Vítěz: {{team}}",
-    "regular": "po řádné hrací době {{a}}:{{b}}",
+    "regular": "po prodloužení {{a}}:{{b}}",
     "short": "po rozstř.",
     "next": "Další hází: {{team}}",
     "throwing": "hází",
@@ -12,8 +12,7 @@
     "miss": "vedle"
   },
   "app": {
-    "mirrorStandard": "Displej 1 (standardní)",
-    "mirrorInverted": "Displej 2 (invertovaný)"
+    "displaySlot": "Displej {{slot}}"
   },
   "controls": {
     "fullscreenEnter": "Celá obrazovka",
@@ -172,7 +171,8 @@
         "winner": "Vítěz turnaje",
         "top_scorer": "Nejlepší střelec",
         "most_penalty_seconds": "Nejvíc trestných sekund",
-        "total_baskets": "Celkem bodů"
+        "total_baskets": "Celkem bodů",
+        "final_kickoff": "Čas začátku finále"
       },
       "groupWinner": "Vítěz {{group}}",
       "thanks": "Díky za tipování!",
@@ -181,5 +181,10 @@
       "hitBy_many": "trefilo {{count}}",
       "hitBy_other": "trefilo {{count}}"
     }
+  },
+  "overtime": {
+    "title": "Prodloužení",
+    "break": "Přestávka před prodloužením",
+    "short": "po prodl."
   }
 }

@@ -99,7 +99,10 @@
     "extraTime": "Nachspilzyt",
     "extraTimePaused": "Nachspilzyt (Pausä)",
     "running": "lauft",
-    "paused": "pausiert"
+    "paused": "pausiert",
+    "overtime": "Verlängerig lauft",
+    "overtimePaused": "Verlängerig (Pausä)",
+    "overtimeBreak": "Pausä vor de Verlängerig"
   },
   "dashboard": {
     "loading": "Lade s'Scoreboard..."
@@ -114,18 +117,17 @@
     "tournamentStatus": "Turnierstatus: {{status}}",
     "statusCompleted": "abgschlosse",
     "statusRunning": "lauft",
-    "switching": "Wächsle...",
-    "showLive": "Live aazeige",
-    "showBracket": "Turnierboum aazeige"
+    "displaySlot": "D{{slot}}: {{view}}"
   },
   "control": {
     "display": {
       "title": "Beameraazeig",
-      "description": "Wächsel zwüschem Live-Spielstand und em Turnierboum uf em Beamer.",
+      "description": "Leg fescht, was Display 1, 2 und 3 zeiged. Am Bildschirm sälber wählsch per Chnopf, weles Display er isch.",
       "bracketHint": "Für de Turnierbaum zerscht s'Turnier wähle:",
       "chooseTournament": "Turnier wähle …",
       "updating": "Aazeig wird aktualisiert...",
-      "callitHint": "Tippspiel-Ranking für das Turnier zeige:"
+      "callitHint": "Tippspiel-Ranking für das Turnier zeige:",
+      "slot": "Display {{slot}}"
     },
     "context": {
       "title": "Match-Kontext",
@@ -191,7 +193,7 @@
       "changedTitle": "⚠ Nach em Spichere gänderet",
       "changedText": "De Spiilstand isch nach em Spichere gänderet worde. Nomal spichere ersetzt s'gspicherete Resultat.",
       "blockedTitle": "Unentschiede im KO-Spiil",
-      "blockedText": "Spichere gaht erscht nach em Freiwurf-Stäche (Charte unde).",
+      "blockedText": "Spichere goht erscht nach de Verlängerig bzw. em Freiwurf-Stäche (Charte unde).",
       "savedTitle": "✓ Gspicheret – s'Resultat zellt",
       "savedText": "Fürs nächschte Spiil: Zruggsetze und dänn s'nächschte Spiil us em Spiilplan übernäh.",
       "save": "Jetzt spichere",
@@ -205,11 +207,11 @@
     },
     "shootout": {
       "title": "Freiwurf-Stäche",
-      "drawHint": "Unentschiede im KO-Spiil – Entscheidig per Freiwurf-Stäche: je 5 Würf, dänn Sudden Death. Jede Träffer zellt 1 Punkt zum Resultat.",
+      "drawHint": "Au nach de Verlängerig unentschide – Entscheid per Freiwurf-Stäche: je 5 Würf, denn Sudden Death. Jede Träffer zellt 1 Punkt zum Resultat.",
       "firstTeam": "Wer wirft zerscht?",
       "start": "Stäche starte",
       "titleRunning": "Freiwurf-Stäche {{a}}:{{b}}",
-      "regularScore": "Stand nach de reguläre Spiilziit: {{a}}:{{b}}",
+      "regularScore": "Stand nach de Verlängerig: {{a}}:{{b}}",
       "decided": "Entschiede: {{team}} gwünnt s'Stäche {{a}}:{{b}} – jetzt Spiil beände und spichere.",
       "suddenDeath": "Sudden Death – als Nächschts wirft: {{team}}",
       "next": "Als Nächschts wirft: {{team}}",
@@ -232,7 +234,7 @@
       "extraTimeInfo": "Nachspilzyt plant {{planned}} · gloffe {{elapsed}}",
       "start": "Start",
       "pause": "Pausä",
-      "autoStartSecondHalf": "2. Halbzyt automatisch starte",
+      "autoStartSecondHalf": "Nach de Pausä automatisch starte (2. Halbzyt, Verlängerig)",
       "newRemaining": "Nöii Reschtzyt",
       "timerPlaceholder": "z.B. 10:00 oder 600",
       "setTime": "Zyt setze",
@@ -245,7 +247,8 @@
       "extraTimePlaceholder": "z.B. 02:00",
       "finishGame": "Spil beände",
       "saveGame": "Spil speichere",
-      "newGame": "Zruggsetze (ohni Spichere)"
+      "newGame": "Zruggsetze (ohni Spichere)",
+      "overtimeBreakRunning": "Pausä vor de Verlängerig lauft · Rescht: {{remaining}} ({{mode}})"
     },
     "penalties": {
       "title": "Zytstrafe",
@@ -283,6 +286,17 @@
       "cancel": "Freiwürf abbräche",
       "close": "Usblände",
       "failed": "Freiwurf-Aktion hät nöd klappet."
+    },
+    "overtime": {
+      "title": "Verlängerig",
+      "drawHint": "Unentschide nach de Spiilziit – nach {{pause}} Pausä git's e Verlängerig vo {{duration}}. Stoht's denn immer no unentschide, chunnt s Freiwurf-Stäche.",
+      "start": "Verlängerig starte",
+      "breakTitle": "Pausä vor de Verlängerig · {{remaining}}",
+      "breakAuto": "Denn startet d Verlängerig ({{duration}}) automatisch.",
+      "breakManual": "Denn d Verlängerig ({{duration}}) vo Hand aapfiife.",
+      "startNow": "Verlängerig jetzt aapfiife",
+      "cancel": "Verlängerig abbräche",
+      "failed": "Aktion het nöd klappt."
     }
   },
   "schedule": {
@@ -590,8 +604,6 @@
     "confirmResetGame": "Spiil zruggsetze? Teams, Pünkt und Ziit werdet glöscht. Wänn s'Spiil nöd gspicheret isch, isch s'Resultat weg.",
     "confirmReplaceUnsavedGame": "S'aktuelle Spiil isch nonig gspicheret. Trotzdem s'neue Spiil übernäh? S'bisherige Resultat isch dänn weg.",
     "newGameFailed": "Spiil het nöd chönne zruggsetzt werde.",
-    "displayNowScoreboard": "Beamer zeigt jetzt de Live-Spielstand.",
-    "displayNowBracket": "Beamer zeigt jetzt de Turnierboum.",
     "displayUpdateFailed": "Aazeig-Modus het nid chöne aktualisiert werde.",
     "tournamentRequired": "Bitte zerscht es Turnier im Match-Kontext uswähle.",
     "invalidDateTime": "Bitte es gültigs Datum/Uhrzyt uswähle.",
@@ -692,7 +704,7 @@
     "timerCuesSaveFailed": "Timer-Istellige hend nid chöne gspeicheret werde.",
     "audioLoadFailed": "Audiodate hend nid chöne glade werde.",
     "penaltyFreeThrowsSkipped": "Zytstraaf für Team {{team}} dezue taa – Freiwürf nöd aagleit, will no e Serie offe isch.",
-    "displayNowCallit": "De Beamer zeigt jetzt s Tippspiel-Ranking."
+    "displaySet": "Display {{display}} zeigt jetzt: {{view}}."
   },
   "error": {
     "generic": "Es isch en Fähler passiert. Bitte versuech's nomol.",
@@ -788,7 +800,7 @@
     "AUTH_REQUIRED": "Sitzig abgloffe. Bitte nomol aamälde.",
     "TOURNAMENT_REQUIRED": "Bitte zerscht es Turnier wähle.",
     "GROUP_RESULTS_EXIST": "I de Gruppephase gits scho Resultat – Teams chönd nüme tuuscht werde.",
-    "KNOCKOUT_DRAW": "Unentschiede im KO-Spiil – bitte zerscht s'Freiwurf-Stäche mache.",
+    "KNOCKOUT_DRAW": "Unentschide im KO-Spiil – bitte zerscht Verlängerig bzw. Freiwurf-Stäche spiele.",
     "SHOOTOUT_UNDECIDED": "S'Freiwurf-Stäche isch nonig entschiede.",
     "TEAM_OTHER_TOURNAMENT": "Spiiler chönd nur innerhalb vo eim Turnier s'Team wächsle.",
     "TOURNAMENT_CREATE_FAILED": "S'Turnier het nid chöne erstellt werde.",
@@ -825,7 +837,13 @@
     "CALLIT_NOT_AVAILABLE": "Tippspiel isch für das Turnier nöd aktiv.",
     "CALLIT_INVALID_VALUE": "Ungültige Wärt.",
     "CALLIT_MATCH_NOT_FOUND": "Spiel nöd gfunde.",
-    "CALLIT_USER_NOT_FOUND": "Nutzer nöd gfunde."
+    "CALLIT_USER_NOT_FOUND": "Nutzer nöd gfunde.",
+    "SHOOTOUT_NEEDS_OVERTIME": "S Freiwurf-Stäche chunnt erscht nach de Verlängerig.",
+    "OVERTIME_ALREADY_STARTED": "D Verlängerig isch scho gstartet.",
+    "OVERTIME_NOT_KNOCKOUT": "E Verlängerig git's nur i KO-Spiil.",
+    "OVERTIME_NOT_TIED": "E Verlängerig goht nur bi Glichstand.",
+    "OVERTIME_CLOCK_NOT_OVER": "D reguläri Spiilziit isch no nöd abgloffe.",
+    "OVERTIME_IN_PROGRESS": "D Verlängerig lauft scho."
   },
   "export": {
     "title": "PDF-Export / Drucken",
@@ -900,7 +918,8 @@
     "groupLabel": "Gruppe {{group}}",
     "emptyHint": "Turnier uswaehle zum Druckvorlaage aazluege",
     "collapse": "Iiklappe",
-    "expand": "Ufklappe"
+    "expand": "Ufklappe",
+    "overtimeShort": "n.V."
   },
   "callit": {
     "title": "Tippspiel CallIt",
@@ -919,8 +938,8 @@
     "saveJoinCode": "Code speichere",
     "copyLink": "Link kopiere",
     "copied": "Link kopiert.",
-    "beamerOn": "Ranking uf de Beamer",
-    "beamerOff": "Beamer zrugg zum Scoreboard",
+    "beamerOn": "Ranking uf Display {{slot}}",
+    "beamerOff": "Display {{slot}} zrugg zum Spielstand",
     "exportCsv": "CSV-Export",
     "refresh": "Aktualisiere",
     "saved": "Gspeicheret.",
@@ -960,7 +979,8 @@
       "most_penalty_seconds": "Meischti Strafsekunde",
       "group_winner": "Gruppesieger",
       "group_winner_label": "Gruppesieger {{group}}",
-      "total_baskets": "Gsamtpünkt"
+      "total_baskets": "Gsamtpünkt",
+      "final_kickoff": "Aafangsziit Final"
     },
     "matches": {
       "title": "Spiel & Sperre",

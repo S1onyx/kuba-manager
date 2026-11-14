@@ -90,7 +90,7 @@ export default function StatsPage({ id }) {
                 items={bet.distribution.slice(0, 8)}
                 valueLabel={(item) => `${formatPct(item.pct, lang)} · ${t('stats.quote')} ${formatQuote(item.quote, lang)}`}
               />
-              {bet.average !== null && bet.average !== undefined ? <span className="muted small">{t('stats.averageTip', { value: formatPoints(bet.average, lang) })}</span> : null}
+              {bet.average !== null && bet.average !== undefined ? <span className="muted small">{t('stats.averageTip', { value: bet.averageLabel ?? formatPoints(bet.average, lang) })}</span> : null}
               {bet.outcome ? (
                 <span className="small">
                   <span className="muted">{bet.outcome.final ? t('specials.result') : t('specials.currently')}: </span>

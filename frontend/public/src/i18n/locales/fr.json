@@ -3,7 +3,7 @@
     "title": "Lancers francs",
     "suddenDeath": "Mort subite",
     "winner": "Vainqueur : {{team}}",
-    "regular": "après le temps réglementaire {{a}}:{{b}}",
+    "regular": "après prolongation {{a}}:{{b}}",
     "short": "a.l.f.",
     "next": "Prochain tireur : {{team}}",
     "throwing": "tire",
@@ -350,5 +350,12 @@
     "participants_other": "{{count}} joueurs inscrits",
     "leaders": "En tête",
     "points": "{{points}} pts"
+  },
+  "overtime": {
+    "title": "Prolongation",
+    "break": "Pause avant la prolongation",
+    "short": "a.p.",
+    "running": "Prolongation · en cours",
+    "paused": "Prolongation · pause"
   }
 }

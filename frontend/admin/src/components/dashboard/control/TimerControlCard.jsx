@@ -66,7 +66,7 @@ export default function TimerControlCard() {
             </span>
             {scoreboard.isHalftimeBreak ? (
               <span style={{ fontSize: '0.85rem', opacity: 0.75 }}>
-                {t('control.timer.halftimeBreakRunning', {
+                {t(scoreboard.overtime ? 'control.timer.overtimeBreakRunning' : 'control.timer.halftimeBreakRunning', {
                   remaining: formatTime(scoreboard.halftimePauseRemaining ?? 0),
                   mode: autoStart ? t('control.timer.autoStart') : t('control.timer.manualStart')
                 })}

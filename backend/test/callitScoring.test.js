@@ -41,7 +41,7 @@ test('Defaults entsprechen der Spezifikation', () => {
   assert.equal(settings.joker.perPhase, 1);
   assert.deepEqual(
     Object.fromEntries(Object.entries(settings.specials).map(([k, v]) => [k, v.points])),
-    { winner: 10, top_scorer: 6, most_penalty_seconds: 6, group_winner: 3, total_baskets: 5 }
+    { winner: 10, top_scorer: 6, most_penalty_seconds: 6, group_winner: 3, total_baskets: 5, final_kickoff: 5 }
   );
   assert.equal(settings.locks.atScheduledTime, false);
   assert.deepEqual(normalizeSettings(DEFAULT_SETTINGS), settings);
@@ -158,6 +158,40 @@ test('Gesamtkörbe: nächster Wert gewinnt, Gleichstand für alle', () => {
   assert.equal(result.get(1).final, 5);
   assert.equal(result.get(2).final, 5);
   assert.equal(result.get(3).final, 0);
+});
+
+test('Finale-Startzeit: geringste Abweichung in Minuten gewinnt, Gleichstand für alle', () => {
+  const outcomes = new Map([['final_kickoff', { value: 17 * 60 + 15, final: true }]]);
+  const result = scoreSpecials(
+    [
+      { userId: 1, betKey: 'final_kickoff', value: { value: 17 * 60 + 10 } },
+      { userId: 2, betKey: 'final_kickoff', value: { value: 17 * 60 + 20 } },
+      { userId: 3, betKey: 'final_kickoff', value: { value: 16 * 60 + 59 } },
+      { userId: 4, betKey: 'final_kickoff', value: { value: 1440 } }
+    ],
+    outcomes,
+    settings
+  );
+  assert.deepEqual([1, 2, 3].map((id) => result.get(id).final), [5, 5, 0]);
+  assert.equal(result.has(4), false);
+});
+
+test('Uhrzeit: Ortszeit Europe/Berlin minutengenau und formatiert', async () => {
+  const { minutesOfDayInVenue, formatClock } = await import('../src/services/callit/time.js');
+  assert.equal(minutesOfDayInVenue('2026-06-15T15:07:40.000Z'), 17 * 60 + 7);
+  assert.equal(minutesOfDayInVenue('2026-11-14T16:30:59.000Z'), 17 * 60 + 30);
+  assert.equal(minutesOfDayInVenue('kaputt'), null);
+  assert.equal(formatClock(9 * 60 + 5), '09:05');
+});
+
+test('Finale-Startzeit: Anpfiff des Finales ist das Ergebnis, Admin-Korrektur hat Vorrang', async () => {
+  const { deriveSpecialOutcomes } = await import('../src/services/callit/context.js');
+  const matches = [match({ code: 'F', phase: 'knockout', isFinal: true, result: null })];
+  const kickoffs = new Map([['F', '2026-11-14T16:30:59.000Z']]);
+  const derive = (overrides) => deriveSpecialOutcomes({ matches, groups: [], kickoffs, overrides, resolveKey: () => null });
+  assert.deepEqual(derive(new Map()).get('final_kickoff'), { value: 17 * 60 + 30, final: true });
+  assert.deepEqual(derive(new Map([['final_kickoff', { value: 17 * 60 + 32 }]])).get('final_kickoff'), { value: 17 * 60 + 32, final: true });
+  assert.equal(deriveSpecialOutcomes({ matches, groups: [], resolveKey: () => null }).has('final_kickoff'), false);
 });
 
 test('Vorläufige Sonderwetten zählen nicht in die Gesamtpunkte', () => {

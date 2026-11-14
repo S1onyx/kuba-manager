@@ -155,18 +155,26 @@
     "jokerStatus": "Žolík: skupina {{group}} · KO {{ko}}",
     "rulesLink": "Pravidla",
     "filters": {
-      "open": "Otevřené",
-      "all": "Vše",
-      "done": "Odehrané"
+      "upcoming": "Nadcházející",
+      "open": "K tipování",
+      "results": "Výsledky"
     },
-    "empty": "Teď není co tipovat.",
+    "empty": {
+      "upcoming": "Žádné nadcházející zápasy.",
+      "open": "Teď není co tipovat.",
+      "results": "Zatím žádné výsledky."
+    },
     "advanceNeeded": "Vyber postupujícího",
     "jokerShort": "Žolík",
     "underdogShort": "Outsider",
     "pendingCount_one": "Další {{count}} zápas půjde tipovat, až budou známé týmy",
     "pendingCount_few": "Další {{count}} zápasy půjde tipovat, až budou známé týmy",
     "pendingCount_many": "Dalších {{count}} zápasů půjde tipovat, až budou známé týmy",
-    "pendingCount_other": "Dalších {{count}} zápasů půjde tipovat, až budou známé týmy"
+    "pendingCount_other": "Dalších {{count}} zápasů půjde tipovat, až budou známé týmy",
+    "nextMatch": "Další na řadě",
+    "liveNow": "aktuálně",
+    "liveGap": "Rozdíl od tipu",
+    "liveExact": "Aktuální stav = tvůj tip!"
   },
   "specials": {
     "title": "Speciální sázky",
@@ -185,20 +193,23 @@
       "top_scorer": "Nejlepší střelec (nejvíc bodů)",
       "most_penalty_seconds": "Nejvíc trestných sekund",
       "group_winner": "Vítěz {{group}}",
-      "total_baskets": "Celkem bodů v turnaji"
+      "total_baskets": "Celkem bodů v turnaji",
+      "final_kickoff": "Čas začátku finále"
     },
     "hints": {
       "winner": "Kdo vyhraje turnaj?",
       "top_scorer": "Který hráč nastřílí nejvíc bodů?",
       "most_penalty_seconds": "Kdo nasbírá nejvíc trestných sekund?",
       "group_winner": "Kdo vyhraje skupinu?",
-      "total_baskets": "Kolik bodů padne celkem (řádná hrací doba)? Vyhrává nejbližší tip."
+      "total_baskets": "Kolik bodů padne celkem (řádná hrací doba)? Vyhrává nejbližší tip.",
+      "final_kickoff": "V kolik hodin začne finále (místní čas)? Vyhrává tip nejblíže na minutu přesně."
     },
     "doneTitle_one": "{{count}} speciální sázka podána",
     "doneTitle_few": "{{count}} speciální sázky podány",
     "doneTitle_many": "{{count}} speciálních sázek podáno",
     "doneTitle_other": "{{count}} speciálních sázek podáno",
-    "doneHint": "Do prvního výkopu je ještě můžeš změnit."
+    "doneHint": "Do prvního výkopu je ještě můžeš změnit.",
+    "plannedAt": "Podle rozpisu: {{time}}"
   },
   "ranking": {
     "title": "Pořadí",

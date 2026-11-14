@@ -4,6 +4,7 @@ import { getTournamentSummary } from '../tournaments/summary.js';
 import { canonicalGroupLabel } from '../tournaments/helpers.js';
 import { hasLiveGameStarted } from '../tournaments/standings.js';
 import { listPlayersByTeam } from '../playersService.js';
+import { minutesOfDayInVenue } from './time.js';
 
 const CACHE_TTL_MS = 3000;
 const cache = new Map();
@@ -138,7 +139,7 @@ function topKeys(players, field) {
   return players.filter((player) => (player[field] ?? 0) === max && player.playerId != null).map((player) => String(player.playerId));
 }
 
-export function deriveSpecialOutcomes({ tournament, summary, matches, groups, overrides = new Map(), resolveKey }) {
+export function deriveSpecialOutcomes({ tournament, summary, matches, groups, kickoffs = new Map(), overrides = new Map(), resolveKey }) {
   const outcomes = new Map();
   const savedMatches = matches.filter((match) => match.result?.saved);
   const allFinished = matches.length > 0 && savedMatches.length === matches.length;
@@ -173,6 +174,10 @@ export function deriveSpecialOutcomes({ tournament, summary, matches, groups, ov
     const value = savedMatches.reduce((sum, match) => sum + match.result.home + match.result.away, 0);
     outcomes.set('total_baskets', { value, final: tournamentDone });
   }
+
+  const finalMatch = matches.find((match) => match.isFinal);
+  const finalKickoff = finalMatch ? minutesOfDayInVenue(kickoffs.get(finalMatch.code)) : null;
+  if (finalKickoff !== null) outcomes.set('final_kickoff', { value: finalKickoff, final: true });
 
   overrides.forEach((value, betKey) => {
     if (Array.isArray(value?.keys)) outcomes.set(betKey, { keys: value.keys.map(String), final: true });

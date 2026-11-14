@@ -2,6 +2,7 @@ import { CallitError, queryAll, queryOne, write } from './db.js';
 import { computeRanking, getConfig, listSpecialsForUser, loadTournamentState } from './index.js';
 import { setLock } from './locks.js';
 import { specialTypeOf } from './settings.js';
+import { isMinuteOfDay } from './time.js';
 import { emitCallitUpdate } from './events.js';
 import { invalidateTournamentContext, loadTournamentBase } from './context.js';
 import { validTipsByMatch } from './scoring.js';
@@ -110,6 +111,10 @@ export async function adminSetSpecialOverride(tournamentId, betKey, value) {
     if (type === 'total_baskets') {
       const numeric = Number(value.value);
       if (!Number.isInteger(numeric) || numeric < 0) throw new CallitError('CALLIT_INVALID_VALUE', 'Ungültiger Wert.');
+      normalized = { value: numeric };
+    } else if (type === 'final_kickoff') {
+      const numeric = Number(value.value);
+      if (!isMinuteOfDay(numeric)) throw new CallitError('CALLIT_INVALID_VALUE', 'Ungültige Uhrzeit.');
       normalized = { value: numeric };
     } else {
       const keys = (Array.isArray(value.keys) ? value.keys : []).map(String).filter(Boolean).slice(0, 20);

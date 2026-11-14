@@ -1,5 +1,7 @@
 export const POINT_OPTIONS = [1, 2, 3];
 
+export const DISPLAY_SLOTS = ['1', '2', '3'];
+
 export const DISPLAY_VIEW_OPTIONS = [
   { id: 'scoreboard', labelKey: 'displayViews.scoreboard' },
   { id: 'bracket', labelKey: 'displayViews.bracket' },

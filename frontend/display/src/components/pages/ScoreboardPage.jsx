@@ -104,7 +104,11 @@ export default function ScoreboardPage({
           textShadow: '0 2px 12px rgba(0,0,0,0.7)'
         }}
       >
-        {scoreboard?.shootout ? t('shootout.title') : t('scoreboard.halfBadge', { half: currentHalf })}
+        {scoreboard?.shootout
+          ? t('shootout.title')
+          : scoreboard?.overtime
+            ? t('overtime.title')
+            : t('scoreboard.halfBadge', { half: currentHalf })}
       </div>
 
       {hasHeader ? (
@@ -164,6 +168,7 @@ export default function ScoreboardPage({
             extraElapsed={extraElapsed}
             isHalftimeBreak={isHalftimeBreak}
             halftimeBreakRemaining={halftimeBreakRemaining}
+            breakLabel={scoreboard?.overtime ? t('overtime.break') : t('scoreboard.halftimeBreak')}
             isExtraTime={isExtraTime}
           />
 

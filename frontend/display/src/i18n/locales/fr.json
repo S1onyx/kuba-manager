@@ -3,7 +3,7 @@
     "title": "Lancers francs",
     "suddenDeath": "Mort subite",
     "winner": "Vainqueur : {{team}}",
-    "regular": "après le temps réglementaire {{a}}:{{b}}",
+    "regular": "après prolongation {{a}}:{{b}}",
     "short": "a.l.f.",
     "next": "Prochain tireur : {{team}}",
     "throwing": "tire",
@@ -12,8 +12,7 @@
     "miss": "manqué"
   },
   "app": {
-    "mirrorStandard": "Écran 1 (standard)",
-    "mirrorInverted": "Écran 2 (inversé)"
+    "displaySlot": "Écran {{slot}}"
   },
   "controls": {
     "fullscreenEnter": "Plein écran",
@@ -166,12 +165,18 @@
         "winner": "Vainqueur du tournoi",
         "top_scorer": "Meilleur marqueur",
         "most_penalty_seconds": "Le plus de secondes de pénalité",
-        "total_baskets": "Total des points"
+        "total_baskets": "Total des points",
+        "final_kickoff": "Heure de début de la finale"
       },
       "groupWinner": "Vainqueur {{group}}",
       "thanks": "Merci d'avoir joué !",
       "hitBy_one": "trouvé par {{count}}",
       "hitBy_other": "trouvé par {{count}}"
     }
+  },
+  "overtime": {
+    "title": "Prolongation",
+    "break": "Pause avant la prolongation",
+    "short": "a.p."
   }
 }

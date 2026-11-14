@@ -1,6 +1,7 @@
 import { getState, notifySubscribers, snapshotState, applyFreeThrowToStats } from './stateStore.js';
 import { addPoints } from './scoring.js';
 import { evaluateShootout } from './shootoutRules.js';
+import { isClockOver } from './overtimeRules.js';
 
 export class ShootoutError extends Error {
   constructor(code, message) {
@@ -32,6 +33,9 @@ export function startShootout({ firstTeam = 'a' } = {}) {
   }
   if ((state.scoreA ?? 0) !== (state.scoreB ?? 0)) {
     throw new ShootoutError('SHOOTOUT_NOT_TIED', 'Ein Freiwurf-Stechen ist nur bei Gleichstand möglich.');
+  }
+  if (!state.overtime || !isClockOver(state)) {
+    throw new ShootoutError('SHOOTOUT_NEEDS_OVERTIME', 'Das Freiwurf-Stechen folgt erst nach der Verlängerung.');
   }
   state.shootout = {
     firstTeam: normalizeTeam(firstTeam),

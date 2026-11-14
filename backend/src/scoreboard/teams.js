@@ -232,6 +232,7 @@ export function applyScheduleMatchSelection({
   state.scoreA = 0;
   state.scoreB = 0;
   state.shootout = null;
+  state.overtime = null;
   state.isFinished = false;
   state.savedGameId = null;
   state.savedSignature = null;

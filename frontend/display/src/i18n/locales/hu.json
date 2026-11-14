@@ -3,7 +3,7 @@
     "title": "Büntetődobás-párbaj",
     "suddenDeath": "Hirtelen halál",
     "winner": "Győztes: {{team}}",
-    "regular": "a rendes játékidő után {{a}}:{{b}}",
+    "regular": "a hosszabbítás után {{a}}:{{b}}",
     "short": "bünt. után",
     "next": "Következő dobó: {{team}}",
     "throwing": "dob",
@@ -12,8 +12,7 @@
     "miss": "mellé"
   },
   "app": {
-    "mirrorStandard": "1. kijelző (normál)",
-    "mirrorInverted": "2. kijelző (invertált)"
+    "displaySlot": "{{slot}}. kijelző"
   },
   "controls": {
     "fullscreenEnter": "Teljes képernyő",
@@ -166,12 +165,18 @@
         "winner": "Tornagyőztes",
         "top_scorer": "Gólkirály",
         "most_penalty_seconds": "Legtöbb büntetőmásodperc",
-        "total_baskets": "Összes pont"
+        "total_baskets": "Összes pont",
+        "final_kickoff": "A döntő kezdési ideje"
       },
       "groupWinner": "{{group}} győztese",
       "thanks": "Köszönjük, hogy tippeltél!",
       "hitBy_one": "{{count}} találat",
       "hitBy_other": "{{count}} találat"
     }
+  },
+  "overtime": {
+    "title": "Hosszabbítás",
+    "break": "Szünet a hosszabbítás előtt",
+    "short": "hossz. után"
   }
 }

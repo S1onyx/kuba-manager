@@ -21,7 +21,7 @@ const baseStyle = {
   transition: 'opacity 0.2s ease, transform 0.2s ease'
 };
 
-export default function DisplayViewToggle({ displayView, style = {} }) {
+export default function DisplayViewToggle({ displayView, display, style = {} }) {
   const { t } = useTranslation();
   const [pending, setPending] = useState(false);
 
@@ -35,7 +35,7 @@ export default function DisplayViewToggle({ displayView, style = {} }) {
     if (pending || !nextView) return;
     setPending(true);
     try {
-      await updateDisplayView(nextView);
+      await updateDisplayView(nextView, display);
     } catch (error) {
       console.error('Display view change failed:', error);
     } finally {

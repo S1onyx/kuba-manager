@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../api.js';
 import { useDateLocale } from '../i18n/index.js';
-import { canSaveTip, formatCountdown, formatPoints, isKoDraw, stepDraft, teamName } from '../utils/format.js';
+import { canSaveTip, formatCountdown, formatPoints, isKoDraw, liveTipGap, stepDraft, teamName } from '../utils/format.js';
+import { formatStageLabelI18n } from '../utils/stageLabels.js';
 import { errorMessage } from '../utils/errors.js';
 import { IconChevron, IconLock } from './Icons.jsx';
 
@@ -44,7 +45,7 @@ export function KickoffInfo({ match, now }) {
   return <span>{label}</span>;
 }
 
-export function PointsPill({ points }) {
+export function PointsPill({ points, live = false }) {
   const { t, i18n } = useTranslation();
   if (!points) return null;
   const tone = points.level === 'exact' ? 'pill--gold' : points.level === 'miss' ? '' : 'pill--saved';
@@ -53,6 +54,7 @@ export function PointsPill({ points }) {
       +{formatPoints(points.total, i18n.language)} · {t(`levels.${points.level}`)}
       {points.joker > 1 ? ` · ${t('tips.jokerShort')}` : ''}
       {points.underdog > 0 ? ` · ${t('tips.underdogShort')}` : ''}
+      {live ? ` · ${t('tips.liveNow')}` : ''}
     </span>
   );
 }
@@ -156,11 +158,15 @@ export default function MatchCard({ tournamentId, match, now, jokers, canTip, on
 
   const showAdvance = editable && isKoDraw(match, draft);
   const mine = match.myTip;
+  const isLive = match.status === 'live';
+  const gap = isLive ? liveTipGap(mine, match.result) : null;
+  const stage = formatStageLabelI18n(t, match.stageLabelI18n, match.stageLabel);
 
   return (
     <article className={`card match${match.status === 'live' ? ' card--live' : ''}`}>
       <div className="match__head">
         <span className="ellipsis">
+          {stage ? `${stage} · ` : ''}
           <KickoffInfo match={match} now={now} />
           {match.isFinal ? ` · ${t('tips.finalBadge')}` : ''}
         </span>
@@ -244,9 +250,22 @@ export default function MatchCard({ tournamentId, match, now, jokers, canTip, on
               <span className="muted">{match.status === 'open' ? t('tips.loginToTip') : t('tips.noTip')}</span>
             )}
           </span>
-          {match.myPoints ? <PointsPill points={match.myPoints} /> : null}
+          {match.myPoints ? <PointsPill points={match.myPoints} live={isLive} /> : null}
         </div>
       )}
+
+      {gap ? (
+        <span className="small">
+          {gap.exact ? <strong style={{ color: 'var(--gold)' }}>{t('tips.liveExact')}</strong> : (
+            <>
+              <span className="muted">{t('tips.liveGap')}: </span>
+              <strong>
+                {home} {gap.home} · {away} {gap.away}
+              </strong>
+            </>
+          )}
+        </span>
+      ) : null}
 
       {error ? <div className="banner banner--error small">{errorMessage(t, error)}</div> : null}
 

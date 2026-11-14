@@ -99,7 +99,10 @@
     "extraTime": "Nachspielzeit",
     "extraTimePaused": "Nachspielzeit (Pause)",
     "running": "lauft",
-    "paused": "pausiert"
+    "paused": "pausiert",
+    "overtime": "Verlängerung lauft",
+    "overtimePaused": "Verlängerung (Bause)",
+    "overtimeBreak": "Bause vor dr Verlängerung"
   },
   "dashboard": {
     "loading": "Lade Scoreboard..."
@@ -114,18 +117,17 @@
     "tournamentStatus": "Turnierstatus: {{status}}",
     "statusCompleted": "abgschlossa",
     "statusRunning": "lauft",
-    "switching": "Wechsle...",
-    "showLive": "Live anzeiga",
-    "showBracket": "Turnierbaum anzeiga"
+    "displaySlot": "D{{slot}}: {{view}}"
   },
   "control": {
     "display": {
       "title": "Beameranzeig",
-      "description": "Wechsel zwische Live-Spielstand ond Turnierbaum uff'm Beamer.",
+      "description": "Leg fescht, was Display 1, 2 ond 3 zeigat. Am Bildschirm selber wählsch per Knopf, welles Display er isch.",
       "bracketHint": "Fürs Turnierbaum zerscht s'Turnier wähla:",
       "chooseTournament": "Turnier wähla …",
       "updating": "Anzeig wird aktualisiert...",
-      "callitHint": "Tippschbiel-Ranking für des Turnier zeiga:"
+      "callitHint": "Tippschbiel-Ranking für des Turnier zeiga:",
+      "slot": "Display {{slot}}"
     },
     "context": {
       "title": "Match-Kontext",
@@ -191,7 +193,7 @@
       "changedTitle": "⚠ Noch em Speichra gändert",
       "changedText": "Dr Spielstand isch noch em Speichra gändert worra. Nomol speichra ersetzt s'gspeicherte Ergebnis.",
       "blockedTitle": "Unentschiede em KO-Spiel",
-      "blockedText": "Speichra goht erscht noch em Freiwurf-Stecha (Kart unta).",
+      "blockedText": "Schbeichra goht erscht noch dr Verlängerung bzw. em Freiwurf-Schdecha (Kart unta).",
       "savedTitle": "✓ Gspeichert – s'Ergebnis zählt",
       "savedText": "Fürs nächste Spiel: Zrücksetza ond dann s'nächste Spiel aus em Spielplan übernemma.",
       "save": "Jetzt speichra",
@@ -205,11 +207,11 @@
     },
     "shootout": {
       "title": "Freiwurf-Stecha",
-      "drawHint": "Unentschiede em KO-Spiel – Entscheidung per Freiwurf-Stecha: je 5 Würf, drnoch Sudden Death. Jeder Treffer zählt 1 Punkt zum Ergebnis.",
+      "drawHint": "Au noch dr Verlängerung unentschieda – Entscheidung per Freiwurf-Schdecha: je 5 Würf, nochher Sudden Death. Jeder Treffer zählt 1 Punkt zom Ergebnis.",
       "firstTeam": "Wer wirft zerscht?",
       "start": "Stecha starta",
       "titleRunning": "Freiwurf-Stecha {{a}}:{{b}}",
-      "regularScore": "Stand noch dr reguläre Spielzeit: {{a}}:{{b}}",
+      "regularScore": "Stand noch dr Verlängerung: {{a}}:{{b}}",
       "decided": "Entschiede: {{team}} gwinnt s'Stecha {{a}}:{{b}} – jetzt Spiel beenda ond speichra.",
       "suddenDeath": "Sudden Death – als Nächsts wirft: {{team}}",
       "next": "Als Nächsts wirft: {{team}}",
@@ -232,7 +234,7 @@
       "extraTimeInfo": "Nachspielzeit plant {{planned}} · glaufe {{elapsed}}",
       "start": "Start",
       "pause": "Pause",
-      "autoStartSecondHalf": "2. Halbzeit automatisch starta",
+      "autoStartSecondHalf": "Noch dr Bause automatisch starta (2. Halbzeit, Verlängerung)",
       "newRemaining": "Neui Restzeit",
       "timerPlaceholder": "z.B. 10:00 oder 600",
       "setTime": "Zeit setza",
@@ -245,7 +247,8 @@
       "extraTimePlaceholder": "z.B. 02:00",
       "finishGame": "Spiel beenda",
       "saveGame": "Spiel speichera",
-      "newGame": "Zrücksetza (ohne Speichra)"
+      "newGame": "Zrücksetza (ohne Speichra)",
+      "overtimeBreakRunning": "Bause vor dr Verlängerung lauft · Rest: {{remaining}} ({{mode}})"
     },
     "penalties": {
       "title": "Zeitstrafe",
@@ -283,6 +286,17 @@
       "cancel": "Freiwürf abbrecha",
       "close": "Ausblenda",
       "failed": "Freiwurf-Aktion hot ned klappt."
+    },
+    "overtime": {
+      "title": "Verlängerung",
+      "drawHint": "Unentschieda noch dr Spielzeit – noch {{pause}} Bause gibt's a Verlängerung vo {{duration}}. Schdohts nochher emmer no unentschieda, kommt 's Freiwurf-Schdecha.",
+      "start": "Verlängerung starta",
+      "breakTitle": "Bause vor dr Verlängerung · {{remaining}}",
+      "breakAuto": "Nochher startet d' Verlängerung ({{duration}}) automatisch.",
+      "breakManual": "Nochher d' Verlängerung ({{duration}}) vo Hand opfeifa.",
+      "startNow": "Verlängerung jetzt opfeifa",
+      "cancel": "Verlängerung abbrecha",
+      "failed": "Aktion hot ned klappt."
     }
   },
   "schedule": {
@@ -590,8 +604,6 @@
     "confirmResetGame": "Spiel zrücksetza? Teams, Punkt ond Zeit werret glöscht. Wenn s'Spiel ned gspeichert isch, isch s'Ergebnis weg.",
     "confirmReplaceUnsavedGame": "S'aktuelle Spiel isch no ned gspeichert. Trotzdem s'neue Spiel übernemma? S'bisherige Ergebnis isch dann weg.",
     "newGameFailed": "Spiel hot ned zrückgsetzt werra könna.",
-    "displayNowScoreboard": "Beamer zeigt jetzt'n Live-Spielstand.",
-    "displayNowBracket": "Beamer zeigt jetzt'n Turnierbaum.",
     "displayUpdateFailed": "Anzeige-Modus hot net aktualisiert werda könna.",
     "tournamentRequired": "Bittschön zuerst a Turnier im Match-Kontext auswähla.",
     "invalidDateTime": "Bittschön a gültigs Datum/Uhrzeit auswähla.",
@@ -692,7 +704,7 @@
     "timerCuesSaveFailed": "Timer-Eistellunge hen net gsichert werda könna.",
     "audioLoadFailed": "Audiodatä hen net gladä werda könna.",
     "penaltyFreeThrowsSkipped": "Zeitstraf für Team {{team}} dazua gdo – Freiwürf ned aglegt, weil no a Serie offa isch.",
-    "displayNowCallit": "Dr Beamer zeigt jetzt s Tippschbiel-Ranking."
+    "displaySet": "Display {{display}} zeigt jetzt: {{view}}."
   },
   "error": {
     "generic": "A Fehler isch passiert. Bittschön versuch's nomol.",
@@ -788,7 +800,7 @@
     "AUTH_REQUIRED": "Sitzung abgloffa. Bitte nomol amelda.",
     "TOURNAMENT_REQUIRED": "Bitte zerscht a Turnier wähla.",
     "GROUP_RESULTS_EXIST": "En dr Gruppaphas gibts scho Ergebnis – Teams könnet nemme tauscht werra.",
-    "KNOCKOUT_DRAW": "Unentschiede em KO-Spiel – bitte zerscht s'Freiwurf-Stecha macha.",
+    "KNOCKOUT_DRAW": "Unentschieda im KO-Schbiel – bitte zerscht Verlängerung bzw. Freiwurf-Schdecha macha.",
     "SHOOTOUT_UNDECIDED": "S'Freiwurf-Stecha isch no ned entschiede.",
     "TEAM_OTHER_TOURNAMENT": "Spieler könnet bloß innerhalb von oim Turnier s'Team wechsla.",
     "TOURNAMENT_CREATE_FAILED": "Des Turnier hot net erstellt werda könna.",
@@ -825,7 +837,13 @@
     "CALLIT_NOT_AVAILABLE": "Tippschbiel isch für des Turnier net aktiv.",
     "CALLIT_INVALID_VALUE": "Ungültiger Wert.",
     "CALLIT_MATCH_NOT_FOUND": "Schbiel net gfunda.",
-    "CALLIT_USER_NOT_FOUND": "Nutzer net gfunda."
+    "CALLIT_USER_NOT_FOUND": "Nutzer net gfunda.",
+    "SHOOTOUT_NEEDS_OVERTIME": "'s Freiwurf-Schdecha kommt erscht noch dr Verlängerung.",
+    "OVERTIME_ALREADY_STARTED": "D' Verlängerung isch scho gschtartet.",
+    "OVERTIME_NOT_KNOCKOUT": "A Verlängerung gibt's bloß en KO-Schbiel.",
+    "OVERTIME_NOT_TIED": "A Verlängerung goht bloß bei Gleichstand.",
+    "OVERTIME_CLOCK_NOT_OVER": "D' reguläre Schbielzeit isch no ned rom.",
+    "OVERTIME_IN_PROGRESS": "D' Verlängerung lauft scho."
   },
   "export": {
     "title": "PDF-Export / Drucker",
@@ -900,7 +918,8 @@
     "groupLabel": "Gruppa {{group}}",
     "emptyHint": "Turnier auswaehla zum Druckvorlaga agucka",
     "collapse": "Zuklappa",
-    "expand": "Ufklappa"
+    "expand": "Ufklappa",
+    "overtimeShort": "n.V."
   },
   "callit": {
     "title": "Tippschbiel CallIt",
@@ -919,8 +938,8 @@
     "saveJoinCode": "Code schbeichra",
     "copyLink": "Link kopiera",
     "copied": "Link kopiert.",
-    "beamerOn": "Ranking uff da Beamer",
-    "beamerOff": "Beamer zrück zum Scoreboard",
+    "beamerOn": "Ranking uf Display {{slot}}",
+    "beamerOff": "Display {{slot}} zrück zom Schbielstand",
     "exportCsv": "CSV-Export",
     "refresh": "Aktualisiera",
     "saved": "Gschbeichert.",
@@ -960,7 +979,8 @@
       "most_penalty_seconds": "Meischde Schdrofsekonda",
       "group_winner": "Gruppasieger",
       "group_winner_label": "Gruppasieger {{group}}",
-      "total_baskets": "Gsamtpunkt"
+      "total_baskets": "Gsamtpunkt",
+      "final_kickoff": "Aafangszeit Finale"
     },
     "matches": {
       "title": "Schbiel & Schberra",

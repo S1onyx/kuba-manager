@@ -58,7 +58,7 @@ function sanitizeScoreboardState(state) {
     stageLabel: state.stageLabel,
     tournamentCompleted: state.tournamentCompleted,
     penalties: state.penalties,
-    displayView: state.displayView,
+    displays: state.displays,
     lastUpdated: state.lastUpdated,
     scheduleCode: state.scheduleCode,
     players: state.players,
@@ -66,6 +66,7 @@ function sanitizeScoreboardState(state) {
     scoringLog: state.scoringLog,
     penaltyLog: state.penaltyLog,
     shootout: state.shootout ?? null,
+    overtime: state.overtime ?? null,
     isFinished: Boolean(state.isFinished)
   };
 }

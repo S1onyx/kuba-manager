@@ -13,7 +13,8 @@ test('Stechen: Treffer zählt +1 Punkt für Spieler, Status im Zustand, Rückgä
   const { clearGame } = await import('../src/scoreboard/reset.js');
   clearGame();
   Object.assign(getState(), {
-    stageType: 'knockout', scoreA: 6, scoreB: 6, isRunning: false,
+    stageType: 'knockout', scoreA: 6, scoreB: 6, isRunning: false, remainingSeconds: 0,
+    overtime: { regularScoreA: 6, regularScoreB: 6, durationSeconds: 300 },
     players: { a: [{ playerId: 1, name: 'Anna' }], b: [{ playerId: 2, name: 'Ben' }] }
   });
   startShootout({ firstTeam: 'a' });

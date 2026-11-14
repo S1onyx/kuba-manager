@@ -1,5 +1,5 @@
 import { getTournament } from './base.js';
-import { shootoutSummary } from '../shared/shootout.js';
+import { shootoutSummary, overtimeSummary, resultSuffix } from '../shared/shootout.js';
 import { freeThrowPct, rankFreeThrowShooters, collectTeamFreeThrows } from './freeThrowStats.js';
 import { withLiveGame } from './liveGame.js';
 import { listGamesByTournament } from '../gamesService.js';
@@ -188,7 +188,7 @@ export async function getTournamentSummary(tournamentId, { currentSnapshot, incl
     return {
       winner,
       loser,
-      scoreLine: `${scoreA}:${scoreB}${shootoutSummary(game.snapshot) ? ' n.F.' : ''}`
+      scoreLine: `${scoreA}:${scoreB}${resultSuffix(game.snapshot)}`
     };
   };
 
@@ -551,6 +551,7 @@ const topFreeThrowShooters = rankFreeThrowShooters(playerOverview);
       scoreA: game.score_a,
       scoreB: game.score_b,
       shootout: shootoutSummary(game.snapshot),
+      overtime: overtimeSummary(game.snapshot),
       created_at: game.created_at
     }))
     .sort((a, b) => {
@@ -572,6 +573,7 @@ const topFreeThrowShooters = rankFreeThrowShooters(playerOverview);
       scoreA: game.score_a,
       scoreB: game.score_b,
       shootout: shootoutSummary(game.snapshot),
+      overtime: overtimeSummary(game.snapshot),
       created_at: game.created_at
     }));
 

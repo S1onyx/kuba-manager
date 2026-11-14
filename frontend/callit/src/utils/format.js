@@ -32,19 +32,28 @@ export function formatPct(value, locale = 'de-DE') {
   return `${new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Number(value ?? 0))} %`;
 }
 
-export function groupMatchesByStage(matches) {
-  const groups = [];
-  const byLabel = new Map();
-  matches.forEach((match) => {
-    const key = match.stageLabel || match.phase || '';
-    if (!byLabel.has(key)) {
-      const group = { key, phase: match.phase, stageLabelI18n: match.stageLabelI18n, label: match.stageLabel, matches: [] };
-      byLabel.set(key, group);
-      groups.push(group);
-    }
-    byLabel.get(key).matches.push(match);
-  });
-  return groups;
+export const MATCH_FILTERS = ['upcoming', 'open', 'results'];
+
+// Liste kommt in Spielplan-Reihenfolge vom Server. Beendete Spiele nur unter "Ergebnisse", neueste zuerst.
+export function filterMatches(matches, filter) {
+  if (filter === 'results') return matches.filter((match) => match.status === 'finished').reverse();
+  if (filter === 'open') return matches.filter((match) => match.status === 'open');
+  return matches.filter((match) => match.status !== 'finished');
+}
+
+// Erstes Spiel in Spielplan-Reihenfolge, das weder läuft noch beendet ist.
+export function nextMatch(matches) {
+  return matches.find((match) => ['open', 'locked', 'pending'].includes(match.status)) ?? null;
+}
+
+const signed = (value) => (value > 0 ? `+${value}` : value < 0 ? `−${Math.abs(value)}` : '±0');
+
+// Wie weit der aktuelle Stand je Team vom Tipp entfernt ist (+ = fehlt noch, − = schon drüber).
+export function liveTipGap(tip, result) {
+  if (!tip || !result) return null;
+  const home = tip.scoreHome - result.home;
+  const away = tip.scoreAway - result.away;
+  return { home: signed(home), away: signed(away), exact: home === 0 && away === 0 };
 }
 
 export function isKoDraw(match, draft) {
@@ -92,4 +101,24 @@ export const RANKING_CATEGORIES = ['total', 'matches', 'specials', 'exact', 'und
 export function categoryValueSuffix(category) {
   if (category === 'exact' || category === 'underdog') return 'hits';
   return 'points';
+}
+
+// Sonderwette Finale-Startzeit: Uhrzeit als Minuten seit Mitternacht, Ortszeit des Turniers.
+const VENUE_TIME_ZONE = 'Europe/Berlin';
+
+export function clockToMinutes(text) {
+  const match = /^(\d{2}):(\d{2})$/.exec(String(text ?? ''));
+  if (!match || Number(match[1]) > 23 || Number(match[2]) > 59) return null;
+  return Number(match[1]) * 60 + Number(match[2]);
+}
+
+export function minutesToClock(minutes) {
+  if (!Number.isInteger(minutes) || minutes < 0 || minutes >= 24 * 60) return '';
+  return `${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}`;
+}
+
+export function formatVenueClock(iso) {
+  const time = Date.parse(iso ?? '');
+  if (Number.isNaN(time)) return null;
+  return new Intl.DateTimeFormat('en-GB', { timeZone: VENUE_TIME_ZONE, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(time);
 }

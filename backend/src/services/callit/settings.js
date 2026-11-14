@@ -1,4 +1,6 @@
-export const SPECIAL_BET_TYPES = ['winner', 'top_scorer', 'most_penalty_seconds', 'group_winner', 'total_baskets'];
+export const SPECIAL_BET_TYPES = ['winner', 'top_scorer', 'most_penalty_seconds', 'group_winner', 'total_baskets', 'final_kickoff'];
+// Wetten auf einen Zahlenwert: wer am nächsten dran ist, gewinnt.
+export const NEAREST_BET_TYPES = ['total_baskets', 'final_kickoff'];
 
 export const DEFAULT_SETTINGS = Object.freeze({
   points: { exact: 4, diff: 3, tendency: 2, koAdvance: 1 },
@@ -10,7 +12,8 @@ export const DEFAULT_SETTINGS = Object.freeze({
     top_scorer: { enabled: true, points: 6, deadline: null },
     most_penalty_seconds: { enabled: true, points: 6, deadline: null },
     group_winner: { enabled: true, points: 3, deadline: null },
-    total_baskets: { enabled: true, points: 5, deadline: null }
+    total_baskets: { enabled: true, points: 5, deadline: null },
+    final_kickoff: { enabled: true, points: 5, deadline: null }
   },
   locks: { atScheduledTime: false }
 });

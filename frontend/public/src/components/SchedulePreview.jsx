@@ -330,7 +330,7 @@ function renderGroupSchedule(groupStages, formatDateTime, t) {
                             }}
                           >
                             {match.result?.hasResult
-                              ? formatResultScore(match.result.scoreA, match.result.scoreB, match.result.shootout)
+                              ? formatResultScore(match.result.scoreA, match.result.scoreB, match.result)
                               : 'vs'}
                           </span>
                           <span style={{ fontWeight: 600, textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -462,7 +462,7 @@ function renderTimelineRow(entry, status, formatDateTime, formatTime, t) {
     classNames.push('schedule-timeline__item--now');
   }
   const scoreLabel = entry.result?.hasResult
-    ? formatResultScore(entry.result.scoreA, entry.result.scoreB, entry.result.shootout)
+    ? formatResultScore(entry.result.scoreA, entry.result.scoreB, entry.result)
     : 'vs';
   const metaParts = [];
   if (entry.phaseLabel) {

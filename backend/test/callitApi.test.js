@@ -159,6 +159,15 @@ test('Sonderwette: Sieger tippen, ungültige Auswahl abgelehnt', async () => {
   assert.ok(group, 'Gruppensieger-Wette vorhanden');
   const total = await call('PUT', `/callit/tournaments/${TID}/specials/total_baskets`, { token: users.Zocker.token, body: { value: { value: 80 } } });
   assert.equal(total.status, 200);
+  const kickoff = specials.body.find((bet) => bet.betKey === 'final_kickoff');
+  assert.ok(kickoff, 'Finale-Startzeit-Wette vorhanden');
+  assert.equal('scheduledAt' in kickoff, true);
+  const badTime = await call('PUT', `/callit/tournaments/${TID}/specials/final_kickoff`, { token: users.Zocker.token, body: { value: { value: 1440 } } });
+  assert.equal(badTime.status, 400);
+  const time = await call('PUT', `/callit/tournaments/${TID}/specials/final_kickoff`, { token: users.Zocker.token, body: { value: { value: 17 * 60 + 15 } } });
+  assert.equal(time.status, 200);
+  const mine = await call('GET', `/callit/tournaments/${TID}/specials`, { token: users.Zocker.token });
+  assert.equal(mine.body.find((bet) => bet.betKey === 'final_kickoff').myLabel, '17:15');
 });
 
 test('Laufende Uhr sperrt sofort, auch bei 0:0 und vollem Spielstand', async () => {
@@ -313,4 +322,27 @@ test('Endübersicht: Podest, Kategorien und Sonderwetten', async () => {
   assert.ok(res.body.categoryWinners.every((entry) => entry.winners.length > 0));
   const info = await call('GET', `/callit/tournaments/${TID}`);
   assert.equal(info.body.finished, false);
+});
+
+test('Erster Uhr-Start des Finales wird als Startzeit erfasst, Admin kann korrigieren', async () => {
+  const { minutesOfDayInVenue, formatClock } = await import('../src/services/callit/time.js');
+  const finalMatch = schedule.find((entry) => entry.phase === 'knockout' && entry.stage_label.toLowerCase() === 'finale');
+  assert.ok(finalMatch, 'Finale im Spielplan');
+  const expected = formatClock(minutesOfDayInVenue(new Date().toISOString()));
+  Object.assign(getState(), { tournamentId: TID, scheduleCode: finalMatch.code, isRunning: true });
+  notifySubscribers();
+  await new Promise((resolve) => setTimeout(resolve, 50));
+  Object.assign(getState(), { isRunning: false });
+  notifySubscribers();
+  await new Promise((resolve) => setTimeout(resolve, 50));
+  invalidateTournamentContext(TID);
+  let bet = (await call('GET', `/callit/tournaments/${TID}/specials`)).body.find((entry) => entry.betKey === 'final_kickoff');
+  assert.deepEqual(bet.outcome.labels, [expected]);
+  assert.equal(bet.outcome.final, true);
+  assert.equal((await call('PUT', `/callit-admin/tournaments/${TID}/specials/final_kickoff/result`, { body: { value: { value: 1440 } } })).status, 400);
+  assert.equal((await call('PUT', `/callit-admin/tournaments/${TID}/specials/final_kickoff/result`, { body: { value: { value: 18 * 60 } } })).status, 204);
+  bet = (await call('GET', `/callit/tournaments/${TID}/specials`)).body.find((entry) => entry.betKey === 'final_kickoff');
+  assert.deepEqual(bet.outcome.labels, ['18:00']);
+  Object.assign(getState(), { tournamentId: null, scheduleCode: null });
+  notifySubscribers();
 });

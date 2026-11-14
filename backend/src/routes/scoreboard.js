@@ -13,6 +13,9 @@ import {
   undoShootoutAttempt,
   cancelShootout,
   ShootoutError,
+  startOvertime,
+  cancelOvertime,
+  OvertimeError,
   startFreeThrows,
   setFreeThrowShooter,
   recordFreeThrow,
@@ -290,12 +293,12 @@ router.post('/context', async (req, res) => {
 });
 
 router.post('/display', (req, res) => {
-  const { view, callitTournamentId } = req.body ?? {};
+  const { view, display, callitTournamentId } = req.body ?? {};
   try {
-    const nextState = setDisplayView(view, { callitTournamentId });
+    const nextState = setDisplayView(view, { display, callitTournamentId });
     res.json(nextState);
   } catch (error) {
-    if (error?.code === 'INVALID_DISPLAY_VIEW') {
+    if (error?.code === 'INVALID_DISPLAY_VIEW' || error?.code === 'INVALID_DISPLAY') {
       return res.status(400).json({ code: 'INVALID_DISPLAY_VIEW', message: error.message });
     }
     console.error('Anzeige-Modus konnte nicht gesetzt werden:', error);
@@ -465,7 +468,7 @@ router.post('/save', async (_req, res) => {
       return res.status(409).json({ code: 'FREE_THROWS_OPEN', message: 'Es sind noch Freiwürfe offen.' });
     }
     if (['knockout', 'placement'].includes(snapshot.stageType) && (snapshot.scoreA ?? 0) === (snapshot.scoreB ?? 0)) {
-      return res.status(409).json({ code: 'KNOCKOUT_DRAW', message: 'Unentschieden im KO-Spiel – bitte Freiwurf-Stechen durchführen.' });
+      return res.status(409).json({ code: 'KNOCKOUT_DRAW', message: 'Unentschieden im KO-Spiel – bitte Verlängerung bzw. Freiwurf-Stechen durchführen.' });
     }
     if (snapshot.savedGameId) {
       await deleteGame(snapshot.savedGameId);
@@ -496,6 +499,21 @@ router.post('/shootout/start', shootoutAction((body) => startShootout({ firstTea
 router.post('/shootout/attempt', shootoutAction((body) => recordShootoutAttempt({ team: body.team, playerId: body.playerId, hit: body.hit === true })));
 router.post('/shootout/undo', shootoutAction(() => undoShootoutAttempt()));
 router.post('/shootout/cancel', shootoutAction(() => cancelShootout()));
+
+const overtimeAction = (action) => (_req, res) => {
+  try {
+    res.json(action());
+  } catch (error) {
+    if (error instanceof OvertimeError) {
+      return res.status(409).json({ code: error.code, message: error.message });
+    }
+    console.error('Verlängerung fehlgeschlagen:', error);
+    res.status(500).json({ code: 'OVERTIME_FAILED', message: 'Verlängerung konnte nicht aktualisiert werden.' });
+  }
+};
+
+router.post('/overtime/start', overtimeAction(() => startOvertime()));
+router.post('/overtime/cancel', overtimeAction(() => cancelOvertime()));
 
 const FREE_THROW_INPUT_ERRORS = ['INVALID_TEAM_SIDE', 'FREE_THROWS_INVALID_TOTAL', 'PLAYER_NOT_IN_TEAM'];
 

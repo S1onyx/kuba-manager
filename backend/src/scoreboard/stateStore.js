@@ -3,6 +3,18 @@ import { evaluateShootout } from './shootoutRules.js';
 const DEFAULT_DURATION_SECONDS = 10 * 60;
 const DISPLAY_VIEWS = ['scoreboard', 'bracket', 'callit'];
 const DEFAULT_DISPLAY_VIEW = DISPLAY_VIEWS[0];
+// Bis zu drei Beamer/Bildschirme, jeder mit eigener Ansicht.
+const DISPLAY_SLOTS = ['1', '2', '3'];
+const DEFAULT_DISPLAYS = Object.freeze({ 1: 'scoreboard', 2: 'bracket', 3: 'callit' });
+
+function normalizeDisplays(raw) {
+  return Object.fromEntries(
+    DISPLAY_SLOTS.map((slot) => {
+      const view = typeof raw?.[slot] === 'string' ? raw[slot].toLowerCase().trim() : '';
+      return [slot, DISPLAY_VIEWS.includes(view) ? view : DEFAULT_DISPLAYS[slot]];
+    })
+  );
+}
 
 const TEAM_KEYS = ['a', 'b'];
 const TEAM_TOTAL_KEY = '__team_total__';
@@ -159,7 +171,7 @@ function createDefaultState(overrides = {}) {
       overrides.scheduleVersion !== undefined && overrides.scheduleVersion !== null
         ? Math.max(0, Math.trunc(Number(overrides.scheduleVersion) || 0))
         : 0,
-    displayView: DEFAULT_DISPLAY_VIEW,
+    displays: { ...DEFAULT_DISPLAYS },
     displayCallitTournamentId: null,
     lastUpdated: new Date().toISOString(),
     players: {
@@ -173,6 +185,7 @@ function createDefaultState(overrides = {}) {
     scoringLog: [],
     penaltyLog: [],
     shootout: null,
+    overtime: null,
     freeThrows: null,
     isFinished: false,
     savedGameId: null,
@@ -184,13 +197,7 @@ function createDefaultState(overrides = {}) {
     base.stageLabel = normalizeGroupStageLabel(base.stageLabel);
   }
 
-  const normalizedDisplayView =
-    typeof base.displayView === 'string'
-      ? base.displayView.toLowerCase().trim()
-      : DEFAULT_DISPLAY_VIEW;
-  base.displayView = DISPLAY_VIEWS.includes(normalizedDisplayView)
-    ? normalizedDisplayView
-    : DEFAULT_DISPLAY_VIEW;
+  base.displays = normalizeDisplays(base.displays);
 
   base.players = {
     a: normalizeRoster(teamAPlayersRaw),
@@ -564,12 +571,17 @@ function omitClockBackup({ clockBeforeResume, ...series }) {
   return series;
 }
 
+function omitOvertimeClock({ clockBefore, ...overtime }) {
+  return overtime;
+}
+
 export function snapshotState() {
   const saveState = !state.savedGameId ? 'unsaved' : state.savedSignature === resultSignature() ? 'saved' : 'changed';
   return {
     ...state,
     saveState,
     penalties: copyPenalties(),
+    displays: { ...state.displays },
     players: {
       a: cloneRoster(state.players.a),
       b: cloneRoster(state.players.b)
@@ -587,6 +599,7 @@ export function snapshotState() {
           status: evaluateShootout(state.shootout)
         }
       : null,
+    overtime: state.overtime ? omitOvertimeClock(state.overtime) : null,
     freeThrows: state.freeThrows
       ? {
           ...omitClockBackup(state.freeThrows),
@@ -682,5 +695,6 @@ export {
   normalizeGroupStageLabel,
   createDefaultState,
   DISPLAY_VIEWS,
-  DEFAULT_DISPLAY_VIEW
+  DEFAULT_DISPLAY_VIEW,
+  DISPLAY_SLOTS
 };

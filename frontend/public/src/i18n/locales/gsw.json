@@ -3,7 +3,7 @@
     "title": "Freiwurf-Stäche",
     "suddenDeath": "Sudden Death",
     "winner": "Sieger: {{team}}",
-    "regular": "nach de reguläre Spiilziit {{a}}:{{b}}",
+    "regular": "nach de Verlängerig {{a}}:{{b}}",
     "short": "n.F.",
     "next": "Als Nächschts wirft: {{team}}",
     "throwing": "wirft",
@@ -350,5 +350,12 @@
     "participants_other": "{{count}} Tipper debii",
     "leaders": "Aktuell vorne",
     "points": "{{points}} Pkt."
+  },
+  "overtime": {
+    "title": "Verlängerig",
+    "break": "Pausä vor de Verlängerig",
+    "short": "n.V.",
+    "running": "Verlängerig · lauft",
+    "paused": "Verlängerig · Pausä"
   }
 }

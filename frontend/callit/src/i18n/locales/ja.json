@@ -135,15 +135,23 @@
     "jokerStatus": "ジョーカー:グループ {{group}} · トーナメント {{ko}}",
     "rulesLink": "ルール",
     "filters": {
-      "open": "受付中",
-      "all": "すべて",
-      "done": "終了"
+      "upcoming": "これから",
+      "open": "予想する",
+      "results": "結果"
     },
-    "empty": "現在予想できる試合はありません。",
+    "empty": {
+      "upcoming": "これからの試合はありません。",
+      "open": "現在予想できる試合はありません。",
+      "results": "まだ結果はありません。"
+    },
     "advanceNeeded": "勝ち上がりを選択",
     "jokerShort": "ジョーカー",
     "underdogShort": "大穴",
-    "pendingCount_other": "あと{{count}}試合、チームが決まり次第予想できます"
+    "pendingCount_other": "あと{{count}}試合、チームが決まり次第予想できます",
+    "nextMatch": "次の試合",
+    "liveNow": "現在",
+    "liveGap": "予想との差",
+    "liveExact": "現在のスコア＝あなたの予想！"
   },
   "specials": {
     "title": "特別予想",
@@ -162,17 +170,20 @@
       "top_scorer": "得点王(最多得点)",
       "most_penalty_seconds": "最多ペナルティ秒数",
       "group_winner": "{{group}} 1位",
-      "total_baskets": "大会の総得点"
+      "total_baskets": "大会の総得点",
+      "final_kickoff": "決勝の開始時刻"
     },
     "hints": {
       "winner": "優勝するのはどのチーム?",
       "top_scorer": "最も多く得点する選手は?",
       "most_penalty_seconds": "ペナルティ秒数が最も多いのは?",
       "group_winner": "グループ1位になるのは?",
-      "total_baskets": "総得点(正規時間)はいくつ?一番近い人が勝ち。"
+      "total_baskets": "総得点(正規時間)はいくつ?一番近い人が勝ち。",
+      "final_kickoff": "決勝は何時に始まる？（現地時間）分単位で最も近い予想が勝ち。"
     },
     "doneTitle_other": "特別予想 {{count}}件 予想済み",
-    "doneHint": "最初のキックオフまで変更できます。"
+    "doneHint": "最初のキックオフまで変更できます。",
+    "plannedAt": "予定：{{time}}"
   },
   "ranking": {
     "title": "ランキング",

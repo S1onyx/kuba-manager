@@ -24,7 +24,7 @@ export function resetGame() {
     teamAId: state.teamAId,
     teamBId: state.teamBId,
     scheduleCode: state.scheduleCode,
-    displayView: state.displayView,
+    displays: { ...state.displays },
     displayCallitTournamentId: state.displayCallitTournamentId,
     scheduleVersion: state.scheduleVersion,
     players: {
@@ -50,7 +50,7 @@ export function clearGame() {
       tournamentId: state.tournamentId,
       tournamentName: state.tournamentName,
       tournamentCompleted: state.tournamentCompleted,
-      displayView: state.displayView,
+      displays: { ...state.displays },
       displayCallitTournamentId: state.displayCallitTournamentId,
       scheduleVersion: state.scheduleVersion
     })

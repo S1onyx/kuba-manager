@@ -1,6 +1,8 @@
 import i18next from 'i18next';
 
-export function formatResultScore(scoreA, scoreB, shootout, separator = ' : ') {
+// Ergebnis mit Kennzeichnung " n.F." bzw. " n.V."; Stechen schlägt Verlängerung.
+export function formatResultScore(scoreA, scoreB, result, separator = ' : ') {
   const base = `${scoreA ?? 0}${separator}${scoreB ?? 0}`;
-  return shootout ? `${base} ${i18next.t('shootout.short')}` : base;
+  if (result?.shootout) return `${base} ${i18next.t('shootout.short')}`;
+  return result?.overtime ? `${base} ${i18next.t('overtime.short')}` : base;
 }

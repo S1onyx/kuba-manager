@@ -135,15 +135,23 @@
     "jokerStatus": "加倍卡:小组赛 {{group}} · 淘汰赛 {{ko}}",
     "rulesLink": "规则",
     "filters": {
-      "open": "未开赛",
-      "all": "全部",
-      "done": "已比赛"
+      "upcoming": "待进行",
+      "open": "待竞猜",
+      "results": "结果"
     },
-    "empty": "目前没有可竞猜的比赛。",
+    "empty": {
+      "upcoming": "没有待进行的比赛。",
+      "open": "目前没有可竞猜的比赛。",
+      "results": "暂无结果。"
+    },
     "advanceNeeded": "请选择晋级队",
     "jokerShort": "加倍",
     "underdogShort": "冷门",
-    "pendingCount_other": "还有 {{count}} 场比赛将在球队确定后开放竞猜"
+    "pendingCount_other": "还有 {{count}} 场比赛将在球队确定后开放竞猜",
+    "nextMatch": "下一场",
+    "liveNow": "当前",
+    "liveGap": "与竞猜的差距",
+    "liveExact": "当前比分 = 你的竞猜！"
   },
   "specials": {
     "title": "特别竞猜",
@@ -162,17 +170,20 @@
       "top_scorer": "得分王(得分最多)",
       "most_penalty_seconds": "罚时最多",
       "group_winner": "{{group}} 第一名",
-      "total_baskets": "赛事总得分"
+      "total_baskets": "赛事总得分",
+      "final_kickoff": "决赛开始时间"
     },
     "hints": {
       "winner": "谁会赢得冠军?",
       "top_scorer": "哪位球员得分最多?",
       "most_penalty_seconds": "谁的罚时最多?",
       "group_winner": "谁会获得小组第一?",
-      "total_baskets": "全部比赛(常规时间)总共会得多少分?最接近者获胜。"
+      "total_baskets": "全部比赛(常规时间)总共会得多少分?最接近者获胜。",
+      "final_kickoff": "决赛几点开始（当地时间）？精确到分钟，最接近者获胜。"
     },
     "doneTitle_other": "已完成 {{count}} 项特别竞猜",
-    "doneHint": "首场开赛前仍可修改。"
+    "doneHint": "首场开赛前仍可修改。",
+    "plannedAt": "赛程时间：{{time}}"
   },
   "ranking": {
     "title": "排行榜",

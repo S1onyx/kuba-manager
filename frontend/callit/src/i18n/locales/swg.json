@@ -142,16 +142,24 @@
     "jokerStatus": "Joker: Grupp {{group}} · KO {{ko}}",
     "rulesLink": "Regla",
     "filters": {
-      "open": "Offa",
-      "all": "Älle",
-      "done": "Gschbielt"
+      "upcoming": "Anstehend",
+      "open": "Zom Tippa",
+      "results": "Ergebnis"
     },
-    "empty": "Grad gibt's nix zum Tippa.",
+    "empty": {
+      "upcoming": "Koine anstehende Schbiel.",
+      "open": "Grad gibt's nix zum Tippa.",
+      "results": "No koine Ergebnis."
+    },
     "advanceNeeded": "Weiterkommer wähla",
     "jokerShort": "Joker",
     "underdogShort": "Underdog",
     "pendingCount_one": "{{count}} weiters Schbiel wird tippbar, sobald d Teams feschtschdandet",
-    "pendingCount_other": "{{count}} weitere Schbiel werdet tippbar, sobald d Teams feschtschdandet"
+    "pendingCount_other": "{{count}} weitere Schbiel werdet tippbar, sobald d Teams feschtschdandet",
+    "nextMatch": "Als Nägschds",
+    "liveNow": "aktuell",
+    "liveGap": "Abschdand zom Tipp",
+    "liveExact": "Aktueller Schdand = dei Tipp!"
   },
   "specials": {
     "title": "Sonderwetta",
@@ -170,18 +178,21 @@
       "top_scorer": "Topscorer (meischde Punkt)",
       "most_penalty_seconds": "Meischde Schdrofsekonda",
       "group_winner": "Sieger {{group}}",
-      "total_baskets": "Älle Punkt im Turnier"
+      "total_baskets": "Älle Punkt im Turnier",
+      "final_kickoff": "Aafangszeit Finale"
     },
     "hints": {
       "winner": "Wer gwinnt s' Turnier?",
       "top_scorer": "Welcher Schbieler macht d' meischde Punkt?",
       "most_penalty_seconds": "Wer sammelt d' meischde Schdrofsekonda?",
       "group_winner": "Wer wird Gruppaerschder?",
-      "total_baskets": "Wie viel Punkt fallet insgsamt (reguläre Schbielzeit)? Wer am nägschda dra isch, gwinnt."
+      "total_baskets": "Wie viel Punkt fallet insgsamt (reguläre Schbielzeit)? Wer am nägschda dra isch, gwinnt.",
+      "final_kickoff": "Om wiaviel Uhr wird s Finale opfiffa (Ortszeit)? Wer uf d Minut am nägschda dra isch, gwinnt."
     },
     "doneTitle_one": "{{count}} Sonderwett tippt",
     "doneTitle_other": "{{count}} Sonderwetta tippt",
-    "doneHint": "Bis zum erschda Aapfiff kasch se no ändra."
+    "doneHint": "Bis zum erschda Aapfiff kasch se no ändra.",
+    "plannedAt": "Laut Schbielplan: {{time}} Uhr"
   },
   "ranking": {
     "title": "Ranking",

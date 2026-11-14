@@ -3,7 +3,7 @@
     "title": "フリースロー戦",
     "suddenDeath": "サドンデス",
     "winner": "勝者：{{team}}",
-    "regular": "規定時間終了時 {{a}}:{{b}}",
+    "regular": "延長戦終了時 {{a}}:{{b}}",
     "short": "FT戦",
     "next": "次に投げる：{{team}}",
     "throwing": "投球中",
@@ -344,5 +344,12 @@
     "participants_other": "{{count}}人参加中",
     "leaders": "現在の上位",
     "points": "{{points}}pt"
+  },
+  "overtime": {
+    "title": "延長戦",
+    "break": "延長戦前の休憩",
+    "short": "延長",
+    "running": "延長戦 · 進行中",
+    "paused": "延長戦 · 休憩"
   }
 }

@@ -3,7 +3,7 @@
     "title": "Rozstřel",
     "suddenDeath": "Náhlá smrt",
     "winner": "Vítěz: {{team}}",
-    "regular": "po řádné hrací době {{a}}:{{b}}",
+    "regular": "po prodloužení {{a}}:{{b}}",
     "short": "po rozstř.",
     "next": "Další hází: {{team}}",
     "throwing": "hází",
@@ -361,5 +361,12 @@
     "participants_other": "{{count}} tipérů",
     "leaders": "Aktuálně v čele",
     "points": "{{points}} b."
+  },
+  "overtime": {
+    "title": "Prodloužení",
+    "break": "Přestávka před prodloužením",
+    "short": "po prodl.",
+    "running": "Prodloužení · běží",
+    "paused": "Prodloužení · pauza"
   }
 }
