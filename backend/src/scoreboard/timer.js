@@ -82,6 +82,12 @@ function endGame(state) {
   state.isExtraTime = false;
   state.isRunning = false;
   stopTicker();
+  // KO-Unentschieden: Pausen-Signal wie zur Halbzeit, 1 Minute Pause, danach Verlängerung.
+  if (needsOvertime(state)) {
+    triggerPauseTone(createAudioContext(state));
+    startOvertime();
+    return;
+  }
   triggerAudioEvent('game_end', {
     teamA: state.teamAName,
     teamB: state.teamBName,
@@ -90,10 +96,6 @@ function endGame(state) {
   }).catch((error) => {
     console.error('Audio-Trigger (game_end) fehlgeschlagen:', error);
   });
-  // KO-Unentschieden: direkt 1 Minute Pause, danach Verlängerung.
-  if (needsOvertime(state)) {
-    startOvertime();
-  }
 }
 
 function tickPenalties(state) {

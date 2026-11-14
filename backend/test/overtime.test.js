@@ -58,6 +58,11 @@ test('Start: 1 Minute Pause, danach halbe Spieldauer auf der Uhr, Nachspielzeit 
   assert.throws(() => startOvertime(), { code: 'OVERTIME_ALREADY_STARTED' });
 });
 
+test('Verlängerung dauert immer 5 Minuten, auch wenn "Zeit setzen" die Spieldauer verkürzt hat', () => {
+  tiedKnockoutAfterRegulation({ durationSeconds: 10 });
+  assert.equal(startOvertime().remainingSeconds, 300);
+});
+
 test('Abbrechen während der Pause stellt die Uhr wieder her, nach Anpfiff nicht mehr möglich', () => {
   tiedKnockoutAfterRegulation();
   startOvertime();

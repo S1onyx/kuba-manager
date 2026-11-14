@@ -1,8 +1,8 @@
 export const OVERTIME_PAUSE_SECONDS = 60;
 export const KNOCKOUT_STAGES = ['knockout', 'placement'];
 
-// Reglement 2.3: Verlängerung über die halbe Spieldauer.
-export const overtimeDurationFor = (durationSeconds) => Math.max(1, Math.round((durationSeconds ?? 0) / 2));
+// Reglement 2.3: Verlängerung über die halbe Spieldauer (5 Minuten). Fest, weil "Zeit setzen" die Spieldauer überschreibt.
+export const OVERTIME_SECONDS = 5 * 60;
 
 // KO-Gleichstand am Ende der regulären Spielzeit: Verlängerung steht an (genau einmal pro Spiel).
 export function needsOvertime(state) {
