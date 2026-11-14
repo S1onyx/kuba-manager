@@ -8,6 +8,7 @@ import { formatTime } from '../../../utils/formatters.js';
 import { canStartOvertime, isOvertimeBreak } from '../../../utils/gameStatus.js';
 
 const OVERTIME_PAUSE_SECONDS = 60;
+const OVERTIME_SECONDS = 5 * 60;
 
 export default function OvertimeCard() {
   const { t } = useTranslation();
@@ -39,7 +40,7 @@ export default function OvertimeCard() {
       <PanelCard
         title={t('control.overtime.title')}
         description={t('control.overtime.drawHint', {
-          duration: formatTime(Math.round((scoreboard.durationSeconds ?? 0) / 2)),
+          duration: formatTime(OVERTIME_SECONDS),
           pause: formatTime(OVERTIME_PAUSE_SECONDS)
         })}
         tone="accent"

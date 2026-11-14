@@ -443,14 +443,17 @@ router.post('/finish', (_req, res) => {
     clearScoreboardTicker();
     markGameFinished();
     const snapshot = getScoreboardState();
-    triggerAudioEvent('game_end', {
-      teamA: snapshot.teamAName,
-      teamB: snapshot.teamBName,
-      scoreA: snapshot.scoreA,
-      scoreB: snapshot.scoreB
-    }).catch((error) => {
-      console.error('Audio-Trigger (game_end) fehlgeschlagen:', error);
-    });
+    // Bei KO-Unentschieden geht es in die Verlängerung – dann kein Schluss-Signal.
+    if (snapshot.isFinished) {
+      triggerAudioEvent('game_end', {
+        teamA: snapshot.teamAName,
+        teamB: snapshot.teamBName,
+        scoreA: snapshot.scoreA,
+        scoreB: snapshot.scoreB
+      }).catch((error) => {
+        console.error('Audio-Trigger (game_end) fehlgeschlagen:', error);
+      });
+    }
     res.json(snapshot);
   } catch (error) {
     console.error('Spiel konnte nicht beendet werden:', error);

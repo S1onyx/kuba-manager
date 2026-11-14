@@ -1,6 +1,6 @@
 import { getState, notifySubscribers, snapshotState } from './stateStore.js';
 import { startBreak, stopTicker } from './timer.js';
-import { KNOCKOUT_STAGES, OVERTIME_PAUSE_SECONDS, isClockOver, overtimeDurationFor } from './overtimeRules.js';
+import { KNOCKOUT_STAGES, OVERTIME_PAUSE_SECONDS, OVERTIME_SECONDS, isClockOver } from './overtimeRules.js';
 
 export class OvertimeError extends Error {
   constructor(code, message) {
@@ -37,7 +37,7 @@ export function startOvertime() {
   if (!isClockOver(state)) {
     throw new OvertimeError('OVERTIME_CLOCK_NOT_OVER', 'Die reguläre Spielzeit ist noch nicht abgelaufen.');
   }
-  const durationSeconds = overtimeDurationFor(state.durationSeconds);
+  const durationSeconds = OVERTIME_SECONDS;
   state.overtime = {
     regularScoreA: state.scoreA ?? 0,
     regularScoreB: state.scoreB ?? 0,

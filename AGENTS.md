@@ -17,7 +17,7 @@
 - Display-App: welches Display ein Bildschirm ist, per Knopf (reihum 1→2→3, in localStorage `kuba-display-slot`) oder URL `?display=N` (`frontend/display/src/utils/displaySlot.js`).
 
 ## KO-Unentschieden: Verlängerung → Stechen
-- Ablauf: Zeit abgelaufen + Gleichstand im KO-Spiel → Admin-Karte "Verlängerung" (oben im ControlTab) → 1 min Pause (nutzt `isHalftimeBreak`-Countdown, Auto-Start wie Halbzeit) → Verlängerung über halbe Spieldauer → bei Gleichstand Freiwurf-Stechen.
+- Ablauf: Zeit abgelaufen + Gleichstand im KO-Spiel → Admin-Karte "Verlängerung" (oben im ControlTab) → 1 min Pause (nutzt `isHalftimeBreak`-Countdown, Auto-Start wie Halbzeit) → Verlängerung fest 5 min (`OVERTIME_SECONDS`; nicht aus `durationSeconds`, das "Zeit setzen" überschreibt) → bei Gleichstand Freiwurf-Stechen. Startet automatisch bei Zeitablauf/"Spiel beenden"; Audio: Pausen-Signal statt Schluss-Signal, Countdown vor Pausenende, Start-Signal, Schluss-Signal erst nach der Verlängerung.
 - Backend: `backend/src/scoreboard/overtime.js` (+ `overtimeRules.js`), Zustand `state.overtime`; `startShootout` verlangt abgelaufene Verlängerung. Ergebnis-Kennzeichnung "n.V." über `overtimeSummary`/`resultSuffix` in `services/shared/shootout.js` ("n.F." hat Vorrang).
 - CallIt wertet den Stand nach Verlängerung (vor Stechen), unverändert über `shootout.regularScoreA/B`.
 
