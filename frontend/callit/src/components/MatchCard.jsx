@@ -165,7 +165,7 @@ export default function MatchCard({ tournamentId, match, now, jokers, canTip, on
   return (
     <article className={`card match${match.status === 'live' ? ' card--live' : ''}`}>
       <div className="match__head">
-        <span className="ellipsis">
+        <span className="grow ellipsis">
           {stage ? `${stage} · ` : ''}
           <KickoffInfo match={match} now={now} />
           {match.isFinal ? ` · ${t('tips.finalBadge')}` : ''}

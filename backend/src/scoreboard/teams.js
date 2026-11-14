@@ -6,7 +6,8 @@ import {
   resetPenaltyIds,
   resetScoreEventIds,
   setTeamPlayers,
-  refreshTeamTotals
+  refreshTeamTotals,
+  DEFAULT_DURATION_SECONDS
 } from './stateStore.js';
 
 export function setTeams({
@@ -236,7 +237,8 @@ export function applyScheduleMatchSelection({
   state.isFinished = false;
   state.savedGameId = null;
   state.savedSignature = null;
-  state.remainingSeconds = state.durationSeconds;
+  state.durationSeconds = DEFAULT_DURATION_SECONDS;
+  state.remainingSeconds = DEFAULT_DURATION_SECONDS;
   state.isRunning = false;
   state.currentHalf = 1;
   state.halftimeTriggered = false;
