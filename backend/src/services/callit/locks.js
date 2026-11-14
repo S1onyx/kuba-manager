@@ -63,12 +63,12 @@ export function isRunningOnScoreboard(tournamentId, code, state = getState()) {
   return Boolean(state && Number(state.tournamentId) === Number(tournamentId) && state.scheduleCode === code && state.isRunning);
 }
 
-// Gespeichertes Ergebnis sperrt immer. Manuelles Entsperren hebt Anpfiff-, Live- und Uhrzeit-Sperre auf.
+// Gespeichertes oder laufendes Ergebnis sperrt immer. Manuelles Entsperren hebt nur Anpfiff- und
+// Uhrzeit-Sperre vor Spielbeginn auf, nicht während das Spiel tatsächlich läuft.
 export function isMatchLocked(match, lockRow, settings, now = Date.now()) {
-  if (match.result?.saved) return true;
+  if (match.result) return true;
   if (lockRow?.state === 'unlocked') return false;
   if (lockRow?.state === 'locked') return true;
-  if (match.result) return true;
   if (settings.locks.atScheduledTime && match.scheduledAt) {
     const time = Date.parse(match.scheduledAt);
     if (!Number.isNaN(time) && time <= now) return true;

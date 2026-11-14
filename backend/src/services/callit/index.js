@@ -182,9 +182,7 @@ export async function loadTournamentState(tournamentId, now = Date.now()) {
   const matches = liveMatches.map((match) => {
     const lockRow = locks.get(match.code);
     const known = Boolean(match.home && match.away);
-    const locked =
-      isMatchLocked(match, lockRow, settings, now) ||
-      (lockRow?.state !== 'unlocked' && isRunningOnScoreboard(tournamentId, match.code, scoreboardState));
+    const locked = isMatchLocked(match, lockRow, settings, now) || isRunningOnScoreboard(tournamentId, match.code, scoreboardState);
     const status = !known ? 'pending' : !locked ? 'open' : match.result?.live ? 'live' : match.result ? 'finished' : 'locked';
     return { ...match, locked, lockReason: lockRow?.state === 'locked' ? lockRow.reason : null, unlockedOverride: lockRow?.state === 'unlocked', status };
   });
@@ -350,7 +348,7 @@ export async function submitTip(tournamentId, user, code, payload = {}) {
     }
   }
 
-  if (!match.unlockedOverride && isRunningOnScoreboard(tournamentId, code)) {
+  if (isRunningOnScoreboard(tournamentId, code)) {
     throw new CallitError('CALLIT_MATCH_LOCKED', 'Das Spiel hat bereits begonnen.', 409);
   }
   statements.push([
@@ -370,7 +368,7 @@ export async function deleteTip(tournamentId, user, code) {
   const state = await loadTournamentState(tournamentId);
   const match = state.matches.find((entry) => entry.code === code);
   if (!match) throw new CallitError('CALLIT_MATCH_NOT_FOUND', 'Spiel nicht gefunden.', 404);
-  if (match.locked || (!match.unlockedOverride && isRunningOnScoreboard(tournamentId, code))) {
+  if (match.locked || isRunningOnScoreboard(tournamentId, code)) {
     throw new CallitError('CALLIT_MATCH_LOCKED', 'Das Spiel hat bereits begonnen.', 409);
   }
   await write(['DELETE FROM callit_tips WHERE tournament_id = ? AND user_id = ? AND schedule_code = ?', [tournamentId, user.id, code]]);

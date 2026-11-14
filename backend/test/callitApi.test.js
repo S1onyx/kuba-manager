@@ -181,10 +181,11 @@ test('Laufende Uhr sperrt sofort, auch bei 0:0 und vollem Spielstand', async () 
   await setLock(TID, other.code, null, null);
 });
 
-test('Gespeichertes Ergebnis bleibt trotz manuellem Entsperren gesperrt', () => {
+test('Gespeichertes oder laufendes Ergebnis bleibt trotz manuellem Entsperren gesperrt', () => {
   const settings = normalizeSettings({});
   assert.equal(isMatchLocked({ result: { saved: true } }, { state: 'unlocked' }, settings), true);
-  assert.equal(isMatchLocked({ result: { saved: false, live: true } }, { state: 'unlocked' }, settings), false);
+  assert.equal(isMatchLocked({ result: { saved: false, live: true } }, { state: 'unlocked' }, settings), true);
+  assert.equal(isMatchLocked({ result: null }, { state: 'unlocked' }, settings), false);
   assert.equal(isMatchLocked({ result: null }, { state: 'locked' }, settings), true);
 });
 
