@@ -492,6 +492,24 @@ a {
   font-variant-numeric: tabular-nums;
 }
 
+/* Zwei volle Stepper (2x48px Buttons) sprengen bei ~360px Breite die Karte. */
+@media (max-width: 380px) {
+  .match__body {
+    gap: 4px;
+  }
+
+  .stepper button {
+    width: 40px;
+    height: 46px;
+    font-size: 1.3rem;
+  }
+
+  .stepper__value {
+    min-width: 28px;
+    font-size: 1.35rem;
+  }
+}
+
 .score-big {
   font-size: 1.8rem;
   font-weight: 800;
