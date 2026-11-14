@@ -99,3 +99,33 @@ test('Zusammenfassung aus gespeichertem Spiel: Verlängerung mit regulärem Stan
     regularScoreB: 4
   });
 });
+
+test('Zeitablauf bei KO-Gleichstand startet automatisch die Pause vor der Verlängerung', async () => {
+  const { startTimer } = await import('../src/scoreboard/timer.js');
+  tiedKnockoutAfterRegulation({ remainingSeconds: 1, extraSeconds: 0, extraElapsedSeconds: 0, isFinished: false, durationSeconds: 600 });
+  startTimer({ silent: true });
+  await new Promise((resolve) => setTimeout(resolve, 2300));
+  const state = getState();
+  assert.deepEqual(
+    [Boolean(state.overtime), state.isHalftimeBreak, state.remainingSeconds, state.isFinished, state.isRunning],
+    [true, true, 300, false, false]
+  );
+});
+
+test('Zeitablauf ohne Gleichstand oder in der Gruppe beendet das Spiel normal', async () => {
+  const { startTimer } = await import('../src/scoreboard/timer.js');
+  tiedKnockoutAfterRegulation({ stageType: 'group', remainingSeconds: 1, extraSeconds: 0, extraElapsedSeconds: 0, isFinished: false });
+  startTimer({ silent: true });
+  await new Promise((resolve) => setTimeout(resolve, 2300));
+  assert.deepEqual([getState().overtime, getState().isFinished], [null, true]);
+});
+
+test('Spiel beenden bei KO-Gleichstand startet die Verlängerung, nach der Verlängerung nicht erneut', async () => {
+  const { markGameFinished } = await import('../src/scoreboard/index.js');
+  tiedKnockoutAfterRegulation({ remainingSeconds: 40, isFinished: false });
+  markGameFinished();
+  assert.deepEqual([Boolean(getState().overtime), getState().isHalftimeBreak], [true, true]);
+  Object.assign(getState(), { isHalftimeBreak: false, remainingSeconds: 10 });
+  markGameFinished();
+  assert.deepEqual([getState().isFinished, getState().isHalftimeBreak, getState().remainingSeconds], [true, false, 10]);
+});
