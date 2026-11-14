@@ -7,6 +7,8 @@ import {
 import { triggerAudioEvent } from '../audio/dispatcher.js';
 import { broadcastAudioStop } from '../audio/socket.js';
 import { getTimerCueSettingsSync } from '../services/audio/index.js';
+import { needsOvertime } from './overtimeRules.js';
+import { startOvertime } from './overtime.js';
 
 let ticker = null;
 
@@ -88,6 +90,10 @@ function endGame(state) {
   }).catch((error) => {
     console.error('Audio-Trigger (game_end) fehlgeschlagen:', error);
   });
+  // KO-Unentschieden: direkt 1 Minute Pause, danach Verlängerung.
+  if (needsOvertime(state)) {
+    startOvertime();
+  }
 }
 
 function tickPenalties(state) {

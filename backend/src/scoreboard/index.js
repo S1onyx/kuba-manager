@@ -24,6 +24,7 @@ import { addPenalty, removePenalty } from './penalties.js';
 import { clearGame, resetGame } from './reset.js';
 import { startShootout, recordShootoutAttempt, undoShootoutAttempt, cancelShootout, ShootoutError } from './shootout.js';
 import { startOvertime, cancelOvertime, OvertimeError } from './overtime.js';
+import { needsOvertime } from './overtimeRules.js';
 import {
   startFreeThrows,
   setFreeThrowShooter,
@@ -39,7 +40,13 @@ export function getScoreboardState() {
 }
 
 export function markGameFinished() {
-  getState().isFinished = true;
+  const state = getState();
+  state.isFinished = true;
+  // Auch "Spiel beenden" bei KO-Unentschieden führt in die Verlängerung.
+  if (needsOvertime(state)) {
+    startOvertime();
+    return;
+  }
   notifySubscribers();
 }
 
